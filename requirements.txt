@@ -1,0 +1,6 @@
+torch
+pyyaml
+numpy
+transformers>=4.45
+datasets
+accelerate

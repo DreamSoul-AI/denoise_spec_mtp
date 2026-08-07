@@ -1,0 +1,49 @@
+# BC=60 with DYNAMIC tree expansion (Table 2 "dynamic" column /
+# Section 4.2). Dynamic trees change shape per step, so only the
+# naive attention path applies (Appendix C: no efficient dynamic
+# impl exists). Use this for tau comparisons, not speedup ratios.
+run:
+  algorithm: esp_mtp
+  stages: [test]
+  save_root: results/hf/qwen3_8b
+  save_name: ema_bc60_dynamic
+  seed: 123
+  deterministic: false
+
+data:
+  name: specbench
+  path: data/spec_bench/question.jsonl
+  categories: null
+  apply_chat_template: true
+  chat_template_kwargs:
+    enable_thinking: false   # paper decodes 100-token answers directly
+  max_prompt_len: 2048
+
+model:
+  type: hf_causal
+  name_or_path: Qwen/Qwen3-8B
+  local_files_only: false
+  torch_dtype: bfloat16
+  attn_implementation: eager
+
+eval:
+  device: auto
+  max_new_tokens: 100
+  temperature: 0.0
+  stop_on_eos: true
+  num_eval_prompts: 480
+  run_ar_baseline: true
+  log_per_prompt: true
+
+spec:
+  method: ema_velocity
+  num_masks: 2
+  block_complexity: 60
+  impl: naive
+  tree:
+    mode: dynamic
+    pruning: true
+  ema:                        # ours: EMA-of-differences velocity extrapolation
+    beta: 0.9
+    step_scale: 1.0
+    update: true

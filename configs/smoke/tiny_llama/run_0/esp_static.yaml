@@ -1,0 +1,50 @@
+# CPU smoke test: static [7,2] tree through the efficient (Appendix E) path.
+run:
+  algorithm: esp_mtp
+  stages: [test]
+  save_root: results/smoke/tiny_llama
+  save_name: esp_static
+  seed: 123
+  deterministic: false
+
+data:
+  name: local_prompts
+  mode: synthetic
+  vocab_size: 256
+  prompt_len: 32
+  num_prompts: 4
+  seed: 0
+
+model:
+  type: tiny_llama
+  attn_implementation: eager
+  tiny:
+    vocab_size: 256
+    hidden_size: 64
+    intermediate_size: 128
+    num_layers: 2
+    num_heads: 4
+    num_kv_heads: 2
+    max_position_embeddings: 1024
+
+eval:
+  device: cpu
+  max_new_tokens: 32
+  temperature: 0.0
+  stop_on_eos: false
+  num_eval_prompts: 4
+  run_ar_baseline: true
+  log_per_prompt: true
+
+spec:
+  method: esp
+  num_masks: 2
+  impl: efficient
+  tree:
+    mode: static
+    branches: [7, 2]       # BC = 3 * (1 + 9) = 30
+    pruning: true
+  mask:
+    init: mean_prompt
+    lam: 0.1
+    update: true

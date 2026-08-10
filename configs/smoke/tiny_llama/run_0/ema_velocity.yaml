@@ -46,5 +46,7 @@ spec:
     pruning: true
   ema:
     beta: 0.9
-    step_scale: 1.0
+    step_scale: 1.0     # gamma
+    normalize: false    # false: m_i = e+i*gamma*vhat | true: unit vhat, len = gamma*ref
+    extrapolate_ema: false # true: EMA rolls forward through the k extrapolation steps
     update: true

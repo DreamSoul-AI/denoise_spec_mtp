@@ -100,6 +100,10 @@ denominator, and paper numbers provide the comparison points.
 - `exact_match_rate`: losslessness audit vs AR under a shared seed
   (temperature 0 and 1 both supported); must be 1.0.
 
+Full column-by-column schemas for `spec_metrics.csv` / `summary.csv`, the
+audit invariants relating them, and the per-algorithm schema differences
+are in [notes/metrics.md](notes/metrics.md).
+
 ## Caveats / paper ambiguities
 
 Deliberate interpretation choices are documented in

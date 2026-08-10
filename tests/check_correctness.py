@@ -101,6 +101,126 @@ def test_mask_providers():
     check('EMA velocity: anchor tracks last token',
           torch.equal(p._anchor, e_new))
 
+    # Formulation 2: gamma scales the raw-vhat step.
+    p = EMAVelocityMaskProvider(2, table, beta=beta, step_scale=0.5)
+    p.init_from_prompt(prompt)
+    check('EMA velocity: gamma scales raw step',
+          torch.allclose(p.masks(),
+                         torch.stack([prompt[-1] + 0.5 * vhat,
+                                      prompt[-1] + 1.0 * vhat]), atol=1e-5))
+
+    # Formulation 3: unit direction, step length = gamma * EMA of diff norms.
+    gamma = 0.7
+    p = EMAVelocityMaskProvider(2, table, beta=beta, step_scale=gamma,
+                                normalize=True)
+    p.init_from_prompt(prompt)
+    ref = diffs[0].norm()
+    for j in range(1, diffs.size(0)):
+        ref = beta * ref + (1 - beta) * diffs[j].norm()
+    check('EMA velocity (norm): ref-norm recursion',
+          torch.allclose(p._ref_norm, ref, atol=1e-5))
+    m = p.masks()
+    check('EMA velocity (norm): step length = i*gamma*ref',
+          torch.allclose((m - prompt[-1]).norm(dim=1),
+                         gamma * ref * torch.tensor([1.0, 2.0]), atol=1e-4))
+    check('EMA velocity (norm): direction = vhat/||vhat||',
+          torch.allclose((m[0] - prompt[-1]) / (m[0] - prompt[-1]).norm(),
+                         vhat / vhat.norm(), atol=1e-5))
+
+    # extrapolate_ema=true: identical to false at gamma=1 (the fixed point
+    # made testable), geometric per-depth decay rho = beta+(1-beta)*gamma
+    # at gamma != 1, and masks() stays pure (no state mutation).
+    p_sh = EMAVelocityMaskProvider(3, table, beta=beta, step_scale=1.0)
+    p_co = EMAVelocityMaskProvider(3, table, beta=beta, step_scale=1.0,
+                                   extrapolate_ema=True)
+    p_sh.init_from_prompt(prompt)
+    p_co.init_from_prompt(prompt)
+    check('extrapolate_ema == plain at gamma=1',
+          torch.allclose(p_sh.masks(), p_co.masks(), atol=1e-5))
+
+    gamma = 0.5
+    rho = beta + (1 - beta) * gamma
+    p = EMAVelocityMaskProvider(3, table, beta=beta, step_scale=gamma,
+                                extrapolate_ema=True)
+    p.init_from_prompt(prompt)
+    m = p.masks()
+    expected = torch.stack([
+        prompt[-1] + gamma * vhat,
+        prompt[-1] + gamma * (1 + rho) * vhat,
+        prompt[-1] + gamma * (1 + rho + rho**2) * vhat,
+    ])
+    check('extrapolate_ema: steps scale by rho per depth',
+          torch.allclose(m, expected, atol=1e-5))
+    check('extrapolate_ema: masks() is pure (state untouched)',
+          torch.allclose(p._velocity, vhat, atol=1e-6)
+          and torch.equal(p._anchor, prompt[-1])
+          and torch.allclose(p.masks(), m, atol=1e-6))
+
+    # normalized + compound: step lengths gamma*r, gamma*rho*r, ...
+    p = EMAVelocityMaskProvider(2, table, beta=beta, step_scale=gamma,
+                                normalize=True, extrapolate_ema=True)
+    p.init_from_prompt(prompt)
+    m = p.masks()
+    lens = torch.stack([(m[0] - prompt[-1]).norm(),
+                        (m[1] - m[0]).norm()])
+    check('extrapolate_ema (norm): lengths gamma*r, gamma*rho*r',
+          torch.allclose(lens, gamma * ref * torch.tensor([1.0, rho]),
+                         atol=1e-4))
+
+    # The incremental commit-update is exactly "recompute the EMA over the
+    # full current sequence": same recursion, same diffs, same order. So
+    # `update: true` needs no separate Eq-5-style rule — unlike ESP, whose
+    # mean init is not the fixed point of its own update. The state recursion
+    # never branches on the read-policy knobs, so the equivalence must hold
+    # across the whole {normalize} x {extrapolate_ema} x {gamma} grid.
+    committed = torch.randn(5, 8)
+    full_seq = torch.cat([prompt, committed], dim=0)
+    for norm_opt in (False, True):
+        for xema_opt in (False, True):
+            for gamma_opt in (0.5, 1.0):
+                kw = dict(beta=beta, step_scale=gamma_opt,
+                          normalize=norm_opt, extrapolate_ema=xema_opt)
+                p_inc = EMAVelocityMaskProvider(2, table, **kw)
+                p_inc.init_from_prompt(prompt)
+                prev = prompt[-1]
+                for tok in committed:
+                    p_inc.on_token_committed(tok, prev)
+                    prev = tok
+                p_full = EMAVelocityMaskProvider(2, table, **kw)
+                p_full.init_from_prompt(full_seq)
+                check(f'incremental == fresh full-sequence EMA '
+                      f'(norm={norm_opt}, xema={xema_opt}, gamma={gamma_opt})',
+                      torch.allclose(p_inc._velocity, p_full._velocity, atol=1e-6)
+                      and torch.allclose(p_inc._ref_norm, p_full._ref_norm, atol=1e-6)
+                      and torch.equal(p_inc._anchor, p_full._anchor)
+                      and torch.allclose(p_inc.masks(), p_full.masks(), atol=1e-5))
+
+    # Negative control: update=false is NOT the full-sequence EMA (frozen
+    # prefill velocity), and is not the prefill state either — its anchor
+    # still tracks the last committed token. A deliberate hybrid.
+    p_frozen = EMAVelocityMaskProvider(2, table, beta=beta, update=False)
+    p_frozen.init_from_prompt(prompt)
+    prefill_vhat = p_frozen._velocity.clone()
+    prev = prompt[-1]
+    for tok in committed:
+        p_frozen.on_token_committed(tok, prev)
+        prev = tok
+    p_full = EMAVelocityMaskProvider(2, table, beta=beta)
+    p_full.init_from_prompt(full_seq)
+    check('update=false: velocity frozen at prefill, != full-sequence EMA',
+          torch.allclose(p_frozen._velocity, prefill_vhat)
+          and not torch.allclose(p_frozen._velocity, p_full._velocity, atol=1e-3))
+    check('update=false: anchor still tracks the last committed token',
+          torch.equal(p_frozen._anchor, committed[-1]))
+
+    # Degenerate history (all diffs zero) must not NaN; masks sit on anchor.
+    flat = prompt[0].unsqueeze(0).expand(6, -1).clone()
+    p = EMAVelocityMaskProvider(2, table, beta=beta, normalize=True)
+    p.init_from_prompt(flat)
+    check('EMA velocity (norm): zero-drift collapses to anchor',
+          torch.isfinite(p.masks()).all()
+          and torch.allclose(p.masks(), flat[-1].expand(2, -1)))
+
 
 # -------------------------------------------------------------------- trees
 def test_trees():
@@ -215,7 +335,7 @@ def _spec_cfg(method, num_masks, tree_mode, branches=None, bc=None,
         'impl': impl,
         'tree': {'mode': tree_mode, 'branches': branches, 'pruning': pruning},
         'mask': {'init': 'mean_prompt', 'lam': 0.1, 'update': True},
-        'ema': {'beta': 0.9, 'step_scale': 1.0, 'update': True},
+        'ema': {'beta': 0.9, 'step_scale': 1.0, 'normalize': False, 'update': True},
     })
 
 
@@ -268,6 +388,22 @@ def test_lossless():
         ar_out, _ = ar_generate(model, prompts[0], eval_cfg,
                                 generator=torch.Generator().manual_seed(3))
         check(f'lossless under init={init}', torch.equal(out, ar_out))
+
+    # EMA formulations 2/3 and both extrapolate_ema modes must stay lossless.
+    for knob in ({'step_scale': 0.5}, {'normalize': True},
+                 {'normalize': True, 'step_scale': 2.0},
+                 {'extrapolate_ema': True, 'step_scale': 0.5},
+                 {'extrapolate_ema': True, 'normalize': True}):
+        spec_cfg = _spec_cfg('ema_velocity', 2, 'static', [7, 2], None, True,
+                             'efficient')
+        for key, value in knob.items():
+            spec_cfg.ema[key] = value
+        dec = SpecDecoder(model, spec_cfg, eval_cfg,
+                          generator=torch.Generator().manual_seed(4))
+        out, _ = dec.generate(prompts[0])
+        ar_out, _ = ar_generate(model, prompts[0], eval_cfg,
+                                generator=torch.Generator().manual_seed(4))
+        check(f'lossless under ema {knob}', torch.equal(out, ar_out))
 
     # Frozen-mask and lambda ablation knobs.
     for knob in ({'lam': 0.01}, {'lam': 0.5}, {'update': False}):

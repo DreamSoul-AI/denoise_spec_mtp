@@ -30,9 +30,30 @@ point, so within a block the masks are exactly linear in `i`.
 - `src/spec/mask_providers.py::EMAVelocityMaskProvider`
 - selected with `spec.method: ema_velocity`; knobs under `spec.ema:`
   - `beta` (default 0.9) — EMA decay over differences
-  - `step_scale` (default 1.0) — extrapolation step size
+  - `step_scale` (default 1.0) — gamma, extrapolation step size
+  - `normalize` (default false) — formulation switch, see below
   - `update` (default true) — fold generated-token diffs into vhat;
     `false` freezes the prefill velocity
+
+Three formulations of the extrapolation step, switchable in YAML:
+
+| # | `normalize` | `step_scale` | mask formula | reading |
+|---|---|---|---|---|
+| 1 | false | 1.0 | `m_i = e_last + i*vhat` | meeting spec; \|\|vhat\|\| doubles as confidence (scattered history -> small step) |
+| 2 | false | gamma | `m_i = e_last + gamma*i*vhat` | shrink/stretch: gamma is the regression / trust-region coefficient; gamma=1/(1-beta) recovers raw-momentum semantics |
+| 3 | true | gamma | `m_i = e_last + gamma*i*r*vhat/\|\|vhat\|\|` | unit direction: confidence signal removed, gamma alone sets step length in units of r = EMA of per-token diff norms (dimensionless, model-agnostic); \|\|vhat\|\|~0 collapses to the anchor |
+
+Comparing 1/2 vs 3 tests whether vhat's data-dependent magnitude helps
+(adaptive confidence) or hurts (outlier diffs inflating the step).
+`scripts/run_ema_ablations.sh` sweeps all three.
+
+Orthogonal extrapolation switch (`extrapolate_ema`, needs >= 2 masks to
+matter):
+
+| value | behavior |
+|---|---|
+| `false` (default) | every step extrapolates with the same vhat: `m_i = anchor + i*step`. Exact closed form of iterated extrapolate-and-fold at gamma=1 (folding the extrapolated diff into the EMA is a fixed point). |
+| `true` | the EMA rolls forward through the k extrapolation steps: each realized step is folded into (vhat, r) before the next. Equals `false` at gamma=1; at gamma != 1 the per-step size scales geometrically by `rho = beta + (1-beta)*gamma` — a smooth depth-decaying (gamma<1) or growing (gamma>1) trust schedule. Within-block simulation only; committed-token state is untouched. |
 
 ## Open design choices (flagged in the call, not settled)
 

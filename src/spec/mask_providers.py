@@ -98,44 +98,118 @@ class ESPMaskProvider:
 
 
 class EMAVelocityMaskProvider:
-    """Ours: EMA-of-differences velocity extrapolation replacing Eq (4)/(5)."""
+    """Ours: EMA-of-differences velocity extrapolation replacing Eq (4)/(5).
+
+    Three switchable formulations of the extrapolation step (spec.ema):
+
+      1. normalize: false, step_scale: 1.0   (default; the meeting spec)
+             m_i = e_last + i * vhat
+         Raw vhat: its data-dependent magnitude doubles as a confidence
+         signal (directionally scattered history -> cancellation -> small
+         step; coherent drift -> full step).
+      2. normalize: false, step_scale: gamma
+             m_i = e_last + gamma * i * vhat
+         Same, with a global shrink/stretch of the extrapolation (gamma is
+         the regression-coefficient / trust-region knob; gamma = 1/(1-beta)
+         also recovers raw-momentum-accumulator semantics).
+      3. normalize: true, step_scale: gamma
+             m_i = e_last + gamma * i * r * vhat / ||vhat||
+         Unit direction: the confidence signal is removed and gamma alone
+         controls the step length, measured in units of r = EMA of observed
+         per-token diff norms (so gamma stays dimensionless and
+         model-agnostic; gamma = 1 is one typical token-step). Degenerate
+         ||vhat|| ~ 0 collapses the masks onto the anchor.
+
+    Orthogonal switch — how the velocity behaves across the k speculative
+    extrapolation steps (the MTP mask slots), `extrapolate_ema`:
+
+      false     (default) every step extrapolates with the same vhat:
+                m_i = anchor + i * step. Exact closed form of "extrapolate,
+                fold, extrapolate again" at gamma = 1, since folding the
+                extrapolated diff into the EMA is a fixed point.
+      true      the EMA keeps running WHILE extrapolating: each realized
+                step is folded into (vhat, r) before the next step is
+                taken. Identical to false at gamma = 1 (normalize: false);
+                at gamma != 1 the per-step size scales geometrically by
+                rho = beta + (1-beta)*gamma — a smooth depth-decaying
+                (gamma < 1) or growing (gamma > 1) trust schedule.
+                Within-block only: the committed-token state is never
+                touched by this simulation.
+    """
+
+    _NORM_EPS = 1e-8
 
     def __init__(self, num_masks, embedding_table, beta=0.9, step_scale=1.0,
-                 update=True, generator=None):
+                 normalize=False, extrapolate_ema=False, update=True,
+                 generator=None):
         self.num_masks = int(num_masks)
         self.embedding_table = embedding_table  # unused; kept for a uniform ctor
         self.beta = float(beta)
         self.step_scale = float(step_scale)
+        self.normalize = bool(normalize)
+        self.extrapolate_ema = bool(extrapolate_ema)
         self.update = bool(update)
         self.generator = generator
         self._velocity = None  # vhat, [d]
         self._anchor = None    # e of the last committed token, [d]
+        self._ref_norm = None  # EMA of ||diff||, scalar (formulation 3 unit)
 
     def init_from_prompt(self, prompt_embeds):
         if prompt_embeds.size(0) < 2:
             raise ValueError('EMA velocity needs a prompt with >= 2 tokens')
         diffs = prompt_embeds[1:] - prompt_embeds[:-1]  # v_j = e_{j+1} - e_j
         vhat = diffs[0].clone()
+        ref = diffs[0].float().norm()
         for j in range(1, diffs.size(0)):
             vhat = self.beta * vhat + (1.0 - self.beta) * diffs[j]
+            ref = self.beta * ref + (1.0 - self.beta) * diffs[j].float().norm()
         self._velocity = vhat
+        self._ref_norm = ref
         self._anchor = prompt_embeds[-1].clone()
 
+    def _step_vector(self, velocity, ref_norm):
+        """One extrapolation step under the active formulation."""
+        if not self.normalize:
+            return self.step_scale * velocity
+        norm = velocity.float().norm()
+        if norm < self._NORM_EPS:
+            return torch.zeros_like(velocity)
+        unit = velocity / norm.to(velocity.dtype)
+        return (self.step_scale * ref_norm.to(velocity.dtype)) * unit
+
     def masks(self):
-        # m_i = e_last + step_scale * i * vhat. Extrapolating i steps along a
-        # constant velocity: folding the extrapolated difference back into the
-        # EMA is a fixed point (beta*v + (1-beta)*v = v), so the linear form
-        # is exact for the within-block masks.
-        steps = torch.arange(
-            1, self.num_masks + 1,
-            device=self._anchor.device, dtype=self._anchor.dtype,
-        ).unsqueeze(1)
-        return self._anchor.unsqueeze(0) + self.step_scale * steps * self._velocity.unsqueeze(0)
+        if not self.extrapolate_ema:
+            # m_i = e_last + i * step: closed form of iterated
+            # extrapolate-and-fold at gamma = 1 (folding the extrapolated
+            # diff into the EMA is a fixed point: beta*v + (1-beta)*v = v).
+            steps = torch.arange(
+                1, self.num_masks + 1,
+                device=self._anchor.device, dtype=self._anchor.dtype,
+            ).unsqueeze(1)
+            step = self._step_vector(self._velocity, self._ref_norm)
+            return self._anchor.unsqueeze(0) + steps * step.unsqueeze(0)
+
+        # extrapolate_ema: keep the EMA running over the realized steps. Local
+        # copies only — masks() must stay pure w.r.t. the committed state.
+        velocity = self._velocity.clone()
+        ref_norm = self._ref_norm.clone()
+        pos = self._anchor.clone()
+        out = []
+        for _ in range(self.num_masks):
+            step = self._step_vector(velocity, ref_norm)
+            pos = pos + step
+            out.append(pos.clone())
+            velocity = self.beta * velocity + (1.0 - self.beta) * step
+            ref_norm = (self.beta * ref_norm
+                        + (1.0 - self.beta) * step.float().norm())
+        return torch.stack(out)
 
     def on_token_committed(self, new_embed, prev_embed):
         if self.update:
             diff = new_embed - prev_embed
             self._velocity = self.beta * self._velocity + (1.0 - self.beta) * diff
+            self._ref_norm = (self.beta * self._ref_norm
+                              + (1.0 - self.beta) * diff.float().norm())
         # The anchor always tracks the last committed token, even when the
         # velocity EMA is frozen (update: false ablation).
         self._anchor = new_embed.clone()
@@ -162,6 +236,8 @@ def build_mask_provider(spec_cfg, embedding_table, generator=None):
             embedding_table=embedding_table,
             beta=ema_cfg.get('beta', 0.9),
             step_scale=ema_cfg.get('step_scale', 1.0),
+            normalize=ema_cfg.get('normalize', False),
+            extrapolate_ema=ema_cfg.get('extrapolate_ema', False),
             update=ema_cfg.get('update', True),
             generator=generator,
         )

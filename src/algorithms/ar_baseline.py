@@ -24,6 +24,13 @@ def test(cfg, model=None):
 
     logger = log_module.Logger(cfg.run.get('save_dir', None), filename='spec_metrics.csv')
     total_tokens, total_time = 0, 0.0
+    if bool(cfg.eval.get('warmup', True)) and prompts:
+        # Untimed first pass: CUDA kernel selection / allocator growth 
+        # would otherwise inflate the measurement
+        warm_cfg = dict(cfg.eval)
+        warm_cfg['max_new_tokens'] = int(cfg.eval.get('warmup_tokens', 8))
+        ar_generate(model, prompts[0]['input_ids'], warm_cfg, eos_ids=eos_ids)
+        sync_device(device)
     for idx, item in enumerate(prompts):
         generator = torch.Generator(device=device)
         generator.manual_seed(seed + idx)

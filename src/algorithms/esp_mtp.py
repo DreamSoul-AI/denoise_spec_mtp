@@ -54,6 +54,28 @@ def _aggregate(rows):
     return out
 
 
+def _warmup(decoder, model, prompt_ids, eval_cfg, eos_ids, run_ar, device, seed):
+    """Short untimed generation before the measured loop.
+
+    The first CUDA call pays kernel selection and allocator growth,
+    which may inflate the measurement.
+    Disable with `eval.warmup: false`.
+    """
+    budget = int(eval_cfg.get('warmup_tokens', 8))
+    original = decoder.max_new_tokens
+    decoder.max_new_tokens = budget
+    try:
+        decoder.generate(prompt_ids)
+    finally:
+        decoder.max_new_tokens = original
+    if run_ar:
+        warm_cfg = dict(eval_cfg)
+        warm_cfg['max_new_tokens'] = budget
+        ar_generate(model, prompt_ids, warm_cfg, eos_ids=eos_ids,
+                    generator=_make_generator(device, seed))
+    sync_device(device)
+
+
 def test(cfg, model=None):
     device = get_device(cfg.eval.get('device', 'auto'))
     if model is None:
@@ -82,6 +104,10 @@ def test(cfg, model=None):
     if bool(cfg.eval.get('log_per_prompt', True)):
         per_prompt_logger = log_module.Logger(
             cfg.run.get('save_dir', None), filename='spec_metrics.csv')
+
+    if bool(cfg.eval.get('warmup', True)) and prompts:
+        _warmup(decoder, model, prompts[0]['input_ids'], cfg.eval, eos_ids,
+                run_ar, device, seed)
 
     rows = []
     for idx, item in enumerate(prompts):

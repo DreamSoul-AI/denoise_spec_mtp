@@ -16,8 +16,7 @@ def seed_everything(seed, deterministic=False):
         torch.backends.cudnn.benchmark = False
 
 
-def makedir_exist_ok(path):
-    is_file = os.path.splitext(path)[1] != ''
+def makedir_exist_ok(path, is_file=False):
     if is_file:
         path = os.path.dirname(path)
     os.makedirs(path, exist_ok=True)

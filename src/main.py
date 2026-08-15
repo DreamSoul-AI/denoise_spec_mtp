@@ -6,9 +6,11 @@ the ablation sweep scripts use to fan out from base configs.
 """
 
 import argparse
+import json
 import os
 import shutil
 import sys
+import yaml
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
@@ -55,7 +57,9 @@ def main():
         print(f'{"=" * 60}')
         if stage == 'test':
             tools.makedir_exist_ok(cfg.run.save_dir)
-            shutil.copy(cfg.cfg_file, os.path.join(cfg.run.save_dir, 'cfg.yml'))
+            shutil.copy(cfg.cfg_file, os.path.join(cfg.run.save_dir, 'cfg_base.yml'))
+            with open(os.path.join(cfg.run.save_dir, 'cfg.yml'), 'w') as f:
+                yaml.safe_dump(json.loads(json.dumps(cfg)), f, sort_keys=False)
             algo.test(cfg)
         elif stage == 'train':
             raise ValueError('This project is training-free; only stage "test" exists.')

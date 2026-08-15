@@ -3,4 +3,5 @@ __pycache__/
 .DS_Store
 /results/
 /data/
+!**/src/data/
 *.pt

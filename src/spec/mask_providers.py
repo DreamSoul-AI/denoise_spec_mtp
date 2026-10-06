@@ -103,17 +103,19 @@ class EMAVelocityMaskProvider:
     Three switchable formulations of the extrapolation step (spec.ema):
 
       1. normalize: false, step_scale: 1.0   (default; the meeting spec)
-             m_i = e_last + i * vhat
+             m_i = origin + i * vhat
+         origin is e_last when level=last, and the order-0 embedding EMA
+         (prompt mean, then Eq (5)) when level=order0.
          Raw vhat: its data-dependent magnitude doubles as a confidence
          signal (directionally scattered history -> cancellation -> small
          step; coherent drift -> full step).
       2. normalize: false, step_scale: gamma
-             m_i = e_last + gamma * i * vhat
+             m_i = origin + gamma * i * vhat
          Same, with a global shrink/stretch of the extrapolation (gamma is
          the regression-coefficient / trust-region knob; gamma = 1/(1-beta)
          also recovers raw-momentum-accumulator semantics).
       3. normalize: true, step_scale: gamma
-             m_i = e_last + gamma * i * r * vhat / ||vhat||
+             m_i = origin + gamma * i * r * vhat / ||vhat||
          Unit direction: the confidence signal is removed and gamma alone
          controls the step length, measured in units of r = EMA of observed
          per-token diff norms (so gamma stays dimensionless and
@@ -141,7 +143,7 @@ class EMAVelocityMaskProvider:
 
     def __init__(self, num_masks, embedding_table, beta=0.9, step_scale=1.0,
                  normalize=False, extrapolate_ema=False, update=True,
-                 generator=None):
+                 level='last', lam=0.1, generator=None):
         self.num_masks = int(num_masks)
         self.embedding_table = embedding_table  # unused; kept for a uniform ctor
         self.beta = float(beta)
@@ -149,9 +151,14 @@ class EMAVelocityMaskProvider:
         self.normalize = bool(normalize)
         self.extrapolate_ema = bool(extrapolate_ema)
         self.update = bool(update)
+        self.level_mode = str(level).lower()
+        if self.level_mode not in ('last', 'order0'):
+            raise ValueError(f'Unsupported ema.level: {level}')
+        self.lam = float(lam)
         self.generator = generator
         self._velocity = None  # vhat, [d]
         self._anchor = None    # e of the last committed token, [d]
+        self._level = None     # order-0 EMA of embeddings, [d]
         self._ref_norm = None  # EMA of ||diff||, scalar (formulation 3 unit)
 
     def init_from_prompt(self, prompt_embeds):
@@ -166,6 +173,8 @@ class EMAVelocityMaskProvider:
         self._velocity = vhat
         self._ref_norm = ref
         self._anchor = prompt_embeds[-1].clone()
+        # Order-0 initial value: mean of the prompt embeddings, same as ESP Eq (4).
+        self._level = prompt_embeds.mean(dim=0).clone()
 
     def _step_vector(self, velocity, ref_norm):
         """One extrapolation step under the active formulation."""
@@ -177,23 +186,34 @@ class EMAVelocityMaskProvider:
         unit = velocity / norm.to(velocity.dtype)
         return (self.step_scale * ref_norm.to(velocity.dtype)) * unit
 
+    def _origin(self):
+        """Level the slope is added to.
+
+        last: the latest committed embedding. order0: the embedding EMA,
+        initialized at the prompt mean and updated with lam.
+        """
+        if self.level_mode == 'order0':
+            return self._level
+        return self._anchor
+
     def masks(self):
+        origin = self._origin()
         if not self.extrapolate_ema:
-            # m_i = e_last + i * step: closed form of iterated
+            # m_i = origin + i * step: closed form of iterated
             # extrapolate-and-fold at gamma = 1 (folding the extrapolated
             # diff into the EMA is a fixed point: beta*v + (1-beta)*v = v).
             steps = torch.arange(
                 1, self.num_masks + 1,
-                device=self._anchor.device, dtype=self._anchor.dtype,
+                device=origin.device, dtype=origin.dtype,
             ).unsqueeze(1)
             step = self._step_vector(self._velocity, self._ref_norm)
-            return self._anchor.unsqueeze(0) + steps * step.unsqueeze(0)
+            return origin.unsqueeze(0) + steps * step.unsqueeze(0)
 
         # extrapolate_ema: keep the EMA running over the realized steps. Local
         # copies only — masks() must stay pure w.r.t. the committed state.
         velocity = self._velocity.clone()
         ref_norm = self._ref_norm.clone()
-        pos = self._anchor.clone()
+        pos = origin.clone()
         out = []
         for _ in range(self.num_masks):
             step = self._step_vector(velocity, ref_norm)
@@ -213,6 +233,9 @@ class EMAVelocityMaskProvider:
         # The anchor always tracks the last committed token, even when the
         # velocity EMA is frozen (update: false ablation).
         self._anchor = new_embed.clone()
+        if self.level_mode == 'order0':
+            # Same update as ESP Eq (5). Independent of the velocity flag.
+            self._level = self._level + self.lam * (new_embed - self._level)
 
 
 def build_mask_provider(spec_cfg, embedding_table, generator=None):
@@ -239,6 +262,8 @@ def build_mask_provider(spec_cfg, embedding_table, generator=None):
             normalize=ema_cfg.get('normalize', False),
             extrapolate_ema=ema_cfg.get('extrapolate_ema', False),
             update=ema_cfg.get('update', True),
+            level=ema_cfg.get('level', 'last'),
+            lam=ema_cfg.get('lam', 0.1),
             generator=generator,
         )
     raise ValueError(f'Unsupported spec.method: {method}')

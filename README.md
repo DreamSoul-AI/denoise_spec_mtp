@@ -33,7 +33,11 @@ tests/       CPU correctness checks (no GPU, no downloads)
 pip install -r requirements.txt
 bash scripts/run_correctness_checks.sh   # 172 checks incl. losslessness vs AR
 bash scripts/run_smoke.sh                # tiny random LLaMA through main.py
+python scripts/run_ci_checks.py          # CI entry: checks + smoke -> .test-results/<run_id>/
 ```
+
+CI and branch flow: [docs/ci.md](docs/ci.md). History-extrapolation research
+notes: [docs/research/history_mtp/](docs/research/history_mtp/README.md).
 
 Every smoke summary must show `exact_match_rate=1.0000`: speculative output
 is verified token-for-token against plain autoregressive decoding.

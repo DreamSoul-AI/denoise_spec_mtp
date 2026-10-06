@@ -38,9 +38,10 @@ def get_prompts(cfg, tokenizer):
         for i in range(num_prompts):
             text = _TEXT_PROMPTS[i % len(_TEXT_PROMPTS)]
             if bool(data_cfg.get('apply_chat_template', True)):
-                input_ids = tokenizer.apply_chat_template(
+                encoded = tokenizer.apply_chat_template(
                     [{'role': 'user', 'content': text}],
                     add_generation_prompt=True, return_tensors='pt')
+                input_ids = encoded['input_ids'] if hasattr(encoded, 'keys') else encoded
             else:
                 input_ids = tokenizer(text, return_tensors='pt').input_ids
             prompts.append({

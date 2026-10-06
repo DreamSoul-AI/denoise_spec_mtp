@@ -47,10 +47,12 @@ def get_prompts(cfg, tokenizer):
     for item in load_questions(path, categories):
         text = item['turns'][0]
         if apply_template:
-            input_ids = tokenizer.apply_chat_template(
+            encoded = tokenizer.apply_chat_template(
                 [{'role': 'user', 'content': text}],
                 add_generation_prompt=True, return_tensors='pt',
                 **template_kwargs)
+            # transformers 5 returns a BatchEncoding; earlier versions a Tensor.
+            input_ids = encoded['input_ids'] if hasattr(encoded, 'keys') else encoded
         else:
             input_ids = tokenizer(text, return_tensors='pt').input_ids
         if input_ids.size(1) > max_prompt_len:

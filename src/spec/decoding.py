@@ -95,7 +95,13 @@ class SpecDecoder:
         provider = build_mask_provider(self.spec_cfg, model.embedding_table,
                                        generator=self.generator)
         stats = {'prefill_calls': 1, 'decode_calls': 0, 'accepted': 0,
-                 'committed': 0, 'hit_context_limit': 0}
+                 'committed': 0, 'hit_context_limit': 0,
+                 # Draft attempts/accepts at depth 1..3. An attempt is a
+                 # sampled token that had tree children to match; the bonus
+                 # token past the last child is not an attempt. Counted before
+                 # EOS/budget truncation, same as `accepted`.
+                 'attempt_by_depth': [0, 0, 0, 0],
+                 'accept_by_depth': [0, 0, 0, 0]}
 
         # ---- Prefill: [prompt | m_1..m_k], plain causal mask. -------------
         start = time.perf_counter()
@@ -167,11 +173,17 @@ class SpecDecoder:
             while True:
                 y = select_token(logits[cur], self.temperature, self.generator)
                 committed_now.append(y)
+                children = tree.children_of(cur)
                 match = None
-                for child in tree.children_of(cur):
+                for child in children:
                     if tree.tokens[child - 1] == y:
                         match = child
                         break
+                depth = len(accepted_nodes) + 1
+                if children and depth < len(stats['attempt_by_depth']):
+                    stats['attempt_by_depth'][depth] += 1
+                    if match is not None:
+                        stats['accept_by_depth'][depth] += 1
                 if match is None:
                     break
                 accepted_nodes.append(match)

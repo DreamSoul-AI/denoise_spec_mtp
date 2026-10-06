@@ -50,6 +50,12 @@ def _aggregate(rows):
             summary['speedup'] = ar_time / spec_time if spec_time > 0 else 0.0
             summary['exact_match_rate'] = (
                 sum(r.get('exact_match', 0) for r in group) / len(group))
+        for depth in (1, 2, 3):
+            attempts = sum(int(r.get(f'attempt_d{depth}', 0)) for r in group)
+            accepts = sum(int(r.get(f'accept_d{depth}', 0)) for r in group)
+            summary[f'attempt_d{depth}'] = attempts
+            summary[f'accept_d{depth}'] = accepts
+            summary[f'accept_rate_d{depth}'] = accepts / attempts if attempts else 0.0
         out[key] = summary
     return out
 
@@ -131,6 +137,9 @@ def test(cfg, model=None):
             'spec_time': stats['prefill_time'] + stats['decode_time'],
             'hit_context_limit': stats['hit_context_limit'],
         }
+        for depth in (1, 2, 3):
+            row[f'attempt_d{depth}'] = int(stats['attempt_by_depth'][depth])
+            row[f'accept_d{depth}'] = int(stats['accept_by_depth'][depth])
         if run_ar:
             sync_device(device)
             ar_out, ar_stats = ar_generate(

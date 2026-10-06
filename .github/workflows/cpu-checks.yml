@@ -1,0 +1,48 @@
+# CPU correctness + smoke for every work-branch push and every PR into dev/main.
+# Same entry as local runs: python scripts/run_ci_checks.py (see docs/ci.md).
+# GPU model runs are not part of this workflow.
+name: cpu-checks
+
+on:
+  push:
+    branches: ['feature/**', 'fix/**']
+  pull_request:
+    branches: [dev, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cpu-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cpu-checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+
+      - name: Run plan cpu_pr_checks
+        run: python scripts/run_ci_checks.py --plan cpu_pr_checks
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .test-results/
+          if-no-files-found: warn
+          retention-days: 30

@@ -19,9 +19,10 @@ def get_prompts(cfg, tokenizer):
         text = item['instruction']
         if item.get('context'):
             text = f"{item['context']}\n\n{text}"
-        input_ids = tokenizer.apply_chat_template(
+        encoded = tokenizer.apply_chat_template(
             [{'role': 'user', 'content': text}],
             add_generation_prompt=True, return_tensors='pt')
+        input_ids = encoded['input_ids'] if hasattr(encoded, 'keys') else encoded
         if input_ids.size(1) > int(data_cfg.get('max_prompt_len', 2048)):
             continue
         prompts.append({

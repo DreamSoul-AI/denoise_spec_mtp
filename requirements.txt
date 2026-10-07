@@ -1,6 +1,2 @@
-torch
-pyyaml
-numpy
-transformers>=4.45
-datasets
-accelerate
+# Install the package (rpipe + spec_mtp). For dev: pip install -e ".[dev]"
+-e .

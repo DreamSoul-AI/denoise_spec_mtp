@@ -8,3 +8,12 @@ __pycache__/
 *.pt
 /lark_transcripts/
 /docs/papers/*.pdf
+/.tmp/
+studies/**/runs/
+studies/**/shared/
+studies/**/scripts/
+studies/**/index.json
+studies/**/process.json
+*.egg-info/
+.dist/
+/build/

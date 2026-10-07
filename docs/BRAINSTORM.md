@@ -1,23 +1,16 @@
 # BRAINSTORM
 
-未拍板。这里只记下一步要做的事，不当实现合同。当前代码和已有数字以 [architecture.md](architecture.md)、[research.md](research.md)、[ci.md](ci.md) 为准。
+未拍板。这里只记下一步要做的事，不当实现合同。当前代码和已有数字以 [ARCHITECTURE.md](ARCHITECTURE.md)、[RESEARCH.md](RESEARCH.md)、[CI.md](CI.md) 为准。
 
 ## 1. 用 RPipe 重构这个仓库
 
-整仓重构对齐 [RPipe](https://github.com/diaoenmao/RPipe)，在 `refactor/spec-rpipe` 上进行。该分支从 `dev` 拉出，`main` 仍停在复现基线。量化仓库 `DreamSoul-AI/quantization` 已经按这套模板拆过：`src/rpipe` 是执行层，研究代码单独放，一轮实验是 `studies/<name>/` 里的 Study、Experiment、Run。
+**状态（2026-10-08，`refactor/spec-rpipe`）**：已 vendor `src/rpipe`，研究代码迁到 `src/spec_mtp/`，`eval` + `source: spec_mtp` 注册完成。CPU 门改为 `studies/smoke_tiny_llama`（`python -m rpipe run`），仍经 `scripts/run_ci_checks.py`，见 [CI.md](CI.md)、[TESTING.md](TESTING.md)。`spec_metrics.csv` / `summary.csv` 写在 Run `assets/`；汇总指标进 tracker。`configs/smoke/` + `src/main.py` 保留作对照。
 
-重构时要保住的行为：
+仍待做（不在本段实现合同里）：
 
-- ESP 与 EMA-velocity 的 mask、树、验证不变。float32 贪心必须仍和普通生成逐 token 一致。
-- CPU 门留着：`tests/check_correctness.py`、`tests/check_ema_history.py`、tiny-LLaMA smoke。入口现在是 `scripts/run_ci_checks.py`，见 [ci.md](ci.md)。
-- [research.md](research.md) 里的接受数不重跑，也不改口径。
-
-重构前要先定、现在不定的事：
-
-- `configs/hf/` 和 `scripts/run_*.sh` 怎么收成 Study 的因素声明。
-- 现在的 `spec_metrics.csv` / `summary.csv` 怎么落到 RPipe 的 Run result。
-- `rpipe` 是安装依赖，还是像量化仓库那样把源码放进本仓库。
-- CI 是换成 RPipe 的测试入口，还是先保留现在这条 CPU 工作流。
+- `configs/hf/` 里 ESP 论文复现扫描还没收成 Study。历史外推已整理到 `studies/history_extrapolation/`，下一格设计在 `studies/history_4b_next52_confirm/`，未跑。
+- 可选：收紧 `tests/rpipe/` 进 CI，或只保留 spec_mtp 脚本门。
+- PR 合入 `dev` 后删 `refactor/spec-rpipe`。
 
 ## 2. 在输出层做外推
 
@@ -34,8 +27,8 @@
 - `vhat` 的 `1 − β^s` 校正
 - Momentum Guidance。它放大的是当前速度相对历史的偏差，和这里沿 `vhat` 往前走不是同一个对象
 - `β = 0`，以及 0 和 1 以外的 `γ`
-- 4B 中间那组 52 条上的长记忆 gamma。这组已有冻结均值 1462、最后 token 1323、更新均值 1479，没有 `β = 0.9999` 的 mean-plus-gamma
+- 4B 中间那组 52 条上的长记忆 gamma。设计已写在 `studies/history_4b_next52_confirm/`，尚未开跑。这组已有冻结均值 1462、最后 token 1323、更新均值 1479
 
 ## 4. 这次已经收好的文档
 
-2026-10-08：`notes/` 和 `docs/research/history_mtp/` 收成上面三份文档。论文 PDF 在 `docs/papers/`，不进 git，索引是 [papers/README.md](papers/README.md)。
+2026-10-08：`notes/` 和 `docs/research/history_mtp/` 收成 ARCHITECTURE / RESEARCH / CI。论文 PDF 在 `docs/papers/`，不进 git，索引是 [papers/INDEX.md](papers/INDEX.md)。

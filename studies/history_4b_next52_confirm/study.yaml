@@ -1,0 +1,52 @@
+# One confirmatory cell. Do not add the archived controls back onto this axis.
+# Plan: docs/PLAN.md. Recorded frozen-mean accepts on this slice: 1462.
+
+study: history_4b_next52_confirm
+description: Qwen3-4B next-52 confirm of mean-plus-gamma at beta 0.9999, lambda 0.1
+
+experiment:
+  name: next52_mean_plus_gamma
+
+fixed:
+  data:
+    name: specbench
+    source: spec_mtp
+    config:
+      path: data/spec_bench/question.jsonl
+      skip_per_category: 2
+      take_per_category: 4
+      apply_chat_template: true
+      chat_template_kwargs:
+        enable_thinking: false
+      max_prompt_len: 2048
+  model:
+    name: hf_causal
+    source: spec_mtp
+    config:
+      name_or_path: Qwen/Qwen3-4B
+      hub: modelscope
+      torch_dtype: float32
+      attn_implementation: eager
+  algorithm:
+    mode: eval
+    source: spec_mtp
+    config:
+      task: esp_mtp
+      mask: mean_plus_gamma
+      beta: 0.9999
+      lam: 0.1
+      gamma: 1
+      eval:
+        max_new_tokens: 100
+        temperature: 0.0
+        stop_on_eos: true
+        num_eval_prompts: 52
+        run_ar_baseline: true
+        log_per_prompt: true
+  system:
+    config:
+      device: cuda
+
+seeds: [123]
+
+run_description: "4b next52 mean_plus_gamma beta=0.9999 lam=0.1 seed={seed}"

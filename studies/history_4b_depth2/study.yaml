@@ -1,0 +1,55 @@
+# First 26, tree [7, 2], two mask slots. Plan: docs/PLAN.md
+
+study: history_4b_depth2
+description: Qwen3-4B first-26, two-level tree, frozen mean versus mean-plus-gamma
+
+experiment:
+  name: first26_depth2
+
+fixed:
+  data:
+    name: specbench
+    source: spec_mtp
+    config:
+      path: data/spec_bench/question.jsonl
+      skip_per_category: 0
+      take_per_category: 2
+      apply_chat_template: true
+      chat_template_kwargs:
+        enable_thinking: false
+      max_prompt_len: 2048
+  model:
+    name: hf_causal
+    source: spec_mtp
+    config:
+      name_or_path: Qwen/Qwen3-4B
+      hub: modelscope
+      torch_dtype: float32
+      attn_implementation: eager
+  algorithm:
+    mode: eval
+    source: spec_mtp
+    config:
+      task: esp_mtp
+      beta: 0.9999
+      lam: 0.1
+      gamma: 1
+      branches: [7, 2]
+      num_masks: 2
+      eval:
+        max_new_tokens: 100
+        temperature: 0.0
+        stop_on_eos: true
+        num_eval_prompts: 26
+        run_ar_baseline: true
+        log_per_prompt: true
+  system:
+    config:
+      device: cuda
+
+axes:
+  algorithm.config.mask: [frozen_mean, mean_plus_gamma]
+
+seeds: [123]
+
+run_description: "4b first26 depth2 {mask} seed={seed}"

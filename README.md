@@ -5,39 +5,44 @@ Training-free multi-token prediction. Two things live here:
 1. A reproduction of **ESP** (Embedding-Space Probing),
    [arXiv:2603.17942](https://arxiv.org/abs/2603.17942), including the masking
    settings in its ablations. The PDF is local-only: see
-   [docs/papers/README.md](docs/papers/README.md).
+   [docs/papers/INDEX.md](docs/papers/INDEX.md).
 2. **EMA-velocity**: the same pipeline, with the ESP mask replaced by an EMA
    of input-embedding differences.
 
-How the loop, the two masks, and the result files fit together:
-[docs/architecture.md](docs/architecture.md). History-extrapolation counts:
-[docs/research.md](docs/research.md). CI: [docs/ci.md](docs/ci.md). Next
-restructuring, not started: [docs/BRAINSTORM.md](docs/BRAINSTORM.md).
+Docs (UPPERCASE filenames): [ARCHITECTURE](docs/ARCHITECTURE.md),
+[RESEARCH](docs/RESEARCH.md), [CI](docs/CI.md), [LAYOUT](docs/LAYOUT.md),
+[TESTING](docs/TESTING.md), [BRAINSTORM](docs/BRAINSTORM.md).
 
 ```text
-configs/     smoke/ (CPU, no downloads)  +  hf/<family>/run_0 + ablations
-scripts/     download_data.sh, run_*.sh sweeps (one per paper table)
 src/
-  algorithms/  esp_mtp, ar_baseline, alignment_probe
-  core/        config / logger / tools
-  data/        specbench, dolly, local_prompts
-  models/      hf_causal (LLaMA3 / Qwen3 / tiny_llama adapter)
-  spec/        mask_providers, tree, tree_attention, kv_cache, decoding
-tests/       CPU correctness checks (no GPU, no downloads)
-docs/        architecture, research, CI, brainstorm; papers/ is local PDFs
+  rpipe/       vendored RPipe execution substrate
+  spec_mtp/    decoders, data, models, RPipe registrations
+studies/       smoke_tiny_llama (CPU CI gate) + future sweeps
+configs/       legacy per-run YAML for HF sweeps (scripts/run_*.sh)
+scripts/       run_ci_checks.py, download_data.sh, sweep shells
+tests/         spec_mtp CPU checks + optional rpipe suite
+docs/          ARCHITECTURE, RESEARCH, CI, …; papers/ is local PDFs
 ```
 
 ## Quick Start (CPU, no downloads)
 
 ```bash
-pip install -r requirements.txt
-bash scripts/run_correctness_checks.sh
-bash scripts/run_smoke.sh
+pip install -e .
+set PYTHONUTF8=1
 python scripts/run_ci_checks.py
 ```
 
+Or: `bash scripts/run_correctness_checks.sh` and `bash scripts/run_smoke.sh`
+(`python -m rpipe run studies/smoke_tiny_llama`).
+
 Every smoke summary must show `exact_match_rate=1.0000`: speculative output
 is verified token-for-token against plain autoregressive decoding.
+
+Legacy single-config entry (still supported for `configs/smoke/`):
+
+```bash
+python src/main.py --cfg_file configs/smoke/tiny_llama/run_0/esp_static.yaml
+```
 
 ## GPU Server
 
@@ -51,7 +56,7 @@ bash scripts/run_main_results.sh qwen3_32b
 
 Results land in `results/<...>/spec_metrics.csv` (per prompt) and
 `summary.csv` (per category + overall). Column meanings are in
-[docs/architecture.md](docs/architecture.md).
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Config → Paper Map
 
@@ -79,5 +84,5 @@ reimplemented here. The AR baseline is the speedup denominator.
 Where this code does not follow a literal line of the paper — Last-K index,
 per-dimension sampling sigma, the Table 3 block size, 100 vs 256 new tokens,
 and the static tree behind the BC=60 headline — the list is in
-[docs/architecture.md](docs/architecture.md). Use `attn_implementation: eager`
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Use `attn_implementation: eager`
 or sdpa. Flash-attention 2 cannot take the 4D tree masks.

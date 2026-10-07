@@ -3,4 +3,6 @@
 # (naive == efficient), and end-to-end losslessness vs AR decoding.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-python tests/check_correctness.py
+export PYTHONUTF8=1
+export PYTHONPATH="${PYTHONPATH:-}:$(pwd)/src"
+python tests/spec_mtp/spec/test_correctness.py

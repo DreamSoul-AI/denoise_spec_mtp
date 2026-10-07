@@ -1,6 +1,6 @@
 # CPU correctness + smoke.
 # Work-branch pushes, PRs into dev/main, and the dev commit after a merge.
-# Same entry as local runs: python scripts/run_ci_checks.py (see docs/ci.md).
+# Same entry as local runs: python scripts/run_ci_checks.py (see docs/CI.md).
 # GPU model runs are not part of this workflow. This is not a release build.
 name: cpu-checks
 

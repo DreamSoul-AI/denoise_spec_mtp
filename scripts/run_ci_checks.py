@@ -22,11 +22,13 @@ import uuid
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-SMOKE_CONFIGS = [
-    ('smoke_esp_static', 'configs/smoke/tiny_llama/run_0/esp_static.yaml', []),
-    ('smoke_esp_dynamic', 'configs/smoke/tiny_llama/run_0/esp_dynamic.yaml', []),
-    ('smoke_ema_velocity', 'configs/smoke/tiny_llama/run_0/ema_velocity.yaml', []),
-]
+SMOKE_STUDY = 'studies/smoke_tiny_llama'
+SMOKE_RUNS = 3
+SMOKE_BASELINE_ACCEPTED = {
+    'esp_static': 27,
+    'esp_dynamic': 31,
+    'ema_velocity': 8,
+}
 
 PLANS = {
     'cpu_pr_checks': ['correctness', 'ema_history', 'smoke'],
@@ -60,11 +62,20 @@ def _read_summary(path):
         return list(csv.DictReader(f))
 
 
+def _run_env():
+    return {
+        **os.environ,
+        'PYTHONUTF8': '1',
+        'PYTHONPATH': os.path.join(ROOT, 'src'),
+        'MPLBACKEND': 'Agg',
+    }
+
+
 def _run(cmd, log_path):
     start = time.perf_counter()
     with open(log_path, 'w', encoding='utf-8') as log:
         proc = subprocess.run(cmd, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT,
-                              text=True, env={**os.environ, 'PYTHONUTF8': '1'})
+                              text=True, env=_run_env())
     return proc.returncode, time.perf_counter() - start
 
 
@@ -72,23 +83,71 @@ def _checks_for(plan, run_dir):
     checks = []
     for group in PLANS[plan]:
         if group == 'correctness':
-            checks.append(('correctness', [sys.executable, 'tests/check_correctness.py'], None))
+            checks.append(('correctness',
+                           [sys.executable, 'tests/spec_mtp/spec/test_correctness.py'], None))
         elif group == 'ema_history':
-            checks.append(('ema_history', [sys.executable, 'tests/check_ema_history.py'], None))
+            checks.append(('ema_history',
+                           [sys.executable, 'tests/spec_mtp/spec/test_ema_history.py'], None))
         elif group == 'smoke':
-            for name, cfg, extra in SMOKE_CONFIGS:
-                cmd = [sys.executable, 'src/main.py', '--cfg_file', cfg,
-                       '--save_dir', os.path.join(run_dir, 'smoke'),
-                       '--save_name', name, *extra]
-                summary = os.path.join(run_dir, 'smoke', name, 'summary.csv')
-                checks.append((name, cmd, summary))
+            checks.append(('rpipe_smoke',
+                           [sys.executable, '-m', 'rpipe', 'run', SMOKE_STUDY],
+                           'rpipe_study'))
     return checks
+
+
+def _nested_get(mapping, dotted, default=None):
+    cur = mapping
+    for key in dotted.split('.'):
+        if not isinstance(cur, dict):
+            return default
+        cur = cur.get(key)
+    return cur if cur is not None else default
+
+
+def _rpipe_smoke_detail():
+    import yaml
+
+    runs_root = os.path.join(ROOT, SMOKE_STUDY, 'runs')
+    if not os.path.isdir(runs_root):
+        return 'failed', f'missing {runs_root}'
+    detail = {}
+    for entry in sorted(os.listdir(runs_root)):
+        run_dir = os.path.join(runs_root, entry)
+        cfg_path = os.path.join(run_dir, 'config.yaml')
+        summary_path = os.path.join(run_dir, 'assets', 'summary.csv')
+        if not os.path.isfile(summary_path):
+            continue
+        with open(cfg_path, encoding='utf-8') as handle:
+            cfg = yaml.safe_load(handle) or {}
+        variant = _nested_get(cfg, 'algorithm.config.variant')
+        rows = _read_summary(summary_path)
+        overall = [r for r in rows if r.get('category') == 'overall']
+        if len(overall) != 1:
+            return 'failed', f'overall row missing in {summary_path}'
+        row = overall[0]
+        if float(row.get('exact_match_rate', 0.0)) != 1.0:
+            return 'failed', f'exact_match_rate={row.get("exact_match_rate")} in {summary_path}'
+        accepted = int(float(row.get('accept_d1', 0)))
+        if variant in SMOKE_BASELINE_ACCEPTED and accepted != SMOKE_BASELINE_ACCEPTED[variant]:
+            return 'failed', (
+                f'{variant} accept_d1={accepted}, expected {SMOKE_BASELINE_ACCEPTED[variant]}')
+        label = str(variant or entry)
+        detail[label] = {
+            'accept_d1': accepted,
+            'exact_match_rate': row.get('exact_match_rate'),
+            'tau': row.get('tau'),
+        }
+    if len(detail) != SMOKE_RUNS:
+        return 'failed', f'expected {SMOKE_RUNS} runs, got {len(detail)}'
+    return 'passed', detail
 
 
 def _verdict(returncode, summary_path):
     """Process exit is necessary; smoke also needs exact_match_rate == 1."""
     if returncode != 0:
         return 'failed', None
+    if summary_path == 'rpipe_study':
+        return _rpipe_smoke_detail()
     if summary_path is None:
         return 'passed', None
     if not os.path.exists(summary_path):

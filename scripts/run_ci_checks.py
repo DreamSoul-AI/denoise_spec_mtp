@@ -226,6 +226,11 @@ def main():
             with open(os.path.join(run_dir, 'results.jsonl'), 'a', encoding='utf-8') as f:
                 f.write(json.dumps(result) + '\n')
             print(f'[{verdict}] {name} ({seconds:.1f}s)')
+            if verdict != 'passed':
+                log_path = os.path.join(run_dir, f'{name}.log')
+                tail = open(log_path, encoding='utf-8', errors='replace').read().splitlines()[-40:]
+                print(f'--- {name}.log ---')
+                print('\n'.join(tail))
     finally:
         complete = len(results) == len(checks)
         all_passed = complete and all(r['verdict'] == 'passed' for r in results)

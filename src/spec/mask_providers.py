@@ -24,16 +24,17 @@ default lambda = 0.1 and the Appendix G.9 ablation values {0.01, 0.5}.
 `update: false` freezes the mask at its initialization — an extra ablation
 (not in the paper) probing whether the on-the-fly update matters at all.
 
-EMAVelocityMaskProvider is our replacement for Eq (4)+(5) (see
-notes/ema_velocity_method.md and lark_transcripts/summary_july31.md):
-consecutive prompt-embedding differences are treated as a velocity field
-(flow-matching view of AR); an EMA of those differences gives a biased but
-variance-reduced gradient estimate at the sequence tail, and mask i
-extrapolates i steps along it:
+EMAVelocityMaskProvider is our replacement for Eq (4)+(5)
+(docs/architecture.md): consecutive prompt-embedding differences are
+treated as a velocity field; an EMA of those differences gives a biased but
+variance-reduced estimate at the sequence tail, and mask i extrapolates i
+steps along it. spec.ema.level=order0 adds that step to the ESP mean
+instead of to the last embedding.
 
     v_j    = e_{j+1} - e_j
     vhat_j = beta * vhat_{j-1} + (1 - beta) * v_j          (EMA over prefill)
-    m_i    = e_last + step_scale * i * vhat                (i = 1..k)
+    m_i    = origin + step_scale * i * vhat                (i = 1..k)
+    origin = e_last, or the ESP mean when level=order0
 
 During generation each committed token folds its actual difference into the
 EMA: vhat <- beta * vhat + (1 - beta) * (e_new - e_prev). Everything else
@@ -187,7 +188,7 @@ class EMAVelocityMaskProvider:
         return (self.step_scale * ref_norm.to(velocity.dtype)) * unit
 
     def _origin(self):
-        """Level the slope is added to.
+        """Level the first-order term is added to.
 
         last: the latest committed embedding. order0: the embedding EMA,
         initialized at the prompt mean and updated with lam.

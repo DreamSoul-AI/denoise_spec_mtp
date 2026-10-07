@@ -7,3 +7,4 @@ __pycache__/
 !**/src/data/
 *.pt
 /lark_transcripts/
+/docs/papers/*.pdf

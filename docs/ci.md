@@ -1,9 +1,9 @@
 # CI setup
 
-Status: **configured, not yet verified on GitHub.** The local run and the
-blocking behaviour were verified on 2026-10-06. The workflow has not run on
-GitHub because nothing has been pushed, and the required check is not yet
-set in branch protection.
+Status: **configured.** The local run and the blocking behaviour were verified
+on 2026-10-06. The workflow file is on `origin`. A green GitHub run is a
+separate fact from this page, and the required check is not yet set in
+branch protection.
 
 ## Branch flow
 

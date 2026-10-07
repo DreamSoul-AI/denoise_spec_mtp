@@ -1,15 +1,13 @@
 # STUDY_REPORT — smoke_tiny_llama
 
-Fill after a local `rpipe run`. This Study is the CI CPU gate; numbers here
-are pipeline checks, not paper comparisons.
+2026-10-08，本机 CPU，`python -m rpipe run studies/smoke_tiny_llama`。随机 tiny LLaMA，四条合成 prompt，seed 123。三格 `exact_match_rate` 都是 1。
 
-## Template
+`accept_d1` 与重构前旧入口一致。这是流水线核对，不是方法比较。
 
-| **variant** | **run_id** | **accepted (overall)** | **exact_match_rate** | **notes** |
-| --- | --- | ---: | ---: | --- |
-| esp_static | | | | |
-| esp_dynamic | | | | |
-| ema_velocity | | | | |
+| **variant** | **accept_d1** | **exact_match_rate** |
+| --- | ---: | ---: |
+| esp_static | 27 | 1 |
+| esp_dynamic | 31 | 1 |
+| ema_velocity | 8 | 1 |
 
-Legacy baseline (pre-RPipe, same configs): esp_static 27 accepts, esp_dynamic 31,
-ema_velocity 8 (four prompts, seed 123).
+Run 目录在 `studies/smoke_tiny_llama/runs/`，不进 git。

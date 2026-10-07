@@ -1,0 +1,51 @@
+# Full SpecBench, two cells. Plan: docs/PLAN.md
+
+study: history_4b_full480
+description: Qwen3-4B full 480, frozen mean versus the confirmed mean-plus-gamma pair
+
+experiment:
+  name: full480
+
+fixed:
+  data:
+    name: specbench
+    source: spec_mtp
+    config:
+      path: data/spec_bench/question.jsonl
+      apply_chat_template: true
+      chat_template_kwargs:
+        enable_thinking: false
+      max_prompt_len: 2048
+  model:
+    name: hf_causal
+    source: spec_mtp
+    config:
+      name_or_path: Qwen/Qwen3-4B
+      hub: modelscope
+      torch_dtype: float32
+      attn_implementation: eager
+  algorithm:
+    mode: eval
+    source: spec_mtp
+    config:
+      task: esp_mtp
+      beta: 0.9999
+      lam: 0.1
+      gamma: 1
+      eval:
+        max_new_tokens: 100
+        temperature: 0.0
+        stop_on_eos: true
+        num_eval_prompts: 480
+        run_ar_baseline: true
+        log_per_prompt: true
+  system:
+    config:
+      device: cuda
+
+axes:
+  algorithm.config.mask: [frozen_mean, mean_plus_gamma]
+
+seeds: [123]
+
+run_description: "4b full480 {mask} seed={seed}"

@@ -12,6 +12,7 @@ from rpipe.structure.algorithm.tracker import AlgorithmTracker
 from spec_mtp.algorithms import alignment_probe, ar_baseline, esp_mtp
 from spec_mtp.algorithms.common import place_model, select_prompts
 from spec_mtp.rpipe.config_bridge import apply_variant, legacy_cfg
+from spec_mtp.rpipe.mask_settings import spec_for
 from spec_mtp.rpipe.prompts import resolve_eos, resolve_prompts
 
 _TASKS = {
@@ -33,6 +34,16 @@ class SpecMtpEvalAlgorithm(Algorithm):
         variant = self.config.setting('variant', None)
         if variant:
             cfg.spec = apply_variant(dict(cfg.spec), variant)
+        mask = self.config.setting('mask', None)
+        if mask:
+            cfg.spec = spec_for(
+                mask,
+                beta=self.config.setting('beta', None),
+                lam=self.config.setting('lam', None),
+                gamma=self.config.setting('gamma', None),
+                branches=self.config.setting('branches', None),
+                num_masks=self.config.setting('num_masks', None),
+            )
 
         module = place_model(model.module, system.device)
         prompts, eos_ids = select_prompts(

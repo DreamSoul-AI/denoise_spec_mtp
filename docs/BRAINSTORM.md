@@ -8,7 +8,7 @@
 
 仍待做（不在本段实现合同里）：
 
-- `configs/hf/` 与 `scripts/run_*.sh` 收成 Study 声明（history-extrapolation 等）。
+- `configs/hf/` 里 ESP 论文复现扫描还没收成 Study。历史外推已整理到 `studies/history_extrapolation/`，下一格设计在 `studies/history_4b_next52_confirm/`，未跑。
 - 可选：收紧 `tests/rpipe/` 进 CI，或只保留 spec_mtp 脚本门。
 - PR 合入 `dev` 后删 `refactor/spec-rpipe`。
 
@@ -27,7 +27,7 @@
 - `vhat` 的 `1 − β^s` 校正
 - Momentum Guidance。它放大的是当前速度相对历史的偏差，和这里沿 `vhat` 往前走不是同一个对象
 - `β = 0`，以及 0 和 1 以外的 `γ`
-- 4B 中间那组 52 条上的长记忆 gamma。这组已有冻结均值 1462、最后 token 1323、更新均值 1479，没有 `β = 0.9999` 的 mean-plus-gamma
+- 4B 中间那组 52 条上的长记忆 gamma。设计已写在 `studies/history_4b_next52_confirm/`，尚未开跑。这组已有冻结均值 1462、最后 token 1323、更新均值 1479
 
 ## 4. 这次已经收好的文档
 

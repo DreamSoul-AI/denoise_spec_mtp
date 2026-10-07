@@ -9,7 +9,7 @@ src/
     models/        hf_causal / tiny_llama adapter
     spec/          mask_providers, tree, decoding
     rpipe/         Data / Model / Algorithm builders (source spec_mtp)
-studies/           Study declarations (smoke_tiny_llama = CPU CI gate)
+studies/           smoke_tiny_llama, history_extrapolation, history_4b_next52_confirm
 configs/           legacy single-run YAML (HF sweeps; migrate to studies/)
 scripts/           run_ci_checks.py, download_data.sh, run_*.sh
 tests/

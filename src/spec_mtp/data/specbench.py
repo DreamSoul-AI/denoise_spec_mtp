@@ -36,13 +36,41 @@ def load_questions(path, categories=None):
     return questions
 
 
+def window_by_category(questions, skip=0, take=None):
+    """Contiguous window inside each category.
+
+    Categories are sorted by name. Within a category, order is file order.
+    ``take`` None keeps the tail after ``skip``. This is the slice used by
+    ``scripts/make_dev_slice.py`` (first 2, next 4, last 4).
+    """
+    skip = int(skip or 0)
+    by_category = {}
+    for item in questions:
+        by_category.setdefault(item['category'], []).append(item)
+    picked = []
+    for category in sorted(by_category):
+        rows = by_category[category]
+        window = rows[skip:] if take is None else rows[skip:skip + int(take)]
+        if take is not None and len(window) < int(take):
+            raise ValueError(
+                f'{category} has {len(rows)} questions, need {skip + int(take)}')
+        picked.extend(window)
+    return picked
+
+
 def load_records(data_cfg):
     path = data_cfg.get('path', 'data/spec_bench/question.jsonl')
+    questions = load_questions(path, data_cfg.get('categories', None))
+    questions = window_by_category(
+        questions,
+        skip=data_cfg.get('skip_per_category', 0),
+        take=data_cfg.get('take_per_category', None),
+    )
     return [{
         'question_id': item.get('question_id', None),
         'category': item['category'],
         'text': item['turns'][0],
-    } for item in load_questions(path, data_cfg.get('categories', None))]
+    } for item in questions]
 
 
 def encode(records, tokenizer, data_cfg):

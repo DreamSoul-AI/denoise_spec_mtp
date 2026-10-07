@@ -1,5 +1,7 @@
 # History extrapolation
 
+Organized as the Study [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md). The next cell, not run, is [history_4b_next52_confirm](../studies/history_4b_next52_confirm/docs/PLAN.md). Tables below are the recorded cells. They were not rerun for the RPipe move.
+
 Qwen3, float32, tree `[14]`, one mask slot, block complexity 30. Greedy, temperature 0, at most 100 new tokens, seed 123, Qwen3 thinking off. Branch `feature/research-ema-history-audit`.
 
 Every float32 cell matches ordinary generation token for token. Within one model and one prompt group, every row commits the same tokens. The number in each table is how many draft tokens were kept.
@@ -205,7 +207,15 @@ The 52-prompt columns were not used to choose `β` or `λ`.
 
 ## Not run
 
-The 480-prompt set, a deeper tree, a debiased `vhat`, Momentum Guidance, `β = 0`, any `γ` other than 0 and 1, any `i` other than 1, and long-memory gamma on the 4B next-52 group.
+A deeper tree, a debiased `vhat`, Momentum Guidance, and any `i` other than 1.
+
+The full 480-prompt set on Qwen3-4B was run on 2026-10-08. Frozen prompt mean: 12809 accepts, run `5035d03aed9c28c0`. Mean plus gamma at β = 0.9999, λ = 0.1, γ = 1: 15009 accepts, run `2645ebe241330750`. Both have `exact_match_rate` 1. See [history_4b_full480](../studies/history_4b_full480/docs/STUDY_REPORT.md).
+
+`β = 0` on the 4B first 26 was run on 2026-10-08: 622 accepts, run `7262d76f68e9f111`. That is not below the recorded `β = 0.5` cell (620). See [history_4b_beta0](../studies/history_4b_beta0/docs/STUDY_REPORT.md).
+
+`γ` of 0.25, 0.5, 2, and 4 on that same slice were run the same day. None exceeded the recorded `γ = 1` cell (777). See [history_4b_gamma_screen](../studies/history_4b_gamma_screen/docs/STUDY_REPORT.md).
+
+Long-memory gamma on the 4B next-52 group was run on 2026-10-08: 1686 accepts, `exact_match_rate` 1, run `9d48dc5a82624d1a`. The frozen mean on that slice stays the recorded 1462. See [history_4b_next52_confirm](../studies/history_4b_next52_confirm/docs/STUDY_REPORT.md).
 
 ## Local files
 

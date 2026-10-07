@@ -1,11 +1,12 @@
-# CPU correctness + smoke for every work-branch push and every PR into dev/main.
+# CPU correctness + smoke.
+# Work-branch pushes, PRs into dev/main, and the dev commit after a merge.
 # Same entry as local runs: python scripts/run_ci_checks.py (see docs/ci.md).
-# GPU model runs are not part of this workflow.
+# GPU model runs are not part of this workflow. This is not a release build.
 name: cpu-checks
 
 on:
   push:
-    branches: ['feature/**', 'fix/**']
+    branches: ['feature/**', 'fix/**', 'refactor/**', 'dev']
   pull_request:
     branches: [dev, main]
   workflow_dispatch:

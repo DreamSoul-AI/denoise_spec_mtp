@@ -4,9 +4,9 @@
 
 ## 1. 用 RPipe 重构这个仓库
 
-下一次整仓重构，对齐 [RPipe](https://github.com/diaoenmao/RPipe)。量化仓库 `DreamSoul-AI/quantization` 已经按这套模板拆过：`src/rpipe` 是执行层，研究代码单独放，一轮实验是 `studies/<name>/` 里的 Study、Experiment、Run。
+整仓重构对齐 [RPipe](https://github.com/diaoenmao/RPipe)，在 `feature/rpipe-refactor` 上进行。该分支从 `dev` 拉出，`main` 仍停在复现基线。量化仓库 `DreamSoul-AI/quantization` 已经按这套模板拆过：`src/rpipe` 是执行层，研究代码单独放，一轮实验是 `studies/<name>/` 里的 Study、Experiment、Run。
 
-这次不改运行结构。重构时要保住的行为：
+重构时要保住的行为：
 
 - ESP 与 EMA-velocity 的 mask、树、验证不变。float32 贪心必须仍和普通生成逐 token 一致。
 - CPU 门留着：`tests/check_correctness.py`、`tests/check_ema_history.py`、tiny-LLaMA smoke。入口现在是 `scripts/run_ci_checks.py`，见 [ci.md](ci.md)。

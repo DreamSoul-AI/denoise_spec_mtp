@@ -1,22 +1,33 @@
 # CI setup
 
-Status: **configured.** The local run and the blocking behaviour were verified
-on 2026-10-06. The workflow file is on `origin`. A green GitHub run is a
-separate fact from this page, and the required check is not yet set in
-branch protection.
+Status: **running on GitHub.** Local blocking behaviour was verified on
+2026-10-06. The check context is `cpu-checks`. The Actions page shows it as
+`cpu-checks / cpu-checks`.
 
 ## Branch flow
 
 `feature/*` / `fix/*` → PR → `dev` → release PR → `main`. Do not push directly
-to `dev` or `main`. `dev` exists locally only until a maintainer creates it on
-`origin`.
+to `dev` or `main`.
+
+| **Branch** | **Role** |
+| --- | --- |
+| `main` | Release line. Stays at `b636f90` (`fix gitignore`), the reproduction baseline. The history audit is not on `main`. |
+| `dev` | Integration line. The history audit and the doc consolidation, ahead of `main`. |
+| `feature/rpipe-refactor` | Cut from `dev` for the RPipe refactor. No refactor commits yet. |
+
+`feature/research-ema-history-audit` is retired. Its commits are on `dev`.
+
+The two commits `dev` adds over `main` already passed this check:
+
+- [Add order-0 gamma masks and the history audit](https://github.com/DreamSoul-AI/denoise_spec_mtp/actions/runs/37499541219)
+- [Consolidate the docs and record the RPipe refactor](https://github.com/DreamSoul-AI/denoise_spec_mtp/actions/runs/37670855461)
 
 ## Workflow
 
 | **Item** | **Value** |
 | --- | --- |
 | File | `.github/workflows/cpu-checks.yml` |
-| Required check name | `cpu-checks / cpu-checks` |
+| Required check context | `cpu-checks` |
 | Triggers | push to `feature/**`, `fix/**`; PR into `dev`, `main`; manual |
 | Runner | `ubuntu-24.04`, Python 3.12, CPU torch wheel, 30 min timeout |
 | Permissions | `contents: read` only, no secrets |

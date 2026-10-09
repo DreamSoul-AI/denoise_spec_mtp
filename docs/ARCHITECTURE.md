@@ -4,24 +4,27 @@ Training-free multi-token prediction. One decode loop, two mask providers: ESP f
 
 Paper: *Efficient Training-Free Multi-Token Prediction via Embedding-Space Probing* (Goel, Gagrani, Lee, Lott — Qualcomm AI Research, ICML 2026), [arXiv:2603.17942](https://arxiv.org/abs/2603.17942). Local PDF, not in git: `docs/papers/2603.17942v2.pdf`.
 
+`src/spec_mtp/` is RPipe copied file for file. The copied layers stay as RPipe wrote them. SpecMTP code sits in a `spec_mtp/` submodule under the layer it belongs to. Decoding is an eval algorithm, next to RPipe's `algorithm/train/` and `algorithm/eval/`. The tree is in [LAYOUT.md](LAYOUT.md).
+
 ## Modules
 
 ```text
-src/main.py                 config in, one algorithm out
-src/algorithms/esp_mtp.py   the speculative loop and CSV aggregation
-src/algorithms/ar_baseline.py
-src/algorithms/alignment_probe.py
-src/spec/decoding.py        embed, append masks, forward, select, verify
-src/spec/mask_providers.py  ESP and EMA-velocity
-src/spec/tree.py            static and dynamic draft trees, pruning
-src/spec/tree_attention.py  block layout, tree mask, position ids
-src/spec/kv_cache.py        keep prefix + root + accepted path
-src/models/hf_causal.py     input embedding table; forward takes inputs_embeds
-src/data/                   SpecBench, Dolly, local prompts
-src/core/                   config, logger, tools
+structure/algorithm/eval/spec_mtp/ under src/spec_mtp/:
+  registry.py         the eval Algorithm registered as (eval, spec_mtp)
+  esp_mtp.py          the speculative loop and CSV aggregation
+  ar_baseline.py
+  alignment_probe.py
+  decoding.py         embed, append masks, forward, select, verify
+  mask_providers.py   ESP and EMA-velocity
+  mask_settings.py    named mask settings for study.yaml
+  tree.py             static and dynamic draft trees, pruning
+  tree_attention.py   block layout, tree mask, position ids
+  kv_cache.py         keep prefix + root + accepted path
+src/spec_mtp/structure/model/spec_mtp/hf_causal.py   input embedding table; forward takes inputs_embeds
+src/spec_mtp/structure/data/spec_mtp/                SpecBench, Dolly, local prompts
 ```
 
-`configs/hf/<family>/` is one YAML per paper setting. `configs/smoke/` is a tiny random LLaMA, no download. `scripts/run_*.sh` is one sweep per paper table.
+Everything else under `src/spec_mtp/` is RPipe copied file for file. `configs/hf/<family>/` keeps the old per-setting YAML as a record; runs go through a Study.
 
 ## One decode step
 
@@ -32,7 +35,7 @@ src/core/                   config, logger, tools
 5. Re-embed only committed tokens and hand those embeddings to the provider. Rejected drafts never enter the history.
 6. Drop KV for rejected positions. After the step, `cache_len == root_pos`. The bonus token is the next block's root, not a cached position.
 
-Float32 greedy with a shared seed must match ordinary generation token for token. `exact_match` is that check. It is not the quality metric. The quality metric used in [RESEARCH.md](RESEARCH.md) is how many draft tokens were kept.
+Float32 greedy with a shared seed must match ordinary generation token for token. `exact_match` is that check. It is not the quality metric. The quality metric in [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md) is how many draft tokens were kept.
 
 ## ESP
 
@@ -54,7 +57,7 @@ Other inits, used by the paper ablations: last-k prompt embeddings, a sample fro
 vhat ← β vhat + (1 − β) (e_new − e_prev)
 ```
 
-The first prompt difference seeds `vhat`. There is no `1 − β^s` correction. At `β = 0.9999`, `vhat` stays near that first difference. `β = 0` would use only the latest step. That setting has not been run.
+The first prompt difference seeds `vhat`. There is no `1 − β^s` correction. At `β = 0.9999`, `vhat` stays near that first difference. `β = 0` uses only the latest step. Those cells are in [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md).
 
 The mask is
 
@@ -102,7 +105,7 @@ Verification is exact match against the model's own chain, not residual sampling
 
 ## Result files
 
-Each run writes `results/<save_root>/<save_name>/`. The logger appends. A new run needs a new directory.
+A Study run writes `studies/<name>/runs/<id>/assets/`. `runs/` and `results/` are gitignored. A new cell is a new Run id from `python -m spec_mtp make`; do not reuse a directory, because the CSV logger appends. Older cells for this question are under [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md).
 
 `spec_metrics.csv`, one row per prompt: `prompt`, `category`, `new_tokens`, `committed`, `decode_calls`, `accepted`, `tau`, `spec_time`, `hit_context_limit`. With `eval.run_ar_baseline: true` also `ar_time`, `ar_calls`, `exact_match`.
 

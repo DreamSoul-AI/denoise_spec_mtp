@@ -1,6 +1,6 @@
 # CPU correctness + smoke.
 # Work-branch pushes, PRs into dev/main, and the dev commit after a merge.
-# Same entry as local runs: python scripts/run_ci_checks.py (see docs/CI.md).
+# Same entry as local runs: python -m pytest tests/spec_mtp (see docs/CI.md).
 # GPU model runs are not part of this workflow. This is not a release build.
 name: cpu-checks
 
@@ -37,14 +37,8 @@ jobs:
           pip install -e . --no-deps
           pip install numpy PyYAML "transformers>=4.45" datasets accelerate matplotlib scipy kornia pytest
 
-      - name: Run plan cpu_pr_checks
-        run: python scripts/run_ci_checks.py --plan cpu_pr_checks
-
-      - name: Archive test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results-${{ github.run_id }}-${{ github.run_attempt }}
-          path: .test-results/
-          if-no-files-found: warn
-          retention-days: 30
+      - name: Run spec_mtp tests
+        env:
+          PYTHONUTF8: "1"
+          MPLBACKEND: Agg
+        run: python -m pytest tests/spec_mtp

@@ -1,16 +1,14 @@
 # BRAINSTORM
 
-未拍板。这里只记下一步要做的事，不当实现合同。当前代码和已有数字以 [ARCHITECTURE.md](ARCHITECTURE.md)、[RESEARCH.md](RESEARCH.md)、[CI.md](CI.md) 为准。
+未拍板。这里只记下一步要做的事，不当实现合同。当前代码以 [ARCHITECTURE.md](ARCHITECTURE.md)、[CI.md](CI.md) 为准。已有数字在 [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md)。
 
 ## 1. 用 RPipe 重构这个仓库
 
-**状态（2026-10-08，`refactor/spec-rpipe`）**：已 vendor `src/rpipe`，研究代码迁到 `src/spec_mtp/`，`eval` + `source: spec_mtp` 注册完成。CPU 门改为 `studies/smoke_tiny_llama`（`python -m rpipe run`），仍经 `scripts/run_ci_checks.py`，见 [CI.md](CI.md)、[TESTING.md](TESTING.md)。`spec_metrics.csv` / `summary.csv` 写在 Run `assets/`；汇总指标进 tracker。`configs/smoke/` + `src/main.py` 保留作对照。
+**状态（2026-10-09）**：`src/spec_mtp/` 是 RPipe 按文件拷过来的，包名换成 `spec_mtp`。SpecMTP 的代码在各层的 `spec_mtp/` 子模块里。解码在 `structure/algorithm/eval/spec_mtp/`，和 RPipe 的 `train/`、`eval/` 并列，注册为 `(eval, spec_mtp)`。`src/rpipe/` 保持上游那份，不往里面注册。CPU 门是 `studies/smoke_tiny_llama`，人跑 `studies/<name>/scripts/launch.ps1`，CI 用 `python -m spec_mtp run`。见 [LAYOUT.md](LAYOUT.md)、[CI.md](CI.md)、[TESTING.md](TESTING.md)。
 
-仍待做（不在本段实现合同里）：
+仍待做：
 
-- `configs/hf/` 里 ESP 论文复现扫描还没收成 Study。历史外推已整理到 `studies/history_extrapolation/`，下一格设计在 `studies/history_4b_next52_confirm/`，未跑。
-- 可选：收紧 `tests/rpipe/` 进 CI，或只保留 spec_mtp 脚本门。
-- PR 合入 `dev` 后删 `refactor/spec-rpipe`。
+- `configs/hf/` 里 ESP 论文复现扫描还没收成 Study。已记录的接受数在 [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md)。下一轮从 `_template` 复制。
 
 ## 2. 在输出层做外推
 
@@ -20,15 +18,18 @@
 
 ## 3. 还没有跑的格子
 
-不在 RPipe 重构里顺手开这些实验：
+不在结构改动里顺手开这些实验。已经有数字的格子在 [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md)，不重跑。
 
-- SpecBench 全量 480 条
-- 更深的树，以及 `i` 不是 1
+还没跑：
+
+- 输出层外推（见上一节）
 - `vhat` 的 `1 − β^s` 校正
 - Momentum Guidance。它放大的是当前速度相对历史的偏差，和这里沿 `vhat` 往前走不是同一个对象
-- `β = 0`，以及 0 和 1 以外的 `γ`
-- 4B 中间那组 52 条上的长记忆 gamma。设计已写在 `studies/history_4b_next52_confirm/`，尚未开跑。这组已有冻结均值 1462、最后 token 1323、更新均值 1479
+- 1.7B 上的 `γ` 扫描、`β = 0`、两层树。0.6B 和 4B 上这几格已经有记录
+- 0.6B 全量 480。4B 全量已经有记录
+
+已经跑过、数字留在 [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md) 里的，包括 4B / 0.6B 的 `γ` 扫描、`β = 0`、两层树 `[7, 2]`，以及 4B 全量 480 和 next-52 长记忆 gamma。
 
 ## 4. 这次已经收好的文档
 
-2026-10-08：`notes/` 和 `docs/research/history_mtp/` 收成 ARCHITECTURE / RESEARCH / CI。论文 PDF 在 `docs/papers/`，不进 git，索引是 [papers/INDEX.md](papers/INDEX.md)。
+2026-10-08：`notes/` 和 `docs/research/history_mtp/` 收成 ARCHITECTURE / CI，实验记录进 Study。论文 PDF 在 `docs/papers/`，不进 git，索引是 [papers/INDEX.md](papers/INDEX.md)。

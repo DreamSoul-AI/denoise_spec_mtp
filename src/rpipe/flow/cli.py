@@ -27,10 +27,6 @@ from rpipe.structure.make import (
 from rpipe.structure.origin import apply_model_origin, normalize_origin
 from rpipe.structure.api import data_api
 
-try:
-    import spec_mtp.rpipe  # noqa: F401 — register spec_mtp data/model/algorithm builders
-except ImportError:
-    pass
 from rpipe.structure.make.capacity import (
     attach_estimates,
     batch_summaries,

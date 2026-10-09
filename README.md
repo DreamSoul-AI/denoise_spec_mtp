@@ -10,18 +10,20 @@ Training-free multi-token prediction. Two things live here:
    of input-embedding differences.
 
 Docs (UPPERCASE filenames): [ARCHITECTURE](docs/ARCHITECTURE.md),
-[RESEARCH](docs/RESEARCH.md), [CI](docs/CI.md), [LAYOUT](docs/LAYOUT.md),
+[CI](docs/CI.md), [LAYOUT](docs/LAYOUT.md),
 [TESTING](docs/TESTING.md), [BRAINSTORM](docs/BRAINSTORM.md).
+Recorded accepts: [history_extrapolation](studies/history_extrapolation/docs/STUDY_REPORT.md).
+Agent notes: [AGENTS.md](AGENTS.md).
 
 ```text
 src/
-  rpipe/       vendored RPipe execution substrate
-  spec_mtp/    decoders, data, models, RPipe registrations
-studies/       smoke_tiny_llama (CPU CI gate) + future sweeps
-configs/       legacy per-run YAML for HF sweeps (scripts/run_*.sh)
-scripts/       run_ci_checks.py, download_data.sh, sweep shells
-tests/         spec_mtp CPU checks + optional rpipe suite
-docs/          ARCHITECTURE, RESEARCH, CI, …; papers/ is local PDFs
+  rpipe/       full RPipe package: structure/ + flow/, unchanged
+  spec_mtp/    RPipe copied file for file; SpecMTP sits in each layer's spec_mtp/ submodule
+               (the decoder is structure/algorithm/eval/spec_mtp/)
+studies/           each Study holds its code and data; scripts/, runs/, and results/ stay local
+configs/       old per-run YAML; not an entry
+tests/         tests/spec_mtp mirrors src/spec_mtp
+docs/          ARCHITECTURE, CI, LAYOUT, TESTING, BRAINSTORM; papers/ is local PDFs
 ```
 
 ## Quick Start (CPU, no downloads)
@@ -29,52 +31,53 @@ docs/          ARCHITECTURE, RESEARCH, CI, …; papers/ is local PDFs
 ```bash
 pip install -e .
 set PYTHONUTF8=1
-python scripts/run_ci_checks.py
+python -m pytest tests/spec_mtp
 ```
 
-Or: `bash scripts/run_correctness_checks.sh` and `bash scripts/run_smoke.sh`
-(`python -m rpipe run studies/smoke_tiny_llama`).
+The smoke Study is `studies/smoke_tiny_llama`. A person runs the script that Study generates: `studies/smoke_tiny_llama/scripts/launch.ps1`. Every smoke summary must show `exact_match_rate=1.0000`.
 
-Every smoke summary must show `exact_match_rate=1.0000`: speculative output
-is verified token-for-token against plain autoregressive decoding.
+## Run a Study
 
-Legacy single-config entry (still supported for `configs/smoke/`):
+A run starts from `studies/<name>`, not from `src/main.py`. `make` writes
+`studies/<name>/scripts/` (gitignored). That script is what you run.
 
-```bash
-python src/main.py --cfg_file configs/smoke/tiny_llama/run_0/esp_static.yaml
+```text
+set PYTHONUTF8=1
+python -m spec_mtp make studies/<name>
+studies/<name>/scripts/launch.ps1
 ```
+
+On bash the same directory has `launch.sh`. CI calls `python -m spec_mtp run`
+on `studies/smoke_tiny_llama` directly; that is the same runner the script uses.
 
 ## GPU Server
 
 ```bash
-bash scripts/download_data.sh --models --dolly   # SpecBench + weights + Dolly
-bash scripts/run_main_results.sh llama3_2_3b     # Table 1 row (ESP + ours + AR)
-bash scripts/run_main_results.sh llama3_1_8b
-bash scripts/run_main_results.sh qwen3_8b
-bash scripts/run_main_results.sh qwen3_32b
+bash studies/history_extrapolation/scripts/download_data.sh --models --dolly
 ```
 
-Results land in `results/<...>/spec_metrics.csv` (per prompt) and
-`summary.csv` (per category + overall). Column meanings are in
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+A GPU cell is a Study under `studies/`, then `studies/<name>/scripts/launch.ps1`.
+Per-prompt rows and the category summary land in `studies/<name>/runs/<id>/assets/`.
 
 ## Config → Paper Map
 
-| Paper | Config / script |
+These YAML files record the paper factors. A run is a Study, not one of these files.
+
+| Paper | Config |
 |---|---|
-| Table 1, Figs 4–5 (main, BC=10/30/60) | `configs/hf/<family>/run_0/esp_bc*.yaml`, `scripts/run_main_results.sh` |
-| Table 2 (dynamic vs static trees) | `scripts/run_ablation_tree.sh`, `run_0/esp_bc60_dynamic.yaml` |
-| Table 3 (# masks at BC=60) | `scripts/run_ablation_masks.sh`, `ablations/masks{1,3}_bc60.yaml` |
-| Table 4 (naive vs efficient impl) | `scripts/run_ablation_impl.sh`, `ablations/impl_naive_bc30.yaml` |
-| Table 5 (mask init: Last-K / Sample / Mean) | `scripts/run_ablation_init.sh`, `ablations/init_*_bc30.yaml` |
+| Table 1, Figs 4–5 (main, BC=10/30/60) | `configs/hf/<family>/run_0/esp_bc*.yaml` |
+| Table 2 (dynamic vs static trees) | `run_0/esp_bc60_dynamic.yaml` |
+| Table 3 (# masks at BC=60) | `ablations/masks{1,3}_bc60.yaml` |
+| Table 4 (naive vs efficient impl) | `ablations/impl_naive_bc30.yaml` |
+| Table 5 (mask init: Last-K / Sample / Mean) | `ablations/init_*_bc30.yaml` |
 | Fig 2 (layer-wise cosine alignment) | `configs/hf/llama3_2_3b/run_0/alignment_probe.yaml` |
-| G.3 (temperature 1.0) | `scripts/run_ablation_temperature.sh`, `ablations/temp1_bc*.yaml` |
+| G.3 (temperature 1.0) | `ablations/temp1_bc*.yaml` |
 | G.4 (BC=120, 3 masks) | `ablations/bc120_masks3.yaml` |
 | G.8 (init at mu+5s / mu+10s) | `ablations/init_offset{5,10}_bc60.yaml` |
-| G.9 (lambda 0.01/0.1/0.5) | `scripts/run_ablation_lambda.sh`, `ablations/lam*_bc30.yaml` |
-| G.7 (tree pruner on/off) | `scripts/run_ablation_pruner.sh`, `ablations/pruner_off_bc30.yaml` |
+| G.9 (lambda 0.01/0.1/0.5) | `ablations/lam*_bc30.yaml` |
+| G.7 (tree pruner on/off) | `ablations/pruner_off_bc30.yaml` |
 | extra: frozen mask (no update) | `ablations/update_off_bc30.yaml` |
-| ours: EMA velocity + sweeps | `run_0/ema_bc*.yaml`, `scripts/run_ema_ablations.sh` |
+| ours: EMA velocity + sweeps | `run_0/ema_bc*.yaml` |
 
 Baselines PLD / STAND / LADE are other repos' methods. They are not
 reimplemented here. The AR baseline is the speedup denominator.

@@ -11,6 +11,7 @@ __pycache__/
 /.tmp/
 studies/**/runs/
 studies/**/shared/
+studies/**/results/
 studies/**/scripts/
 studies/**/index.json
 studies/**/process.json

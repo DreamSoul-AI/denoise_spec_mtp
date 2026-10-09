@@ -2,20 +2,31 @@
 
 ```text
 src/
-  rpipe/           vendored RPipe 0.2.0 (MIT, Enmao Diao)
-  spec_mtp/        ESP + EMA-velocity research code and RPipe registrations
-    algorithms/    esp_mtp, ar_baseline, alignment_probe
-    data/          specbench, dolly, local_prompts
-    models/        hf_causal / tiny_llama adapter
-    spec/          mask_providers, tree, decoding
-    rpipe/         Data / Model / Algorithm builders (source spec_mtp)
-studies/           smoke_tiny_llama, history_extrapolation, history_4b_next52_confirm
+  rpipe/           full RPipe 0.2.0 package (local RPipe main, MIT, Enmao Diao), unchanged
+  spec_mtp/        rpipe/ copied file for file (rpipe. → spec_mtp.); SpecMTP sits in spec_mtp/ submodules
+    flow/          prepare → execute → collect → summarize → write → process
+    structure/
+      algorithm/   RPipe base, factory, train/, eval/
+        eval/spec_mtp/   masks, tree, decoder, esp / ar / alignment, the eval Algorithm
+      data/        RPipe config, factory, prepare, profile
+        spec_mtp/        SpecBench, Dolly, local prompts
+      model/       RPipe config, factory, ...
+        spec_mtp/        hf_causal, tiny LLaMA
+      system/      RPipe System, Logger, runtime
+        spec_mtp/        device, dtype, seed helpers
+      control/     RPipe Control, layers, run_config
+        spec_mtp/        NamedDict for the decoder cfg
+      artifact/    RPipe layout, result, index
+        spec_mtp/        per-prompt CSV rows
+      api/         RPipe layer facades
+        spec_mtp/        register SpecMTP builders
+      make/        RPipe make; writes studies/<name>/scripts/
+studies/           code and data stay; scripts/, runs/, and results/ stay local
 configs/           legacy single-run YAML (HF sweeps; migrate to studies/)
-scripts/           run_ci_checks.py, download_data.sh, run_*.sh
 tests/
-  spec_mtp/spec/   CPU correctness scripts (219 checks)
-  rpipe/           upstream RPipe unit tests (optional)
-docs/              ARCHITECTURE, RESEARCH, CI, BRAINSTORM, LAYOUT, TESTING
+  spec_mtp/        mirrors src/spec_mtp; SpecMTP modules only
+docs/              ARCHITECTURE, CI, BRAINSTORM, LAYOUT, TESTING
+AGENTS.md          how to work in this repo; points at docs/
 ```
 
 Run artifacts: `studies/<name>/runs/<id>/` with `config.yaml`, `result.json`,

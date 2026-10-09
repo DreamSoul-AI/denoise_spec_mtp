@@ -18,8 +18,11 @@ must reach `exact_match_rate = 1` on the overall summary row.
 
 ```text
 set PYTHONUTF8=1
-python -m rpipe run studies/smoke_tiny_llama
+python -m spec_mtp make studies/smoke_tiny_llama
+studies/smoke_tiny_llama/scripts/launch.ps1
 ```
+
+CI calls `python -m spec_mtp run studies/smoke_tiny_llama`, which is the runner that script starts.
 
 Artifacts live under `studies/smoke_tiny_llama/runs/<id>/assets/` (`summary.csv`,
 `spec_metrics.csv`, tracker). This directory is gitignored.

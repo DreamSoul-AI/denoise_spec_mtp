@@ -18,7 +18,7 @@ merge. Naming follows `feature/<scope>-<name>`, `fix/<scope>-<name>`, and
 | --- | --- |
 | `main` | Release line. Stays at `b636f90` (`fix gitignore`), the reproduction baseline. The history audit is not on `main`. |
 | `dev` | Integration line. Daily PRs land here. It is ahead of `main` by the history audit and the doc consolidation. |
-| `refactor/spec-rpipe` | RPipe refactor branch (vendor `src/rpipe`, `studies/smoke_tiny_llama`). |
+| `refactor/spec-rpipe` | RPipe layout: `src/spec_mtp` follows RPipe; SpecMTP code is in each layer's `spec_mtp/` submodule. |
 
 `feature/research-ema-history-audit` is retired. Its commits are on `dev`.
 
@@ -36,7 +36,6 @@ The commits that moved the history audit onto the integration line already passe
 | Triggers | push to `feature/**`, `fix/**`, `refactor/**`, and `dev`; PR into `dev` or `main`; manual |
 | Runner | `ubuntu-24.04`, Python 3.12, CPU torch wheel, 30 min timeout |
 | Permissions | `contents: read` only, no secrets |
-| Artifacts | `.test-results/` uploaded on success and failure, kept 30 days |
 | Maintainer | to be assigned by the repo owner |
 
 ## Entry point and plans
@@ -45,29 +44,16 @@ Local and CI both run:
 
 ```bash
 pip install -e .
-python scripts/run_ci_checks.py --plan cpu_pr_checks
+python -m pytest tests/spec_mtp
 ```
 
-| **plan_id** | **Checks** |
-| --- | --- |
-| `cpu_pr_checks` | `tests/spec_mtp/spec/test_correctness.py`, `test_ema_history.py`, RPipe `studies/smoke_tiny_llama` |
-| `cpu_smoke_only` | RPipe smoke study only |
-
-A smoke check passes only if the process exits 0 and the `overall` row has
-`exact_match_rate == 1.0`. Any failed, missing or incomplete check makes the
-run fail with exit code 1.
+The suite is the SpecMTP modules under `tests/spec_mtp/`, including the smoke Study. A smoke variant passes only when its `overall` row has `exact_match_rate == 1.0`.
 
 ## Result protocol
 
-Each run writes `.test-results/<run_id>/`:
-
-- `manifest.json`: `run_id`, `plan_id`, commit, branch, dirty flag, environment, selected checks and commands, final status
-- `results.jsonl`: one line per check, appended as each finishes
-- `<check>.log`: raw output
-- Smoke CSVs live under `studies/smoke_tiny_llama/runs/*/assets/` (gitignored), not `results/`
-- `report.md`: generated even after a failure
+Pytest writes its cache under `.tmp/pytest-cache/` (gitignored). Smoke CSVs live under `studies/smoke_tiny_llama/runs/*/assets/` (gitignored).
 
 ## Out of scope
 
-GPU model runs (`scripts/run_main_results.sh`, ablations) need weights and a
-GPU. They are not in CI and must not be reported as CI-verified.
+GPU cells are Studies under `studies/`. They need weights and a GPU.
+They are not in CI and must not be reported as CI-verified.

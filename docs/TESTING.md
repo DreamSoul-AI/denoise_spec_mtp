@@ -1,36 +1,23 @@
 # TESTING
 
+Tests live under `tests/spec_mtp/` and follow `src/spec_mtp/`. They cover the SpecMTP modules: the eval algorithm, prompt sets, the tiny model, and the small additions under system, control, artifact, and api. The copied RPipe files are not tested here.
+
 ## CPU gate (CI and local)
 
 ```text
 set PYTHONUTF8=1
 pip install -e .
-python scripts/run_ci_checks.py
+python -m pytest tests/spec_mtp
 ```
 
-Plans:
+That run includes the smoke Study `studies/smoke_tiny_llama`. Each of its three variants must have `exact_match_rate` 1. A person can also run the script that Study generates: `studies/smoke_tiny_llama/scripts/launch.ps1`.
 
-| **plan** | **checks** |
+| **tests** | **what they cover** |
 | --- | --- |
-| `cpu_pr_checks` | correctness + ema_history + RPipe smoke study |
-| `cpu_smoke_only` | `studies/smoke_tiny_llama` via `python -m rpipe run` |
-
-Evidence: `.test-results/<run_id>/` (`manifest.json`, `results.jsonl`, `report.md`).
-
-## Correctness scripts
-
-| **script** | **role** |
-| --- | --- |
-| `tests/spec_mtp/spec/test_correctness.py` | masks, trees, lossless decode |
-| `tests/spec_mtp/spec/test_ema_history.py` | EMA velocity state hygiene |
-
-Legacy YAML smoke (`configs/smoke/`, `src/main.py`) remains for ad-hoc runs;
-CI uses the RPipe study.
-
-## Optional RPipe suite
-
-```text
-python tests/run.py --core
-```
-
-Requires full `tests/rpipe/` markers (see upstream TESTING.md in `.tmp/RPipe`).
+| `structure/algorithm/eval/spec_mtp/` | masks, trees, lossless decode, EMA history, named mask settings, smoke Study |
+| `structure/data/spec_mtp/` | category windows and synthetic prompts |
+| `structure/model/spec_mtp/` | tiny LLaMA embed and forward |
+| `structure/system/spec_mtp/` | device and dtype |
+| `structure/control/spec_mtp/` | NamedDict |
+| `structure/artifact/spec_mtp/` | CSV rows |
+| `structure/api/spec_mtp/` | registration on spec_mtp's own registries |

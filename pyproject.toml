@@ -24,7 +24,7 @@ dependencies = [
 
 [project.scripts]
 rpipe = "rpipe.flow.cli:main"
-spec-mtp = "spec_mtp.cli:main"
+spec-mtp = "spec_mtp.flow.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
@@ -34,24 +34,8 @@ where = ["src"]
 include = ["rpipe*", "spec_mtp*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests/spec_mtp"]
 pythonpath = ["src"]
-addopts = "-q --tb=short --strict-markers --basetemp=.tmp/pytest"
+addopts = "-q --tb=short"
 cache_dir = ".tmp/pytest-cache"
 filterwarnings = ["ignore::DeprecationWarning"]
-markers = [
-  "unit: unit test",
-  "integration: integration test",
-  "e2e: end-to-end test",
-  "location: location and structure contract",
-  "content: semantic and behavior contract",
-  "physical: resource metric contract",
-  "p1: highest priority",
-  "p2: default regression priority",
-  "p3: low-frequency or auxiliary",
-  "cost: cost_class c1/c2/c3/c4",
-  "result_type: categorical or numeric, with detail",
-  "slow: long-running",
-  "external: network or optional deps",
-  "gpu: requires a real GPU",
-]

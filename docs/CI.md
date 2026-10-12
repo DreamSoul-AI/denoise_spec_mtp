@@ -19,7 +19,8 @@ merge. Naming follows `feature/<scope>-<name>`, `fix/<scope>-<name>`, and
 | `main` | Release line. Stays at `b636f90` (`fix gitignore`), the reproduction baseline. The history audit is not on `main`. |
 | `dev` | Integration line. Daily PRs land here. It is ahead of `main` by the history audit and the doc consolidation. |
 | `refactor/spec-rpipe` | Merged into `dev` (`b1f6191`): the copied-RPipe layout. Superseded by the dependency design. |
-| `refactor/rpipe-dependency` | Depend on RPipe `dev` (pinned), drop the copied framework. Prepared locally on 2026-10-12; not pushed, CI not run yet. |
+| `refactor/rpipe-dependency` | Depend on RPipe `dev` (pinned), drop the copied framework. Prepared locally on 2026-10-12, includes the context-limit fix (option A); not pushed, CI not run yet. |
+| `fix/ctx-limit-prefix-audit` | Option B for the context-limit audit. Not adopted; kept locally only. |
 
 `feature/research-ema-history-audit` is retired. Its commits are on `dev`.
 

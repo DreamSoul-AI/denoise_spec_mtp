@@ -27,7 +27,7 @@ Before this change the old pipeline wrote such Runs as `succeeded` with
 - Paper (ESP, Table 1 / Appendix G): 256 or 100 new tokens on SpecBench / Dolly with 128K /
   32K–40K context models; the limit is not reached in the paper settings.
 
-## This branch: option A — AR stops at the budget the speculative pass reached
+## Adopted (2026-10-12): option A — AR stops at the budget the speculative pass reached
 
 `esp_mtp.evaluate`: when a prompt has `hit_context_limit = 1`, the AR reference runs with
 `max_new_tokens = new_tokens` of the speculative pass (same seed and generator, so the
@@ -37,4 +37,18 @@ under the same budget”. `hit_context_limit` stays in the row.
 - Pros: one column, gate unchanged, the audit still compares full sequences.
 - Cons: for those prompts `ar_time` / `ar_calls` cover fewer tokens, so `speedup` is
   measured on the shorter budget; AR's own last 2–4 tokens before the limit are not audited.
-- Alternative: branch `fix/ctx-limit-prefix-audit` (option B).
+- Not adopted: option B (common-prefix audit plus `context_limit_prompts` / `ar_extra_tokens`
+  columns), kept locally on branch `fix/ctx-limit-prefix-audit`.
+
+## Regression of the adopted fix
+
+`studies/smoke_tiny_llama/regression/ctx_check.py` compares the old code (`b1f6191`) with
+the merged branch over the same 26 cells (`CONTEXT_LIMIT_OPTION_A.json`):
+
+- 20 cells without a context-limit prompt: rows, summary, metrics and status identical.
+- 6 context-limit cells (`max_position_embeddings=56`, temperature 0 / 0.8, three variants):
+  `exact_match_rate` 0 → 1; only `ar_calls`, `exact_match`, AR timing and `speedup` differ.
+- All speculative token sequences identical; the 24 changed AR sequences are prefixes of the
+  old AR sequences.
+
+`REFACTOR_REGRESSION.json` stays as the record of the pure migration (old = new before this fix).

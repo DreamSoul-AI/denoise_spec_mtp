@@ -120,7 +120,7 @@ A Study run writes `studies/<name>/runs/<id>/assets/`. `runs/` and `results/` ar
 
 Each Run also has `assets/spec_mtp_sources.json` (SpecMTP file hashes, git head, installed RPipe commit) and `result.json:spec_mtp` (gate verdict, `exact_match_rate`, accept counts, source digest). RPipe's `result.json:provenance` is the Study provenance digest. Older cells for this question are under [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md).
 
-`spec_metrics.csv`, one row per prompt: `prompt`, `category`, `new_tokens`, `committed`, `decode_calls`, `accepted`, `tau`, `spec_time`, `hit_context_limit`. With `eval.run_ar_baseline: true` also `ar_time`, `ar_calls`, `exact_match`.
+`spec_metrics.csv`, one row per prompt: `prompt`, `category`, `new_tokens`, `committed`, `decode_calls`, `accepted`, `tau`, `spec_time`, `hit_context_limit`. With `eval.run_ar_baseline: true` also `ar_time`, `ar_calls`, `exact_match`. When `hit_context_limit = 1` the AR reference stops at the speculative `new_tokens` (option A, [CONTEXT_LIMIT.md](CONTEXT_LIMIT.md)), so `ar_*` and `speedup` cover that shorter budget.
 
 `accepted` counts kept draft tokens. `committed = accepted + decode_calls`, aside from a short final pass that stops on the token budget or EOS. `new_tokens = committed + 1` for the prefill token, with the same caveat. `tau = committed / decode_calls`.
 

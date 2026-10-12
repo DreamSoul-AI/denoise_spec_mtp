@@ -22,7 +22,9 @@ Study scope：`spec_mtp_study_check.json` 为 `complete: true, passed: true`，�
 
 ### 本轮发现（未改算法）
 
-`max_position_embeddings=56`（prompt 32 + 32 新 token 触及上下文上限）的 6 个格子，新旧代码都得到 `exact_match_rate = 0`：投机解码按 `root + 1 + 树深 + k` 提前停在上下文上限前，AR 继续生成到上限，两者长度不同。旧流水线把这些 Run 记为 `succeeded`；新的 write 门把它们记为 `failed`（`test_exact_match_failure_fails_the_run`）。这是既有停止条件的口径差异，本轮按“只迁移、不改算法”保留，未修改。
+`max_position_embeddings=56`（prompt 32 + 32 新 token 触及上下文上限）的 6 个格子，新旧代码都得到 `exact_match_rate = 0`：投机解码按 `root + 1 + 树深 + k` 提前停在上下文上限前，AR 继续生成到上限，两者长度不同。旧流水线把这些 Run 记为 `succeeded`；新的 write 门把它们记为 `failed`（`test_exact_match_failure_fails_the_run`）。这是既有停止条件的口径差异，迁移本身保留了它（`REFACTOR_REGRESSION.json` 记录的是纯迁移）。
+
+2026-10-12 采用方案 A（[CONTEXT_LIMIT.md](../../../docs/CONTEXT_LIMIT.md)）：撞上限的 prompt，AR 参照只生成到投机解码实际达到的长度，再整段比较。`regression/CONTEXT_LIMIT_OPTION_A.json`：这 6 格 `exact_match_rate` 0 → 1、Run 成功；口径变化只在 `ar_calls`、`exact_match`、AR 计时和 `speedup`（这些 prompt 的 speedup 按较短长度算）；其余 20 格与旧代码完全一致；投机解码 token 序列全部不变。解码算法未改。
 
 ### 未覆盖
 

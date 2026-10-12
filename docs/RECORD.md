@@ -24,6 +24,8 @@
 
 **验证**：见 [TESTING.md](TESTING.md)、[smoke 报告](../studies/smoke_tiny_llama/docs/STUDY_REPORT.md)。72 个 pytest 全部通过：Python 3.13.5 主环境、独立 venv（`pip install -e ".[dev]"`，与 CI 同步骤）和 Python 3.12.15 venv（CI 版本）各一次，均为 torch 2.14.1+cpu、transformers 5.19.0；重构前后 26 格、249 条序列逐 token 一致；wheel 独立安装后在仓库外跑 smoke 通过。
 
+**上下文上限（2026-10-12 采用方案 A）**：迁移后 6 个撞上限的格子 `exact_match_rate=0`（投机解码提前停在上限前，输出是 AR 的前缀，只差长度），新 write 门会判它们失败。采用方案 A：撞上限的 prompt 让 AR 参照只生成到投机解码达到的长度。口径影响只在这些 prompt 的 `ar_calls` / `exact_match` / AR 计时 / `speedup`；接受数、tau、投机解码 token 不变；其余格子与旧代码一致（`CONTEXT_LIMIT_OPTION_A.json`）。history_extrapolation 和论文设置碰不到上限，不受影响。方案 B 留在本地分支 `fix/ctx-limit-prefix-audit`，未采用。详见 [CONTEXT_LIMIT.md](CONTEXT_LIMIT.md)。
+
 **Windows**：旧包在 `sys.platform == 'win32'` 时先 import torch（注释说先 import NumPy 会在 `blas_fpe_check` 出错）。RPipe dev 已改成先 import NumPy（为与 Conda NumPy 共享 libiomp5md）。两者方向相反，Linux 上无法验证；默认保留旧包的 Torch 优先，可用 `SPEC_MTP_WIN_IMPORT_ORDER=torch|numpy|off` 切换，只在经 `spec_mtp` 入口（先于 rpipe 导入）时生效，经 `python -m rpipe` 时由 RPipe 的顺序决定。需在 Windows 本机跑 `tools/windows_selfcheck.py` 核对，见 [WINDOWS.md](WINDOWS.md)。
 
 **未做**：不改 RPipe；不推送、不开 PR（本轮只在本地提交，交付 bundle / patch）；不重跑 history_extrapolation；`configs/hf/` 收成 `studies/paper_hf/`（11 个 Study、59 格，仅验证展开与配置一致）；GPU / 真实权重 / Windows 未运行；GitHub Actions 未运行（本地 3.12 通过不等于 CI 通过）。

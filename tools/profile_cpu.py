@@ -78,8 +78,15 @@ def profile_variant(variant: str, args: argparse.Namespace) -> dict:
     eval_cfg = _convert({'max_new_tokens': args.new_tokens, 'temperature': 0.0, 'stop_on_eos': False,
                          'run_ar_baseline': True, 'log_per_prompt': False, 'warmup': True})
     profiler = cProfile.Profile()
-    start = time.perf_counter()
     with contextlib.redirect_stdout(io.StringIO()):
+        if args.timing_repeats:
+            # Clean timing first (no profiler), best of N: spec / AR tok/s without cProfile overhead.
+            best = None
+            for _ in range(args.timing_repeats):
+                timed = esp_mtp.evaluate(model, prompts, [], spec, eval_cfg, 123, torch.device('cpu'))
+                spec_s = sum(r['spec_time'] for r in timed['rows'])
+                best = spec_s if best is None else min(best, spec_s)
+        start = time.perf_counter()
         profiler.enable()
         out = esp_mtp.evaluate(model, prompts, [], spec, eval_cfg, 123, torch.device('cpu'))
         profiler.disable()
@@ -99,8 +106,12 @@ def profile_variant(variant: str, args: argparse.Namespace) -> dict:
     spec_time = sum(r['spec_time'] for r in rows)
     ar_time = sum(r['ar_time'] for r in rows)
     tokens = sum(r['new_tokens'] for r in rows)
+    clean = {}
+    if args.timing_repeats:
+        clean = {'spec_s_unprofiled_best': round(best, 4),
+                 'spec_tok_per_s_unprofiled': round(sum(r['new_tokens'] for r in rows) / best, 1)}
     return {
-        'variant': variant, 'wall_s_profiled': round(wall, 3),
+        'variant': variant, 'wall_s_profiled': round(wall, 3), **clean,
         'spec_s': round(spec_time, 4), 'ar_s': round(ar_time, 4),
         'spec_tok_per_s': round(tokens / spec_time, 1) if spec_time else None,
         'ar_tok_per_s': round(tokens / ar_time, 1) if ar_time else None,
@@ -116,11 +127,12 @@ def markdown(report: dict) -> str:
              f"Machine: {report['machine']}; torch {report['torch']}, threads {report['threads']}. "
              f"Tiny LLaMA {report['model']}, {report['workload']}. Random weights: tau and speedup are not paper numbers; "
              'cProfile overhead inflates Python-heavy parts.', '',
-             '| **variant** | **exact_match** | **tau** | **decode calls** | **spec tok/s** | **AR tok/s** |',
-             '| --- | --- | --- | --- | --- | --- |']
+             '| **variant** | **exact_match** | **tau** | **decode calls** | **spec tok/s** | **AR tok/s** '
+             '| **spec tok/s, no profiler** |',
+             '| --- | --- | --- | --- | --- | --- | --- |']
     for r in report['results']:
         lines.append(f"| `{r['variant']}` | {r['exact_match_rate']} | {r['tau']} | {r['decode_calls']} | "
-                     f"{r['spec_tok_per_s']} | {r['ar_tok_per_s']} |")
+                     f"{r['spec_tok_per_s']} | {r['ar_tok_per_s']} | {r.get('spec_tok_per_s_unprofiled', '-')} |")
     names = sorted({k for r in report['results'] for k in r['self_time_share']},
                    key=lambda k: -max(r['self_time_share'].get(k, 0) for r in report['results']))
     lines += ['', 'Self-time share by component (profiled run, spec + AR + warm-up):', '',
@@ -147,6 +159,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--new-tokens', type=int, default=64)
     parser.add_argument('--threads', type=int, default=1)
     parser.add_argument('--top', type=int, default=8)
+    parser.add_argument('--timing-repeats', type=int, default=0,
+                        help='also time N unprofiled runs and report the best spec tok/s')
     parser.add_argument('--out', default='.tmp/profile')
     args = parser.parse_args(argv)
     import torch

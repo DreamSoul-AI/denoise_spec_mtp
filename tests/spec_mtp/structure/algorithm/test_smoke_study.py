@@ -65,20 +65,27 @@ def test_make_then_launch_scripts_path(study_copy):
     _check_smoke(study)
 
 
-def test_exact_match_failure_fails_the_run(study_copy):
-    """Context limit 56 < prompt 32 + 32 new tokens: spec stops early, exact_match < 1."""
+def test_context_limit_run_passes_on_reached_budget(study_copy):
+    """Option A: context limit 56 < 32 + 32; AR is audited on the budget the speculative pass reached."""
     def patch(study):
         study['fixed']['model']['config']['tiny']['max_position_embeddings'] = 56
         study['axes'] = {'algorithm.config.variant': ['esp_static']}
     study = study_copy(patch, name='ctx_limit')
+    cli('run', study, check=True)
+    run_id = json.loads((study / 'index.json').read_text())['experiments'][0]['runs'][0]['id']
+    assert float(_overall(study, run_id)['exact_match_rate']) == 1.0
+
+
+def test_unaudited_run_fails_the_gate(study_copy):
+    def patch(study):
+        study['fixed']['algorithm']['config']['eval']['run_ar_baseline'] = False
+        study['axes'] = {'algorithm.config.variant': ['esp_static']}
+    study = study_copy(patch, name='unaudited')
     proc = cli('run', study)
     assert proc.returncode != 0
-    index = json.loads((study / 'index.json').read_text(encoding='utf-8'))
-    run_id = index['experiments'][0]['runs'][0]['id']
+    run_id = json.loads((study / 'index.json').read_text())['experiments'][0]['runs'][0]['id']
     result = json.loads((study / 'runs' / run_id / 'result.json').read_text(encoding='utf-8'))
-    assert result['status'] == 'failed'
-    assert 'exact_match_rate' in result['error']
-    assert float(_overall(study, run_id)['exact_match_rate']) < 1.0
+    assert result['status'] == 'failed' and 'run_ar_baseline' in result['error']
 
 
 def test_bad_config_fails_before_construction(study_copy):

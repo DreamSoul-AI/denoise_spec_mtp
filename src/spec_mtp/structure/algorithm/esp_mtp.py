@@ -133,9 +133,17 @@ def evaluate(model, prompts, eos_ids, spec_cfg, eval_cfg, seed, device, save_dir
             row[f'attempt_d{depth}'] = int(stats['attempt_by_depth'][depth])
             row[f'accept_d{depth}'] = int(stats['accept_by_depth'][depth])
         if run_ar:
+            # Context limit: the speculative block needs room for the tree and
+            # k mask slots past the root, so SpecDecoder stops a few tokens
+            # before ar_generate would. The audit then compares the same
+            # budget: AR stops at the token count the speculative pass reached.
+            ar_cfg = eval_cfg
+            if stats['hit_context_limit']:
+                ar_cfg = dict(eval_cfg)
+                ar_cfg['max_new_tokens'] = stats['new_tokens']
             sync_device(device)
             ar_out, ar_stats = ar_generate(
-                model, prompt_ids, eval_cfg, eos_ids=eos_ids,
+                model, prompt_ids, ar_cfg, eos_ids=eos_ids,
                 generator=make_generator(device, seed + idx),
             )
             sync_device(device)

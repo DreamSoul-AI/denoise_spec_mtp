@@ -73,7 +73,35 @@ Self-time share by component (profiled run, spec + AR + warm-up):
 
 - Every variant keeps `exact_match_rate = 1` under profiling.
 - SpecMTP-owned code (tree attention + tree build + KV cache + mask providers + decoder loop) is about 4–10% of self time on the small model and about 2–4% on the larger one; the rest is the model forward (Python dispatch in torch / transformers plus C kernels). The C-kernel share grows with model size, so on real models the decoder overhead shrinks further.
-- The 4D tree-attention mask is the only SpecMTP part that stands out: 5–6% with dynamic trees / `impl: naive` (mask rebuilt per call) against 0.2–0.4% with static trees / `impl: efficient` (cached). A cache for dynamic masks would be the first optimisation to try; it is not done here (no algorithm change in this round).
+- The 4D tree-attention mask is the only SpecMTP part that stands out: 5–6% with dynamic trees / `impl: naive` (mask rebuilt per call) against 0.2–0.4% with static trees / `impl: efficient` (cached). Addressed by the dynamic-tree mask cache below.
 - The BC=60 paper presets cost the most per decode call (bigger tree block): in the larger run 75–78 spec tok/s against about 100 for the smoke variants at similar tau.
 - cProfile overhead inflates Python-heavy parts; absolute tok/s without the profiler are higher. Compare variants inside one run only.
 - GPU behaviour (kernel launch, memory bandwidth, bf16) is not covered.
+
+## Dynamic-tree mask cache (2026-10-12, branch `perf/dynamic-tree-mask`)
+
+`DynamicTreeAttentionCache` (`tree_attention.py`) replaces the per-entry Python fill of `build_block_attention` for `tree.mode: dynamic`: the block-local structure is memoised per tree signature (LRU, 256 entries) and filled with one indexed write; per step only the cache columns are prepended and the PIDs shifted. Static trees with `impl: naive` keep the literal builder so the Table 4 naive-vs-efficient ablation still times the naive path; `impl: efficient` is unchanged.
+
+Output identity (all must match before / after):
+
+- `tools/decode_fingerprint.py`: 555 cells (every smoke variant and paper preset × T 0 / 0.7 / 1 × 3 prompts, plus a 64-position context-limited model): tokens, `new_tokens`, `accepted`, `committed`, `decode_calls`, `tau`, depth attempts / accepts, `hit_context_limit` identical (fingerprint sha256 `150154ecea4dfc76…` both).
+- `tools/paper_hf_dryrun.py --keep`: all 59 Runs' `spec_metrics.csv` / `summary.csv` / `alignment_metrics.csv` identical except timing columns.
+- Smoke regression capture (5 Studies, 26 cells, every spec and AR token sequence): identical to the pre-change capture; `ctx_check.py` against `b1f6191` still ok.
+- `test_tree_attention_cache.py`: bit-identical mask and PIDs to the naive builder on random dynamic trees (fp32 / bf16, cache hits and eviction).
+
+Speed (`tools/profile_cpu.py --timing-repeats 3`, best unprofiled spec tok/s; same machine, same run order; ±4% is noise, see the unchanged static rows):
+
+| **model** | **variant** | **tau before / after** | **decode calls** | **spec tok/s** | **tree-attention self time** |
+| --- | --- | --- | --- | --- | --- |
+| hidden 128, 4 layers, 1 thread | `esp_dynamic` | 1.5849 / 1.5849 | 159 / 159 | 617.4 → 741.5 (+20%) | 5.7% → 0.5% |
+| hidden 128, 4 layers, 1 thread | `ema_velocity` | 1.575 / 1.575 | 160 / 160 | 686.8 → 726.4 (+6%) | 0.4% → 0.4% |
+| hidden 128, 4 layers, 1 thread | `llama3/esp_bc60_dynamic` | 1.5849 / 1.5849 | 159 / 159 | 443.6 → 567.3 (+28%) | 9.6% → 0.5% |
+| hidden 128, 4 layers, 1 thread | `qwen3/esp_bc60_dynamic` | 1.5849 / 1.5849 | 159 / 159 | 463.4 → 565.5 (+22%) | 9.5% → 0.4% |
+| hidden 128, 4 layers, 1 thread | `llama3/impl_naive_bc30` | 1.5849 / 1.5849 | 159 / 159 | 639.5 → 658.8 (+3%) | 4.9% → 4.9% |
+| hidden 128, 4 layers, 1 thread | `esp_static` | 1.726 / 1.726 | 146 / 146 | 770.5 → 795.5 (+3%) | 0.4% → 0.4% |
+| hidden 512, 8 layers, 4 threads | `esp_dynamic` | 1.1053 / 1.1053 | 228 / 228 | 109.9 → 111.3 (+1%) | 2.2% → 0.2% |
+| hidden 512, 8 layers, 4 threads | `llama3/esp_bc60_dynamic` | 1.1053 / 1.1053 | 228 / 228 | 77.9 → 87.1 (+12%) | 3.5% → 0.2% |
+| hidden 512, 8 layers, 4 threads | `qwen3/esp_bc60_dynamic` | 1.1053 / 1.1053 | 228 / 228 | 82.5 → 91.0 (+10%) | 3.4% → 0.2% |
+| hidden 512, 8 layers, 4 threads | `esp_static` | 1.12 / 1.12 | 225 / 225 | 124.6 → 119.8 (-4%) | 0.2% → 0.2% |
+
+Dynamic presets gain about 20–28% on the small model and 10–12% for BC=60 on the larger one; the tree-attention share drops from 6–10% to under 0.5%. Unchanged paths (static efficient, static naive, EMA static) move within noise.

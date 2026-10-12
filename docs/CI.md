@@ -54,7 +54,7 @@ python -m pytest tests/spec_mtp
 
 mypy reads `[tool.mypy]` in `pyproject.toml`: only the modules written for the RPipe dependency are checked; `recipe`, `cli`, `_win_import`, `flow/checks`, `artifact/sources` and `config_bridge` are in the strict tier (every def annotated, no bare generics, no `Any` returns), `eval.py` and the two registries get `check_untyped_defs`. The research decoder modules are not type-checked (audited code, not rewritten). RPipe has no `py.typed`, so its types are `Any`.
 
-Lint is ruff 0.17.0, rules `F` and `E9` only (`pyproject.toml`); `decoding.py` keeps an `F841` ignore so the decoder stays byte-identical to the audited one.
+Lint is ruff 0.17.0, rules `F` and `E9` only (`pyproject.toml`); `decoding.py` keeps an `F841` ignore so the audited decoder text is not reformatted.
 
 To replay the workflow locally without Actions: `python tools/ci_local.py`. It checks the current commit out into a git worktree, makes a fresh Python 3.12 venv with uv and runs each `run:` block of `cpu-checks.yml` verbatim. It does not emulate the runner image; a local pass is not a CI pass.
 

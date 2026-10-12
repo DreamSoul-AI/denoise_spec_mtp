@@ -116,3 +116,53 @@ class TreeAttentionCache:
         mask[..., cache_len:] = self._structure          # unchanged block structure
         position_ids = self._rel + root_position         # uniform PID shift
         return mask, position_ids
+
+
+class DynamicTreeAttentionCache:
+    """Dynamic trees (``impl: naive``, ``tree.mode: dynamic``): same mask and PIDs as
+    `build_block_attention`, built faster.
+
+    Dynamic trees change shape between steps but repeat a small set of shapes,
+    so the block-local structure is memoised per tree signature (LRU) and
+    filled with one indexed write instead of one Python write per entry. Per
+    step only the attend columns for the current cache are prepended and the
+    PIDs shifted, as in `TreeAttentionCache`. The result is bit-identical to
+    the naive builder (same dtype, same 0 / ``min_value`` entries, same PIDs);
+    ``tests/.../test_tree_attention_cache.py`` checks it on random trees.
+
+    Static trees with ``impl: naive`` keep `build_block_attention`, so the
+    paper's naive vs efficient ablation (Table 4) still times the naive path.
+    """
+
+    def __init__(self, max_entries=256):
+        self.max_entries = int(max_entries)
+        self._entries = {}       # signature -> (structure [1,1,B,B], rel [1,B]); dict order = LRU
+        self.hits = 0
+        self.misses = 0
+
+    def _structure(self, tree, num_masks, dtype, device, min_value):
+        key = (tuple(tree.depths), tuple(tree.parents), num_masks, dtype, str(device), float(min_value))
+        entry = self._entries.pop(key, None)
+        if entry is None:
+            self.misses += 1
+            attend, rel, _, size = block_layout(tree, num_masks)
+            rows = [i for i, cols in enumerate(attend) for _ in cols]
+            cols = [j for cols_i in attend for j in cols_i]
+            structure = torch.full((1, 1, size, size), min_value, dtype=dtype, device=device)
+            structure[0, 0, torch.tensor(rows, dtype=torch.long, device=device),
+                      torch.tensor(cols, dtype=torch.long, device=device)] = 0.0
+            entry = (structure, torch.tensor([rel], dtype=torch.long, device=device))
+            if len(self._entries) >= self.max_entries:
+                self._entries.pop(next(iter(self._entries)))
+        else:
+            self.hits += 1
+        self._entries[key] = entry
+        return entry
+
+    def get(self, tree, num_masks, cache_len, root_position, dtype, device, min_value):
+        structure, rel = self._structure(tree, num_masks, dtype, device, min_value)
+        size = structure.size(-1)
+        mask = torch.empty((1, 1, size, cache_len + size), dtype=dtype, device=device)
+        mask[..., :cache_len] = 0.0
+        mask[..., cache_len:] = structure
+        return mask, rel + root_position

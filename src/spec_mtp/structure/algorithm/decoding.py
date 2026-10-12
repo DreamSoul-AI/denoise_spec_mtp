@@ -28,8 +28,8 @@ import torch
 from spec_mtp.structure.algorithm import kv_cache
 from spec_mtp.structure.algorithm.mask_providers import build_mask_provider
 from spec_mtp.structure.algorithm.tree import build_tree, node_budget_for
-from spec_mtp.structure.algorithm.tree_attention import (TreeAttentionCache, build_block_attention,
-                                          mask_indices_of)
+from spec_mtp.structure.algorithm.tree_attention import (DynamicTreeAttentionCache, TreeAttentionCache,
+                                          build_block_attention, mask_indices_of)
 
 
 def select_token(logits_row, temperature, generator):
@@ -70,6 +70,9 @@ class SpecDecoder:
         if self.impl not in ('naive', 'efficient'):
             raise ValueError(f'Unsupported spec.impl: {self.impl}')
         self._attn_cache = TreeAttentionCache() if self.impl == 'efficient' else None
+        # Dynamic trees: memoised, vectorised build of the same naive mask (perf only).
+        # Static + naive keeps the literal builder for the Table 4 timing ablation.
+        self._dynamic_attn = DynamicTreeAttentionCache() if tree_mode == 'dynamic' else None
 
         # Log the realized block complexity (Eq 7) for bookkeeping.
         if tree_mode == 'static':
@@ -155,6 +158,9 @@ class SpecDecoder:
 
             if self.impl == 'efficient':
                 attn, position_ids = self._attn_cache.get(
+                    tree, k, cache_len, root_position, dtype, device, min_value)
+            elif self._dynamic_attn is not None:
+                attn, position_ids = self._dynamic_attn.get(
                     tree, k, cache_len, root_position, dtype, device, min_value)
             else:
                 attn, position_ids = build_block_attention(

@@ -50,7 +50,7 @@ line-length = 120
 select = ["F", "E9"]
 
 [tool.ruff.lint.per-file-ignores]
-# Decoder kept byte-identical in the refactor; `block_size` is an unused local.
+# Decoder logic unchanged since the audit (perf: dynamic-tree mask cache only); `block_size` is an unused local.
 "src/spec_mtp/structure/algorithm/decoding.py" = ["F841"]
 
 [tool.mypy]

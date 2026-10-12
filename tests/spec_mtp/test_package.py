@@ -67,3 +67,19 @@ def test_cli_lock_only_for_make_run_launch(tmp_path):
     assert json.loads((study / sources.LOCK_NAME).read_text())['created_at'] == first
     assert cli.write_lock_for(['launch', str(study), '--remake']) is not None
     assert cli.write_lock_for(['study', 'run', str(study)]) is not None
+
+
+def test_load_lock_absent_is_none(tmp_path):
+    assert sources.load_lock(tmp_path) is None
+
+
+def test_load_lock_rejects_corrupt_and_non_object(tmp_path):
+    path = tmp_path / sources.LOCK_NAME
+    path.write_text('{not json', encoding='utf-8')
+    with pytest.raises(sources.SpecMtpSourceChangedError, match='not valid JSON'):
+        sources.load_lock(tmp_path)
+    path.write_text('[1, 2]', encoding='utf-8')
+    with pytest.raises(sources.SpecMtpSourceChangedError, match='JSON object'):
+        sources.load_lock(tmp_path)
+    path.write_text('{"digest": "abc"}\n', encoding='utf-8')
+    assert sources.load_lock(tmp_path) == {'digest': 'abc'}

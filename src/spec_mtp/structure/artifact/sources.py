@@ -91,6 +91,10 @@ def manifest() -> dict[str, Any]:
     }
 
 
+class SpecMtpSourceChangedError(RuntimeError):
+    pass
+
+
 def lock_path(study_dir: Path | str) -> Path:
     return Path(study_dir) / LOCK_NAME
 
@@ -104,15 +108,25 @@ def write_lock(study_dir: Path | str) -> Path:
 
 
 def load_lock(study_dir: Path | str) -> dict[str, Any] | None:
+    """Return the Study lock, or None when the file is absent.
+
+    Raises ``SpecMtpSourceChangedError`` when the file exists but is not valid
+    JSON or is not a JSON object, so freeze / make failures name the lock path.
+    """
     path = lock_path(study_dir)
     if not path.is_file():
         return None
-    body: dict[str, Any] = json.loads(path.read_text(encoding='utf-8'))
+    try:
+        body = json.loads(path.read_text(encoding='utf-8'))
+    except json.JSONDecodeError as error:
+        raise SpecMtpSourceChangedError(
+            f'{path} is not valid JSON ({error.msg} at char {error.pos}); '
+            f'remove it or run `python -m spec_mtp make {study_dir}` again') from error
+    if not isinstance(body, dict):
+        raise SpecMtpSourceChangedError(
+            f'{path} must be a JSON object, got {type(body).__name__}; '
+            f'remove it or run `python -m spec_mtp make {study_dir}` again')
     return body
-
-
-class SpecMtpSourceChangedError(RuntimeError):
-    pass
 
 
 def changed_files(lock: dict[str, Any], current: dict[str, Any]) -> list[str]:

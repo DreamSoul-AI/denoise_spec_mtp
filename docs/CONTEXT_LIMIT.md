@@ -51,4 +51,6 @@ the merged branch over the same 26 cells (`CONTEXT_LIMIT_OPTION_A.json`):
 - All speculative token sequences identical; the 24 changed AR sequences are prefixes of the
   old AR sequences.
 
+Rerun after the alignment_probe artifact fix (same day): unchanged, except that the `alignment_probe` cell now also has `alignment_metrics.csv` (listed as `new_artifacts`; values equal the old run's stdout).
+
 `REFACTOR_REGRESSION.json` stays as the record of the pure migration (old = new before this fix).

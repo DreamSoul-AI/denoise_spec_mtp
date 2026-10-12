@@ -19,6 +19,9 @@ import sys
 AUDIT = {'ar_calls', 'exact_match', 'ar_time', 'exact_match_rate', 'speedup', 'ar_tok_per_s',
          'test_exactmatchrate', 'test_speedup', 'test_arcalls', 'status'}
 TIMING = ('time', 'tok_per_s', 'speedup')
+# Artifacts the old code never wrote (alignment_probe CSV, fixed 2026-10-12): new-only is allowed;
+# their values match the old stdout log (layer / cos_* / n_* identical).
+NEW_ONLY = {'alignment_metrics.csv'}
 
 
 def strip(obj, drop):
@@ -52,10 +55,11 @@ for key in sorted(new):
     o, n = old[key], new[key]
     limited = ctx_cell(n)
     drop = AUDIT if limited else set()
-    same = strip(o, drop) == strip(n, drop)
+    added = sorted(k for k in NEW_ONLY if k in n and k not in o)
+    same = strip(o, drop) == strip(n, drop | set(added))
     rate = n['metrics'].get('test_exactmatchrate')
     ok = same and n['status'] == 'succeeded' and (rate is None or float(rate) == 1.0)
-    report['cells'].append({'key': key, 'context_limit': limited, 'identical_outside_audit': same,
+    report['cells'].append({'key': key, 'context_limit': limited, 'identical_outside_audit': same, 'new_artifacts': added,
                             'status_old': o['status'], 'status_new': n['status'],
                             'exact_match_rate_old': o['metrics'].get('test_exactmatchrate'),
                             'exact_match_rate_new': rate, 'ok': ok})

@@ -1,5 +1,6 @@
 """DynamicTreeAttentionCache is bit-identical to the naive builder on random dynamic trees."""
 
+import pytest
 import torch
 from hypothesis import given, settings
 from hypothesis import strategies as st
@@ -59,3 +60,26 @@ def test_decoder_uses_it_only_for_dynamic_trees():
     assert dynamic._dynamic_attn is not None
     assert naive_static._dynamic_attn is None and naive_static._attn_cache is None  # Table 4 naive path kept
     assert efficient._dynamic_attn is None and efficient._attn_cache is not None
+
+
+def test_max_entries_must_be_at_least_one():
+    with pytest.raises(ValueError, match='max_entries'):
+        DynamicTreeAttentionCache(max_entries=0)
+    with pytest.raises(ValueError, match='max_entries'):
+        DynamicTreeAttentionCache(max_entries=-1)
+    assert DynamicTreeAttentionCache(max_entries=1).max_entries == 1
+
+
+def test_static_efficient_cache_matches_naive_builder():
+    """TreeAttentionCache (Appendix E) stays bit-identical after sharing _block_structure."""
+    from spec_mtp.structure.algorithm.tree import build_static_tree
+    from spec_mtp.structure.algorithm.tree_attention import TreeAttentionCache
+
+    g = torch.Generator().manual_seed(2)
+    probs = torch.softmax(torch.randn(2, 48, generator=g), dim=-1)
+    tree = build_static_tree(probs, [7, 2], root_token=3, pruning=True)
+    cache = TreeAttentionCache()
+    for cache_len, root in ((0, 5), (12, 40), (3, 0)):
+        want_m, want_p = build_block_attention(tree, 2, cache_len, root, torch.float32, 'cpu', -1e4)
+        got_m, got_p = cache.get(tree, 2, cache_len, root, torch.float32, 'cpu', -1e4)
+        assert torch.equal(got_m, want_m) and torch.equal(got_p, want_p)

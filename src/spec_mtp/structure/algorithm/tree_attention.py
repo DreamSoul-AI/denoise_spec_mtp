@@ -67,6 +67,25 @@ def mask_indices_of(tree, num_masks, owner_block_idx):
     return list(range(base, base + num_masks))
 
 
+def _block_structure(tree, num_masks, dtype, device, min_value):
+    """Block-local additive mask [1,1,B,B] and relative PIDs [1,B].
+
+    Same values as filling with a Python loop over ``block_layout`` attend sets;
+    one indexed write. Used by both the static efficient cache and the dynamic
+    memoised cache so the two stay bit-identical to each other and to the naive
+    builder.
+    """
+    attend, rel, _, size = block_layout(tree, num_masks)
+    rows = [i for i, cols in enumerate(attend) for _ in cols]
+    cols = [j for cols_i in attend for j in cols_i]
+    structure = torch.full((1, 1, size, size), min_value, dtype=dtype, device=device)
+    if rows:
+        structure[0, 0, torch.tensor(rows, dtype=torch.long, device=device),
+                  torch.tensor(cols, dtype=torch.long, device=device)] = 0.0
+    return structure, torch.tensor([rel], dtype=torch.long, device=device)
+
+
+
 def build_block_attention(tree, num_masks, cache_len, root_position, dtype, device,
                           min_value):
     """Naive path: full 4D additive mask + PIDs from the tree structure."""
@@ -98,13 +117,7 @@ class TreeAttentionCache:
         return (tuple(tree.depths), tuple(tree.parents), num_masks)
 
     def prepare(self, tree, num_masks, dtype, device, min_value):
-        attend, rel, _, size = block_layout(tree, num_masks)
-        structure = torch.full((1, 1, size, size), min_value, dtype=dtype, device=device)
-        for i, cols in enumerate(attend):
-            for j in cols:
-                structure[0, 0, i, j] = 0.0
-        self._structure = structure
-        self._rel = torch.tensor([rel], dtype=torch.long, device=device)
+        self._structure, self._rel = _block_structure(tree, num_masks, dtype, device, min_value)
         self._signature = self._tree_signature(tree, num_masks)
 
     def get(self, tree, num_masks, cache_len, root_position, dtype, device, min_value):
@@ -136,7 +149,10 @@ class DynamicTreeAttentionCache:
     """
 
     def __init__(self, max_entries=256):
-        self.max_entries = int(max_entries)
+        max_entries = int(max_entries)
+        if max_entries < 1:
+            raise ValueError(f'DynamicTreeAttentionCache.max_entries must be >= 1, got {max_entries}')
+        self.max_entries = max_entries
         self._entries = {}       # signature -> (structure [1,1,B,B], rel [1,B]); dict order = LRU
         self.hits = 0
         self.misses = 0
@@ -146,13 +162,7 @@ class DynamicTreeAttentionCache:
         entry = self._entries.pop(key, None)
         if entry is None:
             self.misses += 1
-            attend, rel, _, size = block_layout(tree, num_masks)
-            rows = [i for i, cols in enumerate(attend) for _ in cols]
-            cols = [j for cols_i in attend for j in cols_i]
-            structure = torch.full((1, 1, size, size), min_value, dtype=dtype, device=device)
-            structure[0, 0, torch.tensor(rows, dtype=torch.long, device=device),
-                      torch.tensor(cols, dtype=torch.long, device=device)] = 0.0
-            entry = (structure, torch.tensor([rel], dtype=torch.long, device=device))
+            entry = _block_structure(tree, num_masks, dtype, device, min_value)
             if len(self._entries) >= self.max_entries:
                 self._entries.pop(next(iter(self._entries)))
         else:

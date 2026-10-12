@@ -23,6 +23,7 @@
 | 还没拍板的下一步 | [BRAINSTORM.md](docs/BRAINSTORM.md) |
 | 结构改动的开发记录 | [RECORD.md](docs/RECORD.md) |
 | 上下文上限与 exact_match 口径 | [CONTEXT_LIMIT.md](docs/CONTEXT_LIMIT.md) |
+| sample_embedding 与采样 RNG | [MASK_INIT_RNG.md](docs/MASK_INIT_RNG.md) |
 | RPipe 的 Study / Flow 合同 | RPipe 仓库 `studies/README.md`、`docs/code/flow.md` §14（按 `pyproject.toml` 固定的提交读） |
 | 论文 PDF | [papers/INDEX.md](docs/papers/INDEX.md)。PDF 不进 git |
 

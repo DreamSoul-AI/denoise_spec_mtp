@@ -32,6 +32,15 @@ from spec_mtp.structure.algorithm.tree_attention import (DynamicTreeAttentionCac
                                           build_block_attention, mask_indices_of)
 
 
+def _fork_generator(generator):
+    """Independent Generator with the same current state (None stays None)."""
+    if generator is None:
+        return None
+    fork = torch.Generator(device=generator.device)
+    fork.set_state(generator.get_state())
+    return fork
+
+
 def select_token(logits_row, temperature, generator):
     """Greedy at temperature 0, else one multinomial draw ("sample matching")."""
     if temperature <= 0.0:
@@ -95,8 +104,12 @@ class SpecDecoder:
         t = prompt_ids.size(1)
         k = self.num_masks
 
+        # Mask init gets its own Generator, a copy of the sampling generator's
+        # current state: sample_embedding noise is the same as when it drew from
+        # the shared generator, but token sampling no longer loses those draws,
+        # so temperature > 0 stays token-identical to ar_generate.
         provider = build_mask_provider(self.spec_cfg, model.embedding_table,
-                                       generator=self.generator)
+                                       generator=_fork_generator(self.generator))
         stats = {'prefill_calls': 1, 'decode_calls': 0, 'accepted': 0,
                  'committed': 0, 'hit_context_limit': 0,
                  # Draft attempts/accepts at depth 1..3. An attempt is a

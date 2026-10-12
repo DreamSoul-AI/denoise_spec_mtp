@@ -46,7 +46,8 @@ Local and CI both run:
 
 ```bash
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-pip install -e ".[dev]"
+pip install -e ".[dev]" --no-deps
+# then the pyproject deps except torch/torchvision (RPipe pin, pytest, mypy, ruff, …)
 pip install ruff==0.17.0 && ruff check src tests studies tools
 pip install mypy==2.4.0 types-PyYAML==6.0.12.20260906 && mypy
 python -m pytest tests/spec_mtp
@@ -58,7 +59,7 @@ Lint is ruff 0.17.0, rules `F` and `E9` only (`pyproject.toml`); `decoding.py` k
 
 To replay the workflow locally without Actions: `python tools/ci_local.py`. It checks the current commit out into a git worktree, makes a fresh Python 3.12 venv with uv and runs each `run:` block of `cpu-checks.yml` verbatim. It does not emulate the runner image; a local pass is not a CI pass.
 
-`pip install -e ".[dev]"` installs RPipe from the commit pinned in `pyproject.toml` (public GitHub, no token). A step before pytest prints that commit and checks that `rpipe` resolves to `rpipe.flow.cli:main` and `spec-mtp` to `spec_mtp.cli:main`.
+CI installs the CPU torch wheel first, then `-e ".[dev]" --no-deps`, then the remaining `pyproject.toml` dependencies (including the pinned RPipe commit) so pip does not replace the CPU wheel. A step before pytest prints that commit and checks that `rpipe` resolves to `rpipe.flow.cli:main` and `spec-mtp` to `spec_mtp.cli:main`.
 
 The suite is the SpecMTP modules under `tests/spec_mtp/`, including the smoke Study. A smoke variant passes only when its `overall` row has `exact_match_rate == 1.0`; the Study write hook fails the Run otherwise.
 

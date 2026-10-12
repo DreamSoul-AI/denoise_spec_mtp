@@ -1,9 +1,10 @@
 """Thin entry over ``rpipe.flow.cli``.
 
-The only addition: ``make`` / ``run`` (and ``launch --remake`` or a launch that
-has no jobs yet) write the SpecMTP source lock into the Study before RPipe
-expands it. Every other command and argument goes to RPipe unchanged, so
-scripts, this cli and ``python -m rpipe`` share one execution chain.
+``make`` and ``launch --remake`` write the SpecMTP source lock. ``run`` and a
+plain ``launch`` keep an existing lock so ``freeze: true`` can see source drift
+after make. A first ``run`` without a lock still writes one, unless the Study
+sets ``freeze: true`` (then recipe reports the missing lock). Everything else
+goes to RPipe unchanged.
 """
 
 from __future__ import annotations
@@ -33,6 +34,18 @@ def _command(argv: list[str]) -> str | None:
     return argv[0]
 
 
+def _study_freeze(study: Path) -> bool:
+    try:
+        import yaml
+    except ImportError:
+        return False
+    try:
+        body = yaml.safe_load((study / 'study.yaml').read_text(encoding='utf-8')) or {}
+    except (OSError, yaml.YAMLError):
+        return False
+    return isinstance(body, dict) and body.get('freeze') is True
+
+
 def write_lock_for(argv: list[str]) -> Path | None:
     command = _command(argv)
     if command not in _LOCK_COMMANDS:
@@ -42,10 +55,13 @@ def write_lock_for(argv: list[str]) -> Path | None:
         return None
     from spec_mtp.structure.artifact.sources import load_lock, write_lock
 
-    if command == 'launch' and '--remake' not in argv and (study / 'scripts' / 'jobs.json').is_file():
-        # launch reuses the make plan; keep the make-time lock so freeze can detect drift.
-        if load_lock(study) is not None:
-            return None
+    remake = command == 'launch' and '--remake' in argv
+    if command == 'make' or remake:
+        return write_lock(study)
+    if load_lock(study) is not None:
+        return None
+    if _study_freeze(study):
+        return None
     return write_lock(study)
 
 

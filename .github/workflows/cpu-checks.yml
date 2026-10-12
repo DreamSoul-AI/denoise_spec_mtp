@@ -35,8 +35,20 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          # Resolves the pinned RPipe dependency together with this package.
-          pip install -e ".[dev]"
+          # Keep the CPU torch wheel: do not resolve torch from pyproject.
+          pip install -e ".[dev]" --no-deps
+          python - <<'PY'
+          import sys, tomllib
+          from pathlib import Path
+          from subprocess import check_call
+          data = tomllib.loads(Path('pyproject.toml').read_bytes())
+          skip = {'torch', 'torchvision'}
+          def name(dep: str) -> str:
+              return dep.split()[0].split('@')[0].split('>')[0].split('<')[0].split('=')[0].strip().lower()
+          deps = [d for d in data['project']['dependencies'] if name(d) not in skip]
+          deps += data['project']['optional-dependencies']['dev']
+          check_call([sys.executable, '-m', 'pip', 'install', *deps])
+          PY
 
       - name: Lint (pyflakes errors only)
         run: |

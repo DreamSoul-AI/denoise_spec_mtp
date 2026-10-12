@@ -42,8 +42,8 @@
 - RPipe 是外部依赖（`pyproject.toml` 固定 `diaoenmao/RPipe` 的 `dev` 提交）。调度、Flow 阶段链、FlowContext、Tracker、Logger、result、provenance / freeze、聚合与 readout 都用库里的，不在本仓库复制，也不通过换包名复制 runner、Factory、Registry、artifact、make。
 - `src/spec_mtp/` 是 SpecMTP 专用代码，按 RPipe 的 `structure` 分层命名：`structure/algorithm/`（mask、树、解码、esp / ar / alignment，注册为 `(eval, spec_mtp)`）、`structure/data/`、`structure/model/`、`structure/system/`、`structure/control/`、`structure/artifact/`。`spec_mtp/recipe.py` 做注册和构造条件校验；`spec_mtp/flow/` 只放 Study 阶段会调用的 SpecMTP 专用检查。
 - 注册只发生在 Study 的 `recipe.register(ctx)` 里，导入 `spec_mtp` 不注册、不计算。不改 RPipe 默认 source。
-- 入口：`python -m rpipe …` 是主入口。`python -m spec_mtp` / `spec-mtp` 是薄入口：在 make / run 时额外写 SpecMTP 源码清单，其余原样转给 `rpipe`。本项目安装不提供 `rpipe` 命令，不覆盖真正的 RPipe。
-- Windows：`spec_mtp/__init__.py` 保留“先 import torch”的适配（原因见该文件注释）；只在经 `spec_mtp` 入口时先于 RPipe 生效。Linux 上无法验证，不要据此删除。不恢复 `src/main.py`。
+- 入口：`python -m rpipe …` 是主入口。`python -m spec_mtp` / `spec-mtp` 是薄入口：`make` 写 SpecMTP 源码清单，`run` 不覆盖已有锁。其余原样转给 `rpipe`。本项目安装不提供 `rpipe` 命令，不覆盖真正的 RPipe。
+- Windows：`spec_mtp/__init__.py` 和 `src/sitecustomize.py` 保留“先 import torch”的适配（原因见该文件注释）。editable 安装下 `python -m rpipe` 也会走到 sitecustomize。Linux 上无法验证，不要据此删除。不恢复 `src/main.py`。
 
 ## 5. 实验
 

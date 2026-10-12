@@ -37,3 +37,12 @@ def test_torch_missing_falls_back_to_numpy():
 def test_bad_value_fails():
     with pytest.raises(ValueError, match=w.ENV):
         w.preload('win32', {w.ENV: 'scipy'}, _importer()[0])
+
+
+def test_sitecustomize_lives_next_to_the_package():
+    from pathlib import Path
+
+    import spec_mtp
+    import sitecustomize
+
+    assert Path(sitecustomize.__file__).resolve().parent == Path(spec_mtp.__file__).resolve().parents[1]

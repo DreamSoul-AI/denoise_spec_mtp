@@ -6,10 +6,11 @@ RPipe 依赖：`diaoenmao/RPipe` 分支 `dev`，固定提交 `ce8b3e6453d282711f
 
 ```text
 src/
+  sitecustomize.py         editable install: Windows torch-first even for python -m rpipe
   spec_mtp/                SpecMTP only; RPipe is an installed dependency
     __init__.py            no registration at import; calls _win_import.preload()
     _win_import.py         Windows import order switch (SPEC_MTP_WIN_IMPORT_ORDER)
-    __main__.py / cli.py   thin entry: make / run / launch write the SpecMTP source lock, then forward to rpipe
+    __main__.py / cli.py   thin entry: make writes the SpecMTP source lock; run keeps it; then forward to rpipe
     recipe.py              register(ctx): config checks + register sources on RPipe registries
     flow/
       checks.py            exact_match Run gate, Study scope gate (called by Study flow/<phase>/run.py)

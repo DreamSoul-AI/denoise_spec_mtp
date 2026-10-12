@@ -17,13 +17,17 @@ serialises the git worktree add/remove against the same repo.
 from __future__ import annotations
 
 import argparse
-import fcntl
 import os
 import shutil
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+try:
+    import fcntl
+except ImportError:  # Windows
+    fcntl = None
 
 import yaml
 
@@ -49,7 +53,8 @@ def main() -> int:
     # ``.tmp/ci_local/cpu-checks/`` and race on pip install / worktree remove.
     lock_path = base / 'ci_local.lock'
     lock_file = lock_path.open('a+', encoding='utf-8')
-    fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+    if fcntl is not None:
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
     results = []
     try:
         for job_name, job in workflow['jobs'].items():
@@ -84,7 +89,8 @@ def main() -> int:
                 if not args.keep:
                     subprocess.run(['git', 'worktree', 'remove', '--force', str(work)], cwd=ROOT)
     finally:
-        fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+        if fcntl is not None:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
         lock_file.close()
         if not args.keep:
             shutil.rmtree(run, ignore_errors=True)

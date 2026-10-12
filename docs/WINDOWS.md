@@ -12,7 +12,7 @@
 | `numpy` | 先 NumPy（同 RPipe dev） |
 | `off` | spec_mtp 不预导入，谁先 import 谁决定 |
 
-只在 `sys.platform == 'win32'` 生效，且只在 spec_mtp 先于 rpipe / torch / numpy 导入时有意义，也就是 `python -m spec_mtp ...`。`python -m rpipe ...` 先走 RPipe 自己的顺序，开关管不到。取值写错会在 import 时报错。代码在 `src/spec_mtp/_win_import.py`。
+只在 `sys.platform == 'win32'` 生效。`python -m spec_mtp` 走包入口的 preload。editable 安装还会加载 `src/sitecustomize.py`（site.py 在把 `src/` 加进 `sys.path` 之后 import），所以 `python -m rpipe` 和生成的 `launch.ps1` / `run-one` 也会先 Torch。取值写错会在 import 时报错。代码在 `src/spec_mtp/_win_import.py`。
 
 ## 自检
 

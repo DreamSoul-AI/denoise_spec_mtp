@@ -19,6 +19,8 @@
 | 怎么跑一个 Study | [studies/README.md](studies/README.md)，以及该 Study 的 `docs/PLAN.md` |
 | 测试与 CI | [TESTING.md](docs/TESTING.md)、[CI.md](docs/CI.md) |
 | 还没拍板的下一步 | [BRAINSTORM.md](docs/BRAINSTORM.md) |
+| 结构改动的开发记录 | [RECORD.md](docs/RECORD.md) |
+| RPipe 的 Study / Flow 合同 | RPipe 仓库 `studies/README.md`、`docs/code/flow.md` §14（按 `pyproject.toml` 固定的提交读） |
 | 论文 PDF | [papers/INDEX.md](docs/papers/INDEX.md)。PDF 不进 git |
 
 [BRAINSTORM.md](docs/BRAINSTORM.md) 只记探索，不当实现合同。

@@ -116,7 +116,9 @@ Verification is exact match against the model's own chain, not residual sampling
 
 ## Result files
 
-A Study run writes `studies/<name>/runs/<id>/assets/`. `runs/` and `results/` are gitignored. A new cell is a new Run id from `python -m spec_mtp make`; do not reuse a directory, because the CSV logger appends. Older cells for this question are under [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md).
+A Study run writes `studies/<name>/runs/<id>/assets/`. `runs/` and `results/` are gitignored. A new cell is a new Run id from `python -m spec_mtp make` (or `rpipe make`); do not reuse a directory, because the CSV logger appends.
+
+Each Run also has `assets/spec_mtp_sources.json` (SpecMTP file hashes, git head, installed RPipe commit) and `result.json:spec_mtp` (gate verdict, `exact_match_rate`, accept counts, source digest). RPipe's `result.json:provenance` is the Study provenance digest. Older cells for this question are under [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md).
 
 `spec_metrics.csv`, one row per prompt: `prompt`, `category`, `new_tokens`, `committed`, `decode_calls`, `accepted`, `tau`, `spec_time`, `hit_context_limit`. With `eval.run_ar_baseline: true` also `ar_time`, `ar_calls`, `exact_match`.
 

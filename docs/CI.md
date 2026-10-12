@@ -18,7 +18,8 @@ merge. Naming follows `feature/<scope>-<name>`, `fix/<scope>-<name>`, and
 | --- | --- |
 | `main` | Release line. Stays at `b636f90` (`fix gitignore`), the reproduction baseline. The history audit is not on `main`. |
 | `dev` | Integration line. Daily PRs land here. It is ahead of `main` by the history audit and the doc consolidation. |
-| `refactor/spec-rpipe` | RPipe layout: `src/spec_mtp` follows RPipe; SpecMTP code is in each layer's `spec_mtp/` submodule. |
+| `refactor/spec-rpipe` | Merged into `dev` (`b1f6191`): the copied-RPipe layout. Superseded by the dependency design. |
+| `refactor/rpipe-dependency` | Depend on RPipe `dev` (pinned), drop the copied framework. Prepared locally on 2026-10-12; not pushed, CI not run yet. |
 
 `feature/research-ema-history-audit` is retired. Its commits are on `dev`.
 
@@ -43,11 +44,14 @@ The commits that moved the history audit onto the integration line already passe
 Local and CI both run:
 
 ```bash
-pip install -e .
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -e ".[dev]"
 python -m pytest tests/spec_mtp
 ```
 
-The suite is the SpecMTP modules under `tests/spec_mtp/`, including the smoke Study. A smoke variant passes only when its `overall` row has `exact_match_rate == 1.0`.
+`pip install -e ".[dev]"` installs RPipe from the commit pinned in `pyproject.toml` (public GitHub, no token). A step before pytest prints that commit and checks that `rpipe` resolves to `rpipe.flow.cli:main` and `spec-mtp` to `spec_mtp.cli:main`.
+
+The suite is the SpecMTP modules under `tests/spec_mtp/`, including the smoke Study. A smoke variant passes only when its `overall` row has `exact_match_rate == 1.0`; the Study write hook fails the Run otherwise.
 
 ## Result protocol
 

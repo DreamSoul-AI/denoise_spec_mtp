@@ -17,24 +17,30 @@ Agent notes: [AGENTS.md](AGENTS.md).
 
 ```text
 src/
-  rpipe/       full RPipe package: structure/ + flow/, unchanged
-  spec_mtp/    RPipe copied file for file; SpecMTP sits in each layer's spec_mtp/ submodule
-               (the decoder is structure/algorithm/eval/spec_mtp/)
-studies/           each Study holds its code and data; scripts/, runs/, and results/ stay local
+  spec_mtp/    SpecMTP only: structure/<layer>/ (decoder in structure/algorithm/),
+               recipe.py, flow/checks.py, thin cli.py
+studies/       each Study holds declarations, recipe.py, flow/ hooks and data;
+               scripts/, runs/, and results/ stay local
 configs/       old per-run YAML; not an entry
 tests/         tests/spec_mtp mirrors src/spec_mtp
-docs/          ARCHITECTURE, CI, LAYOUT, TESTING, BRAINSTORM; papers/ is local PDFs
+docs/          ARCHITECTURE, CI, LAYOUT, TESTING, BRAINSTORM, RECORD; papers/ is local PDFs
 ```
+
+RPipe is a dependency, pinned to `diaoenmao/RPipe` `dev` commit
+`ce8b3e6453d282711f0032b73409e147a49d49fa` in `pyproject.toml`. This repo no
+longer carries a copy of RPipe. Installing it does not install an `rpipe`
+command of its own; `rpipe` comes from the RPipe package.
 
 ## Quick Start (CPU, no downloads)
 
 ```bash
-pip install -e .
+pip install torch --index-url https://download.pytorch.org/whl/cpu   # or your CUDA wheel
+pip install -e ".[dev]"        # pulls the pinned RPipe from GitHub
 set PYTHONUTF8=1
 python -m pytest tests/spec_mtp
 ```
 
-The smoke Study is `studies/smoke_tiny_llama`. A person runs the script that Study generates: `studies/smoke_tiny_llama/scripts/launch.ps1`. Every smoke summary must show `exact_match_rate=1.0000`.
+The smoke Study is `studies/smoke_tiny_llama`. A person runs the script that Study generates: `studies/smoke_tiny_llama/scripts/launch.ps1`. Every smoke Run must show `exact_match_rate=1.0000`; a Run that does not is written as `failed`.
 
 ## Run a Study
 
@@ -47,8 +53,12 @@ python -m spec_mtp make studies/<name>
 studies/<name>/scripts/launch.ps1
 ```
 
-On bash the same directory has `launch.sh`. CI calls `python -m spec_mtp run`
-on `studies/smoke_tiny_llama` directly; that is the same runner the script uses.
+On bash the same directory has `launch.sh`. `python -m spec_mtp` is a thin
+entry over `python -m rpipe`: it writes the SpecMTP source lock
+(`spec_mtp_sources.json`) on `make` / `run`, then hands the same arguments to
+RPipe. `status`, `logs`, `report`, `process`, `compare` work the same through
+either entry. CI calls `python -m spec_mtp run` on `studies/smoke_tiny_llama`;
+the scripts call `rpipe launch`; both reach the same RPipe FlowRunner.
 
 ## GPU Server
 

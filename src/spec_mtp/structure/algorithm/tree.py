@@ -21,9 +21,8 @@ repetition) is replaced by the next-best token from the same mask
 distribution.
 """
 
-from typing import Any
 from dataclasses import dataclass, field
-from typing import List
+from typing import Any
 
 import torch
 
@@ -34,10 +33,10 @@ class DraftTree:
     node j (1-indexed by position in `tokens`) sits at block index j."""
 
     root_token: int
-    tokens: List[int] = field(default_factory=list)       # node tokens
-    depths: List[int] = field(default_factory=list)       # node depths, >= 1
-    parents: List[int] = field(default_factory=list)      # parent block index
-    probs: List[float] = field(default_factory=list)      # cumulative path prob
+    tokens: list[int] = field(default_factory=list)       # node tokens
+    depths: list[int] = field(default_factory=list)       # node depths, >= 1
+    parents: list[int] = field(default_factory=list)      # parent block index
+    probs: list[float] = field(default_factory=list)      # cumulative path prob
 
     @property
     def num_nodes(self):

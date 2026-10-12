@@ -113,16 +113,18 @@ class TreeAttentionCache:
         self._rel: Any = None         # [1, B] relative PIDs
         self._signature = None
 
-    def _tree_signature(self, tree, num_masks):
-        return (tuple(tree.depths), tuple(tree.parents), num_masks)
+    def _signature_key(self, tree, num_masks, dtype, device, min_value):
+        # dtype / device / min_value must be part of the key: a float32 structure
+        # reused for a bf16 step would keep the wrong fill value (caught 2026-10-12).
+        return (tuple(tree.depths), tuple(tree.parents), num_masks, dtype, str(device), float(min_value))
 
     def prepare(self, tree, num_masks, dtype, device, min_value):
         self._structure, self._rel = _block_structure(tree, num_masks, dtype, device, min_value)
-        self._signature = self._tree_signature(tree, num_masks)
+        self._signature = self._signature_key(tree, num_masks, dtype, device, min_value)
 
     def get(self, tree, num_masks, cache_len, root_position, dtype, device, min_value):
-        if self._signature != self._tree_signature(tree, num_masks):
-            # First step, or the structure changed: (re)build once.
+        if self._signature != self._signature_key(tree, num_masks, dtype, device, min_value):
+            # First step, or tree / dtype / device / min_value changed: (re)build once.
             self.prepare(tree, num_masks, dtype, device, min_value)
         size = self._structure.size(-1)
         mask = torch.empty((1, 1, size, cache_len + size), dtype=dtype, device=device)

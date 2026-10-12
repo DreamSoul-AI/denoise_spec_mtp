@@ -83,3 +83,18 @@ def test_static_efficient_cache_matches_naive_builder():
         want_m, want_p = build_block_attention(tree, 2, cache_len, root, torch.float32, 'cpu', -1e4)
         got_m, got_p = cache.get(tree, 2, cache_len, root, torch.float32, 'cpu', -1e4)
         assert torch.equal(got_m, want_m) and torch.equal(got_p, want_p)
+
+
+def test_static_cache_rebuilds_when_dtype_or_min_value_changes():
+    from spec_mtp.structure.algorithm.tree import build_static_tree
+    from spec_mtp.structure.algorithm.tree_attention import TreeAttentionCache
+
+    g = torch.Generator().manual_seed(0)
+    tree = build_static_tree(torch.softmax(torch.randn(2, 32, generator=g), dim=-1), [4], root_token=1, pruning=False)
+    cache = TreeAttentionCache()
+    cache.get(tree, 2, 3, 10, torch.float32, 'cpu', torch.finfo(torch.float32).min)
+    for dtype in (torch.bfloat16, torch.float32):
+        min_value = torch.finfo(dtype).min
+        got, _ = cache.get(tree, 2, 3, 10, dtype, 'cpu', min_value)
+        want, _ = build_block_attention(tree, 2, 3, 10, dtype, 'cpu', min_value)
+        assert got.dtype == dtype and torch.equal(got, want)

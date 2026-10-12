@@ -40,3 +40,15 @@ pythonpath = ["src"]
 addopts = "-q --tb=short"
 cache_dir = ".tmp/pytest-cache"
 filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+# Errors only (pyflakes + syntax); no style rewrite of the research code.
+select = ["F", "E9"]
+
+[tool.ruff.lint.per-file-ignores]
+# Decoder kept byte-identical in the refactor; `block_size` is an unused local.
+"src/spec_mtp/structure/algorithm/decoding.py" = ["F841"]

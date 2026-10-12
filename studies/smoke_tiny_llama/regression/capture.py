@@ -13,12 +13,12 @@ enabled here, so a cell that breaks exact match is still captured instead of
 failing; the Run gate is tested separately in tests/. Every SpecDecoder and
 AR output sequence is recorded in call order (warm-up included).
 """
-import csv, importlib, json, os, shutil, sys
+import csv, importlib, json, shutil, sys
 import yaml
 from pathlib import Path
 mode, out, studies = sys.argv[1], sys.argv[2], sys.argv[3:]
 if mode == 'old':
-    import spec_mtp  # registers
+    import spec_mtp  # noqa: F401  old package registers on import
     from spec_mtp.flow.cli import run_study
     dec_mod = 'spec_mtp.structure.algorithm.eval.spec_mtp.decoding'
     prefix = 'spec_mtp.structure.algorithm.eval.spec_mtp'

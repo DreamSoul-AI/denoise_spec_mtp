@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 
 from rpipe.structure.model.factory import Model, ModelRegistry
 
-from spec_mtp.structure.control.named import NamedDict, _convert
+from spec_mtp.structure.control.named import _convert
 from spec_mtp.structure.model.hf_causal import build_model
 
 
@@ -24,7 +23,7 @@ def _materialize_hub(model_cfg):
     hub = str(model_cfg.get('hub', '') or '').lower()
     if hub != 'modelscope':
         return model_cfg
-    import torch  # load before ModelScope on Windows so BLAS DLLs agree
+    import torch  # noqa: F401  load before ModelScope on Windows so BLAS DLLs agree
     from modelscope import snapshot_download
 
     local = snapshot_download(str(model_cfg['name_or_path']))

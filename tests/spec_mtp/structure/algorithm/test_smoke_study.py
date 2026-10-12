@@ -7,10 +7,8 @@ framework). They guard the migration; they are not a research result.
 import csv
 import json
 
-import pytest
-import yaml
 
-from conftest import ROOT, SMOKE, cli
+from conftest import SMOKE, cli
 
 EXPECTED_ACCEPT_D1 = {
     'esp_static': 27,

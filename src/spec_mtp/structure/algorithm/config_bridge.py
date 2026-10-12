@@ -1,6 +1,6 @@
 """Map an RPipe Run layer into the legacy NamedDict the decoders expect."""
 
-from spec_mtp.structure.control.named import NamedDict, _convert
+from spec_mtp.structure.control.named import _convert
 
 
 def legacy_cfg(data, model, system, algorithm_config, seed):

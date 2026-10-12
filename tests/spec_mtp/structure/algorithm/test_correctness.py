@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4] / 'src'))
 
 import torch
 
-from spec_mtp.structure.control.named import NamedDict, _convert
+from spec_mtp.structure.control.named import _convert
 from spec_mtp.structure.model.hf_causal import HFCausalLM
 from spec_mtp.structure.algorithm.decoding import SpecDecoder, ar_generate
 from spec_mtp.structure.algorithm.mask_providers import EMAVelocityMaskProvider, ESPMaskProvider

@@ -1,6 +1,7 @@
 # CPU correctness + smoke.
 # Work-branch pushes, PRs into dev/main, and the dev commit after a merge.
 # Same entry as local runs: python -m pytest tests/spec_mtp (see docs/CI.md).
+# RPipe is installed from the commit pinned in pyproject.toml (public GitHub, no secrets).
 # GPU model runs are not part of this workflow. This is not a release build.
 name: cpu-checks
 
@@ -34,8 +35,18 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          pip install -e . --no-deps
-          pip install numpy PyYAML "transformers>=4.45" datasets accelerate matplotlib scipy kornia pytest
+          # Resolves the pinned RPipe dependency together with this package.
+          pip install -e ".[dev]"
+
+      - name: Check RPipe pin and entry points
+        run: |
+          python - <<'PY'
+          import importlib.metadata as m, json
+          url = json.loads(m.distribution('rpipe').read_text('direct_url.json'))
+          print('rpipe', url['url'], url['vcs_info']['commit_id'])
+          eps = {e.name: e.value for e in m.entry_points(group='console_scripts') if e.name in ('rpipe', 'spec-mtp')}
+          assert eps == {'rpipe': 'rpipe.flow.cli:main', 'spec-mtp': 'spec_mtp.cli:main'}, eps
+          PY
 
       - name: Run spec_mtp tests
         env:

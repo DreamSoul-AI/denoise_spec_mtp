@@ -34,6 +34,7 @@ Temporary files and the pytest cache go to `.tmp/`. End-to-end tests copy the sm
 | `structure/algorithm/test_tree_boundaries.py` | empty DraftTree helpers; node_budget too small; more branches than masks; zero-width stop; _topk banned/taken; dynamic pruning exhausts vocab; build_tree dispatch / unknown mode; children_of Top-1 expansion |
 | `structure/algorithm/test_mask_provider_boundaries.py` | ESP update=false; offset/sample init; EMA update=false freezes velocity but moves anchor; extrapolate_ema; build_mask_provider wiring |
 | `structure/algorithm/test_decoder_boundaries.py` | bad impl/tree/mask.init/method/ema.level; last_k / short EMA prompt; EOS vs AR; context-limit flag + budgeted AR; budget truncation; RNG fork; KV crop / keep_block_positions / unsupported type |
+| `structure/algorithm/test_decoding_esp_boundaries.py` | select_token / tree_probs; budget=1 prefill-only; naive-static literal attention; EOS mid-pass + AR EOS; esp_mtp totals / _aggregate / warmup restore / empty prompts / CSV / run_ar_baseline=false / test() shim |
 | `structure/algorithm/test_tree_attention_cache.py` | dynamic-tree mask cache bit-identical to the naive builder (random trees, fp32 / bf16, hits, LRU eviction, no aliasing); decoder picks it only for dynamic trees |
 | `test_fingerprint_tool.py` | `tools/decode_fingerprint.py` comparison logic |
 | `test_win_import.py` | `SPEC_MTP_WIN_IMPORT_ORDER` logic (real DLL order needs Windows: `tools/windows_selfcheck.py`) |

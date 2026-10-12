@@ -30,7 +30,7 @@ tools/                     ci_local.py (replay the CI workflow), windows_selfche
                            see tools/README.md
 tests/
   spec_mtp/                mirrors src/spec_mtp
-docs/                      ARCHITECTURE, CI, BRAINSTORM, LAYOUT, TESTING, WINDOWS, RECORD, CONTEXT_LIMIT, PROFILE
+docs/                      ARCHITECTURE, CI, BRAINSTORM, LAYOUT, TESTING, WINDOWS, RECORD, MIGRATION_CHANGELOG, CONTEXT_LIMIT, PROFILE
 AGENTS.md                  how to work in this repo; points at docs/
 ```
 

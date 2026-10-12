@@ -46,8 +46,13 @@ Local and CI both run:
 ```bash
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install -e ".[dev]"
+pip install ruff==0.17.0 && ruff check .
 python -m pytest tests/spec_mtp
 ```
+
+Lint is ruff 0.17.0, rules `F` and `E9` only (`pyproject.toml`); `decoding.py` keeps an `F841` ignore so the decoder stays byte-identical to the audited one.
+
+To replay the workflow locally without Actions: `python tools/ci_local.py`. It checks the current commit out into a git worktree, makes a fresh Python 3.12 venv with uv and runs each `run:` block of `cpu-checks.yml` verbatim. It does not emulate the runner image; a local pass is not a CI pass.
 
 `pip install -e ".[dev]"` installs RPipe from the commit pinned in `pyproject.toml` (public GitHub, no token). A step before pytest prints that commit and checks that `rpipe` resolves to `rpipe.flow.cli:main` and `spec-mtp` to `spec_mtp.cli:main`.
 
@@ -60,4 +65,4 @@ Pytest writes its cache under `.tmp/pytest-cache/` (gitignored). Smoke CSVs live
 ## Out of scope
 
 GPU cells are Studies under `studies/`. They need weights and a GPU.
-They are not in CI and must not be reported as CI-verified.
+They are not in CI and must not be reported as CI-verified. CI only checks that `studies/paper_hf/` expands and matches `configs/hf/` (`test_paper_hf.py`). Windows is not in CI; see [WINDOWS.md](WINDOWS.md).

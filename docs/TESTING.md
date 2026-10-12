@@ -7,8 +7,11 @@ Tests live under `tests/spec_mtp/` and follow `src/spec_mtp/`. They cover the Sp
 ```text
 set PYTHONUTF8=1
 pip install -e ".[dev]"
+ruff check .
 python -m pytest tests/spec_mtp
 ```
+
+`python tools/ci_local.py` replays `.github/workflows/cpu-checks.yml` in a fresh worktree and venv (see [CI.md](CI.md)).
 
 Temporary files and the pytest cache go to `.tmp/`. End-to-end tests copy the smoke Study into a pytest temp dir; only `test_smoke_study_matches_plain_generation` runs the repository Study in place (its `runs/` is gitignored).
 
@@ -21,6 +24,8 @@ Temporary files and the pytest cache go to `.tmp/`. End-to-end tests copy the sm
 | `structure/system/`, `control/`, `artifact/` | device / dtype, NamedDict, CSV rows |
 | `flow/test_checks.py` | Run gate and Study-scope gate (missing, subset, failed, mixed source digest, seeds) |
 | `test_recipe.py` | no registration on import, idempotent registration on RPipe registries, config boundary checks, source lock / freeze, repository Studies expand and validate |
+| `test_paper_hf.py` | `studies/paper_hf/` generated files current; 59 legacy `configs/hf` cells = 59 expanded Runs (data / model / task / eval / effective spec / seed); recipe checks. No weights, no GPU |
+| `test_win_import.py` | `SPEC_MTP_WIN_IMPORT_ORDER` logic (real DLL order needs Windows: `tools/windows_selfcheck.py`) |
 | `test_package.py` | RPipe pinned and not vendored, console scripts do not override `rpipe`, source manifest coverage, cli lock rules |
 
 ## Refactor regression (manual)

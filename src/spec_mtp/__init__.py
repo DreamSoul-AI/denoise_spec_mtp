@@ -9,17 +9,12 @@ Importing this package registers nothing; registration happens in a Study
 recipe before Data / Model are built.
 """
 
-import sys
+from spec_mtp._win_import import preload as _preload
 
-# On Windows, import Torch before other native extensions so OpenMP/BLAS DLLs
-# agree. Importing NumPy alone first can fault in blas_fpe_check on some setups.
-# Kept from the pre-refactor package (2026-10-06 local Windows setup); it only
-# takes effect when spec_mtp is imported before rpipe (the spec_mtp entry).
-# Not verifiable on Linux; do not drop it as part of de-duplication.
-if sys.platform == 'win32':
-    try:
-        import torch  # noqa: F401
-    except ImportError:
-        import numpy  # noqa: F401
+# Windows only: import order of native extensions (OpenMP / BLAS DLLs).
+# Default ``torch`` keeps the pre-refactor behaviour; RPipe dev uses NumPy
+# first. Switch with SPEC_MTP_WIN_IMPORT_ORDER=torch|numpy|off, see
+# spec_mtp/_win_import.py and docs/WINDOWS.md. Not verifiable on Linux.
+_preload()
 
 __version__ = '0.2.0'

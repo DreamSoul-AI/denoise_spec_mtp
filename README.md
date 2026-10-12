@@ -11,7 +11,7 @@ Training-free multi-token prediction. Two things live here:
 
 Docs (UPPERCASE filenames): [ARCHITECTURE](docs/ARCHITECTURE.md),
 [CI](docs/CI.md), [LAYOUT](docs/LAYOUT.md),
-[TESTING](docs/TESTING.md), [BRAINSTORM](docs/BRAINSTORM.md).
+[TESTING](docs/TESTING.md), [WINDOWS](docs/WINDOWS.md), [BRAINSTORM](docs/BRAINSTORM.md).
 Recorded accepts: [history_extrapolation](studies/history_extrapolation/docs/STUDY_REPORT.md).
 Agent notes: [AGENTS.md](AGENTS.md).
 

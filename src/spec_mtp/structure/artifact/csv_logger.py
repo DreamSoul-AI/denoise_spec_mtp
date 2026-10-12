@@ -1,3 +1,5 @@
+from typing import Any
+
 import csv
 import os
 
@@ -5,13 +7,13 @@ import os
 class Logger:
     """Simple CSV + stdout logger for experiment metrics."""
 
-    def __init__(self, save_dir, filename='metrics.csv'):
+    def __init__(self, save_dir: str | None, filename: str = 'metrics.csv') -> None:
         self.save_dir = save_dir
         self.filepath = os.path.join(save_dir, filename) if save_dir else None
         self._header_written = False
 
-    def log(self, metrics: dict, step=None, prefix=''):
-        row = {}
+    def log(self, metrics: dict[str, Any], step: int | None = None, prefix: str = '') -> None:
+        row: dict[str, Any] = {}
         if step is not None:
             row['step'] = step
         for k, v in metrics.items():

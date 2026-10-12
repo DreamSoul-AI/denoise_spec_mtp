@@ -83,3 +83,15 @@ disallow_any_generics = true
 warn_return_any = true
 no_implicit_reexport = true
 strict_equality = true
+
+[[tool.mypy.overrides]]
+# Mid tier: research helpers with annotations; calls into torch / transformers stay free.
+module = [
+  "spec_mtp.structure.algorithm.kv_cache",
+  "spec_mtp.structure.algorithm.common",
+  "spec_mtp.structure.artifact.csv_logger",
+]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+warn_return_any = false

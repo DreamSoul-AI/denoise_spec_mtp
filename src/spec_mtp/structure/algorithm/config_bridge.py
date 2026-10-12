@@ -16,14 +16,16 @@ def legacy_cfg(data, model, system, algorithm_config, seed):
 
 
 def apply_variant(spec_cfg, variant):
-    """Merge a smoke / sweep variant label into ``spec``."""
+    """Merge a smoke variant or a ``<group>/<cell>`` paper preset into ``spec``."""
+    from spec_mtp.structure.algorithm.paper_variants import PAPER_VARIANTS
     from spec_mtp.structure.algorithm.smoke_variants import VARIANTS
 
     key = str(variant or '').lower()
     if not key:
         return spec_cfg
-    if key not in VARIANTS:
+    presets = {**VARIANTS, **PAPER_VARIANTS}
+    if key not in presets:
         raise ValueError(f'unknown spec variant: {key!r}')
     merged = dict(spec_cfg or {})
-    merged.update(VARIANTS[key])
+    merged.update(presets[key])
     return _convert(merged)

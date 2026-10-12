@@ -29,7 +29,7 @@ src/spec_mtp/flow/checks.py                 exact_match Run gate and Study scope
 src/spec_mtp/structure/artifact/sources.py  SpecMTP source manifest (provenance outside the Study)
 ```
 
-`configs/hf/<family>/` keeps the old per-setting YAML as a record; runs go through a Study.
+`configs/hf/<family>/` keeps the old per-setting YAML as a record; runs go through a Study. `studies/paper_hf/` holds one Study per family / group / task, generated from those files (`migrate_configs.py`, `--check` in tests); spec blocks live in `structure/algorithm/paper_variants.py` and are picked by `algorithm.config.variant`. The legacy `eval.device: auto` is replaced by `system.config.device: cuda`.
 
 ## Run path and gates
 

@@ -16,6 +16,7 @@ SpecMTP Study 的固定写法：
 | --- | --- | --- |
 | [history_extrapolation](history_extrapolation/docs/PLAN.md) | 已记录 | 长记忆 gamma 接受的 draft 是否多于冻结 prompt mean |
 | [hw_probe](hw_probe/docs/PLAN.md) | 已记录 | 2026-10-07 本机 GPU 显存探针 |
+| [paper_hf](paper_hf/README.md) | 未运行（GPU） | `configs/hf/` 论文配置的 Study 形式；59 格与原 YAML 逐项相等 |
 | [smoke_tiny_llama](smoke_tiny_llama/docs/PLAN.md) | CPU 门 | 随机 tiny LLaMA 上三种 mask 是否与普通生成逐 token 一致；含 2026-10-12 重构前后对照 |
 | [_template](_template/docs/PLAN.md) | 空模板 | 复制成 `studies/<name>/` 后再写问题和因素 |
 

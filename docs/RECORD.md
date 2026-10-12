@@ -26,4 +26,4 @@
 
 **Windows**：旧包在 `sys.platform == 'win32'` 时先 import torch（注释说先 import NumPy 会在 `blas_fpe_check` 出错）。RPipe dev 已改成先 import NumPy（为与 Conda NumPy 共享 libiomp5md）。两者方向相反，Linux 上无法验证；本轮保留 `spec_mtp/__init__.py` 的原适配，它只在经 `spec_mtp` 入口（先于 rpipe 导入）时生效，经 `python -m rpipe` 时由 RPipe 的顺序决定。需在 Windows 本机核对。
 
-**未做**：不改 RPipe；不推送、不开 PR（本轮只在本地提交，交付 bundle / patch）；不重跑 history_extrapolation；`configs/hf/` 仍是记录，未收成 Study；GPU / 真实权重 / Windows 未运行；GitHub Actions 未运行（本地 3.12 通过不等于 CI 通过）。
+**未做**：不改 RPipe；不推送、不开 PR（本轮只在本地提交，交付 bundle / patch）；不重跑 history_extrapolation；`configs/hf/` 收成 `studies/paper_hf/`（11 个 Study、59 格，仅验证展开与配置一致）；GPU / 真实权重 / Windows 未运行；GitHub Actions 未运行（本地 3.12 通过不等于 CI 通过）。

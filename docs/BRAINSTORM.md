@@ -8,7 +8,7 @@
 
 仍待做：
 
-- `configs/hf/` 里 ESP 论文复现扫描还没收成 Study。已记录的接受数在 [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md)。下一轮从 `_template` 复制。
+- `configs/hf/` 已收成 [studies/paper_hf](../studies/paper_hf/README.md)（2026-10-12），只验证了展开和配置一致，GPU 未跑。已记录的接受数在 [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md)。
 
 ## 2. 在输出层做外推
 

@@ -26,6 +26,6 @@ Study scope：`spec_mtp_study_check.json` 为 `complete: true, passed: true`，�
 
 ### 未覆盖
 
-GPU、真实权重（Qwen3 / LLaMA）、bf16、sdpa、Windows、Python 3.12 CI runner 均未在本轮运行。
+GPU、真实权重（Qwen3 / LLaMA）、bf16、sdpa、Windows、GitHub Actions 均未在本轮运行。Python 3.12.15 只在本地 venv 跑过 pytest。
 
 Run 目录在 `studies/smoke_tiny_llama/runs/`，不进 git。

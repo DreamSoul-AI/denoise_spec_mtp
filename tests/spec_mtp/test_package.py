@@ -1,4 +1,4 @@
-"""Packaging and entry: RPipe is a dependency, spec_mtp is a thin entry, no rpipe override."""
+"""Packaging and entry: RPipe lives in src/rpipe; spec_mtp is a thin entry over it."""
 
 import importlib.metadata as metadata
 import json
@@ -17,33 +17,34 @@ ROOT = Path(__file__).resolve().parents[2]
 PYPROJECT = tomllib.loads((ROOT / 'pyproject.toml').read_text(encoding='utf-8'))
 
 
-def _pinned_commit():
-    for dep in PYPROJECT['project']['dependencies']:
-        match = re.match(r'rpipe @ git\+https://github.com/diaoenmao/RPipe(?:\.git)?@([0-9a-f]{40})$', dep)
-        if match:
-            return match.group(1)
-    raise AssertionError('rpipe dependency must be pinned to a full commit')
+def _vendored_commit():
+    text = (ROOT / 'src' / 'rpipe' / 'ORIGIN').read_text(encoding='utf-8').strip()
+    match = re.match(r'[0-9a-f]{40}$', text)
+    if not match:
+        raise AssertionError('src/rpipe/ORIGIN must be the full upstream commit')
+    return text
 
 
-def test_rpipe_is_a_pinned_dependency_not_vendored():
-    assert _pinned_commit()
-    assert not (ROOT / 'src' / 'rpipe').exists()
-    assert PYPROJECT['tool']['setuptools']['packages']['find']['include'] == ['spec_mtp*']
-    assert Path(rpipe.__file__).resolve().parents[1] != (ROOT / 'src').resolve()
-
-
-def test_console_scripts_do_not_override_rpipe():
-    assert PYPROJECT['project']['scripts'] == {'spec-mtp': 'spec_mtp.cli:main'}
-    eps = [ep for ep in metadata.entry_points(group='console_scripts') if ep.name == 'rpipe']
-    assert all(ep.value == 'rpipe.flow.cli:main' for ep in eps)
-    dist = metadata.distribution('denoise-spec-mtp')
-    assert {ep.name for ep in dist.entry_points if ep.group == 'console_scripts'} == {'spec-mtp'}
-
-
-def test_installed_rpipe_matches_pin_when_vcs_installed():
+def test_rpipe_is_vendored_from_the_recorded_commit():
+    commit = _vendored_commit()
+    assert (ROOT / 'src' / 'rpipe' / '__init__.py').is_file()
+    assert 'rpipe*' in PYPROJECT['tool']['setuptools']['packages']['find']['include']
+    assert Path(rpipe.__file__).resolve().parent == (ROOT / 'src' / 'rpipe').resolve()
     origin = sources.rpipe_origin()
-    if 'commit' in origin:
-        assert origin['commit'] == _pinned_commit()
+    assert origin.get('vendored') is True
+    assert origin.get('commit') == commit
+
+
+def test_console_scripts_expose_vendored_rpipe_and_spec_mtp():
+    assert PYPROJECT['project']['scripts'] == {
+        'rpipe': 'rpipe.flow.cli:main',
+        'spec-mtp': 'spec_mtp.cli:main',
+    }
+    dist = metadata.distribution('denoise-spec-mtp')
+    assert {ep.name: ep.value for ep in dist.entry_points if ep.group == 'console_scripts'} == {
+        'rpipe': 'rpipe.flow.cli:main',
+        'spec-mtp': 'spec_mtp.cli:main',
+    }
 
 
 def test_manifest_covers_package_sources():

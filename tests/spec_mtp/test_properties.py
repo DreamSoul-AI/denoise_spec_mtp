@@ -8,7 +8,7 @@ import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-from spec_mtp import _win_import, cli
+from spec_mtp import cli
 from spec_mtp.flow import checks
 from spec_mtp.structure.algorithm.config_bridge import apply_variant
 from spec_mtp.structure.algorithm.paper_variants import PAPER_VARIANTS
@@ -104,22 +104,6 @@ def test_unknown_variant_raises(name):
 def test_empty_variant_returns_input():
     base = {'impl': 'naive'}
     assert apply_variant(base, None) is base and apply_variant(base, '') is base
-
-
-# ------------------------------------------------------------ windows switch
-
-@PROFILE
-@given(st.sampled_from(sorted(_win_import.MODES)), st.text(' \t', max_size=2), st.booleans())
-def test_mode_normalises_case_and_space(mode, pad, upper):
-    value = pad + (mode.upper() if upper else mode) + pad
-    assert _win_import.mode({_win_import.ENV: value}) == mode
-
-
-@PROFILE
-@given(st.text(max_size=8).filter(lambda s: s.strip().lower() not in _win_import.MODES and s.strip()))
-def test_mode_rejects_anything_else(value):
-    with pytest.raises(ValueError):
-        _win_import.mode({_win_import.ENV: value})
 
 
 # ------------------------------------------------------------ cli parsing

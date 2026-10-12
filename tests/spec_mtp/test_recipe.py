@@ -19,7 +19,7 @@ from spec_mtp.structure.artifact import sources
 
 def _config(**algorithm_config):
     base = yaml.safe_load((Path(__file__).resolve().parents[2]
-                           / 'studies/smoke_tiny_llama/experiment_config.yaml').read_text(encoding='utf-8'))
+                           / 'studies/smoke/experiment_config.yaml').read_text(encoding='utf-8'))
     base['algorithm']['config'].update(algorithm_config)
     return base
 
@@ -84,12 +84,6 @@ def _ctx(study_dir, config):
                          assets_dir=study_dir / 'runs/r/assets')
 
 
-def test_register_requires_prepare_shared_false(study_copy):
-    study_dir = study_copy(lambda s: s['flow'].update(prepare_shared=True))
-    with pytest.raises(ValueError, match='prepare_shared'):
-        recipe.register(_ctx(study_dir, _config(variant='esp_static')))
-
-
 def test_register_writes_source_manifest(study_copy):
     study_dir = study_copy()
     recipe.register(_ctx(study_dir, _config(variant='esp_static')))
@@ -125,7 +119,7 @@ def test_freeze_detects_changed_rpipe_commit(study_copy):
         recipe.register(_ctx(study_dir, _config(variant='esp_static')))
 
 
-@pytest.mark.parametrize('study', ['_template', 'smoke_tiny_llama'])
+@pytest.mark.parametrize('study', ['_template', 'smoke'])
 def test_repository_studies_expand_and_validate(tmp_path, study):
     """make-level expansion through RPipe, then the recipe checks on every Run config (no weights)."""
     import shutil
@@ -136,10 +130,11 @@ def test_repository_studies_expand_and_validate(tmp_path, study):
     src = Path(__file__).resolve().parents[2] / 'studies' / study
     dest = tmp_path / study
     shutil.copytree(src, dest, ignore=shutil.ignore_patterns(
-        'runs', 'shared', 'scripts', '*.json', 'docs', 'regression', '__pycache__'))
+        'runs', 'shared', 'scripts', '*.json', 'docs', '__pycache__'))
     declared = load_study_yaml(dest)
     assert declared['recipe'] == 'recipe.py'
-    assert declared['flow'] == {'study_phases': True, 'prepare_shared': False}
+    assert declared.get('flow', {}).get('study_phases') is True
+    assert declared.get('flow', {}).get('prepare_shared') is not False
     out = expand_study(dest)
     assert out['configs']
     for path in out['configs']:

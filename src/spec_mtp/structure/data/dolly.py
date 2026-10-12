@@ -1,7 +1,7 @@
 """Dolly-Databricks creative-writing prompts (Conover et al., 2023).
 
 Used by the Figure 2 alignment probe: 100 creative-writing samples.
-Requires the `datasets` package (see studies/history_extrapolation/scripts/download_data.sh)."""
+Requires the `datasets` package. Hugging Face / ModelScope caches go under the Study `shared/model`."""
 
 from spec_mtp.structure.data.encode import render
 

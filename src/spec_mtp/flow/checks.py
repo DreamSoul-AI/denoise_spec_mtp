@@ -106,7 +106,7 @@ def run_gate(ctx: FlowContext) -> dict[str, Any]:
             draft[GATE_KEY]['sources'] = {k: body.get(k) for k in ('digest', 'git', 'rpipe')}
     if not report['passed']:
         raise SpecMtpGateError(f"SpecMTP gate failed: {'; '.join(report['reasons'])} "
-                               f'(assets: {ctx.layout.assets_dir}; see docs/ARCHITECTURE.md "Run path and gates")')
+                               f'(assets: {ctx.layout.assets_dir}; see docs/architecture.md "Run path and gates")')
     return report
 
 

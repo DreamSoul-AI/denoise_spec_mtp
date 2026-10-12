@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
+
 from rpipe.structure.data.factory import Data, DataRegistry
 
 from spec_mtp.structure.data import encode_prompts, load_records, needs_tokenizer
+
+_REPO = Path(__file__).resolve().parents[4]
+_DEFAULT_SPECBENCH = _REPO / 'datasets' / 'spec_bench' / 'question.jsonl'
 
 
 def _data_cfg(data_config):
@@ -13,9 +19,30 @@ def _data_cfg(data_config):
     return cfg
 
 
+def _land_specbench(data_cfg, assets_dir: Path) -> dict:
+    """Copy the repo SpecBench jsonl into ``shared/data/specbench`` once."""
+    src = Path(data_cfg.get('path') or _DEFAULT_SPECBENCH)
+    if not src.is_file():
+        src = _DEFAULT_SPECBENCH
+    dest_dir = assets_dir / 'specbench'
+    dest = dest_dir / 'question.jsonl'
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    if src.is_file() and (not dest.is_file() or dest.stat().st_mtime < src.stat().st_mtime):
+        shutil.copy2(src, dest)
+    if not dest.is_file():
+        raise FileNotFoundError(
+            f'SpecBench question file not found: {src}\n'
+            'Place question.jsonl at datasets/spec_bench/question.jsonl')
+    landed = dict(data_cfg)
+    landed['path'] = str(dest)
+    return landed
+
+
 def _build(data_config, assets_dir, seed=None):
-    del assets_dir, seed
+    del seed
     data_cfg = _data_cfg(data_config)
+    if data_cfg['name'] == 'specbench':
+        data_cfg = _land_specbench(data_cfg, Path(assets_dir))
     records = load_records(data_cfg)
     meta = {'data_cfg': data_cfg}
     if needs_tokenizer(data_cfg):

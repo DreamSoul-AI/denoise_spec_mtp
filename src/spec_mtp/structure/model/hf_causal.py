@@ -24,7 +24,7 @@ from spec_mtp.structure.system.device import get_dtype
 class HFCausalLM(nn.Module):
 
     def __init__(self, name_or_path=None, local_files_only=False, torch_dtype='auto',
-                 attn_implementation='eager', tiny_config=None):
+                 attn_implementation='eager', tiny_config=None, cache_dir=None):
         super().__init__()
         self.hf: Any
         if tiny_config is not None:
@@ -46,6 +46,8 @@ class HFCausalLM(nn.Module):
                 local_files_only=bool(local_files_only),
                 attn_implementation=attn_implementation,
             )
+            if cache_dir:
+                kwargs['cache_dir'] = cache_dir
             try:  # transformers >= 4.56 prefers `dtype`; older only knows `torch_dtype`
                 self.hf = AutoModelForCausalLM.from_pretrained(
                     name_or_path, dtype=get_dtype(torch_dtype), **kwargs)
@@ -110,5 +112,6 @@ def build_model(cfg):
             local_files_only=model_cfg.get('local_files_only', False),
             torch_dtype=model_cfg.get('torch_dtype', 'auto'),
             attn_implementation=model_cfg.get('attn_implementation', 'eager'),
+            cache_dir=model_cfg.get('cache_dir'),
         )
     raise ValueError(f'Unsupported model.type: {model_type}')

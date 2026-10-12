@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-SMOKE = ROOT / 'studies' / 'smoke_tiny_llama'
+SMOKE = ROOT / 'studies' / 'smoke'
 
 
 def copy_study(tmp_path, patch=None, name='smoke_copy'):

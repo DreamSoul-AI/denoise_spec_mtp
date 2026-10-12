@@ -1,7 +1,7 @@
 # CPU correctness + smoke.
 # Work-branch pushes, PRs into dev/main, and the dev commit after a merge.
-# Same entry as local runs: python -m pytest tests/spec_mtp (see docs/CI.md).
-# RPipe is installed from the commit pinned in pyproject.toml (public GitHub, no secrets).
+# Same entry as local runs: python -m pytest tests/spec_mtp (see docs/testing.md).
+# RPipe is the vendored copy at src/rpipe (commit in src/rpipe/ORIGIN).
 # GPU model runs are not part of this workflow. This is not a release build.
 name: cpu-checks
 
@@ -63,9 +63,12 @@ jobs:
       - name: Check RPipe pin and entry points
         run: |
           python - <<'PY'
-          import importlib.metadata as m, json
-          url = json.loads(m.distribution('rpipe').read_text('direct_url.json'))
-          print('rpipe', url['url'], url['vcs_info']['commit_id'])
+          import importlib.metadata as m
+          from pathlib import Path
+          import rpipe
+          origin = Path(rpipe.__file__).resolve().parent / 'ORIGIN'
+          print('rpipe', rpipe.__file__, origin.read_text(encoding='utf-8').strip())
+          assert origin.is_file()
           eps = {e.name: e.value for e in m.entry_points(group='console_scripts') if e.name in ('rpipe', 'spec-mtp')}
           assert eps == {'rpipe': 'rpipe.flow.cli:main', 'spec-mtp': 'spec_mtp.cli:main'}, eps
           PY

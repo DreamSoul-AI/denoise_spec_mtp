@@ -45,7 +45,7 @@ def _check_smoke(study):
 
 def test_smoke_study_matches_plain_generation():
     """The repository Study itself, via the thin spec_mtp entry (CI path)."""
-    cli('run', 'studies/smoke_tiny_llama', check=True)
+    cli('run', 'studies/smoke', check=True)
     _check_smoke(SMOKE)
 
 

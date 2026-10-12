@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 
 from rpipe.structure.model.factory import Model, ModelRegistry
 
@@ -9,33 +10,34 @@ from spec_mtp.structure.control.named import _convert
 from spec_mtp.structure.model.hf_causal import build_model
 
 
-def _model_cfg(model_config, model_type):
+def _model_cfg(model_config, model_type, assets_dir):
     cfg = dict(model_config.config or {})
     cfg['type'] = model_type
     if model_type == 'hf_causal':
         cfg['name_or_path'] = cfg.get('name_or_path') or model_config.name
-        cfg = _materialize_hub(cfg)
+        cfg = _materialize_hub(cfg, Path(assets_dir))
     return cfg
 
 
-def _materialize_hub(model_cfg):
-    """Download via ModelScope when ``hub: modelscope`` is set, then load locally."""
+def _materialize_hub(model_cfg, assets_dir: Path):
+    """Land weights under the Study ``shared/model`` tree so Runs reuse one download."""
+    resolved = dict(model_cfg)
+    resolved['cache_dir'] = str(assets_dir / 'hf')
     hub = str(model_cfg.get('hub', '') or '').lower()
     if hub != 'modelscope':
-        return model_cfg
+        return resolved
     import torch  # noqa: F401  load before ModelScope on Windows so BLAS DLLs agree
     from modelscope import snapshot_download
 
-    local = snapshot_download(str(model_cfg['name_or_path']))
-    resolved = dict(model_cfg)
+    local = snapshot_download(str(model_cfg['name_or_path']), cache_dir=str(assets_dir / 'modelscope'))
     resolved['name_or_path'] = local
     resolved['local_files_only'] = True
     return resolved
 
 
 def _build_tiny(model_config, assets_dir, data_meta=None):
-    del assets_dir, data_meta
-    model_cfg = _model_cfg(model_config, 'tiny_llama')
+    del data_meta
+    model_cfg = _model_cfg(model_config, 'tiny_llama', assets_dir)
     module = build_model(_convert({'model': model_cfg}))
     return Model(
         name=str(model_config.name or 'tiny_llama'),
@@ -46,8 +48,8 @@ def _build_tiny(model_config, assets_dir, data_meta=None):
 
 
 def _build_hf(model_config, assets_dir, data_meta=None):
-    del assets_dir, data_meta
-    model_cfg = _model_cfg(model_config, 'hf_causal')
+    del data_meta
+    model_cfg = _model_cfg(model_config, 'hf_causal', assets_dir)
     module = build_model(_convert({'model': model_cfg}))
     return Model(
         name=str(model_config.name or 'hf_causal'),

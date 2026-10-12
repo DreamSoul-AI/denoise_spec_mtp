@@ -1,4 +1,4 @@
-"""Every doc and tool is reachable: docs/*.md linked from AGENTS.md, tools/*.py named in LAYOUT.md."""
+"""Every doc and tool is reachable: docs/*.md linked from AGENTS.md, tools/*.py named in layout.md."""
 
 from pathlib import Path
 
@@ -12,9 +12,9 @@ def test_every_doc_is_linked_from_agents():
 
 
 def test_every_tool_is_listed_in_layout():
-    layout = (ROOT / 'docs' / 'LAYOUT.md').read_text(encoding='utf-8')
+    layout = (ROOT / 'docs' / 'layout.md').read_text(encoding='utf-8')
     missing = [p.name for p in sorted((ROOT / 'tools').glob('*.py')) if p.name not in layout]
-    assert not missing, f'add to docs/LAYOUT.md tools/: {missing}'
+    assert not missing, f'add to docs/layout.md tools/: {missing}'
 
 
 def test_every_tool_has_a_usage_docstring():

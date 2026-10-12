@@ -1,7 +1,8 @@
 """SpecBench prompts (Xia et al., 2024), the paper's evaluation suite.
 
-Expects the `question.jsonl` from the official Spec-Bench repo (see
-studies/history_extrapolation/scripts/download_data.sh), one JSON object per line:
+Expects the `question.jsonl` from the official Spec-Bench repo at
+`datasets/spec_bench/question.jsonl` (copied into the Study `shared/data`
+on prepare), one JSON object per line:
 
     {"question_id": ..., "category": "...", "turns": ["...", ...]}
 
@@ -22,7 +23,7 @@ def load_questions(path, categories=None):
     if not os.path.isfile(path):
         raise FileNotFoundError(
             f'SpecBench question file not found: {path}\n'
-            f'Run studies/history_extrapolation/scripts/download_data.sh first.')
+            'Place it at datasets/spec_bench/question.jsonl')
     questions = []
     with open(path, 'r', encoding='utf-8') as f:
         for line in f:
@@ -59,7 +60,7 @@ def window_by_category(questions, skip=0, take=None):
 
 
 def load_records(data_cfg):
-    path = data_cfg.get('path', 'studies/history_extrapolation/data/spec_bench/question.jsonl')
+    path = data_cfg.get('path', 'datasets/spec_bench/question.jsonl')
     questions = load_questions(path, data_cfg.get('categories', None))
     questions = window_by_category(
         questions,

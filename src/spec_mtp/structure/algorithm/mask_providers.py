@@ -25,7 +25,7 @@ default lambda = 0.1 and the Appendix G.9 ablation values {0.01, 0.5}.
 (not in the paper) probing whether the on-the-fly update matters at all.
 
 EMAVelocityMaskProvider is our replacement for Eq (4)+(5)
-(docs/ARCHITECTURE.md): consecutive prompt-embedding differences are
+(docs/architecture.md): consecutive prompt-embedding differences are
 treated as a velocity field; an EMA of those differences gives a biased but
 variance-reduced estimate at the sequence tail, and mask i extrapolates i
 steps along it. spec.ema.level=order0 adds that step to the ESP mean

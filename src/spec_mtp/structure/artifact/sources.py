@@ -59,7 +59,18 @@ def _git(root: Path) -> dict[str, Any]:
 
 
 def rpipe_origin() -> dict[str, Any]:
-    """Installed RPipe version and, for a VCS / local install, its commit."""
+    """Vendored ``src/rpipe`` commit, or the installed distribution if that is missing."""
+    import rpipe
+
+    origin = Path(rpipe.__file__).resolve().parent / 'ORIGIN'
+    if origin.is_file():
+        commit = origin.read_text(encoding='utf-8').strip().split()[0]
+        return {
+            'version': getattr(rpipe, '__version__', None),
+            'commit': commit,
+            'vendored': True,
+            'path': str(Path(rpipe.__file__).resolve().parent),
+        }
     from importlib import metadata
 
     out: dict[str, Any] = {}

@@ -11,6 +11,7 @@ __pycache__/
 *.pt
 /lark_transcripts/
 /docs/papers/*.pdf
+/docs/research/*.pdf
 /.tmp/
 studies/**/runs/
 studies/**/shared/

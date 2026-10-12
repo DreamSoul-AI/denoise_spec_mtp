@@ -18,3 +18,7 @@ studies/**/process.json
 *.egg-info/
 .dist/
 /build/
+studies/**/provenance.json
+studies/**/activity.json
+studies/**/spec_mtp_sources.json
+studies/**/spec_mtp_study_check.json

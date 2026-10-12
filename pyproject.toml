@@ -5,11 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "denoise-spec-mtp"
 version = "0.1.0"
-description = "ESP speculative MTP reproduction and EMA-velocity masks on RPipe"
+description = "ESP speculative MTP reproduction and EMA-velocity masks; depends on RPipe"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = [
+  # RPipe dev, pinned. Update together with docs/LAYOUT.md.
+  "rpipe @ git+https://github.com/diaoenmao/RPipe.git@ce8b3e6453d282711f0032b73409e147a49d49fa",
   "accelerate",
   "datasets",
   "kornia",
@@ -23,15 +25,14 @@ dependencies = [
 ]
 
 [project.scripts]
-rpipe = "rpipe.flow.cli:main"
-spec-mtp = "spec_mtp.flow.cli:main"
+spec-mtp = "spec_mtp.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["rpipe*", "spec_mtp*"]
+include = ["spec_mtp*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests/spec_mtp"]

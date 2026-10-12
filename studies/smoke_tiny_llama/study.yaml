@@ -1,11 +1,19 @@
 # CPU losslessness smoke — three spec variants on random tiny LLaMA.
 # ``make`` expands axes; ``rpipe run studies/smoke_tiny_llama`` must keep exact_match_rate = 1.
+# recipe.py registers the spec_mtp sources on RPipe; flow/write gates exact_match
+# before the Run result is written; flow/process checks the full matrix at Study scope.
 
 study: smoke_tiny_llama
 description: CPU tiny LLaMA speculative MTP smoke (exact_match audit)
 
 experiment:
   name: tiny_llama_smoke
+
+recipe: recipe.py
+
+flow:
+  study_phases: true
+  prepare_shared: false
 
 fixed:
   data:

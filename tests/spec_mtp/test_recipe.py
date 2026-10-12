@@ -167,3 +167,26 @@ def test_legacy_cfg_takes_device_from_system_and_seed_from_run():
                      SimpleNamespace(device='cpu'), algo, '7')
     assert cfg.eval.device == 'cpu' and cfg.eval.max_new_tokens == 8
     assert cfg.run.seed == 7 and cfg.spec.impl == 'naive' and cfg.data.name == 'x' and dict(cfg.model) == {}
+
+
+@pytest.mark.parametrize('mutate, message', [
+    (lambda c: c['algorithm']['config'].update(variant='esp_statik'), "did you mean 'esp_static'"),
+    (lambda c: c['algorithm']['config'].update(variant='llama3/esp_bc6'), "'llama3/esp_bc60'"),
+    (lambda c: c['algorithm']['config'].update(variant='qwen3/zz'), 'paper_variants.py'),
+    (lambda c: c['algorithm']['config'].update(task='esp_mpt'), "did you mean 'esp_mtp'"),
+    (lambda c: c['model'].update(name='tiny_lama'), "did you mean 'tiny_llama'"),
+    (lambda c: c['data'].update(name='specbnch'), "did you mean 'specbench'"),
+    (lambda c: c['data'].update(name='qqqq'), 'known:'),
+])
+def test_config_errors_suggest_the_fix(mutate, message):
+    config = _config()
+    mutate(config)
+    with pytest.raises(ValueError, match=message):
+        recipe.validate(config)
+
+
+def test_register_error_names_the_study(study_copy):
+    study_dir = study_copy()
+    config = _config(task='nope')
+    with pytest.raises(recipe.SpecMtpConfigError, match=r'study\.yaml; checked before any weights load'):
+        recipe.register(_ctx(study_dir, config))

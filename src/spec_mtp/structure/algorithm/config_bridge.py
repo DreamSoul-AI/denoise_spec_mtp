@@ -29,7 +29,13 @@ def apply_variant(spec_cfg: dict[str, Any] | None, variant: str | None) -> Any:
         return spec_cfg
     presets = {**VARIANTS, **PAPER_VARIANTS}
     if key not in presets:
-        raise ValueError(f'unknown spec variant: {key!r}')
+        import difflib
+
+        close = difflib.get_close_matches(key, sorted(presets), n=3, cutoff=0.6)
+        hint = f'; did you mean {", ".join(map(repr, close))}?' if close else (
+            f'; smoke variants: {sorted(VARIANTS)}; paper presets are <llama3|qwen3>/<cell>, '
+            'see spec_mtp/structure/algorithm/paper_variants.py')
+        raise ValueError(f'unknown spec variant: {key!r}{hint}')
     merged = dict(spec_cfg or {})
     merged.update(presets[key])
     return _convert(merged)

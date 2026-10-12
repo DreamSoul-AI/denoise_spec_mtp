@@ -25,6 +25,14 @@ class SpecMtpConfigError(ValueError):
     pass
 
 
+def suggest(value: object, choices: list[str] | tuple[str, ...]) -> str:
+    """``"; did you mean 'x'?"`` for a close match, else the sorted choices."""
+    import difflib
+
+    close = difflib.get_close_matches(str(value).lower(), [str(c) for c in choices], n=1, cutoff=0.6)
+    return f'; did you mean {close[0]!r}?' if close else f'; known: {sorted(choices)}'
+
+
 def _layer(config: dict[str, Any], name: str) -> dict[str, Any]:
     block = config.get(name) or {}
     if not isinstance(block, dict):
@@ -50,10 +58,11 @@ def validate(config: dict[str, Any]) -> dict[str, Any]:
     if algorithm.get('mode') != 'eval':
         raise SpecMtpConfigError('SpecMTP decoding is an eval Algorithm; set algorithm.mode: eval')
     if data.get('source') == SOURCE and str(data.get('name', '')).lower() not in DATASETS:
-        raise SpecMtpConfigError(f'unknown SpecMTP data name: {data.get("name")!r}; known: {sorted(DATASETS)}')
+        raise SpecMtpConfigError(f'unknown SpecMTP data name: {data.get("name")!r}' + suggest(data.get('name'), list(DATASETS)))
     if model.get('source') == SOURCE:
         if model.get('name') not in ('tiny_llama', 'hf_causal'):
-            raise SpecMtpConfigError(f'unknown SpecMTP model name: {model.get("name")!r}')
+            raise SpecMtpConfigError(f'unknown SpecMTP model name: {model.get("name")!r}'
+                                     + suggest(model.get('name'), ['tiny_llama', 'hf_causal']))
         attn = str((model.get('config') or {}).get('attn_implementation', 'eager')).lower()
         if attn in FLASH_ATTENTION:
             raise SpecMtpConfigError(
@@ -61,7 +70,7 @@ def validate(config: dict[str, Any]) -> dict[str, Any]:
     algorithm_config = AlgorithmConfig.from_mapping(algorithm)
     task = task_name(algorithm_config)
     if task not in TASKS:
-        raise SpecMtpConfigError(f'unknown spec_mtp task: {task!r}; known: {list(TASKS)}')
+        raise SpecMtpConfigError(f'unknown spec_mtp task: {task!r}' + suggest(task, list(TASKS)))
     # Same resolution as the Algorithm (spec → variant → mask); pure config work.
     spec = effective_spec(_convert(dict(algorithm_config.setting('spec', {}) or {})), algorithm_config)
     info = {'task': task}
@@ -99,7 +108,11 @@ def register(ctx: RecipeContext) -> None:
         raise SpecMtpConfigError('SpecMTP Studies build prompts per Run; set flow.prepare_shared: false')
     current = manifest()
     check_frozen(ctx.study_dir, study, current)
-    validate(ctx.config)
+    try:
+        validate(ctx.config)
+    except SpecMtpConfigError as error:
+        where = ctx.study_dir / 'study.yaml'
+        raise SpecMtpConfigError(f'{error} (Run config from {where}; checked before any weights load)') from error
     ctx.assets_dir.mkdir(parents=True, exist_ok=True)
     (ctx.assets_dir / RUN_ASSET_NAME).write_text(
         json.dumps(current, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')

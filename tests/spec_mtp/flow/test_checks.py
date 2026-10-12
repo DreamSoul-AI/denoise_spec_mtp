@@ -120,3 +120,62 @@ def test_study_gate_seed_mismatch_is_incomplete(tmp_path):
 
 def test_study_gate_skips_run_scope():
     assert checks.study_gate(SimpleNamespace(scope='run')) == {}
+
+
+# ------------------------------------------------------------ edge branches
+
+def test_ar_baseline_needs_summary(tmp_path):
+    empty = tmp_path / 'empty'
+    empty.mkdir()
+    (empty / 'spec_mtp_sources.json').write_text('{"digest": "d"}')
+    assert checks.evaluate_run(_config('ar_baseline'), empty)['reasons'] == ['missing summary.csv']
+    assert checks.evaluate_run(_config('ar_baseline'), _assets(tmp_path))['passed']
+
+
+def test_alignment_probe_needs_its_csv(tmp_path):
+    assets = _assets(tmp_path)
+    assert checks.evaluate_run(_config('alignment_probe'), assets)['reasons'] == ['missing alignment_metrics.csv']
+    (assets / 'alignment_metrics.csv').write_text('layer\n1\n')
+    assert checks.evaluate_run(_config('alignment_probe'), assets)['passed']
+
+
+def test_empty_rate_is_missing(tmp_path):
+    report = checks.evaluate_run(_config(), _assets(tmp_path, rate=''))
+    assert report['reasons'] == ['exact_match_rate missing'] and report['exact_match_rate'] is None
+
+
+def test_two_overall_rows_are_rejected(tmp_path):
+    assets = _assets(tmp_path)
+    with (assets / 'summary.csv').open('a', newline='', encoding='utf-8') as handle:
+        handle.write('overall,1.0,5\n')
+    assert 'summary.csv has no single overall row' in checks.evaluate_run(_config(), assets)['reasons']
+
+
+def test_task_name_is_case_insensitive(tmp_path):
+    assert checks.evaluate_run(_config('ESP_MTP'), _assets(tmp_path))['task'] == 'esp_mtp'
+
+
+def test_run_gate_without_draft_still_gates(tmp_path):
+    ctx = SimpleNamespace(config=_config(), layout=SimpleNamespace(assets_dir=_assets(tmp_path)), state={})
+    assert checks.run_gate(ctx)['passed']
+    bad = SimpleNamespace(config=_config(), layout=SimpleNamespace(assets_dir=_assets(tmp_path, '0.5', name='b')),
+                          state={})
+    with pytest.raises(checks.SpecMtpGateError, match='exact_match_rate=0.5 != 1'):
+        checks.run_gate(bad)
+
+
+def test_study_gate_empty_index_is_incomplete(tmp_path):
+    ctx = _study(tmp_path, [])
+    with pytest.raises(checks.SpecMtpGateError, match='incomplete'):
+        checks.study_gate(ctx)
+    assert ctx.state['spec_mtp']['complete'] is False
+
+
+def test_study_gate_explicit_expected_factors(tmp_path):
+    ctx = _study(tmp_path, [('a', 'succeeded', True, 'd'), ('b', 'succeeded', True, 'd')])
+    expected = [{'algorithm.config.variant': 'b'}, {'algorithm.config.variant': 'a'}]
+    assert checks.study_gate(ctx, expected_factors=expected)['passed']
+
+
+def test_declared_factors_without_axes():
+    assert checks.declared_factors({}) == [{}]

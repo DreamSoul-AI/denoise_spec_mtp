@@ -144,3 +144,26 @@ def test_repository_studies_expand_and_validate(tmp_path, study):
     assert out['configs']
     for path in out['configs']:
         recipe.validate(yaml.safe_load(Path(path).read_text(encoding='utf-8')))
+
+
+def test_layer_must_be_a_mapping():
+    config = _config()
+    config['data'] = ['not', 'a', 'mapping']
+    with pytest.raises(recipe.SpecMtpConfigError, match='data must be a mapping'):
+        recipe.validate(config)
+
+
+def test_legacy_cfg_takes_device_from_system_and_seed_from_run():
+    from types import SimpleNamespace
+
+    from rpipe.structure.control.layers import AlgorithmConfig
+
+    from spec_mtp.structure.algorithm.config_bridge import legacy_cfg
+
+    algo = AlgorithmConfig.from_mapping({'mode': 'eval', 'source': 'spec_mtp',
+                                         'config': {'eval': {'device': 'cuda', 'max_new_tokens': 8},
+                                                    'spec': {'impl': 'naive'}}})
+    cfg = legacy_cfg(SimpleNamespace(meta={'data_cfg': {'name': 'x'}}), SimpleNamespace(meta={}),
+                     SimpleNamespace(device='cpu'), algo, '7')
+    assert cfg.eval.device == 'cpu' and cfg.eval.max_new_tokens == 8
+    assert cfg.run.seed == 7 and cfg.spec.impl == 'naive' and cfg.data.name == 'x' and dict(cfg.model) == {}

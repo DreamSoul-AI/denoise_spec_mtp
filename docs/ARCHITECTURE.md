@@ -109,7 +109,7 @@ Verification is exact match against the model's own chain, not residual sampling
 6. The BC=120 ablation uses `[15,10,4]`.
 7. The first tree is proposed before the first new token exists.
 8. Qwen3 thinking is off.
-9. Efficient mask reuse (`impl: efficient`, Appendix E) is static trees only. Dynamic trees use a memoised, vectorised build of the same naive mask (`DynamicTreeAttentionCache`, bit-identical; performance only, see [PROFILE.md](PROFILE.md)). Static trees with `impl: naive` keep the literal per-entry builder for the Table 4 ablation.
+9. Efficient mask reuse (`impl: efficient`, Appendix E) is static trees only. Dynamic trees use a memoised, vectorised build of the same naive mask (`DynamicTreeAttentionCache`, bit-identical; performance only, see [PROFILE.md](PROFILE.md)). Static trees with `impl: naive` keep the literal per-entry builder for the Table 4 ablation. Both caches key on tree shape **and** dtype / device / min_value so a float32 structure is never reused for bf16.
 10. The BC=60 main configs are static plus efficient. Dynamic trees are the separate `*_bc60_dynamic.yaml` files.
 11. `tau` is committed tokens per decode call. The prefill forward is not in the denominator. `call_reduction = 1 − 1/tau`.
 12. PLD, STAND, and LADE are not in this repo. The autoregressive baseline is.

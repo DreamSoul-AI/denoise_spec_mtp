@@ -8,12 +8,16 @@ GitHub-hosted runner image, caches and the PR merge commit are not reproduced.
 
     python tools/ci_local.py [--workflow .github/workflows/cpu-checks.yml] [--keep]
 
-Work dirs live under ``.tmp/ci_local/`` (gitignored).
+Work dirs live under ``.tmp/ci_local/<run-id>/`` (gitignored). Concurrent
+invocations each get their own directory (timestamp + pid) so two runs do not
+share a worktree or venv; an advisory lock on ``.tmp/ci_local/ci_local.lock``
+serialises the git worktree add/remove against the same repo.
 """
 
 from __future__ import annotations
 
 import argparse
+import fcntl
 import os
 import shutil
 import subprocess
@@ -39,41 +43,52 @@ def main() -> int:
     workflow = yaml.safe_load((ROOT / args.workflow).read_text(encoding='utf-8'))
     base = ROOT / '.tmp' / 'ci_local'
     base.mkdir(parents=True, exist_ok=True)
+    run = base / f"{time.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}"
+    run.mkdir()
+    # Serialise worktree mutations: two overlapping runs used to share
+    # ``.tmp/ci_local/cpu-checks/`` and race on pip install / worktree remove.
+    lock_path = base / 'ci_local.lock'
+    lock_file = lock_path.open('a+', encoding='utf-8')
+    fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
     results = []
-    for job_name, job in workflow['jobs'].items():
-        work = base / job_name / 'repo'
-        venv = base / job_name / 'venv'
-        if work.exists():
-            sh(['git', 'worktree', 'remove', '--force', str(work)], cwd=ROOT)
-        shutil.rmtree(work, ignore_errors=True)
-        shutil.rmtree(venv, ignore_errors=True)
-        sh(['git', 'worktree', 'add', '--detach', str(work), 'HEAD'], cwd=ROOT)
-        try:
-            for step in job['steps']:
-                uses = step.get('uses', '')
-                if uses.startswith('actions/checkout'):
-                    results.append((job_name, 'checkout (git worktree HEAD)', 'ok', 0.0))
-                    continue
-                if uses.startswith('actions/setup-python'):
-                    version = str(step['with']['python-version'])
-                    sh(['uv', 'venv', '-q', '--seed', '-p', version, str(venv)])
-                    results.append((job_name, f'setup-python {version} (uv venv)', 'ok', 0.0))
-                    continue
-                if 'run' not in step:
-                    raise SystemExit(f'unsupported step: {step}')
-                env = {**os.environ, **{k: str(v) for k, v in (step.get('env') or {}).items()},
-                       'VIRTUAL_ENV': str(venv), 'PATH': f'{venv / "bin"}{os.pathsep}{os.environ["PATH"]}'}
-                env.pop('PYTHONPATH', None)
-                start = time.time()
-                print(f'\n=== {job_name}: {step.get("name", "run")} ===', flush=True)
-                proc = subprocess.run(['bash', '-e', '-c', step['run']], cwd=work, env=env)
-                status = 'ok' if proc.returncode == 0 else f'FAILED ({proc.returncode})'
-                results.append((job_name, step.get('name', 'run'), status, time.time() - start))
-                if proc.returncode != 0:
-                    break
-        finally:
-            if not args.keep:
-                subprocess.run(['git', 'worktree', 'remove', '--force', str(work)], cwd=ROOT)
+    try:
+        for job_name, job in workflow['jobs'].items():
+            work = run / job_name / 'repo'
+            venv = run / job_name / 'venv'
+            sh(['git', 'worktree', 'add', '--detach', str(work), 'HEAD'], cwd=ROOT)
+            try:
+                for step in job['steps']:
+                    uses = step.get('uses', '')
+                    if uses.startswith('actions/checkout'):
+                        results.append((job_name, 'checkout (git worktree HEAD)', 'ok', 0.0))
+                        continue
+                    if uses.startswith('actions/setup-python'):
+                        version = str(step['with']['python-version'])
+                        sh(['uv', 'venv', '-q', '--seed', '-p', version, str(venv)])
+                        results.append((job_name, f'setup-python {version} (uv venv)', 'ok', 0.0))
+                        continue
+                    if 'run' not in step:
+                        raise SystemExit(f'unsupported step: {step}')
+                    env = {**os.environ, **{k: str(v) for k, v in (step.get('env') or {}).items()},
+                           'VIRTUAL_ENV': str(venv),
+                           'PATH': f'{venv / "bin"}{os.pathsep}{os.environ["PATH"]}'}
+                    env.pop('PYTHONPATH', None)
+                    start = time.time()
+                    print(f'\n=== {job_name}: {step.get("name", "run")} ===', flush=True)
+                    proc = subprocess.run(['bash', '-e', '-c', step['run']], cwd=work, env=env)
+                    status = 'ok' if proc.returncode == 0 else f'FAILED ({proc.returncode})'
+                    results.append((job_name, step.get('name', 'run'), status, time.time() - start))
+                    if proc.returncode != 0:
+                        break
+            finally:
+                if not args.keep:
+                    subprocess.run(['git', 'worktree', 'remove', '--force', str(work)], cwd=ROOT)
+    finally:
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+        lock_file.close()
+        if not args.keep:
+            shutil.rmtree(run, ignore_errors=True)
+
     print('\nsummary:')
     for job_name, name, status, seconds in results:
         print(f'  {job_name:12s} {status:12s} {seconds:7.1f}s  {name}')

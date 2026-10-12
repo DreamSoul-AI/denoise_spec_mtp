@@ -7,6 +7,15 @@ description: one-line question
 experiment:
   name: first26
 
+# SpecMTP sources are registered by the recipe; prompts are built per Run.
+recipe: recipe.py
+
+flow:
+  study_phases: true      # flow/write = exact_match gate, flow/process = Study-scope gate
+  prepare_shared: false
+
+# freeze: true            # optional: refuse to run if Study, rpipe or spec_mtp sources change after make
+
 fixed:
   data:
     name: specbench

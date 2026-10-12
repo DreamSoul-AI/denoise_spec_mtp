@@ -123,3 +123,24 @@ def test_freeze_detects_changed_rpipe_commit(study_copy):
     lock.write_text(json.dumps(body), encoding='utf-8')
     with pytest.raises(sources.SpecMtpSourceChangedError, match='rpipe commit'):
         recipe.register(_ctx(study_dir, _config(variant='esp_static')))
+
+
+@pytest.mark.parametrize('study', ['_template', 'smoke_tiny_llama'])
+def test_repository_studies_expand_and_validate(tmp_path, study):
+    """make-level expansion through RPipe, then the recipe checks on every Run config (no weights)."""
+    import shutil
+
+    from rpipe.structure.make import expand_study
+    from rpipe.structure.make.expand import load_study_yaml
+
+    src = Path(__file__).resolve().parents[2] / 'studies' / study
+    dest = tmp_path / study
+    shutil.copytree(src, dest, ignore=shutil.ignore_patterns(
+        'runs', 'shared', 'scripts', '*.json', 'docs', 'regression', '__pycache__'))
+    declared = load_study_yaml(dest)
+    assert declared['recipe'] == 'recipe.py'
+    assert declared['flow'] == {'study_phases': True, 'prepare_shared': False}
+    out = expand_study(dest)
+    assert out['configs']
+    for path in out['configs']:
+        recipe.validate(yaml.safe_load(Path(path).read_text(encoding='utf-8')))

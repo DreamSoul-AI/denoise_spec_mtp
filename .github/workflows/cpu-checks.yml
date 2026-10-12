@@ -40,7 +40,7 @@ jobs:
 
       - name: Lint (pyflakes errors only)
         run: |
-          pip install "ruff==0.15.12"
+          pip install "ruff==0.17.0"
           ruff check src tests studies
 
       - name: Check RPipe pin and entry points

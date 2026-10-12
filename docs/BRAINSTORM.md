@@ -8,6 +8,8 @@
 
 仍待做：
 
+- `sample_embedding` 初始化与采样共用 RNG，temperature > 0 时无法逐 token 审计（[ARCHITECTURE.md](ARCHITECTURE.md) 第 13 条）。若要在 T>0 跑该消融，可给 mask provider 单独的 Generator；会改变该配置的采样输出，需先决定。
+
 - `configs/hf/` 已收成 [studies/paper_hf](../studies/paper_hf/README.md)（2026-10-12），只验证了展开和配置一致，GPU 未跑。已记录的接受数在 [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md)。
 
 ## 2. 在输出层做外推

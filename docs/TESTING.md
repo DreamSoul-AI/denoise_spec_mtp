@@ -30,6 +30,7 @@ Temporary files and the pytest cache go to `.tmp/`. End-to-end tests copy the sm
 | `test_properties.py` | hypothesis properties: source digest order-free and change-sensitive, `changed_files` symmetric, `declared_factors` = full product, gate passes iff rate is 1, variant presets idempotent / case-insensitive / unknown rejected, Windows switch parsing, cli command and Study argument parsing, cli forwards to RPipe |
 | `test_profile_tool.py` | `tools/profile_cpu.py` component buckets; a tiny profiled run keeps exact match (report: [PROFILE.md](PROFILE.md)) |
 | `test_docs.py`, `test_docs_index.py` | relative Markdown links resolve; every `docs/*.md` linked from AGENTS.md, every `tools/*.py` in LAYOUT.md with a usage docstring |
+| `structure/algorithm/test_lossless_properties.py` | hypothesis: spec output = AR for every smoke variant and every paper esp_mtp preset over random prompt length, budget, temperature, seed; context-limit invariant (output = AR at the reached budget, prefix of full AR); every preset builds a decoder; `sample_embedding` at temperature > 0 recorded as strict xfail (ARCHITECTURE §choices 13) |
 | `test_win_import.py` | `SPEC_MTP_WIN_IMPORT_ORDER` logic (real DLL order needs Windows: `tools/windows_selfcheck.py`) |
 | `test_package.py` | RPipe pinned and not vendored, console scripts do not override `rpipe`, source manifest coverage, cli lock rules |
 

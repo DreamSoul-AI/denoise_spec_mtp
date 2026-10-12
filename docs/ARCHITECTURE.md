@@ -113,6 +113,7 @@ Verification is exact match against the model's own chain, not residual sampling
 10. The BC=60 main configs are static plus efficient. Dynamic trees are the separate `*_bc60_dynamic.yaml` files.
 11. `tau` is committed tokens per decode call. The prefill forward is not in the denominator. `call_reduction = 1 − 1/tau`.
 12. PLD, STAND, and LADE are not in this repo. The autoregressive baseline is.
+13. `mask.init: sample_embedding` draws its noise from the same `Generator` the decoder samples tokens with. At temperature 0 the stream is unused and the output equals AR token for token. At temperature > 0 the token stream is shifted against AR, so `exact_match` fails although the sampling distribution is unchanged. The paper runs this ablation (`init_sample_bc30`) at temperature 0. Found by the property tests on 2026-10-12 (`test_lossless_properties.py`, strict xfail); not changed, since splitting the RNG changes sampled outputs.
 
 ## Result files
 

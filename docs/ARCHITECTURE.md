@@ -4,27 +4,38 @@ Training-free multi-token prediction. One decode loop, two mask providers: ESP f
 
 Paper: *Efficient Training-Free Multi-Token Prediction via Embedding-Space Probing* (Goel, Gagrani, Lee, Lott — Qualcomm AI Research, ICML 2026), [arXiv:2603.17942](https://arxiv.org/abs/2603.17942). Local PDF, not in git: `docs/papers/2603.17942v2.pdf`.
 
-`src/spec_mtp/` is RPipe copied file for file. The copied layers stay as RPipe wrote them. SpecMTP code sits in a `spec_mtp/` submodule under the layer it belongs to. Decoding is an eval algorithm, next to RPipe's `algorithm/train/` and `algorithm/eval/`. The tree is in [LAYOUT.md](LAYOUT.md).
+The project depends on RPipe (pinned `dev` commit, see [LAYOUT.md](LAYOUT.md)) and keeps only SpecMTP code in `src/spec_mtp/`. Scheduling, the Flow phase chain, Tracker, Logger, result, provenance / freeze and aggregation come from RPipe. A Study's `recipe.register(ctx)` registers the SpecMTP Data / Model / Algorithm sources on RPipe's runtime registries. Decoding is a dedicated eval Algorithm `(eval, spec_mtp)`; it is not RPipe's classification eval and not a training task.
 
 ## Modules
 
 ```text
-structure/algorithm/eval/spec_mtp/ under src/spec_mtp/:
-  registry.py         the eval Algorithm registered as (eval, spec_mtp)
+src/spec_mtp/structure/algorithm/:
+  eval.py             the eval Algorithm registered as (eval, spec_mtp)
   esp_mtp.py          the speculative loop and CSV aggregation
   ar_baseline.py
   alignment_probe.py
   decoding.py         embed, append masks, forward, select, verify
   mask_providers.py   ESP and EMA-velocity
   mask_settings.py    named mask settings for study.yaml
+  smoke_variants.py   CPU smoke spec blocks
+  config_bridge.py    RPipe Run layers -> decoder NamedDict
   tree.py             static and dynamic draft trees, pruning
   tree_attention.py   block layout, tree mask, position ids
   kv_cache.py         keep prefix + root + accepted path
-src/spec_mtp/structure/model/spec_mtp/hf_causal.py   input embedding table; forward takes inputs_embeds
-src/spec_mtp/structure/data/spec_mtp/                SpecBench, Dolly, local prompts
+src/spec_mtp/structure/model/hf_causal.py   input embedding table; forward takes inputs_embeds
+src/spec_mtp/structure/data/                SpecBench, Dolly, local prompts
+src/spec_mtp/recipe.py                      Study recipe: checks + registration
+src/spec_mtp/flow/checks.py                 exact_match Run gate and Study scope gate
+src/spec_mtp/structure/artifact/sources.py  SpecMTP source manifest (provenance outside the Study)
 ```
 
-Everything else under `src/spec_mtp/` is RPipe copied file for file. `configs/hf/<family>/` keeps the old per-setting YAML as a record; runs go through a Study.
+`configs/hf/<family>/` keeps the old per-setting YAML as a record; runs go through a Study.
+
+## Run path and gates
+
+`python -m rpipe run|make|launch studies/<name>` (or the thin `python -m spec_mtp`) → RPipe prepare → Study `recipe.register` (checks, registration) → RPipe builds Data / Model / Algorithm → execute runs `SpecMtpEvalAlgorithm` → collect / summarize → Study `flow/write` runs the SpecMTP gate **before** RPipe writes `result.json` → process. The gate fails the Run when the AR baseline ran and `exact_match_rate != 1`, or when the overall summary is missing. Study scope `process` fails when a Run is missing, failed, or the set of Runs is a subset of the index.
+
+Provenance: RPipe's `provenance.json` hashes the `rpipe` package and Study files only. The SpecMTP package lives outside the Study, so `spec_mtp.structure.artifact.sources` hashes `src/spec_mtp/**.py`, records the git head / dirty flag and the installed RPipe commit, writes the Study lock `spec_mtp_sources.json` at make, and copies the manifest into every Run (`assets/spec_mtp_sources.json`, `result.json:spec_mtp_sources`). With `freeze: true`, a changed SpecMTP source after make fails the Run in `recipe.register`, before construction.
 
 ## One decode step
 

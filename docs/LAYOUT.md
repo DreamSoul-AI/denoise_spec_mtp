@@ -1,34 +1,35 @@
 # LAYOUT
 
+本项目依赖 RPipe，自己只保留 SpecMTP 专用实现。2026-10-12 起不再复制 RPipe（旧设计：`src/rpipe/` 整包 + `src/spec_mtp/` 按文件换包名复制，见提交 `b1f6191`）。
+
+RPipe 依赖：`diaoenmao/RPipe` 分支 `dev`，固定提交 `ce8b3e6453d282711f0032b73409e147a49d49fa`（`pyproject.toml`）。不依赖任何本机未提交的 RPipe 改动。
+
 ```text
 src/
-  rpipe/           full RPipe 0.2.0 package (local RPipe main, MIT, Enmao Diao), unchanged
-  spec_mtp/        rpipe/ copied file for file (rpipe. → spec_mtp.); SpecMTP sits in spec_mtp/ submodules
-    flow/          prepare → execute → collect → summarize → write → process
+  spec_mtp/                SpecMTP only; RPipe is an installed dependency
+    __init__.py            Windows import order; no registration at import
+    __main__.py / cli.py   thin entry: make / run / launch write the SpecMTP source lock, then forward to rpipe
+    recipe.py              register(ctx): config checks + register sources on RPipe registries
+    flow/
+      checks.py            exact_match Run gate, Study scope gate (called by Study flow/<phase>/run.py)
     structure/
-      algorithm/   RPipe base, factory, train/, eval/
-        eval/spec_mtp/   masks, tree, decoder, esp / ar / alignment, the eval Algorithm
-      data/        RPipe config, factory, prepare, profile
-        spec_mtp/        SpecBench, Dolly, local prompts
-      model/       RPipe config, factory, ...
-        spec_mtp/        hf_causal, tiny LLaMA
-      system/      RPipe System, Logger, runtime
-        spec_mtp/        device, dtype, seed helpers
-      control/     RPipe Control, layers, run_config
-        spec_mtp/        NamedDict for the decoder cfg
-      artifact/    RPipe layout, result, index
-        spec_mtp/        per-prompt CSV rows
-      api/         RPipe layer facades
-        spec_mtp/        register SpecMTP builders
-      make/        RPipe make; writes studies/<name>/scripts/
-studies/           code and data stay; scripts/, runs/, and results/ stay local
-configs/           legacy single-run YAML (HF sweeps; migrate to studies/)
+      algorithm/           masks, tree, tree attention, kv cache, decoder, esp / ar / alignment,
+                           eval.py = SpecMtpEvalAlgorithm registered as (eval, spec_mtp)
+      data/                SpecBench, Dolly, local / synthetic prompts; registry.py = Data builders
+      model/               hf_causal, tiny LLaMA; registry.py = Model builders
+      system/              device, dtype, seed helpers
+      control/             NamedDict for the decoder cfg
+      artifact/            per-prompt CSV rows; sources.py = SpecMTP source manifest / lock
+studies/
+  <name>/                  study.yaml, experiment_config.yaml, recipe.py, flow/<phase>/, docs/
+configs/                   legacy single-run YAML (HF sweeps; record only, not an entry)
 tests/
-  spec_mtp/        mirrors src/spec_mtp; SpecMTP modules only
-docs/              ARCHITECTURE, CI, BRAINSTORM, LAYOUT, TESTING
-AGENTS.md          how to work in this repo; points at docs/
+  spec_mtp/                mirrors src/spec_mtp
+docs/                      ARCHITECTURE, CI, BRAINSTORM, LAYOUT, TESTING
+AGENTS.md                  how to work in this repo; points at docs/
 ```
 
 Run artifacts: `studies/<name>/runs/<id>/` with `config.yaml`, `result.json`,
-`assets/` (tracker, logs, `summary.csv`, `spec_metrics.csv`). Study-level
-`runs/`, `shared/`, `index.json` are gitignored.
+`assets/` (tracker, logs, `summary.csv`, `spec_metrics.csv`, `spec_mtp_sources.json`).
+Study-level `runs/`, `shared/`, `scripts/`, `index.json`, `process.json`,
+`provenance.json`, `spec_mtp_sources.json` and `spec_mtp_study_check.json` are gitignored.

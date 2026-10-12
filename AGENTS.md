@@ -6,7 +6,7 @@
 
 1. 先从 [README.md](README.md) 和相关文档确认背景。按需阅读，不必每次通读整个项目。
 2. 对照代码、测试和 [history_extrapolation](studies/history_extrapolation/docs/STUDY_REPORT.md) 里已经记下的数字。文档和实现不一致时，先核对原因，不把现状直接写成设计结论。
-3. 涉及目录或分层的改动，先看 [LAYOUT.md](docs/LAYOUT.md)。`src/spec_mtp/` 是 RPipe 按文件拷过来的。新代码放进对应层的 `spec_mtp/` 子模块，不改拷过来的框架文件。解码在 `structure/algorithm/eval/spec_mtp/`，和 RPipe 的 `train/`、`eval/` 并列。
+3. 涉及目录或分层的改动，先看 [LAYOUT.md](docs/LAYOUT.md)。本项目**依赖** RPipe（固定提交见 [LAYOUT.md](docs/LAYOUT.md)），不再复制 RPipe。`src/spec_mtp/` 只放 SpecMTP 专用实现，经 Study recipe 注册到 RPipe 运行时 Registry。不改上游 RPipe 源码；确需改 RPipe 公共接口时先说明缺口和跨仓库影响，再请求授权。
 4. 按改动范围做必要验证，并同步相关文档。交付时说明完成内容、验证结果和未完成事项。
 
 ## 2. 去哪里找文档
@@ -32,15 +32,17 @@
 
 ## 4. 代码放在哪
 
-- `src/rpipe/` 是上游 RPipe，保持那一份。本机 Windows 需要在包入口先 import torch，这一处保留。不要把 SpecMTP 注册进 `rpipe`。
-- `src/spec_mtp/` 跟随 RPipe：`flow/` 是 prepare → execute → collect → summarize → write → process；`structure/` 的各层与 RPipe 相同。
-- SpecMTP 自己的文件只出现在某层下面的 `spec_mtp/` 子目录。mask、树、解码、esp / ar / alignment 在 `structure/algorithm/eval/spec_mtp/`。数据在 `structure/data/spec_mtp/`，模型在 `structure/model/spec_mtp/`。
-- 入口是 `python -m spec_mtp`。不恢复 `src/main.py`。
+- RPipe 是外部依赖（`pyproject.toml` 固定 `diaoenmao/RPipe` 的 `dev` 提交）。调度、Flow 阶段链、FlowContext、Tracker、Logger、result、provenance / freeze、聚合与 readout 都用库里的，不在本仓库复制，也不通过换包名复制 runner、Factory、Registry、artifact、make。
+- `src/spec_mtp/` 是 SpecMTP 专用代码，按 RPipe 的 `structure` 分层命名：`structure/algorithm/`（mask、树、解码、esp / ar / alignment，注册为 `(eval, spec_mtp)`）、`structure/data/`、`structure/model/`、`structure/system/`、`structure/control/`、`structure/artifact/`。`spec_mtp/recipe.py` 做注册和构造条件校验；`spec_mtp/flow/` 只放 Study 阶段会调用的 SpecMTP 专用检查。
+- 注册只发生在 Study 的 `recipe.register(ctx)` 里，导入 `spec_mtp` 不注册、不计算。不改 RPipe 默认 source。
+- 入口：`python -m rpipe …` 是主入口。`python -m spec_mtp` / `spec-mtp` 是薄入口：在 make / run 时额外写 SpecMTP 源码清单，其余原样转给 `rpipe`。本项目安装不提供 `rpipe` 命令，不覆盖真正的 RPipe。
+- Windows：`spec_mtp/__init__.py` 保留“先 import torch”的适配（原因见该文件注释）；只在经 `spec_mtp` 入口时先于 RPipe 生效。Linux 上无法验证，不要据此删除。不恢复 `src/main.py`。
 
 ## 5. 实验
 
 - 开跑之前先写该 Study 的 `docs/PLAN.md`：问题、假设、对照、指标、停止规则。不在用来检验预注册结论的那一组上再调 β、λ、γ。
-- 人从 Study 跑：`python -m spec_mtp make studies/<name>`，然后 `studies/<name>/scripts/launch.ps1`（bash 用同目录的 `launch.sh`）。`scripts/` 由 `make` 写出，不进 git。
+- 人从 Study 跑：`python -m spec_mtp make studies/<name>`（等价于 `rpipe make` 加 SpecMTP 源码清单），然后 `studies/<name>/scripts/launch.ps1`（bash 用同目录的 `launch.sh`）。`scripts/` 由 `make` 写出，不进 git。
+- 每个 Study 用 `recipe: recipe.py` 注册 SpecMTP source，`flow.prepare_shared: false`。`exact_match_rate` 门在 write 定稿前执行，不为 1 的 Run 记为 failed。
 - `exact_match_rate` 必须是 1，否则该格作废。表里的数是接受的 draft 数。速度和 `tau` 不决定结论。不把 γ 叫成 slope。
 - [history_extrapolation](studies/history_extrapolation/docs/STUDY_REPORT.md) 里已经有数字的格子不重跑。不复用一个 Run 目录，logger 会追加。
 - Windows 上设 `PYTHONUTF8=1`。权重用 ModelScope。用本机的 `D:\anaconda3\python.exe`，不另建 venv。

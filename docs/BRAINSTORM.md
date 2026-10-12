@@ -4,7 +4,7 @@
 
 ## 1. 用 RPipe 重构这个仓库
 
-**状态（2026-10-09）**：`src/spec_mtp/` 是 RPipe 按文件拷过来的，包名换成 `spec_mtp`。SpecMTP 的代码在各层的 `spec_mtp/` 子模块里。解码在 `structure/algorithm/eval/spec_mtp/`，和 RPipe 的 `train/`、`eval/` 并列，注册为 `(eval, spec_mtp)`。`src/rpipe/` 保持上游那份，不往里面注册。CPU 门是 `studies/smoke_tiny_llama`，人跑 `studies/<name>/scripts/launch.ps1`，CI 用 `python -m spec_mtp run`。见 [LAYOUT.md](LAYOUT.md)、[CI.md](CI.md)、[TESTING.md](TESTING.md)。
+**状态（2026-10-12）**：设计从“复制 RPipe、保留两套框架”改为“依赖 RPipe（`dev` 固定提交），保留 SpecMTP 专用实现”。`src/rpipe/` 与 `src/spec_mtp/` 里复制的框架已删除；SpecMTP 代码在 `src/spec_mtp/structure/<layer>/`，由 Study recipe 注册为 `spec_mtp` source。见 [LAYOUT.md](LAYOUT.md)、[ARCHITECTURE.md](ARCHITECTURE.md)。2026-10-09 的复制方案见提交 `b1f6191`。
 
 仍待做：
 

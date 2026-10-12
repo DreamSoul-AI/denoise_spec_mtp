@@ -1,6 +1,6 @@
 # sample_embedding mask init and the sampling RNG (branch `fix/mask-init-rng`)
 
-**Status: separate branch, not merged into `refactor/rpipe-dependency`.** Needs a decision.
+**Status: merged into `refactor/rpipe-dependency` (2026-10-12).** Paper ablation runs at temperature 0 (unchanged); T>0 alignment only makes the exact_match audit stricter.
 
 ## Problem
 

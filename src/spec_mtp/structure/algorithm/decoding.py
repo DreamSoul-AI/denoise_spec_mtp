@@ -21,6 +21,7 @@ token-for-token (greedy at temperature 0) — the audit used by the smoke
 tests. tau = committed tokens (accepted + bonus) per decode call.
 """
 
+from typing import Any
 import time
 
 import torch
@@ -78,10 +79,10 @@ class SpecDecoder:
                              'use spec.impl=naive with dynamic trees')
         if self.impl not in ('naive', 'efficient'):
             raise ValueError(f'Unsupported spec.impl: {self.impl}')
-        self._attn_cache = TreeAttentionCache() if self.impl == 'efficient' else None
+        self._attn_cache: Any = TreeAttentionCache() if self.impl == 'efficient' else None
         # Dynamic trees: memoised, vectorised build of the same naive mask (perf only).
         # Static + naive keeps the literal builder for the Table 4 timing ablation.
-        self._dynamic_attn = DynamicTreeAttentionCache() if tree_mode == 'dynamic' else None
+        self._dynamic_attn: Any = DynamicTreeAttentionCache() if tree_mode == 'dynamic' else None
 
         # Log the realized block complexity (Eq 7) for bookkeeping.
         if tree_mode == 'static':
@@ -110,7 +111,7 @@ class SpecDecoder:
         # so temperature > 0 stays token-identical to ar_generate.
         provider = build_mask_provider(self.spec_cfg, model.embedding_table,
                                        generator=_fork_generator(self.generator))
-        stats = {'prefill_calls': 1, 'decode_calls': 0, 'accepted': 0,
+        stats: dict[str, Any] = {'prefill_calls': 1, 'decode_calls': 0, 'accepted': 0,
                  'committed': 0, 'hit_context_limit': 0,
                  # Draft attempts/accepts at depth 1..3. An attempt is a
                  # sampled token that had tree children to match; the bonus
@@ -187,7 +188,7 @@ class SpecDecoder:
 
             # Verify: walk the model's own prediction chain through the tree.
             cur = 0
-            accepted_nodes = []
+            accepted_nodes: list[int] = []
             committed_now = []
             while True:
                 y = select_token(logits[cur], self.temperature, self.generator)

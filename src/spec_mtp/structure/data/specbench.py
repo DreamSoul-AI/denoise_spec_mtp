@@ -44,7 +44,7 @@ def window_by_category(questions, skip=0, take=None):
     are skip/take ``0/2``, ``2/4``, and ``6/4``.
     """
     skip = int(skip or 0)
-    by_category = {}
+    by_category: dict = {}
     for item in questions:
         by_category.setdefault(item['category'], []).append(item)
     picked = []

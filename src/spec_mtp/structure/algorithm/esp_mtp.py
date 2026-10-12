@@ -21,7 +21,7 @@ from spec_mtp.structure.system.device import sync_device
 
 def _aggregate(rows):
     """Aggregate per-prompt rows into per-category + overall summaries."""
-    groups = {}
+    groups: dict = {}
     for row in rows:
         for key in (row['category'], 'overall'):
             groups.setdefault(key, []).append(row)

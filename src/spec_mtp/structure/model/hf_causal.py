@@ -14,6 +14,7 @@ NOTE: use attn_implementation eager or sdpa. flash_attention_2 cannot consume
 arbitrary 4D attention masks, which tree attention requires.
 """
 
+from typing import Any
 import torch
 import torch.nn as nn
 
@@ -25,9 +26,10 @@ class HFCausalLM(nn.Module):
     def __init__(self, name_or_path=None, local_files_only=False, torch_dtype='auto',
                  attn_implementation='eager', tiny_config=None):
         super().__init__()
+        self.hf: Any
         if tiny_config is not None:
             from transformers import LlamaConfig, LlamaForCausalLM
-            config = LlamaConfig(
+            config = LlamaConfig(  # type: ignore[call-arg]  # attn_implementation goes to PretrainedConfig kwargs
                 vocab_size=int(tiny_config.get('vocab_size', 256)),
                 hidden_size=int(tiny_config.get('hidden_size', 64)),
                 intermediate_size=int(tiny_config.get('intermediate_size', 128)),

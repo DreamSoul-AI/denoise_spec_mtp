@@ -8,7 +8,7 @@
 
 仍待做：
 
-- `sample_embedding` 初始化与采样共用 RNG，temperature > 0 时无法逐 token 审计（[ARCHITECTURE.md](ARCHITECTURE.md) 第 13 条）。分支 `fix/mask-init-rng` 已给 mask provider 独立 Generator（[MASK_INIT_RNG.md](MASK_INIT_RNG.md)），待决定是否合入。
+- `sample_embedding` 初始化与采样共用 RNG，temperature > 0 时无法逐 token 审计（[ARCHITECTURE.md](ARCHITECTURE.md) 第 13 条）。`sample_embedding` 已在 `refactor/rpipe-dependency` 合入独立 Generator（[MASK_INIT_RNG.md](MASK_INIT_RNG.md)）；论文消融用 T=0，T>0 对齐只让 exact_match 更严。
 
 - `configs/hf/` 已收成 [studies/paper_hf](../studies/paper_hf/README.md)（2026-10-12），只验证了展开和配置一致，GPU 未跑。已记录的接受数在 [history_extrapolation](../studies/history_extrapolation/docs/STUDY_REPORT.md)。
 

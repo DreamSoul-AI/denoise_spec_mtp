@@ -25,7 +25,7 @@ def load_records(data_cfg):
 def encode(records, tokenizer, data_cfg):
     num_prompts = int(data_cfg.get('num_prompts', 100))
     max_prompt_len = int(data_cfg.get('max_prompt_len', 2048))
-    prompts = []
+    prompts: list = []
     for item in records:
         input_ids = render(tokenizer, item['text'])
         if input_ids.size(1) > max_prompt_len:

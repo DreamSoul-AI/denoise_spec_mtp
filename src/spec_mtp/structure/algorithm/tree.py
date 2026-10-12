@@ -21,6 +21,7 @@ repetition) is replaced by the next-best token from the same mask
 distribution.
 """
 
+from typing import Any
 from dataclasses import dataclass, field
 from typing import List
 
@@ -110,6 +111,8 @@ def build_static_tree(mask_probs, branches, root_token, pruning=True):
         probs = mask_probs[depth - 1]
         banned = parent_token if pruning else -1
         tokens, token_probs = _topk_with_pruning(probs, width, banned, set())
+        top1_block_idx: Any
+        top1_token: Any
         top1_block_idx, top1_prob, top1_token = None, -1.0, None
         for token, p in zip(tokens, token_probs):
             tree.tokens.append(token)

@@ -17,7 +17,7 @@ _TREE = {
 def spec_for(name, beta=None, lam=None, gamma=None, branches=None, num_masks=None):
     key = str(name or '').lower()
     if key == 'frozen_mean':
-        body = {
+        body: dict = {
             **_TREE,
             'method': 'esp',
             'mask': {'init': 'mean_prompt', 'lam': 0, 'update': False},

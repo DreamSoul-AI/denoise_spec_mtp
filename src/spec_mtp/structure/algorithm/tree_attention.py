@@ -27,6 +27,7 @@ Two implementations, matching the paper's naive/efficient ablation (Table 4):
     exactly the Appendix E update rule.
 """
 
+from typing import Any
 import torch
 
 
@@ -38,7 +39,7 @@ def block_layout(tree, num_masks):
     num_nodes = tree.num_nodes
     block = 1 + num_nodes
     # Attend sets and relative positions for root + nodes.
-    attend = [set() for _ in range(block)]
+    attend: list[set[int]] = [set() for _ in range(block)]
     rel = [0] * block
     attend[0] = {0}
     for j in range(num_nodes):
@@ -48,7 +49,7 @@ def block_layout(tree, num_masks):
         rel[idx] = tree.depths[j]
 
     # Masks, grouped by owner (root first, then nodes in block order).
-    owner_of_mask = []
+    owner_of_mask: list[int] = []
     for owner in range(block):
         base = block + len(owner_of_mask)
         for j in range(num_masks):
@@ -89,8 +90,8 @@ class TreeAttentionCache:
     (e.g. the truncated final step)."""
 
     def __init__(self):
-        self._structure = None   # [1, 1, B, B] additive block-local mask
-        self._rel = None         # [1, B] relative PIDs
+        self._structure: Any = None   # [1, 1, B, B] additive block-local mask
+        self._rel: Any = None         # [1, B] relative PIDs
         self._signature = None
 
     def _tree_signature(self, tree, num_masks):

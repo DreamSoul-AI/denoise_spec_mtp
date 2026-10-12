@@ -42,6 +42,7 @@ EMA: vhat <- beta * vhat + (1 - beta) * (e_new - e_prev). Everything else
 are swapped, per the July discussion ("只是换它这个 4 和 5 Equation").
 """
 
+from typing import Any
 import torch
 
 
@@ -157,10 +158,10 @@ class EMAVelocityMaskProvider:
             raise ValueError(f'Unsupported ema.level: {level}')
         self.lam = float(lam)
         self.generator = generator
-        self._velocity = None  # vhat, [d]
+        self._velocity: Any = None  # vhat, [d]
         self._anchor = None    # e of the last committed token, [d]
         self._level = None     # order-0 EMA of embeddings, [d]
-        self._ref_norm = None  # EMA of ||diff||, scalar (formulation 3 unit)
+        self._ref_norm: Any = None  # EMA of ||diff||, scalar (formulation 3 unit)
 
     def init_from_prompt(self, prompt_embeds):
         if prompt_embeds.size(0) < 2:

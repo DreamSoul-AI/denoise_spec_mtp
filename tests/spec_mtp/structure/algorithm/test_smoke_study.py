@@ -126,3 +126,20 @@ def test_freeze_rejects_study_change_after_make(study_copy):
     proc = cli('run-one', study, run_id)
     assert proc.returncode != 0
     assert 'provenance changed' in (proc.stdout + proc.stderr)
+
+
+def test_alignment_probe_writes_metrics_and_passes_the_gate(study_copy):
+    """The probe's artifact is alignment_metrics.csv; the gate needs it (was dropped before 2026-10-12)."""
+    def patch(study):
+        study['fixed']['algorithm']['config']['task'] = 'alignment_probe'
+        study['fixed']['algorithm']['config']['eval']['probe_steps_per_prompt'] = 4
+        study['axes'] = {'algorithm.config.variant': ['esp_static']}
+    study = study_copy(patch, name='probe')
+    cli('run', study, check=True)
+    run_id = json.loads((study / 'index.json').read_text())['experiments'][0]['runs'][0]['id']
+    with (study / 'runs' / run_id / 'assets' / 'alignment_metrics.csv').open(encoding='utf-8') as handle:
+        rows = list(csv.DictReader(handle))
+    assert [int(r['layer']) for r in rows] == [1, 2]
+    assert all(int(r['n_accepted']) + int(r['n_rejected']) > 0 for r in rows)
+    result = json.loads((study / 'runs' / run_id / 'result.json').read_text(encoding='utf-8'))
+    assert result['status'] == 'succeeded' and result['spec_mtp']['passed']

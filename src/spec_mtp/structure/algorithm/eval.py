@@ -70,8 +70,11 @@ class SpecMtpEvalAlgorithm(Algorithm):
             out = impl.evaluate(
                 module, prompts, eos_ids, cfg.eval, seed, system.device, save_dir=None)
         elif task == 'alignment_probe':
+            # The probe's only artifact is alignment_metrics.csv (the run gate needs it);
+            # before 2026-10-12 save_dir=None here dropped it (old copied pipeline too).
+            assets.mkdir(parents=True, exist_ok=True)
             out = impl.evaluate(
-                module, prompts, eos_ids, cfg.spec, cfg.eval, save_dir=None)
+                module, prompts, eos_ids, cfg.spec, cfg.eval, save_dir=str(assets))
         else:
             out = impl.evaluate(
                 module, prompts, eos_ids, cfg.spec, cfg.eval, seed, system.device,

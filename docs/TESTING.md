@@ -31,6 +31,7 @@ Temporary files and the pytest cache go to `.tmp/`. End-to-end tests copy the sm
 | `test_profile_tool.py` | `tools/profile_cpu.py` component buckets; a tiny profiled run keeps exact match (report: [PROFILE.md](PROFILE.md)) |
 | `test_docs.py`, `test_docs_index.py` | relative Markdown links resolve; every `docs/*.md` linked from AGENTS.md, every `tools/*.py` in LAYOUT.md with a usage docstring |
 | `structure/algorithm/test_lossless_properties.py` | hypothesis: spec output = AR for every smoke variant and every paper esp_mtp preset over random prompt length, budget, temperature, seed; context-limit invariant (output = AR at the reached budget, prefix of full AR); every preset builds a decoder; `sample_embedding` at temperature > 0 token-identical (forked generator, [MASK_INIT_RNG.md](MASK_INIT_RNG.md)) and its mask noise unchanged |
+| `structure/algorithm/test_decoder_boundaries.py` | bad impl/tree/mask.init/method/ema.level; last_k / short EMA prompt; EOS vs AR; context-limit flag + budgeted AR; budget truncation; RNG fork; KV crop / keep_block_positions / unsupported type |
 | `structure/algorithm/test_tree_attention_cache.py` | dynamic-tree mask cache bit-identical to the naive builder (random trees, fp32 / bf16, hits, LRU eviction, no aliasing); decoder picks it only for dynamic trees |
 | `test_fingerprint_tool.py` | `tools/decode_fingerprint.py` comparison logic |
 | `test_win_import.py` | `SPEC_MTP_WIN_IMPORT_ORDER` logic (real DLL order needs Windows: `tools/windows_selfcheck.py`) |

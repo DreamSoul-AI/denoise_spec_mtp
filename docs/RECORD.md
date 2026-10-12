@@ -28,7 +28,7 @@
 
 **alignment_probe 产物（2026-10-12 修）**：RPipe 适配层调用探针时传 `save_dir=None`（旧复制流水线同样如此），`alignment_metrics.csv` 从未写出，write 门因此必然判失败；paper_hf 无权重 dry-run 发现。现在写到 Run 的 `assets/`。探针计算不变。
 
-**后续本地改进（2026-10-12，同一分支，未推送）**：动态树 mask 缓存（输出逐项一致，已合入）；sample_embedding RNG 分叉（T>0 exact_match，已合入）；`tools/ci_local.py` 重放 CI；CI 增加 ruff（含 `tools/`）和 mypy（新模块严格档，见 [CI.md](CI.md)）；`studies/paper_hf/` 与无权重 dry-run（59 个 Run 全过）；alignment_probe 产物修复；hypothesis 属性测试与分支用例；配置错误给出近似建议并指出 Study；CPU 剖析工具与 [PROFILE.md](PROFILE.md)。每个提交都跑过 `tools/ci_local.py`，当前 138 个测试。
+**后续本地改进（2026-10-12，同一分支，未推送）**：动态树 mask 缓存（输出逐项一致，已合入）；sample_embedding RNG 分叉（T>0 exact_match，已合入）；TreeAttentionCache 签名含 dtype/device/min_value；load_lock 损坏 JSON 报路径；ci_local 并发隔离；tools/README 与 dry-run --list；`tools/ci_local.py` 重放 CI；CI 增加 ruff（含 `tools/`）和 mypy（新模块严格档，见 [CI.md](CI.md)）；`studies/paper_hf/` 与无权重 dry-run（59 个 Run 全过）；alignment_probe 产物修复；hypothesis 属性测试与分支用例；配置错误给出近似建议并指出 Study；CPU 剖析工具与 [PROFILE.md](PROFILE.md)。每个提交都跑过 `tools/ci_local.py`，当前 138 个测试。
 
 **Windows**：旧包在 `sys.platform == 'win32'` 时先 import torch（注释说先 import NumPy 会在 `blas_fpe_check` 出错）。RPipe dev 已改成先 import NumPy（为与 Conda NumPy 共享 libiomp5md）。两者方向相反，Linux 上无法验证；默认保留旧包的 Torch 优先，可用 `SPEC_MTP_WIN_IMPORT_ORDER=torch|numpy|off` 切换，只在经 `spec_mtp` 入口（先于 rpipe 导入）时生效，经 `python -m rpipe` 时由 RPipe 的顺序决定。需在 Windows 本机跑 `tools/windows_selfcheck.py` 核对，见 [WINDOWS.md](WINDOWS.md)。
 

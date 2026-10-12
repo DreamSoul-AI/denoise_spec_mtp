@@ -190,3 +190,10 @@ def test_register_error_names_the_study(study_copy):
     config = _config(task='nope')
     with pytest.raises(recipe.SpecMtpConfigError, match=r'study\.yaml; checked before any weights load'):
         recipe.register(_ctx(study_dir, config))
+
+
+def test_freeze_rejects_corrupt_lock(study_copy):
+    study_dir = study_copy(lambda s: s.update(freeze=True))
+    (study_dir / sources.LOCK_NAME).write_text('{not json', encoding='utf-8')
+    with pytest.raises(sources.SpecMtpSourceChangedError, match='not valid JSON'):
+        recipe.register(_ctx(study_dir, _config(variant='esp_static')))

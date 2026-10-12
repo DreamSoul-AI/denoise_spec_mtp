@@ -1,0 +1,301 @@
+{
+ "equal": true,
+ "differences": [],
+ "cells": [
+  {
+   "key": "reg_eos|tokens",
+   "sequences": 30,
+   "old_sha256": "08705473870b3200",
+   "new_sha256": "08705473870b3200",
+   "equal": true
+  },
+  {
+   "key": "reg_eos|{\"algorithm.config.variant\": \"ema_velocity\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 7,
+   "committed": 100,
+   "decode_calls": 93,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_eos|{\"algorithm.config.variant\": \"esp_dynamic\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 27,
+   "committed": 100,
+   "decode_calls": 74,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_eos|{\"algorithm.config.variant\": \"esp_static\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 23,
+   "committed": 100,
+   "decode_calls": 78,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_mask|tokens",
+   "sequences": 60,
+   "old_sha256": "141ba6d1f167af76",
+   "new_sha256": "141ba6d1f167af76",
+   "equal": true
+  },
+  {
+   "key": "reg_mask|{\"algorithm.config.mask\": \"frozen_mean\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 32,
+   "committed": 124,
+   "decode_calls": 93,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_mask|{\"algorithm.config.mask\": \"gamma_last\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 15,
+   "committed": 124,
+   "decode_calls": 109,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_mask|{\"algorithm.config.mask\": \"gamma_last_unit\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 6,
+   "committed": 124,
+   "decode_calls": 118,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_mask|{\"algorithm.config.mask\": \"last_token\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 15,
+   "committed": 124,
+   "decode_calls": 109,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_mask|{\"algorithm.config.mask\": \"mean_plus_gamma\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 17,
+   "committed": 124,
+   "decode_calls": 107,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_mask|{\"algorithm.config.mask\": \"updating_mean\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 35,
+   "committed": 124,
+   "decode_calls": 91,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_matrix|tokens",
+   "sequences": 120,
+   "old_sha256": "0da792b59d737e43",
+   "new_sha256": "0da792b59d737e43",
+   "equal": true
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.0, \"algorithm.config.variant\": \"ema_velocity\", \"model.config.tiny.max_position_embeddings\": 1024}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 8,
+   "committed": 124,
+   "decode_calls": 116,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.0, \"algorithm.config.variant\": \"ema_velocity\", \"model.config.tiny.max_position_embeddings\": 56}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "0.0",
+   "accepted": 5,
+   "committed": 80,
+   "decode_calls": 75,
+   "hit_context_limit": 4
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.0, \"algorithm.config.variant\": \"esp_dynamic\", \"model.config.tiny.max_position_embeddings\": 1024}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 31,
+   "committed": 124,
+   "decode_calls": 94,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.0, \"algorithm.config.variant\": \"esp_dynamic\", \"model.config.tiny.max_position_embeddings\": 56}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "0.0",
+   "accepted": 21,
+   "committed": 87,
+   "decode_calls": 66,
+   "hit_context_limit": 4
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.0, \"algorithm.config.variant\": \"esp_static\", \"model.config.tiny.max_position_embeddings\": 1024}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 28,
+   "committed": 124,
+   "decode_calls": 97,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.0, \"algorithm.config.variant\": \"esp_static\", \"model.config.tiny.max_position_embeddings\": 56}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "0.0",
+   "accepted": 15,
+   "committed": 81,
+   "decode_calls": 66,
+   "hit_context_limit": 4
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.8, \"algorithm.config.variant\": \"ema_velocity\", \"model.config.tiny.max_position_embeddings\": 1024}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 8,
+   "committed": 124,
+   "decode_calls": 116,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.8, \"algorithm.config.variant\": \"ema_velocity\", \"model.config.tiny.max_position_embeddings\": 56}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "0.0",
+   "accepted": 5,
+   "committed": 80,
+   "decode_calls": 75,
+   "hit_context_limit": 4
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.8, \"algorithm.config.variant\": \"esp_dynamic\", \"model.config.tiny.max_position_embeddings\": 1024}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 8,
+   "committed": 124,
+   "decode_calls": 116,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.8, \"algorithm.config.variant\": \"esp_dynamic\", \"model.config.tiny.max_position_embeddings\": 56}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "0.0",
+   "accepted": 4,
+   "committed": 84,
+   "decode_calls": 80,
+   "hit_context_limit": 4
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.8, \"algorithm.config.variant\": \"esp_static\", \"model.config.tiny.max_position_embeddings\": 1024}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 5,
+   "committed": 124,
+   "decode_calls": 119,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "reg_matrix|{\"algorithm.config.eval.temperature\": 0.8, \"algorithm.config.variant\": \"esp_static\", \"model.config.tiny.max_position_embeddings\": 56}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "0.0",
+   "accepted": 3,
+   "committed": 80,
+   "decode_calls": 77,
+   "hit_context_limit": 4
+  },
+  {
+   "key": "reg_tasks|tokens",
+   "sequences": 9,
+   "old_sha256": "5d18a5ac8b734810",
+   "new_sha256": "5d18a5ac8b734810",
+   "equal": true
+  },
+  {
+   "key": "reg_tasks|{\"algorithm.config.task\": \"alignment_probe\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": null,
+   "accepted": null,
+   "committed": null,
+   "decode_calls": null,
+   "hit_context_limit": null
+  },
+  {
+   "key": "reg_tasks|{\"algorithm.config.task\": \"ar_baseline\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": null,
+   "accepted": null,
+   "committed": null,
+   "decode_calls": null,
+   "hit_context_limit": null
+  },
+  {
+   "key": "smoke_tiny_llama|tokens",
+   "sequences": 30,
+   "old_sha256": "99ea2bee22a520f8",
+   "new_sha256": "99ea2bee22a520f8",
+   "equal": true
+  },
+  {
+   "key": "smoke_tiny_llama|{\"algorithm.config.variant\": \"ema_velocity\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 8,
+   "committed": 124,
+   "decode_calls": 116,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "smoke_tiny_llama|{\"algorithm.config.variant\": \"esp_dynamic\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 31,
+   "committed": 124,
+   "decode_calls": 94,
+   "hit_context_limit": 0
+  },
+  {
+   "key": "smoke_tiny_llama|{\"algorithm.config.variant\": \"esp_static\"}",
+   "equal": true,
+   "status": "succeeded",
+   "exact_match_rate": "1.0",
+   "accepted": 28,
+   "committed": 124,
+   "decode_calls": 97,
+   "hit_context_limit": 0
+  }
+ ]
+}

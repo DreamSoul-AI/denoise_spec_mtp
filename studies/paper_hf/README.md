@@ -8,6 +8,12 @@
 
 见 `tests/spec_mtp/test_paper_hf.py`。
 
+## 无权重 dry-run
+
+`python tools/paper_hf_dryrun.py [--study <name>] [--cells N] [--out report.json]`：把每个 Study 复制到临时目录，只换底座：模型换成随机 tiny LLaMA（2 层、vocab 256，不下载），数据换成 2 条合成 prompt，`max_new_tokens` 16、`num_eval_prompts` 2、`probe_steps_per_prompt` 4，设备 CPU。task、temperature、`stop_on_eos`、`run_ar_baseline`、全部 variant 预设、seed、recipe、flow 钩子和 exact_match 门原样保留，再走 `python -m spec_mtp run`。
+
+2026-10-12：11 个 Study、59 个 Run 全部成功，esp_mtp 格子 `exact_match_rate` 全为 1，Study 级门通过（约 1 分钟）。这只说明每个论文预设能被接受、能在真实 transformer 结构上无损解码、能过门；不说明真实模型上的接受数、GPU、bf16 或显存。dry-run 首轮发现 alignment_probe 从不写 `alignment_metrics.csv`（已修，见 RECORD）。CI 里 `test_paper_hf_dryrun.py` 每种 task 跑 1 格。
+
 | **Study** | **格子** |
 | --- | --- |
 | `<family>_main` | `run_0/esp_bc*`、`ema_bc*`（10 格） |

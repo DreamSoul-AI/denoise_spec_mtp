@@ -25,6 +25,7 @@ Temporary files and the pytest cache go to `.tmp/`. End-to-end tests copy the sm
 | `flow/test_checks.py` | Run gate and Study-scope gate (missing, subset, failed, mixed source digest, seeds) |
 | `test_recipe.py` | no registration on import, idempotent registration on RPipe registries, config boundary checks, source lock / freeze, repository Studies expand and validate |
 | `test_paper_hf.py` | `studies/paper_hf/` generated files current; 59 legacy `configs/hf` cells = 59 expanded Runs (data / model / task / eval / effective spec / seed); recipe checks. No weights, no GPU |
+| `test_paper_hf_dryrun.py` | `tools/paper_hf_dryrun.py` swaps only model / data / budget / device; one tiny Run per task (esp_mtp temp 0 and 1, ar_baseline, alignment_probe) through recipe, gates and Study process |
 | `test_win_import.py` | `SPEC_MTP_WIN_IMPORT_ORDER` logic (real DLL order needs Windows: `tools/windows_selfcheck.py`) |
 | `test_package.py` | RPipe pinned and not vendored, console scripts do not override `rpipe`, source manifest coverage, cli lock rules |
 

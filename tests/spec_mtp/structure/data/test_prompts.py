@@ -35,3 +35,26 @@ def test_registry_builds_synthetic_prompts_without_a_tokenizer():
     data = _build(config, None)
     assert data.source == 'spec_mtp'
     assert data.meta['prompt_count'] == 3
+
+
+def test_select_prompts_caps_and_keeps_eval_eos():
+    from spec_mtp.structure.algorithm.common import select_prompts
+
+    prompts = [{'id': i} for i in range(5)]
+    sliced, eos = select_prompts(prompts, [1, 2], {'num_eval_prompts': 2})
+    assert sliced == prompts[:2] and eos == [1, 2]
+    sliced, eos = select_prompts(prompts, [1], {'num_eval_prompts': 99, 'eos_token_ids': [9]})
+    assert sliced == prompts and eos == [9]
+    assert select_prompts(prompts, [], {'num_eval_prompts': 0}) == ([], [])
+
+
+def test_local_prompts_text_mode_and_bad_mode():
+    from spec_mtp.structure.data.local_prompts import load_records
+
+    rows = load_records({'mode': 'text', 'num_prompts': 3})
+    assert len(rows) == 3 and all('text' in r for r in rows)
+    try:
+        load_records({'mode': 'bytes'})
+        assert False, 'expected ValueError'
+    except ValueError as error:
+        assert 'Unsupported local_prompts mode' in str(error)

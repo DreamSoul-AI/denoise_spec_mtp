@@ -33,7 +33,7 @@ from spec_mtp.structure.algorithm.tree_attention import (DynamicTreeAttentionCac
                                           build_block_attention, mask_indices_of)
 
 
-def _fork_generator(generator):
+def _fork_generator(generator: torch.Generator | None) -> torch.Generator | None:
     """Independent Generator with the same current state (None stays None)."""
     if generator is None:
         return None

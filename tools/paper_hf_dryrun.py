@@ -121,12 +121,19 @@ def run_study(name: str, cells: int | None, timeout: int, keep: Path | None) -> 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     parser.add_argument('--study', action='append', help='paper_hf Study name (repeatable); default all')
+    parser.add_argument('--list', action='store_true', help='print Study names and cell counts, then exit')
     parser.add_argument('--cells', type=int, default=None, help='first N variants per Study')
     parser.add_argument('--timeout', type=int, default=900)
     parser.add_argument('--out', default=None, help='write the JSON report here')
     parser.add_argument('--keep', default=None, help='keep the Study copies under this directory')
     args = parser.parse_args(argv)
     names = args.study or sorted(p.name for p in PAPER.iterdir() if (p / 'study.yaml').is_file())
+    if args.list:
+        for name in names:
+            study = yaml.safe_load((PAPER / name / 'study.yaml').read_text(encoding='utf-8'))
+            variants = (study.get('axes') or {}).get('algorithm.config.variant') or [None]
+            print(f'{name}\t{len(variants)}\t{study["fixed"]["algorithm"]["config"]["task"]}')
+        return 0
     keep = Path(args.keep).resolve() if args.keep else None
     if keep:
         keep.mkdir(parents=True, exist_ok=True)

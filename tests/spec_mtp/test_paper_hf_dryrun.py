@@ -51,3 +51,10 @@ def test_one_cell_per_task_runs_through_the_gates(tmp_path):
     assert [len(r['runs']) for r in report['results']] == [1, 1, 1, 1]
     rates = {r['study']: r['runs'][0]['exact_match_rate'] for r in report['results']}
     assert rates['qwen3_8b_main'] == 1.0 and rates['llama3_2_3b_ablations_temp1p0'] == 1.0
+
+
+def test_list_prints_studies(capsys):
+    assert dryrun.main(['--list']) == 0
+    out = capsys.readouterr().out
+    assert 'qwen3_8b_main\t10\tesp_mtp' in out
+    assert 'llama3_2_3b_alignment_probe\t1\talignment_probe' in out

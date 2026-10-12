@@ -52,7 +52,7 @@ pip install mypy==2.4.0 types-PyYAML==6.0.12.20260906 && mypy
 python -m pytest tests/spec_mtp
 ```
 
-mypy reads `[tool.mypy]` in `pyproject.toml`: only the modules written for the RPipe dependency are checked; `recipe`, `cli`, `_win_import`, `flow/checks`, `artifact/sources` and `config_bridge` are in the strict tier (every def annotated, no bare generics, no `Any` returns), the rest of `src/spec_mtp` (eval, registries and the research decoder modules) gets `check_untyped_defs`; the decoder modules only received variable / attribute annotations (no logic change). RPipe has no `py.typed`, so its types are `Any`.
+mypy reads `[tool.mypy]` in `pyproject.toml`: only the modules written for the RPipe dependency are checked; `recipe`, `cli`, `_win_import`, `flow/checks`, `artifact/sources` and `config_bridge` are in the strict tier (every def annotated, no bare generics, no `Any` returns), the rest of `src/spec_mtp` gets `check_untyped_defs`. A mid tier (`kv_cache`, `common`, `mask_settings`, `tree_attention`, `csv_logger`) has every def annotated. Remaining research modules (decoding, esp_mtp, mask_providers, tree, eval, …) keep variable / attribute annotations only — no logic change. RPipe has no `py.typed`, so its types are `Any`.
 
 Lint is ruff 0.17.0, rules `F` and `E9` only (`pyproject.toml`); `decoding.py` keeps an `F841` ignore so the audited decoder text is not reformatted.
 

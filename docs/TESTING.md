@@ -18,7 +18,7 @@ Temporary files and the pytest cache go to `.tmp/`. End-to-end tests copy the sm
 
 | **tests** | **what they cover** |
 | --- | --- |
-| `structure/algorithm/` | masks, trees, tree attention, KV cache, lossless decode and sampling RNG order, EMA history, named mask settings |
+| `structure/algorithm/` | masks, trees, tree attention, KV cache, lossless decode and sampling RNG order, EMA history, named mask settings; see also `test_decoder_boundaries.py` / `test_lossless_properties.py` / `test_tree_attention_cache.py` |
 | `structure/algorithm/test_smoke_study.py` | smoke Study through `spec_mtp` and `rpipe` entries, make + launch scripts path, exact_match failure → failed Run, bad config fails before construction, freeze on SpecMTP and on Study sources |
 | `structure/data/` | category windows and synthetic prompts |
 | `structure/model/` | tiny LLaMA embed and forward |

@@ -5,6 +5,7 @@ A Study axis sets ``algorithm.config.mask``. Optional ``beta``, ``lam``, and
 slot, static ``[14]``, block complexity 30.
 """
 
+from typing import Any
 from spec_mtp.structure.control.named import _convert
 
 _TREE = {
@@ -14,7 +15,9 @@ _TREE = {
 }
 
 
-def spec_for(name, beta=None, lam=None, gamma=None, branches=None, num_masks=None):
+def spec_for(name: str, beta: float | None = None, lam: float | None = None,
+             gamma: float | None = None, branches: list[int] | None = None,
+             num_masks: int | None = None) -> Any:
     key = str(name or '').lower()
     if key == 'frozen_mean':
         body: dict = {
@@ -59,7 +62,7 @@ def spec_for(name, beta=None, lam=None, gamma=None, branches=None, num_masks=Non
     return _convert(body)
 
 
-def _ema(level, step_scale, beta, lam, normalize=False):
+def _ema(level: str, step_scale: float, beta: float, lam: float, normalize: bool = False) -> dict[str, Any]:
     return {
         **_TREE,
         'method': 'ema_velocity',

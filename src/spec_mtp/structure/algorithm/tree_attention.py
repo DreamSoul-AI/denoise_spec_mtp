@@ -31,7 +31,7 @@ from typing import Any
 import torch
 
 
-def block_layout(tree, num_masks):
+def block_layout(tree: Any, num_masks: int) -> tuple[list[set[int]], list[int], list[int], int]:
     """Returns (attend_sets, rel_positions, owner_of_mask, block_size).
 
     attend_sets[i] is the set of *block-local* indices row i attends to.
@@ -60,14 +60,14 @@ def block_layout(tree, num_masks):
     return attend, rel, owner_of_mask, len(attend)
 
 
-def mask_indices_of(tree, num_masks, owner_block_idx):
+def mask_indices_of(tree: Any, num_masks: int, owner_block_idx: int) -> list[int]:
     """Block indices of the k masks owned by `owner_block_idx`."""
     block = 1 + tree.num_nodes
     base = block + owner_block_idx * num_masks
     return list(range(base, base + num_masks))
 
 
-def _block_structure(tree, num_masks, dtype, device, min_value):
+def _block_structure(tree: Any, num_masks: int, dtype: Any, device: Any, min_value: float) -> tuple[Any, Any]:
     """Block-local additive mask [1,1,B,B] and relative PIDs [1,B].
 
     Same values as filling with a Python loop over ``block_layout`` attend sets;
@@ -86,8 +86,8 @@ def _block_structure(tree, num_masks, dtype, device, min_value):
 
 
 
-def build_block_attention(tree, num_masks, cache_len, root_position, dtype, device,
-                          min_value):
+def build_block_attention(tree: Any, num_masks: int, cache_len: int, root_position: int, dtype: Any, device: Any,
+                          min_value: float) -> tuple[Any, Any]:
     """Naive path: full 4D additive mask + PIDs from the tree structure."""
     attend, rel, _, size = block_layout(tree, num_masks)
     mask = torch.full((1, 1, size, cache_len + size), min_value, dtype=dtype, device=device)
@@ -108,21 +108,21 @@ class TreeAttentionCache:
     configurations. Callers must re-`prepare` if the structure changes
     (e.g. the truncated final step)."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._structure: Any = None   # [1, 1, B, B] additive block-local mask
         self._rel: Any = None         # [1, B] relative PIDs
-        self._signature = None
+        self._signature: Any = None
 
-    def _signature_key(self, tree, num_masks, dtype, device, min_value):
+    def _signature_key(self, tree: Any, num_masks: int, dtype: Any, device: Any, min_value: float) -> tuple:
         # dtype / device / min_value must be part of the key: a float32 structure
         # reused for a bf16 step would keep the wrong fill value (caught 2026-10-12).
         return (tuple(tree.depths), tuple(tree.parents), num_masks, dtype, str(device), float(min_value))
 
-    def prepare(self, tree, num_masks, dtype, device, min_value):
+    def prepare(self, tree: Any, num_masks: int, dtype: Any, device: Any, min_value: float) -> None:
         self._structure, self._rel = _block_structure(tree, num_masks, dtype, device, min_value)
         self._signature = self._signature_key(tree, num_masks, dtype, device, min_value)
 
-    def get(self, tree, num_masks, cache_len, root_position, dtype, device, min_value):
+    def get(self, tree: Any, num_masks: int, cache_len: int, root_position: int, dtype: Any, device: Any, min_value: float) -> tuple[Any, Any]:
         if self._signature != self._signature_key(tree, num_masks, dtype, device, min_value):
             # First step, or tree / dtype / device / min_value changed: (re)build once.
             self.prepare(tree, num_masks, dtype, device, min_value)
@@ -150,16 +150,16 @@ class DynamicTreeAttentionCache:
     paper's naive vs efficient ablation (Table 4) still times the naive path.
     """
 
-    def __init__(self, max_entries=256):
+    def __init__(self, max_entries: int = 256) -> None:
         max_entries = int(max_entries)
         if max_entries < 1:
             raise ValueError(f'DynamicTreeAttentionCache.max_entries must be >= 1, got {max_entries}')
         self.max_entries = max_entries
-        self._entries = {}       # signature -> (structure [1,1,B,B], rel [1,B]); dict order = LRU
+        self._entries: dict[Any, tuple[Any, Any]] = {}  # signature -> (structure, rel); dict order = LRU
         self.hits = 0
         self.misses = 0
 
-    def _structure(self, tree, num_masks, dtype, device, min_value):
+    def _structure(self, tree: Any, num_masks: int, dtype: Any, device: Any, min_value: float) -> tuple[Any, Any]:
         key = (tuple(tree.depths), tuple(tree.parents), num_masks, dtype, str(device), float(min_value))
         entry = self._entries.pop(key, None)
         if entry is None:
@@ -172,7 +172,7 @@ class DynamicTreeAttentionCache:
         self._entries[key] = entry
         return entry
 
-    def get(self, tree, num_masks, cache_len, root_position, dtype, device, min_value):
+    def get(self, tree: Any, num_masks: int, cache_len: int, root_position: int, dtype: Any, device: Any, min_value: float) -> tuple[Any, Any]:
         structure, rel = self._structure(tree, num_masks, dtype, device, min_value)
         size = structure.size(-1)
         mask = torch.empty((1, 1, size, cache_len + size), dtype=dtype, device=device)

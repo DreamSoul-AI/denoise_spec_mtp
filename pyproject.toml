@@ -89,6 +89,8 @@ strict_equality = true
 module = [
   "spec_mtp.structure.algorithm.kv_cache",
   "spec_mtp.structure.algorithm.common",
+  "spec_mtp.structure.algorithm.mask_settings",
+  "spec_mtp.structure.algorithm.tree_attention",
   "spec_mtp.structure.artifact.csv_logger",
 ]
 disallow_untyped_defs = true

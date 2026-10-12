@@ -78,7 +78,7 @@ Self-time share by component (profiled run, spec + AR + warm-up):
 - cProfile overhead inflates Python-heavy parts; absolute tok/s without the profiler are higher. Compare variants inside one run only.
 - GPU behaviour (kernel launch, memory bandwidth, bf16) is not covered.
 
-## Dynamic-tree mask cache (2026-10-12, branch `perf/dynamic-tree-mask`)
+## Dynamic-tree mask cache (2026-10-12, merged into `refactor/rpipe-dependency`)
 
 `DynamicTreeAttentionCache` (`tree_attention.py`) replaces the per-entry Python fill of `build_block_attention` for `tree.mode: dynamic`: the block-local structure is memoised per tree signature (LRU, 256 entries) and filled with one indexed write; per step only the cache columns are prepended and the PIDs shifted. Static trees with `impl: naive` keep the literal builder so the Table 4 naive-vs-efficient ablation still times the naive path; `impl: efficient` is unchanged.
 

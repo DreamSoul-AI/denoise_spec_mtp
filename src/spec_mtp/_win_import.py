@@ -19,20 +19,22 @@ from __future__ import annotations
 import importlib
 import os
 import sys
+from collections.abc import Callable, Mapping
 
 ENV = 'SPEC_MTP_WIN_IMPORT_ORDER'
 MODES = {'torch': ('torch', 'numpy'), 'numpy': ('numpy', 'torch'), 'off': ()}
 DEFAULT = 'torch'
 
 
-def mode(environ=None) -> str:
+def mode(environ: Mapping[str, str] | None = None) -> str:
     value = str((environ if environ is not None else os.environ).get(ENV, DEFAULT) or DEFAULT).strip().lower()
     if value not in MODES:
         raise ValueError(f'{ENV}={value!r}; expected one of {sorted(MODES)}')
     return value
 
 
-def preload(platform=None, environ=None, importer=None) -> list[str]:
+def preload(platform: str | None = None, environ: Mapping[str, str] | None = None,
+            importer: Callable[[str], object] | None = None) -> list[str]:
     """Import the modules for the selected mode; return the names imported.
 
     Like the old package, the first module that imports successfully is enough

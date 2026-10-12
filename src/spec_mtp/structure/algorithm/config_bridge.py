@@ -1,9 +1,13 @@
 """Map an RPipe Run layer into the legacy NamedDict the decoders expect."""
 
+from __future__ import annotations
+
+from typing import Any
+
 from spec_mtp.structure.control.named import _convert
 
 
-def legacy_cfg(data, model, system, algorithm_config, seed):
+def legacy_cfg(data: Any, model: Any, system: Any, algorithm_config: Any, seed: int) -> Any:
     eval_cfg = dict(algorithm_config.setting('eval', {}) or {})
     eval_cfg['device'] = str(system.device)
     return _convert({
@@ -15,7 +19,7 @@ def legacy_cfg(data, model, system, algorithm_config, seed):
     })
 
 
-def apply_variant(spec_cfg, variant):
+def apply_variant(spec_cfg: dict[str, Any] | None, variant: str | None) -> Any:
     """Merge a smoke variant or a ``<group>/<cell>`` paper preset into ``spec``."""
     from spec_mtp.structure.algorithm.paper_variants import PAPER_VARIANTS
     from spec_mtp.structure.algorithm.smoke_variants import VARIANTS

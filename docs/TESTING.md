@@ -7,7 +7,8 @@ Tests live under `tests/spec_mtp/` and follow `src/spec_mtp/`. They cover the Sp
 ```text
 set PYTHONUTF8=1
 pip install -e ".[dev]"
-ruff check .
+ruff check src tests studies tools
+mypy
 python -m pytest tests/spec_mtp
 ```
 

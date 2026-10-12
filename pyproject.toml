@@ -52,3 +52,43 @@ select = ["F", "E9"]
 [tool.ruff.lint.per-file-ignores]
 # Decoder kept byte-identical in the refactor; `block_size` is an unused local.
 "src/spec_mtp/structure/algorithm/decoding.py" = ["F841"]
+
+[tool.mypy]
+# Gradual: only the code written for the RPipe dependency is checked. The
+# research decoder modules stay untyped (no rewrite of audited code).
+python_version = "3.10"
+files = [
+  "src/spec_mtp/recipe.py",
+  "src/spec_mtp/cli.py",
+  "src/spec_mtp/_win_import.py",
+  "src/spec_mtp/flow/checks.py",
+  "src/spec_mtp/structure/artifact/sources.py",
+  "src/spec_mtp/structure/algorithm/config_bridge.py",
+  "src/spec_mtp/structure/algorithm/eval.py",
+  "src/spec_mtp/structure/data/registry.py",
+  "src/spec_mtp/structure/model/registry.py",
+]
+follow_imports = "silent"
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+# Strict tier: new modules written for the RPipe dependency.
+module = [
+  "spec_mtp.recipe",
+  "spec_mtp.cli",
+  "spec_mtp._win_import",
+  "spec_mtp.flow.checks",
+  "spec_mtp.structure.artifact.sources",
+  "spec_mtp.structure.algorithm.config_bridge",
+]
+# Explicit strict flags (per-module `strict` is not honoured by mypy). Calls
+# into the untyped research helpers (NamedDict, decoders) stay allowed.
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_any_generics = true
+warn_return_any = true
+no_implicit_reexport = true
+strict_equality = true

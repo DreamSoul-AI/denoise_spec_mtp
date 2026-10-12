@@ -12,7 +12,10 @@ only; RPipe's default sources are untouched.
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from rpipe.structure.make.recipe import RecipeContext
 
 SOURCE = 'spec_mtp'
 FLASH_ATTENTION = ('flash_attention_2', 'flash_attention_3')
@@ -85,7 +88,7 @@ def register_sources() -> None:
     register_algorithms()
 
 
-def register(ctx) -> None:
+def register(ctx: RecipeContext) -> None:
     from rpipe.structure.make.expand import load_study_yaml
 
     from spec_mtp.structure.artifact.sources import RUN_ASSET_NAME, check_frozen, manifest

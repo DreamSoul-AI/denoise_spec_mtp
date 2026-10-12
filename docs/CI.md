@@ -47,9 +47,12 @@ Local and CI both run:
 ```bash
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install -e ".[dev]"
-pip install ruff==0.17.0 && ruff check .
+pip install ruff==0.17.0 && ruff check src tests studies tools
+pip install mypy==2.4.0 types-PyYAML==6.0.12.20260906 && mypy
 python -m pytest tests/spec_mtp
 ```
+
+mypy reads `[tool.mypy]` in `pyproject.toml`: only the modules written for the RPipe dependency are checked; `recipe`, `cli`, `_win_import`, `flow/checks`, `artifact/sources` and `config_bridge` are in the strict tier (every def annotated, no bare generics, no `Any` returns), `eval.py` and the two registries get `check_untyped_defs`. The research decoder modules are not type-checked (audited code, not rewritten). RPipe has no `py.typed`, so its types are `Any`.
 
 Lint is ruff 0.17.0, rules `F` and `E9` only (`pyproject.toml`); `decoding.py` keeps an `F841` ignore so the decoder stays byte-identical to the audited one.
 

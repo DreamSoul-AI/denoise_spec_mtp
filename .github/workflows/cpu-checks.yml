@@ -41,7 +41,12 @@ jobs:
       - name: Lint (pyflakes errors only)
         run: |
           pip install "ruff==0.17.0"
-          ruff check src tests studies
+          ruff check src tests studies tools
+
+      - name: Type check (mypy, files and tiers in pyproject.toml)
+        run: |
+          pip install "mypy==2.4.0" "types-PyYAML==6.0.12.20260906"
+          mypy
 
       - name: Check RPipe pin and entry points
         run: |

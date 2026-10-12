@@ -107,7 +107,8 @@ def load_lock(study_dir: Path | str) -> dict[str, Any] | None:
     path = lock_path(study_dir)
     if not path.is_file():
         return None
-    return json.loads(path.read_text(encoding='utf-8'))
+    body: dict[str, Any] = json.loads(path.read_text(encoding='utf-8'))
+    return body
 
 
 class SpecMtpSourceChangedError(RuntimeError):

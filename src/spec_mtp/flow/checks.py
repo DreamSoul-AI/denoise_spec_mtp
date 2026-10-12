@@ -15,7 +15,10 @@ from __future__ import annotations
 import csv
 import json
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from rpipe.flow.context import FlowContext, StudyProcessContext
 
 GATE_KEY = 'spec_mtp'
 STUDY_CHECK_NAME = 'spec_mtp_study_check.json'
@@ -78,6 +81,10 @@ def _overall_any(assets: Path) -> Path | None:
     return path if path.is_file() else None
 
 
+def _normalised(items: list[dict[str, Any]]) -> list[str]:
+    return sorted(json.dumps(item, sort_keys=True) for item in items)
+
+
 def declared_factors(study: dict[str, Any]) -> list[dict[str, Any]]:
     """Cartesian product of ``study.yaml`` axes: the Experiments a complete index must list."""
     import itertools
@@ -87,7 +94,7 @@ def declared_factors(study: dict[str, Any]) -> list[dict[str, Any]]:
     return [dict(zip(keys, values)) for values in itertools.product(*(axes[key] for key in keys))]
 
 
-def run_gate(ctx) -> dict[str, Any]:
+def run_gate(ctx: FlowContext) -> dict[str, Any]:
     """Study write hook: gate this Run before RPipe writes result.json."""
     report = evaluate_run(ctx.config, Path(ctx.layout.assets_dir))
     draft = ctx.state.get('result_draft')
@@ -102,7 +109,7 @@ def run_gate(ctx) -> dict[str, Any]:
     return report
 
 
-def study_gate(ctx, expected_factors: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+def study_gate(ctx: StudyProcessContext | FlowContext, expected_factors: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     """Study process hook (``ctx.scope == 'study'``); writes ``spec_mtp_study_check.json``."""
     from rpipe.structure.artifact._atomic import atomic_write_text
     from rpipe.structure.artifact.index import load_index
@@ -145,8 +152,7 @@ def study_gate(ctx, expected_factors: list[dict[str, Any]] | None = None) -> dic
             if declared_seeds and sorted(r.get('seed') for r in experiment.get('runs') or []) != declared_seeds:
                 seeds_ok = False
     if expected_factors is not None:
-        norm = lambda items: sorted(json.dumps(item, sort_keys=True) for item in items)
-        expected_ok = norm(seen) == norm(expected_factors)
+        expected_ok = _normalised(seen) == _normalised(expected_factors)
     complete = not missing and bool(rows) and expected_ok and seeds_ok
     body = {
         'scope': 'study',

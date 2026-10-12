@@ -28,6 +28,7 @@ Temporary files and the pytest cache go to `.tmp/`. End-to-end tests copy the sm
 | `test_paper_hf.py` | `studies/paper_hf/` generated files current; 59 legacy `configs/hf` cells = 59 expanded Runs (data / model / task / eval / effective spec / seed); recipe checks. No weights, no GPU |
 | `test_paper_hf_dryrun.py` | `tools/paper_hf_dryrun.py` swaps only model / data / budget / device; one tiny Run per task (esp_mtp temp 0 and 1, ar_baseline, alignment_probe) through recipe, gates and Study process |
 | `test_properties.py` | hypothesis properties: source digest order-free and change-sensitive, `changed_files` symmetric, `declared_factors` = full product, gate passes iff rate is 1, variant presets idempotent / case-insensitive / unknown rejected, Windows switch parsing, cli command and Study argument parsing, cli forwards to RPipe |
+| `test_profile_tool.py` | `tools/profile_cpu.py` component buckets; a tiny profiled run keeps exact match (report: [PROFILE.md](PROFILE.md)) |
 | `test_win_import.py` | `SPEC_MTP_WIN_IMPORT_ORDER` logic (real DLL order needs Windows: `tools/windows_selfcheck.py`) |
 | `test_package.py` | RPipe pinned and not vendored, console scripts do not override `rpipe`, source manifest coverage, cli lock rules |
 

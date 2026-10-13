@@ -214,5 +214,64 @@
     "backend": "eager",
     "same_gpu_ar_exact_match": true,
     "not_real_model_validation": true
-  }
+  },
+  "execution_source_context": {
+    "cuda_runs": [
+      {
+        "run": "293b3842490db338",
+        "git": {
+          "head": "49dec9c925ee1ea7dec01b26863139a502f74382",
+          "package_dirty": true
+        },
+        "digest": "8573dfa6b73d44fb"
+      },
+      {
+        "run": "cf7821d233f3e167",
+        "git": {
+          "head": "49dec9c925ee1ea7dec01b26863139a502f74382",
+          "package_dirty": true
+        },
+        "digest": "8573dfa6b73d44fb"
+      },
+      {
+        "run": "a3d4ba109c68aca1",
+        "git": {
+          "head": "49dec9c925ee1ea7dec01b26863139a502f74382",
+          "package_dirty": true
+        },
+        "digest": "8573dfa6b73d44fb"
+      }
+    ],
+    "same_project_digest_checked_again_on_continuation": true,
+    "historical_data_model_algorithm_changed": false
+  },
+  "pending_readout_repro": {
+    "commit": "7a15c46b75c5eb951cccd60ed7b9fc3463db90f5",
+    "configured_mode": "eval",
+    "scheduled_mode": "eval",
+    "planned": 1,
+    "displayed_mode": "train",
+    "eval_filter_count": 0,
+    "train_filter_count": 1,
+    "executed": false,
+    "cli": [
+      {
+        "filter": "all",
+        "returncode": 0,
+        "first_line": "pending-eval-mode  planned=1 succeeded=0 failed=0 pending=1"
+      },
+      {
+        "filter": "eval",
+        "returncode": 0,
+        "first_line": "pending-eval-mode  planned=0 succeeded=0 failed=0 pending=0"
+      },
+      {
+        "filter": "train",
+        "returncode": 0,
+        "first_line": "pending-eval-mode  planned=1 succeeded=0 failed=0 pending=1"
+      }
+    ],
+    "readout_input_hashes_unchanged": true
+  },
+  "pending_readout_issue": "https://github.com/DreamSoul-AI/RPipe/issues/37"
 }

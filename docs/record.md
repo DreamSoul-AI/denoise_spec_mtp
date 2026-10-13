@@ -38,3 +38,7 @@
 C-004全新Toy/Stub最小复现、公开Issue/PR去重及脱敏完成，实际提交 [RPipe#36](https://github.com/DreamSoul-AI/RPipe/issues/36)。真实四格只make新version，缓存缺失有ModelScope E1022证据，未launch/未校准/未声明研究质量通过。阶段commit/push与面向dev草稿PR按当次授权进行，不自动合并、发布或改变远端规则。
 
 本轮实现本地提交 cb5c36d；自动审批拒绝组合 push/草稿PR，理由为当前可信消息未明确确认外传目标及公开资料风险。已只读核实目标DreamSoul-AI/denoising-speculative-decoding为public且有push权限；未推送、未创建PR、未触发新提交CI。保留完整本地提交与待审PR文本，等待明确批准。
+
+接续补查：缓存环境覆盖为空，本机D盘模型目录只有4B/8B。四个0.6B Run仍无result，未launch；不把缓存目录未知写成整个设备绝对不存在权重。核对当前源码digest、251项JUnit、41条包验收命令、CUDA raw源码身份及Data/Model/Algorithm与交接的空diff，工程证据保持成立。CUDA实测发生在49dec9c的未提交树，源digest8573dfa6b73d44fb已与当前实现核对相同。
+
+C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eval而pending读数train，eval过滤0条；readout保持文件哈希。已按授权去重脱敏反馈 [Issue #37](https://github.com/DreamSoul-AI/RPipe/issues/37)。源码未改；仅补充兼容事实、正式精选证据及本地交接，不重新运行已通过的工程批次。

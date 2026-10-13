@@ -38,3 +38,9 @@ C-004 已反馈：[RPipe Issue #36](https://github.com/DreamSoul-AI/RPipe/issues
 C-007 / readout 显示边界：四格实际 config 与 jobs 均为 eval，但 pending Run 的 status mode 显示 train。v0.3.1 的 _mode 仅从轴或已落 result.control 读取，未成功 Run 又没有 algorithm.mode 轴时回退 train；这不改变真实调度的 mode。当前设备尚缺真实权重，不能从该显示推断训练发生；专项未修补 vendor。
 
 B-007 当前设备最终 251 项全量通过，新增 report 字节保全/质量写回检查通过。Windows 工具初次 freeze 缺锁拒绝与工具导航两项失败均保留，修正为显式 make 和登记用法后通过。当前未解除的真实模型限制是 Qwen3-0.6B cache 缺失；不是 CUDA 不可用。
+
+C-007 最小复现补充：固定v0.3.1，两步Toy/Stub声明但不launch，仅CPU make；生成config和jobs均为eval，status列为train，--mode eval显示0条，--mode train显示1条。已确认读数误分类，未影响实际调度/未执行计算。复现脚本初次误用rows键导致KeyError，核对list_runs真实返回runs后修正；不归因于库。原始make与复现保留.tmp/v031-20261014/c007。
+
+缓存范围补查：未发现MODELSCOPE_CACHE/HF_HOME/HF_HUB_CACHE/TRANSFORMERS_CACHE有效覆盖；D盘模型目录只有Qwen3-4B和8B，不替代计划中的0.6B。不能据此断言所有磁盘位置都不存在权重，仍需实际缓存路径。
+
+C-007 已完成真实CLI过滤复验，三命令均exit0，未改index/config/jobs字节；已公开反馈 [RPipe Issue #37](https://github.com/DreamSoul-AI/RPipe/issues/37)。反馈仅合成Toy/Stub声明与公开commit，未提交内部路径、真实权重或资料；保留vendor，不擅改四格轴来绕过显示问题。

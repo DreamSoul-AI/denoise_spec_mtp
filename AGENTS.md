@@ -1,4 +1,4 @@
-# SpecMTP Agent 工作约定
+# Denoising Speculative Decoding Agent 工作约定
 
 适用于本仓库。长期约定在这里。目录、解码口径、怎么跑 Study、测试入口在下表。数字在对应报告里。
 
@@ -30,7 +30,8 @@
 ## 3. 协作
 
 - 保留工作区里已有改动。临时输出放 `.tmp/`。Study 产物（`runs/`、`shared/`、`scripts/`、`index.json`、`process.json`）不进 git。
-- 提交、推送、开实验按当次授权。不直接推 `dev` 或 `main`。
+- 默认分支为 `main`。工作分支通过 PR 先进入 `dev`，再由同仓库 `dev` 的 PR 进入 `main`；不直接推 `dev`/`main`，不强推或删除长期分支。
+- PR 必须通过 `cpu-checks` 和 `Branch flow`；保留现有审批要求。提交、推送、合并和实验仍按当次授权。
 
 ## 4. 代码放在哪
 

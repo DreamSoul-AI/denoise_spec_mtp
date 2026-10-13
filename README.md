@@ -1,4 +1,6 @@
-# Speculative MTP — ESP Reproduction + EMA-Velocity Masks
+# Denoising Speculative Decoding
+
+ESP reproduction + EMA-velocity masks.
 
 Training-free multi-token prediction:
 
@@ -25,3 +27,7 @@ python -m pytest tests/spec_mtp
 Smoke: `python -m spec_mtp make studies/smoke` then `python -m spec_mtp launch studies/smoke`. Every Run must have `exact_match_rate=1` and complete raw evidence. Change `algorithm.config.version` before accepting new sources/inputs with make/remake. See [acceptance report](studies/smoke/docs/study_report.md).
 
 GPU cells are new Studies under `studies/`. Copy `_template/`. SpecBench lives in `datasets/spec_bench/` and is copied into that Study's `shared/data` on the first Run. ModelScope / HF weights land in `shared/model`. Do not start from `src/main.py`.
+
+## Development
+
+Repository: [DreamSoul-AI/denoising-speculative-decoding](https://github.com/DreamSoul-AI/denoising-speculative-decoding). Default branch: `main`. Changes enter `dev` through a work-branch PR, then reach `main` through a PR from this repository's `dev`. Both paths require `cpu-checks` and `Branch flow`; existing approvals remain required.

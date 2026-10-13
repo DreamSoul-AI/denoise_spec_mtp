@@ -8,6 +8,8 @@
 
 新工程验证已实际完成36格tiny严格等值及最终源码wheel/sdist双入口全链。B-008新增嵌套轴/子集回归通过；全量曾253通过/1复制fixture漏正式JSON失败，复制范围已修正并单独3声明用例通过，最终全量254 passed（177.46秒，0 failed/errors/skipped），Ruff与55文件mypy通过；正式增量记录在smoke/v031_validation.json，不将旧251批次替代新源码验收。上游Issues36/37保持真实链接，不改上游源码或权限。旧拒绝推送状态留在下方历史段；当前继续按工作分支→PR/dev流程，不自动合并或发布。
 
+本轮实现和验收已提交为5cfdacc9b0386d490cfc4d741b72305c450c5983。推送refactor/spec-rpipe再次被自动审批拒绝，理由是需对这批代码、研究报告和证据向该公开仓库/分支的特定授权；已向用户明确请求。实查远端仍49dec9c，dev仍1b6d59c，没有新PR，当前提交没有远端CI。旧49dec9c的cpu-checks成功不代表本轮；具体PR正文与同步状态保存在本机.tmp/input-mask-ms-20261014。除这一外部同步步骤外，当前范围本机实现、工程与真实四格前置验收均完成。
+
 ## v0.3.1原工程检查点（2026-10-14，95c0887）
 
 补查缓存环境覆盖及本机模型目录仍未取得Qwen3-0.6B，4B/8B未替代。C-007的pending eval误显示train/过滤漏项已用原生CLI最小复现，读数不改变调度或文件；已提交 [Issue #37](https://github.com/DreamSoul-AI/RPipe/issues/37)。继续以真实config/jobs核对执行mode。工程逐项证据核对通过，四格真实解码、资源校准、推送/PR/新CI仍缺必要条件，整体目标未完成。

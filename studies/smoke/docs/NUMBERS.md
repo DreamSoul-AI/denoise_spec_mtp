@@ -1,6 +1,6 @@
 # Numbers: smoke
 
-Generated from `process.json`. Conclusions and portable evidence are in [study_report.md](study_report.md) and [delivery_validation.json](delivery_validation.json).
+Generated from `process.json`. Conclusions and portable evidence are in [STUDY_REPORT.md](STUDY_REPORT.md) and [delivery_validation.json](delivery_validation.json).
 
 Log paths below are local raw evidence and are not included in Git clones. The numeric table is preserved; local `rpipe report` regenerates clickable log links for the current machine.
 

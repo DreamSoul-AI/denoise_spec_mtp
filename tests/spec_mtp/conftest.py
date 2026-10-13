@@ -21,6 +21,7 @@ def copy_study(tmp_path, patch=None, name='smoke_copy'):
         'spec_mtp_*.json', 'activity.json', '__pycache__', 'docs'))
     study = yaml.safe_load((dest / 'study.yaml').read_text(encoding='utf-8'))
     study['study'] = name
+    study['fixed']['algorithm']['config']['version'] = name
     if patch:
         patch(study)
     (dest / 'study.yaml').write_text(yaml.safe_dump(study, sort_keys=False), encoding='utf-8')

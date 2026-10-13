@@ -6,7 +6,7 @@ from spec_mtp.structure.algorithm.decoding import ar_generate
 from spec_mtp.structure.system.device import sync_device
 
 
-def evaluate(model, prompts, eos_ids, eval_cfg, seed, device, save_dir=None):
+def evaluate(model, prompts, eos_ids, eval_cfg, seed, device, save_dir=None, *, aggregate=True):
     seed = int(seed)
     logger = csv_logger.Logger(save_dir, filename='spec_metrics.csv')
     total_tokens, total_time = 0, 0.0
@@ -17,16 +17,18 @@ def evaluate(model, prompts, eos_ids, eval_cfg, seed, device, save_dir=None):
         warm_cfg['max_new_tokens'] = int(eval_cfg.get('warmup_tokens', 8))
         ar_generate(model, prompts[0]['input_ids'], warm_cfg, eos_ids=eos_ids)
         sync_device(device)
-    rows = []
+    rows, evidence = [], []
     for idx, item in enumerate(prompts):
         generator = make_generator(device, seed + idx)
         sync_device(device)
-        _, stats = ar_generate(model, item['input_ids'], eval_cfg,
+        output, stats = ar_generate(model, item['input_ids'], eval_cfg,
                                eos_ids=eos_ids, generator=generator)
         sync_device(device)
         row = {'prompt': idx, 'category': item['category'], **stats}
         logger.log(row)
         rows.append(row)
+        evidence.append({'prompt': idx, 'input_ids': item['input_ids'][0].tolist(),
+                         'output_ids': output[0].tolist(), 'stats': stats})
         total_tokens += stats['ar_new_tokens']
         total_time += stats['ar_time']
 
@@ -34,8 +36,9 @@ def evaluate(model, prompts, eos_ids, eval_cfg, seed, device, save_dir=None):
         'prompts': len(prompts),
         'tokens_per_s': total_tokens / total_time if total_time > 0 else 0.0,
     }
-    csv_logger.Logger(save_dir, filename='summary.csv').log(summary)
-    return {'rows': rows, 'summary': summary}
+    if aggregate:
+        csv_logger.Logger(save_dir, filename='summary.csv').log(summary)
+    return {'rows': rows, 'summary': summary if aggregate else {}, 'evidence': evidence}
 
 
 def test(cfg, model=None):

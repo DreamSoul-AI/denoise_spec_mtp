@@ -69,6 +69,8 @@ def rpipe_origin() -> dict[str, Any]:
             'version': getattr(rpipe, '__version__', None),
             'commit': commit,
             'vendored': True,
+            'files_digest': files_digest({p.relative_to(origin.parent).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+                                          for p in sorted(origin.parent.rglob('*.py')) if '__pycache__' not in p.parts}),
             'path': str(Path(rpipe.__file__).resolve().parent),
         }
     from importlib import metadata
@@ -112,8 +114,21 @@ def lock_path(study_dir: Path | str) -> Path:
 
 def write_lock(study_dir: Path | str) -> Path:
     body = manifest()
+    body['inputs'] = declared_inputs(Path(study_dir))
     body['created_at'] = datetime.now(timezone.utc).isoformat()
     path = lock_path(study_dir)
+    old = load_lock(study_dir)
+    if old is not None and (changed_files(old, body) or old.get('rpipe') != body.get('rpipe') or old.get('inputs') != body.get('inputs')):
+        from rpipe.structure.artifact.config import load_config
+        from rpipe.structure.control import experiment_config_from_mapping, run_config_from_merge
+        from rpipe.structure.make.expand import expand_patches, load_study_yaml
+
+        study = load_study_yaml(Path(study_dir))
+        base = experiment_config_from_mapping(load_config(Path(study_dir) / 'experiment_config.yaml'))
+        for patch in expand_patches(study):
+            run = run_config_from_merge(base, patch)
+            if (Path(study_dir) / 'runs' / run.id / 'result.json').exists():
+                raise SpecMtpSourceChangedError('new source requires a new algorithm.config.version before make/remake')
     path.write_text(json.dumps(body, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
     return path
 
@@ -147,17 +162,50 @@ def changed_files(lock: dict[str, Any], current: dict[str, Any]) -> list[str]:
 
 def check_frozen(study_dir: Path | str, study: dict[str, Any], current: dict[str, Any]) -> None:
     """Raise when ``freeze: true`` and the SpecMTP sources differ from the make lock."""
-    if study.get('freeze') is not True:
-        return
     lock = load_lock(study_dir)
+    if lock is None and study.get('freeze') is not True:
+        return
     if lock is None:
         raise SpecMtpSourceChangedError(
             f'freeze: true but {LOCK_NAME} is missing; run `python -m spec_mtp make {study_dir}`')
+    from spec_mtp.structure.artifact.evidence import check_inputs
+
+    check_inputs({'files': lock.get('inputs') or {}})
+    if lock.get('inputs', {}) != declared_inputs(Path(study_dir)):
+        raise SpecMtpSourceChangedError('declared input files changed after make')
     changed = changed_files(lock, current)
-    rpipe_changed = (lock.get('rpipe') or {}).get('commit') != (current.get('rpipe') or {}).get('commit')
+    rpipe_changed = lock.get('rpipe') != current.get('rpipe')
     if changed or rpipe_changed:
         shown = ', '.join(changed[:5]) + (' …' if len(changed) > 5 else '')
         if rpipe_changed:
             shown = (shown + ', ' if shown else '') + 'rpipe commit'
         raise SpecMtpSourceChangedError(
             f'SpecMTP sources changed after make ({shown}); run `python -m spec_mtp make` again to accept')
+
+
+def declared_inputs(study_dir: Path) -> dict[str, str]:
+    """Freeze local prompt/model files already available at make, without downloading."""
+    from rpipe.structure.artifact.config import load_config
+    from rpipe.structure.control import experiment_config_from_mapping, run_config_from_merge
+    from rpipe.structure.make.expand import expand_patches, load_study_yaml
+    from spec_mtp.structure.artifact.evidence import file_hash
+
+    if not (study_dir / 'experiment_config.yaml').is_file():
+        return {}
+    base = experiment_config_from_mapping(load_config(study_dir / 'experiment_config.yaml'))
+    paths: set[Path] = set()
+    for patch in expand_patches(load_study_yaml(study_dir)):
+        config = run_config_from_merge(base, patch).to_mapping()
+        data = config['data']
+        data_cfg = data.get('config') or {}
+        prompt = data_cfg.get('path')
+        if not prompt and str(data.get('name')).lower() == 'specbench':
+            prompt = package_dir().parents[1] / 'datasets/spec_bench/question.jsonl'
+        model_cfg = config['model'].get('config') or {}
+        for value in (prompt, model_cfg.get('name_or_path'), data_cfg.get('tokenizer_name')):
+            if value and Path(value).exists():
+                path = Path(value).resolve()
+                paths.update([path] if path.is_file() else (p for p in path.rglob('*') if p.is_file()))
+        if prompt and not Path(prompt).is_file():
+            raise FileNotFoundError(f'declared prompt file is missing: {prompt}')
+    return {str(p): file_hash(p) for p in sorted(paths)}

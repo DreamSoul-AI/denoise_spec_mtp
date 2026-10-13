@@ -23,11 +23,13 @@ def _land_specbench(data_cfg, assets_dir: Path) -> dict:
     """Copy the repo SpecBench jsonl into ``shared/data/specbench`` once."""
     src = Path(data_cfg.get('path') or _DEFAULT_SPECBENCH)
     if not src.is_file():
-        src = _DEFAULT_SPECBENCH
+        raise FileNotFoundError(f'SpecBench question file not found: {src}')
     dest_dir = assets_dir / 'specbench'
     dest = dest_dir / 'question.jsonl'
     dest_dir.mkdir(parents=True, exist_ok=True)
-    if src.is_file() and (not dest.is_file() or dest.stat().st_mtime < src.stat().st_mtime):
+    from spec_mtp.structure.artifact.evidence import file_hash
+
+    if not dest.is_file() or file_hash(src) != file_hash(dest):
         shutil.copy2(src, dest)
     if not dest.is_file():
         raise FileNotFoundError(
@@ -35,6 +37,7 @@ def _land_specbench(data_cfg, assets_dir: Path) -> dict:
             'Place question.jsonl at datasets/spec_bench/question.jsonl')
     landed = dict(data_cfg)
     landed['path'] = str(dest)
+    landed['source_path'] = str(src.resolve())
     return landed
 
 
@@ -44,7 +47,7 @@ def _build(data_config, assets_dir, seed=None):
     if data_cfg['name'] == 'specbench':
         data_cfg = _land_specbench(data_cfg, Path(assets_dir))
     records = load_records(data_cfg)
-    meta = {'data_cfg': data_cfg}
+    meta = {'data_cfg': data_cfg, 'source_path': data_cfg.get('source_path')}
     if needs_tokenizer(data_cfg):
         loaders = {'test': records}
         meta['record_count'] = len(records)

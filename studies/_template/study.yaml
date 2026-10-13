@@ -14,7 +14,7 @@ recipe: recipe.py
 
 flow:
   study_phases: true      # flow/write = exact_match gate, flow/process = Study-scope gate
-  # prepare_shared defaults to true: Data lands in shared/data, weights in shared/model.
+  prepare_shared: false   # make-time download is torchvision-only; Run prepare still fills shared/
 
 # freeze: true            # optional: refuse to run if Study, rpipe or spec_mtp sources change after make
 
@@ -42,6 +42,7 @@ fixed:
     mode: eval
     source: spec_mtp
     config:
+      version: rpipe-v030-20261013
       task: esp_mtp
       mask: frozen_mean
       eval:

@@ -8,8 +8,12 @@ experiment:
 
 recipe: recipe.py
 
+provenance:
+  include: [validate_migration.py]
+
 flow:
   study_phases: true
+  prepare_shared: false   # make-time download is torchvision-only; Run prepare still fills shared/
 
 fixed:
   data:
@@ -38,6 +42,7 @@ fixed:
     mode: eval
     source: spec_mtp
     config:
+      version: rpipe-v030-20261013-final03
       task: esp_mtp
       eval:
         device: cpu

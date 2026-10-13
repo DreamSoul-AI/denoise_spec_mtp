@@ -103,7 +103,19 @@ def register(ctx: RecipeContext) -> None:
     from spec_mtp.structure.artifact.sources import RUN_ASSET_NAME, check_frozen, manifest
 
     study = load_study_yaml(ctx.study_dir) if (ctx.study_dir / 'study.yaml').is_file() else {}
+    flow = study.get('flow') or {}
+    if flow.get('prepare_shared', True) is not False:
+        raise SpecMtpConfigError(
+            'RPipe make-time shared data only knows torchvision hosts; '
+            'SpecMTP lands SpecBench and weights in shared/ during Run prepare. '
+            'Set flow.prepare_shared: false')
     current = manifest()
+    from spec_mtp.structure.artifact.evidence import digest
+
+    current['config_digest'] = digest(ctx.config)
+    from rpipe.structure.artifact.provenance import source_files
+
+    current['study_files'] = source_files(ctx.study_dir, study)
     check_frozen(ctx.study_dir, study, current)
     try:
         validate(ctx.config)

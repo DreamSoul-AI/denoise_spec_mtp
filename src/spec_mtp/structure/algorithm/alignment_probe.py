@@ -31,7 +31,7 @@ def _hidden_states_of_last(model, embeds, device):
     return layers, out.logits[0, -1]
 
 
-def evaluate(model, prompts, eos_ids, spec_cfg, eval_cfg, save_dir=None):
+def evaluate(model, prompts, eos_ids, spec_cfg, eval_cfg, save_dir=None, *, aggregate=True):
     device = model.device
     num_eval = int(eval_cfg.get('num_eval_prompts', len(prompts)))
     prompts = prompts[:num_eval]
@@ -73,6 +73,9 @@ def evaluate(model, prompts, eos_ids, spec_cfg, eval_cfg, save_dir=None):
                     h_true[layer], h_mask[layer], dim=0).item()
             counts[key] += 1
 
+    if not aggregate:
+        return {'sums': {k: v.tolist() for k, v in sums.items()}, 'counts': counts,
+                'n_accepted': counts['accept'], 'n_rejected': counts['reject']}
     logger = csv_logger.Logger(save_dir, filename='alignment_metrics.csv')
     for layer in range(num_layers):
         logger.log({

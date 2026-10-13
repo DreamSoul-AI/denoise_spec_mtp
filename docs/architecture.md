@@ -8,9 +8,9 @@ Paper: *Efficient Training-Free Multi-Token Prediction via Embedding-Space Probi
 
 ## Run path and gates
 
-`python -m spec_mtp` / `python -m rpipe` → prepare → recipe（校验、注册、freeze）→ 建构 Data / Model / Algorithm → execute → collect / summarize → Study `flow/write` 在写 `result.json` **之前**跑 exact_match 门 → process。AR 基线开着且 `exact_match_rate != 1`，或缺少 overall 行，该 Run 为 `failed`。Study scope 的 process 在缺 Run、失败、或集合是 index 的真子集时不通过。
+`python -m spec_mtp` / `python -m rpipe` → prepare → recipe（校验、注册、来源锁）→ 建构 Data / Model / Algorithm → execute 保存 raw → Study collect 计算指标 → Study summarize 拒绝失配 → Study write 再验来源与证据 → 库定稿 result → process。AR 基线开着且 `exact_match_rate != 1`，或缺少 overall 行，该 Run 为 `failed`。Study scope 的 process 在缺 Run、失败、或集合是 index 的真子集时不通过。
 
-RPipe 的 `provenance.json` 只哈希 `rpipe` 包和 Study 文件。SpecMTP 在 Study 外面，所以 `spec_mtp.structure.artifact.sources` 哈希 `src/spec_mtp/**/*.py`，make 时写 `spec_mtp_sources.json`。`freeze: true` 时源码变了，在建构前失败。
+RPipe 的 `provenance.json` 只哈希 `rpipe` 包和 Study 文件。SpecMTP 在 Study 外面，所以 `spec_mtp.structure.artifact.sources` 哈希 `src/spec_mtp/**/*.py`，make 时写 `spec_mtp_sources.json`。存在专项锁时源码变更在建构前失败；freeze:true 还要求锁存在。执行快照与当前来源在 summarize/write/process 再核对。
 
 Float32 greedy、共享 seed，必须和普通生成逐 token 一致。`exact_match` 是这个审计，不是质量指标。质量指标是接受的 draft 数（[history-extrapolation.md](history-extrapolation.md)）。
 
@@ -90,6 +90,8 @@ m_i = origin + γ · i · step(vhat)
 
 history-extrapolation 和论文设置（长上下文、100/256 new tokens）碰不到上限。未采用方案 B（前缀审计加额外列）。
 
+实际输入证据记录完整 prompt token、EOS、模型 state_dict SHA256、模型 commit、tokenizer vocabulary/template/special tokens、实际 dtype/backend/TF32 与本地输入文件 SHA256。模型加载后和定稿前比较权重哈希；不把依赖版本或 seed 代替实际输入。远端未下载的文件无法在 make 冻结；实际加载后的权重与 tokenizer 证据绑定到新 Run，不宣称 Hub 全生态已验收。
+
 ## Result files
 
 写在 `studies/<name>/runs/<id>/assets/`。不要复用 Run 目录，CSV logger 会追加。新格子用 `python -m spec_mtp make` 拿到新 id。
@@ -99,3 +101,14 @@ history-extrapolation 和论文设置（长上下文、100/256 new tokens）碰�
 `accepted` 是留下的 draft。`committed = accepted + decode_calls`（预算或 EOS 截断的最后一拍除外）。`tau = committed / decode_calls`。`summary.csv` 的 `tau` 是 `sum(committed) / sum(decode_calls)`。`exact_match_rate` 必须是 1。`tau` 在 naive / efficient 之间不变，墙钟会变。
 
 `ar_baseline` 只写 AR 列。alignment probe 写 `alignment_metrics.csv`，不写投机 CSV。
+
+## v0.3.0 适配验收合同（2026-10-13）
+
+- 继续使用固定提交的 vendored RPipe；唯一允许的框架例外是 Windows torch-first 导入。Factory、调度、Tracker、日志、状态、provenance 和 readout 由库承担。
+- 专项 execute 保存原始 prompt/output/AR token、逐步接受与 cache 观测；collect 从原始观测计算 CSV 和 Tracker 指标；summarize 拒绝 exact-match 失败；write 再核对证据、来源、实际输入与运行环境后由库定稿。
+- recipe 注册和构造检查不解码。现有 prepare_shared:false 是本项目 Data builder 与上游 torchvision-only make 的实际边界，Run prepare 继续使用 shared/data 与 shared/model，不取消共享约定。
+- 专项源码锁覆盖新增、删除、修改；终验比较执行快照与当前来源、输入 token、配置、模型权重/tokenizer 文件和运行条件。普通 run/launch 保留锁；make/remake 只可为新 version 接受来源变化，已有成功 Run 不重新签收。
+- Study process 重新核验当前 index 的 Run 证据，拒绝缺失、混合来源和声明子集；不扫描历史 Run。
+- 不改变 decoder 的采样、mask、树、cache、EOS 或预算语义。增加观测不构成新论文实现；历史接受数保留原日期和来源。
+
+此次需触及 recipe/CLI、专项来源与证据、Algorithm 适配、Study collect/summarize/write/process、对应测试与使用文档；不恢复已删除 runner，不实现研究草案。

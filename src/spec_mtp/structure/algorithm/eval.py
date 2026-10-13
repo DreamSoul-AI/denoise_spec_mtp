@@ -7,6 +7,7 @@ Decoding is a dedicated Algorithm, not RPipe's classification eval.
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 from rpipe.structure.algorithm.base import Algorithm
@@ -65,35 +66,60 @@ class SpecMtpEvalAlgorithm(Algorithm):
             resolve_eos(data, model, cfg.eval),
             cfg.eval,
         )
+        from spec_mtp.structure.artifact.evidence import capture, check_inputs, digest, model_digest, runtime
+
         assets = Path(system.assets_dir)
+        assets.mkdir(parents=True, exist_ok=True)
+        inputs = capture(data, model, prompts, eos_ids, cfg)
+        (assets / 'decode_inputs.json').write_text(json.dumps(inputs, indent=2) + '\n', encoding='utf-8')
         if task == 'ar_baseline':
             out = impl.evaluate(
-                module, prompts, eos_ids, cfg.eval, seed, system.device, save_dir=None)
+                module, prompts, eos_ids, cfg.eval, seed, system.device, save_dir=None, aggregate=False)
         elif task == 'alignment_probe':
-            # The probe's only artifact is alignment_metrics.csv (the run gate needs it);
-            # before 2026-10-12 save_dir=None here dropped it (old copied pipeline too).
+            # collect writes the layer metrics from these raw sums and counts.
             assets.mkdir(parents=True, exist_ok=True)
             out = impl.evaluate(
-                module, prompts, eos_ids, cfg.spec, cfg.eval, save_dir=str(assets))
+                module, prompts, eos_ids, cfg.spec, cfg.eval, save_dir=None, aggregate=False)
         else:
             out = impl.evaluate(
                 module, prompts, eos_ids, cfg.spec, cfg.eval, seed, system.device,
-                save_dir=None)
+                save_dir=None, aggregate=False)
 
-        metrics = _tracker_metrics(task, out)
-        tracker.append('test', values=metrics)
-        tracker.save('test')
-        _write_assets(assets, task, out)
-        overall = (out.get('summaries') or {}).get('overall', out.get('summary', {}))
-        return {
-            'mode': 'eval',
-            'task': task,
-            'elapsed_seconds': 0.0,
-            **{k: overall.get(k) for k in (
-                'exact_match_rate', 'tau', 'accepted', 'committed', 'decode_calls',
-            ) if k in overall},
-            **metrics,
-        }
+        check_inputs(inputs)
+        if inputs['model_digest'] != model_digest(module) or inputs['runtime'] != runtime():
+            raise RuntimeError('model weights or runtime changed during decoding')
+        raw = {'task': task, 'out': out, 'inputs_digest': digest(inputs)}
+        (assets / 'decode_observations.json').write_text(json.dumps(raw, indent=2) + '\n', encoding='utf-8')
+        return {'mode': 'eval', 'task': task}
+
+
+def collect(ctx):
+    """Study collect hook: derive CSV and Tracker metrics from execute evidence."""
+    assets = Path(ctx.layout.assets_dir)
+    raw = json.loads((assets / 'decode_observations.json').read_text(encoding='utf-8'))
+    task, out = raw['task'], raw['out']
+    if task == 'esp_mtp':
+        out['summaries'] = esp_mtp._aggregate(out['rows'])
+    elif task == 'ar_baseline':
+        rows = out['rows']
+        total_time = sum(row['ar_time'] for row in rows)
+        out['summary'] = {'prompts': len(rows), 'tokens_per_s': sum(row['ar_new_tokens'] for row in rows) / total_time if total_time > 0 else 0.0}
+    elif task == 'alignment_probe':
+        import torch
+
+        out['rows'] = [
+            {'layer': i + 1, 'cos_accepted': (torch.tensor(a) / max(out['counts']['accept'], 1)).item(),
+             'cos_rejected': (torch.tensor(b) / max(out['counts']['reject'], 1)).item(),
+             'n_accepted': out['n_accepted'], 'n_rejected': out['n_rejected']}
+            for i, (a, b) in enumerate(zip(out['sums']['accept'], out['sums']['reject']))]
+    metrics = _tracker_metrics(task, out)
+    tracker = ctx.state['tracker']
+    tracker.append('test', values=metrics)
+    tracker.save('test')
+    tracker.flush_state()
+    _write_assets(assets, task, out)
+    ctx.state['collected']['metrics'].update({f'test_{k.lower()}': v for k, v in metrics.items()})
+
 
 
 def _tracker_metrics(task, out):
@@ -120,11 +146,9 @@ def _tracker_metrics(task, out):
 
 def _write_assets(assets_dir: Path, task: str, out: dict) -> None:
     assets_dir.mkdir(parents=True, exist_ok=True)
-    if task == 'alignment_probe':
-        return
     rows = out.get('rows')
     if rows:
-        path = assets_dir / 'spec_metrics.csv'
+        path = assets_dir / ('alignment_metrics.csv' if task == 'alignment_probe' else 'spec_metrics.csv')
         with path.open('w', newline='', encoding='utf-8') as handle:
             writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
             writer.writeheader()

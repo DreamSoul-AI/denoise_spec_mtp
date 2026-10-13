@@ -134,7 +134,7 @@ def test_repository_studies_expand_and_validate(tmp_path, study):
     declared = load_study_yaml(dest)
     assert declared['recipe'] == 'recipe.py'
     assert declared.get('flow', {}).get('study_phases') is True
-    assert declared.get('flow', {}).get('prepare_shared') is not False
+    assert declared.get('flow', {}).get('prepare_shared') is False
     out = expand_study(dest)
     assert out['configs']
     for path in out['configs']:
@@ -192,3 +192,51 @@ def test_freeze_rejects_corrupt_lock(study_copy):
     (study_dir / sources.LOCK_NAME).write_text('{not json', encoding='utf-8')
     with pytest.raises(sources.SpecMtpSourceChangedError, match='not valid JSON'):
         recipe.register(_ctx(study_dir, _config(variant='esp_static')))
+
+
+@pytest.mark.parametrize('kind', ['added', 'deleted', 'modified'])
+def test_source_lock_covers_all_file_changes(study_copy, kind):
+    study = study_copy()
+    sources.write_lock(study)
+    current = sources.manifest()
+    key = next(iter(current['files']))
+    if kind == 'added':
+        current['files']['spec_mtp/new.py'] = 'new'
+    elif kind == 'deleted':
+        del current['files'][key]
+    else:
+        current['files'][key] = 'changed'
+    with pytest.raises(sources.SpecMtpSourceChangedError):
+        sources.check_frozen(study, {}, current)
+
+
+def test_remake_requires_new_version_after_source_change(study_copy):
+    from rpipe.structure.make import expand_study
+    study = study_copy()
+    sources.write_lock(study)
+    expanded = expand_study(study)
+    run_dir = Path(expanded['configs'][0]).parent
+    (run_dir / 'result.json').write_text('{"status":"succeeded"}')
+    lock = study / sources.LOCK_NAME
+    saved = json.loads(lock.read_text())
+    saved['files']['spec_mtp/new.py'] = 'old'
+    lock.write_text(json.dumps(saved))
+    with pytest.raises(sources.SpecMtpSourceChangedError, match='new.*version'):
+        sources.write_lock(study)
+    declaration = yaml.safe_load((study / 'study.yaml').read_text())
+    declaration['fixed']['algorithm']['config']['version'] = 'new-source'
+    (study / 'study.yaml').write_text(yaml.safe_dump(declaration))
+    sources.write_lock(study)
+
+
+def test_prompt_source_drift_rejected_before_construction(study_copy):
+    study = study_copy()
+    prompt = study / 'prompt.jsonl'
+    prompt.write_text('first')
+    declaration = yaml.safe_load((study / 'study.yaml').read_text())
+    declaration['fixed']['data']['config']['path'] = str(prompt)
+    (study / 'study.yaml').write_text(yaml.safe_dump(declaration))
+    sources.write_lock(study)
+    prompt.write_text('changed')
+    with pytest.raises(RuntimeError, match='input changed'):
+        sources.check_frozen(study, declaration, sources.manifest())

@@ -112,7 +112,7 @@ class SpecDecoder:
         provider = build_mask_provider(self.spec_cfg, model.embedding_table,
                                        generator=_fork_generator(self.generator))
         stats: dict[str, Any] = {'prefill_calls': 1, 'decode_calls': 0, 'accepted': 0,
-                 'committed': 0, 'hit_context_limit': 0,
+                 'committed': 0, 'hit_context_limit': 0, 'trace': [],
                  # Draft attempts/accepts at depth 1..3. An attempt is a
                  # sampled token that had tree children to match; the bonus
                  # token past the last child is not an attempt. Counted before
@@ -229,11 +229,17 @@ class SpecDecoder:
             committed.extend(committed_now)
             stats['committed'] += len(committed_now)
 
+            stats['trace'].append({
+                'root_position': root_position, 'cache_before': cache_len,
+                'accepted_nodes': list(accepted_nodes), 'committed_tokens': list(committed_now),
+                'stopped': stop, 'cache_after': None,
+            })
             if stop:
                 break
 
             # Cache keeps root + accepted path; masks/rejects are evicted.
             kv_cache.keep_block_positions(cache, cache_len, [0] + accepted_nodes)
+            stats['trace'][-1]['cache_after'] = kv_cache.cache_len(cache)
 
             # Next tree seeds: masks of the deepest accepted node (or root).
             n_star = accepted_nodes[-1] if accepted_nodes else 0

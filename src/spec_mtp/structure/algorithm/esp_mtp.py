@@ -82,7 +82,7 @@ def _warmup(decoder, model, prompt_ids, eval_cfg, eos_ids, run_ar, device, seed)
     sync_device(device)
 
 
-def evaluate(model, prompts, eos_ids, spec_cfg, eval_cfg, seed, device, save_dir=None):
+def evaluate(model, prompts, eos_ids, spec_cfg, eval_cfg, seed, device, save_dir=None, *, aggregate=True):
     """Decode every prompt; write spec_metrics.csv / summary.csv under save_dir.
 
     Returns {'rows': per-prompt rows, 'summaries': per-category summaries}.
@@ -107,7 +107,7 @@ def evaluate(model, prompts, eos_ids, spec_cfg, eval_cfg, seed, device, save_dir
         _warmup(decoder, model, prompts[0]['input_ids'], eval_cfg, eos_ids,
                 run_ar, device, seed)
 
-    rows = []
+    rows, evidence = [], []
     for idx, item in enumerate(prompts):
         prompt_ids = item['input_ids']
         # Fresh, identically seeded generators per prompt so spec and AR see
@@ -150,15 +150,20 @@ def evaluate(model, prompts, eos_ids, spec_cfg, eval_cfg, seed, device, save_dir
             row['ar_time'] = ar_stats['ar_time']
             row['ar_calls'] = ar_stats['ar_calls']
             row['exact_match'] = int(torch.equal(output, ar_out))
+        evidence.append({
+            'prompt': idx, 'input_ids': prompt_ids[0].tolist(),
+            'output_ids': output[0].tolist(), 'ar_ids': ar_out[0].tolist() if run_ar else None,
+            'stats': stats,
+        })
         rows.append(row)
         if per_prompt_logger is not None:
             per_prompt_logger.log(row)
 
-    summaries = _aggregate(rows)
+    summaries = _aggregate(rows) if aggregate else {}
     summary_logger = csv_logger.Logger(save_dir, filename='summary.csv')
     for category, summary in summaries.items():
         summary_logger.log({'category': category, **summary})
-    return {'rows': rows, 'summaries': summaries}
+    return {'rows': rows, 'summaries': summaries, 'evidence': evidence}
 
 
 def test(cfg, model=None):

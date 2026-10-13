@@ -1,6 +1,6 @@
 # Study 使用指南
 
-怎么用**现在的代码**开一轮可复现实验。调度以这份 `src/rpipe/` 为准（`src/rpipe/ORIGIN`，RPipe `main` v0.3.0）。RPipe 原文在上游 `studies/readme.md`。这里只写 SpecMTP 多出来的部分。入口是 `python -m spec_mtp`。
+怎么用**现在的代码**开一轮可复现实验。调度以这份 `src/rpipe/` 为准（`src/rpipe/ORIGIN`，RPipe `main` v0.3.0）。RPipe 原文在上游 `studies/README.md`。这里只写 SpecMTP 多出来的部分。入口是 `python -m spec_mtp`。
 
 ## 1. 三个词
 
@@ -18,16 +18,17 @@
 
 SpecMTP 固定写法：
 
-- `recipe: recipe.py`，import 时 `register_sources()`，这样 make 能往 `shared/data` 落 Data
-- `flow.study_phases: true`。**不要写 `prepare_shared: false`**，除非真的不能提前建构 Data
-- Data → `shared/data`，权重 → `shared/model`（同一 Study 只下一遍）
+- `recipe: recipe.py`，import 时 `register_sources()`
+- `flow.study_phases: true`，`prepare_shared: false`（RPipe 的 make 下载只认 MNIST/CIFAR；SpecMTP 的 Data/权重在 **Run prepare** 写入 `shared/`）
+- SpecBench → `shared/data/specbench/`，ModelScope / HF 权重 → `shared/model/`（同一 Study 只下一遍）
 - **不要写 `origin: foreign`**，见 [layout.md](../docs/layout.md)
-- `flow/write`：`exact_match` 门；`flow/process`：Study scope 门
+- `flow/collect`：从 raw 计算 CSV/Tracker；`flow/summarize`：成功门；`flow/write`：证据/来源复验；`flow/process`：当前 index 的 Study 终验
+- 新实测写 algorithm.config.version，源码/输入改变后先改 version 再 make/remake。普通 run/launch 不刷新已有来源锁，不签收旧产物
 - SpecBench 源文件在 `datasets/spec_bench/`，不要把 jsonl 塞进 Study 目录当私货
 
 ## 3. 高效率排班
 
-对照上游 `studies/readme.md` §3。写进 `docs/plan.md`。同类、相近耗时一组；0.6B 和 4B 不要同一 `wait`。seed ≠ 并发。Windows：`PYTHONUTF8=1`，ModelScope，`D:\anaconda3\python.exe`。
+对照上游 `studies/README.md` §3。写进 `docs/plan.md`。GPU 先 --round 1 串行校准权重/KV/树/mask/进程峰值，再用 system.config.vram_bytes 记录预算，小步扩大独立 Run 并发。速度对照不竞争资源；0.6B 和 4B 不同 wait。seed ≠ 并发。Windows：`PYTHONUTF8=1`，ModelScope，`D:\anaconda3\python.exe`。
 
 ## 4. 一条命令
 

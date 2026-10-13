@@ -8,7 +8,7 @@ import csv
 import json
 
 
-from conftest import SMOKE, cli
+from conftest import cli
 
 EXPECTED_ACCEPT_D1 = {
     'esp_static': 27,
@@ -43,10 +43,11 @@ def _check_smoke(study):
     assert check['complete'] and check['passed'] and len(check['sources_digests']) == 1
 
 
-def test_smoke_study_matches_plain_generation():
+def test_smoke_study_matches_plain_generation(study_copy):
     """The repository Study itself, via the thin spec_mtp entry (CI path)."""
-    cli('run', 'studies/smoke', check=True)
-    _check_smoke(SMOKE)
+    study = study_copy(name='fresh_smoke')
+    cli('run', study, check=True)
+    _check_smoke(study)
 
 
 def test_rpipe_entry_runs_the_same_chain(study_copy):
@@ -143,3 +144,39 @@ def test_alignment_probe_writes_metrics_and_passes_the_gate(study_copy):
     assert all(int(r['n_accepted']) + int(r['n_rejected']) > 0 for r in rows)
     result = json.loads((study / 'runs' / run_id / 'result.json').read_text(encoding='utf-8'))
     assert result['status'] == 'succeeded' and result['spec_mtp']['passed']
+
+
+def test_ar_baseline_runs_the_same_stage_chain(study_copy):
+    def patch(study):
+        study['fixed']['algorithm']['config']['task'] = 'ar_baseline'
+        study['axes'] = {'algorithm.config.variant': ['esp_static']}
+    study = study_copy(patch, name='ar_stage_chain')
+    cli('run', study, check=True)
+    run_id = json.loads((study / 'index.json').read_text())['experiments'][0]['runs'][0]['id']
+    root = study / 'runs' / run_id
+    result = json.loads((root / 'result.json').read_text())
+    raw = json.loads((root / 'assets/decode_observations.json').read_text())
+    assert result['status'] == 'succeeded' and result['spec_mtp']['passed']
+    assert len(raw['out']['evidence']) == 4
+    assert all(len(item['output_ids']) == 64 for item in raw['out']['evidence'])
+
+
+def test_raw_mismatch_fails_before_success_is_written(study_copy):
+    study = study_copy(name='raw_mismatch')
+    hook = study / 'flow/collect/run.py'
+    hook.write_text(hook.read_text() + """
+    import json
+    from pathlib import Path
+    path = Path(ctx.layout.assets_dir) / 'decode_observations.json'
+    raw = json.loads(path.read_text())
+    raw['out']['evidence'][0]['ar_ids'][-1] = -1
+    path.write_text(json.dumps(raw))
+""")
+    proc = cli('run', study)
+    assert proc.returncode != 0
+    index = json.loads((study / 'index.json').read_text())
+    for experiment in index['experiments']:
+        root = study / 'runs' / experiment['runs'][0]['id']
+        if (root / 'result.json').is_file():
+            result = json.loads((root / 'result.json').read_text())
+            assert result['status'] == 'failed' and 'raw exact_match' in result['error']

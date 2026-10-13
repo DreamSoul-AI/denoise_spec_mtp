@@ -8,9 +8,10 @@ src/
   spec_mtp/
     recipe.py              register_sources + register(ctx)
     cli.py                 薄入口：make 写源码锁，其余转给 rpipe
-    flow/checks.py         exact_match 门、Study scope 门
+    flow/checks.py         summarize/write 证据门、Study scope 门
+    structure/artifact/evidence.py   实际权重/输入/runtime 证据
     structure/             algorithm / data / model / system / control / artifact
-datasets/spec_bench/       SpecBench 源文件；make 拷进该 Study 的 shared/data
+datasets/spec_bench/       SpecBench 源文件；Run prepare 拷进 shared/data
 studies/                   见 studies/readme.md
 configs/hf/                论文格子的旧 YAML；不是入口
 tools/                     ci_local.py, windows_selfcheck.py, profile_cpu.py,
@@ -24,9 +25,14 @@ docs/                      architecture, layout, testing, windows, brainstorm,
 
 ## shared/
 
-RPipe 默认 `flow.prepare_shared: true`。make 把 Data 落到 `studies/<name>/shared/data/`。每个 Run 的 Model builder 把权重落到 `studies/<name>/shared/model/`（ModelScope `snapshot_download` 的 `cache_dir`，以及 HF `cache_dir`）。同一 Study 里不要让每个 Run 再下一遍。
+RPipe 的 make 共享下载只认识 torchvision 数据集。SpecMTP Study 写 `flow.prepare_shared: false`，但 **Run prepare 仍然把东西写进 `shared/`**：
 
-Study `recipe.py` 在 import 时调用 `register_sources()`，这样 make 在 recipe 的 `register(ctx)` 之前就认得出 `spec_mtp` Data。
+- SpecBench jsonl → `studies/<name>/shared/data/specbench/`
+- ModelScope / HF 权重 → `studies/<name>/shared/model/`
+
+同一 Study 里不要让每个 Run 再下一遍。源文件在 `datasets/spec_bench/`。
+
+Study `recipe.py` 在 import 时调用 `register_sources()`。
 
 ## 不要写 `origin: foreign`
 

@@ -29,16 +29,15 @@
 
 ## 5. 高效率排班（§3）
 
-- **同类一组：** 同一模型、相近树宽的 Run 一起并行；不要把 0.6B 和 4B 塞进同一 `wait`。
-- **`wait` 闸门：** 组末必须等本组进程退出、显存释放完，才开下一组。
-- **吃满 GPU：** `python -m spec_mtp make studies/<name> --num-gpus 1` 默认 `--round auto`；看 **make** 打印的 `pack N waits`。
-- **eval 格子：** SpecMTP 默认没有 train 波。仍按显存装箱，不要全局一个 `--round` 把轻重砍齐。
-- **error：** 单条失败记 `run_id`；本波结束后对未 succeeded 的再跑。
-- **seed ≠ 并发。** 不在检验预注册结论的那一组上再调 β、λ、γ。已记下的格子不重跑。
+- GPU 先以 --round 1 串行测量实际权重、KV cache、树展开、mask 计算和进程峰值；没有实测预算时不使用视觉训练的显存估计扩大并发。
+- 校准后可用 system.config.vram_bytes 记录保守的实际预算，再小步增加独立 Run 的并发。每个 Run 独占解码状态与产物；不重叠启动多个 launch。
+- 同任务量的速度比较串行进行，记录预热、同步、backend、实际生成长度和整体墙钟；不按不同负载的单 Run 时间排名。
+- wait 组末等进程退出与显存释放，保留 OOM/失败；后续重算使用新 version/Run ID，不把已有成功产物当新验收。
+- seed 不表示并发；不在预注册结论的那组调 β/λ/γ，已有数字格子不重跑。
 
 ```text
 set PYTHONUTF8=1
-python -m spec_mtp make studies/<name> --num-gpus 1 --init-gpu 0
+python -m spec_mtp make studies/<name> --num-gpus 1 --init-gpu 0 --round 1
 python -m spec_mtp launch studies/<name> --num-gpus 1 --init-gpu 0
 ```
 
@@ -56,7 +55,7 @@ python -m spec_mtp launch studies/<name> --num-gpus 1 --init-gpu 0
 ## 6. 成功标准
 
 - 计划的 Run 均 `status: succeeded`
-- 每个 overall 行 `exact_match_rate == 1`
+- 每个 overall 行 `exact_match_rate == 1`；summarize/write 完成原始 token、接受/cache、输入与来源核验
 - 主指标是接受的 draft 数；速度不参与判定
 - `study_report.md` 按 Experiment 写结论
 

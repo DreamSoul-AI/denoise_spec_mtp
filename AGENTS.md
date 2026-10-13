@@ -21,6 +21,8 @@
 | 还没拍板的下一步 | [brainstorm.md](docs/brainstorm.md) |
 | 研究计划草案（非 Study 合同） | [research/readme.md](docs/research/readme.md) |
 | 论文 PDF | [papers/index.md](docs/papers/index.md)。PDF 不进 git |
+| 问题与兼容性 | [bugs.md](docs/bugs.md) |
+| 开发记录 | [record.md](docs/record.md) |
 | 已经记下的接受数 | [history-extrapolation.md](docs/history-extrapolation.md) |
 
 文档文件名用小写，和 RPipe 一样，不要再用 `ARCHITECTURE.md` 这种大写。
@@ -33,14 +35,15 @@
 ## 4. 代码放在哪
 
 - `src/rpipe/`：调度、Flow、Tracker、artifact、make。提交见 `ORIGIN`。
-- `src/spec_mtp/`：Data / Model / Algorithm（`(eval, spec_mtp)`）、`recipe.py`、`flow/checks.py`。注册发生在 Study `recipe.py`（import 时 `register_sources()`，Run 时 `register(ctx)`）。
+- `src/spec_mtp/`：Data / Model / Algorithm（`(eval, spec_mtp)`）、`recipe.py`、`flow/checks.py`、专项 artifact/evidence。注册发生在 Study `recipe.py`（import 时 `register_sources()`，Run 时 `register(ctx)`）。
 - 入口：`python -m spec_mtp` 是薄封装，其余转给这份 `rpipe`。不恢复 `src/main.py`。不要加 `sitecustomize.py`。
 
 ## 5. 实验
 
 - 开跑前写 `docs/plan.md`（问题、对照、指标、停止规则、[studies/readme.md](studies/readme.md) §3 排班）。
 - `python -m spec_mtp make studies/<name>`，再 `python -m spec_mtp launch studies/<name>`。
-- Data 进 `shared/data`，权重进 `shared/model`（make 默认 `prepare_shared: true`）。**不要写 `origin: foreign`**（[layout.md](docs/layout.md)）。权重用 ModelScope。
+- `flow.prepare_shared: false`（RPipe make 下载只认 torchvision）。Run prepare 仍把 SpecBench 和权重写进 `shared/`。**不要写 `origin: foreign`**（[layout.md](docs/layout.md)）。权重用 ModelScope。
 - `exact_match_rate` 必须是 1。表里的数是接受的 draft 数。速度和 `tau` 不决定结论。不把 γ 叫成 slope。
-- 已有数字的格子不重跑。不复用一个 Run 目录。
+- 已有数字的格子不重跑。不复用一个 Run 目录。源码或输入变化用新的 algorithm.config.version；make/remake 不签收旧成功 Run。
+- Study collect 从 execute 的原始观测计算指标，summarize 跑成功门，write 再核验，process 只终验当前 index。
 - Windows：`PYTHONUTF8=1`，`D:\anaconda3\python.exe`，不另建 venv。

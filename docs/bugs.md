@@ -13,5 +13,6 @@
 | C-004 / 固定 RPipe 同 ID 失败写入 | 初次旧 smoke 的 Run 3b0724f5e0396351 在 prepare 来源拒绝后，FlowRunner 回写 failed result；运行前未备份原 result，原终态无法确认/恢复，raw/log 未删除 | 专项薄 CLI 在进入库之前预检专项锁及上游 freeze，run/launch/run-one/process 拒绝不触碰旧 result；新增字节保全回归。仍要求新 version，不修改 vendored Runner；直接 python -m rpipe/FlowRunner 仍遵循库原失败回写行为，旧 Run 不可直接复跑 |
 | C-005 / 固定 RPipe 聚合先于 Study 终验 | RPipe 先写通用 process.json，再调用 Study process；专项来源/证据门失败时通用 complete 可能仍为 true | Study hook 将自身质量结论写回同一 process envelope，失败设置 complete=false；薄 report 先复验当前 index，不从失败矩阵生成新数字表。保留 Run 的成功状态与证据 |
 | B-004 / 本项目 CI 安装脚本 | Actions run 38367588147 在 Install CPU dependencies 将 read_bytes 传给 tomllib.loads，TypeError；lint/type/tests 全未执行 | 改为 read_text(encoding=utf-8)，本机执行同一依赖提取片段通过；保持 CPU torch 排除解析与 Actions 启用，远端新提交复验 |
+| B-005 / 本项目数据目录与类型解析 | 本机及 Actions 38367956325 的 mypy 把根 datasets/ 识别为 namespace package，遮蔽已安装 Hugging Face datasets，报 load_dataset 不存在 | 本项目 src 包均有 __init__.py；设置 mypy namespace_packages=false，保持所有现有严格规则，根目录直接复验 40 files passed。早期从目录外检查虽通过但未根除该命名冲突，现已明确记录 |
 
 上述 C 项描述固定上游与本项目的边界，不是对 RPipe 上游的修改请求。正式数字与验证范围见 [smoke 报告](../studies/smoke/docs/study_report.md)。

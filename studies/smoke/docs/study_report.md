@@ -66,3 +66,5 @@ GPU 仅完成随机 tiny 串行门。没有校准真实权重的 KV/树/mask/进
 最终 pytest 229 passed；固定 Ruff/mypy 通过。来源拒绝时旧 result 保全，以及专项失败时通用 envelope 不完整都有针对性回归。C-004 仍保留原始旧 Run 终态无法恢复的事实；直接 native RPipe/FlowRunner 仍有库的失败回写行为，正常入口用 spec_mtp，实测必须新 version。此验收不改变前述真实模型、恢复、GPU 并发与长矩阵边界。交付后的文档提交不改变包源码或 Study 声明。
 
 PR #4 的首轮 Actions 38367588147 在 CPU 依赖提取脚本失败（tomllib.loads 接收 bytes），lint/type/tests 均未执行。这是本项目 CI 缺陷 B-004，改为 UTF-8 文本读取后进行新提交复验；不将首轮远端失败算作通过。工作流触发、CPU torch 策略与启用状态保持。
+
+第二轮远端安装/lint 通过，mypy 在 38367956325 复现根 datasets/ 的 namespace 遮蔽（B-005）。已设置 namespace_packages=false，项目 src 包均有 __init__.py，现有严格类型规则保持。本机在根目录 40 files passed；从目录外的早期本机通过不代替此次远端验收。此修订不改 scientific 包源码、数据或解码配方。

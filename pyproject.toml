@@ -61,6 +61,8 @@ select = ["F", "E9"]
 "src/spec_mtp/structure/algorithm/decoding.py" = ["F841"]
 
 [tool.mypy]
+# datasets/ stores JSONL, not a Python namespace package.
+namespace_packages = false
 # Gradual: whole package with check_untyped_defs; research decoder modules
 # have variable / attribute annotations only (no logic change). Modules
 # written for the RPipe dependency are in the strict tier below.

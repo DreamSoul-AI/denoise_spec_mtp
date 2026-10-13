@@ -2,6 +2,8 @@
 
 ## v0.3.1 当前设备接续（2026-10-14）
 
+实现与本机证据已本地提交 cb5c36d57e02d068d42ad6b1f0d5195cf5fd1186。推送/草稿 PR 的组合操作被自动审批拒绝，未执行；随后确认目标仓库为公开仓库且当前账号有 push 权限。仍待明确外传批准，不绕过拒绝。当前新提交没有远端 CI 结果，交接49dec9c的绿色检查只证明旧提交。PR正文已备妥于本机.tmp/v031-20261014/pr-body.md。
+
 已从交接提交49dec9c接续 refactor/spec-rpipe，保留未跟踪 history_mtp.code-workspace。当前完整 vendor 为固定7a15c46 / v0.3.1，Windows torch-first 唯一例外与MIT保留；旧副本只备份，不删除。职责映射沿用既有迁移，科学 Algorithm、Data、Model 与数值配方未改。
 
 - report 采用上游身份/原子门，专项先只读身份校验再做真实 process envelope 质量写回。B-007 已修：缺 raw 拒绝并写 complete=false，旧身份与写入失败保全旧表。

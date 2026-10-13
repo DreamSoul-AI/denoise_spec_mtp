@@ -36,3 +36,5 @@
 从49dec9c接续，交接提交cpu-checks已通过。先审阅固定新版本文档/接口并改设计，再备份/比较101文件、升级完整vendor到7a15c46；唯一源码差异Windows torch-first和MIT保留，不改上游仓库。发现并修复下游report拒绝raw缺失后旧complete仍true的问题，专项门与上游身份/原子门共存。固定36格严格相等，新设备251回归、Ruff/mypy、Windows与wheel/sdist全链通过；失败日志和边界见smoke报告/JSON。
 
 C-004全新Toy/Stub最小复现、公开Issue/PR去重及脱敏完成，实际提交 [RPipe#36](https://github.com/DreamSoul-AI/RPipe/issues/36)。真实四格只make新version，缓存缺失有ModelScope E1022证据，未launch/未校准/未声明研究质量通过。阶段commit/push与面向dev草稿PR按当次授权进行，不自动合并、发布或改变远端规则。
+
+本轮实现本地提交 cb5c36d；自动审批拒绝组合 push/草稿PR，理由为当前可信消息未明确确认外传目标及公开资料风险。已只读核实目标DreamSoul-AI/denoising-speculative-decoding为public且有push权限；未推送、未创建PR、未触发新提交CI。保留完整本地提交与待审PR文本，等待明确批准。

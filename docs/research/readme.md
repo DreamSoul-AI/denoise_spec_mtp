@@ -1,6 +1,6 @@
 # Research notes
 
-人写的研究计划，不是 Study 执行合同。Study 的 `plan.md` / `study_report.md` 仍在 `studies/<name>/docs/`。已记下的接受数在 [history-extrapolation.md](../history-extrapolation.md)。
+人写的研究计划，不是 Study 执行合同。Study 的 `PLAN.md` / `STUDY_REPORT.md` 仍在 `studies/<name>/docs/`。已记下的接受数在 [history-extrapolation.md](../history-extrapolation.md)。
 
 | **文件** | **性质** |
 | --- | --- |

@@ -1,9 +1,11 @@
-# study_report — smoke
+# Study Report: smoke
+
+本报告保留 2026-10-13 各实现提交/version 的原验收事实。Study 结构重写不新增研究矩阵、不重新签收历史数字；可复用合同见 [PLAN](PLAN.md)。
 
 ## 一、摘要
 
 - 目标：接通固定 RPipe v0.3.0 的真实阶段职责，保留 ESP/EMA/AR/alignment 研究语义，拒绝无证据的成功。
-- 当前实现提交：`934dac3fd3b1662664ebf71d8317b49183e22f0b`（含此前 `7c89d7c` 的适配），工作分支 `refactor/spec-rpipe`；上游固定 `804b3823ab6d2af46cbda1a65688ca8b76c60b22`。接入主体在本次开始前的 c3263c0 已存在，本次只补齐缺口。
+- 历史验收实现提交：`934dac3fd3b1662664ebf71d8317b49183e22f0b`（含此前 `7c89d7c` 的适配），工作分支 `refactor/spec-rpipe`；上游固定 `804b3823ab6d2af46cbda1a65688ca8b76c60b22`。接入主体在本次开始前的 c3263c0 已存在，本次只补齐缺口。
 - 最终结果：229 passed；固定版本 Ruff/mypy 通过；旧/新 36 格 token/接受/cache 完全相同，555 格改动前/后 fingerprint 完全相同。CPU/CUDA tiny 三 variant 均 exact-match=1，wheel/sdist 各通过实际安装与阶段链。
 - 边界：真实预训练模型、ModelScope 下载、严格解码恢复、GPU 并发容量、完整大模型矩阵未验收；没有重跑历史正式接受数。
 
@@ -52,7 +54,7 @@ accept_d1 是深度 1 的接受；accepted 是所有深度的接受（沿用原�
 
 ## 五、复跑与未执行项
 
-先读 [plan.md](plan.md)。普通 run/launch 不刷新现有专项锁；源码/输入变更先设置新的 algorithm.config.version，再 make/remake。make 已有对应 Run result 时不能用新源码重新签收。终验同时比较 Study/RPipe/专项来源、实际 config 和输入文件；make 尚未下载的远端资源只能在构造后记录实际权重/tokenizer，真实 Hub 环境另行验收。
+先读 [PLAN.md](PLAN.md)。普通 run/launch 不刷新现有专项锁；源码/输入变更先设置新的 algorithm.config.version，再 make/remake。make 已有对应 Run result 时不能用新源码重新签收。终验同时比较 Study/RPipe/专项来源、实际 config 和输入文件；make 尚未下载的远端资源只能在构造后记录实际权重/tokenizer，真实 Hub 环境另行验收。
 
 旧/新 probe 可由 Git archive b1f6191 src 后设 PYTHONPATH 指向归档 src，调用 validate_migration.py --out；切回当前 src，再加 --compare。完整 token/trace 参考已经入库；完整 555 格原始文件、实际 Run/assets/logs 和安装目录在 `.tmp/acceptance-20261013/`，不会随 clone 提供。Study 的正式报告与参考 JSON 可独立取得，完整 Run 需要按新 version 重跑。
 
@@ -70,3 +72,19 @@ PR #4 的首轮 Actions 38367588147 在 CPU 依赖提取脚本失败（tomllib.l
 第二轮远端安装/lint 通过，mypy 在 38367956325 复现根 datasets/ 的 namespace 遮蔽（B-005）。已设置 namespace_packages=false，项目 src 包均有 __init__.py，现有严格类型规则保持。本机在根目录 40 files passed；从目录外的早期本机通过不代替此次远端验收。此修订不改 scientific 包源码、数据或解码配方。
 
 第三轮 Actions 38368656580 的实际测试 228 passed，唯一失败为 Numbers 的本机 raw log 超链接在 clone 中不可取得（B-006），本机存在原目录掩盖了该问题。正式 Numbers 已将这些路径改为明确标注的本机文本引用，数字保持；入库的报告和验证 JSON 提供正式依据。没有放宽链接测试或删失败证据。
+
+## 七、Study 合同与结果图（2026-10-13）
+
+按固定 RPipe Study 要求补齐入口、配置合并/阶段/来源合同和计划/报告结构。未更改 smoke 声明、decoder、正式参考 JSON 或历史 NUMBERS 指标；模板只修正注册职责注释与 description 占位符，不改模型、数据或算法配方。
+
+[打开 tiny 接受数图](figures/tiny_acceptance.png)
+
+[![历史 CPU tiny 各深度接受数与总接受数](figures/tiny_acceptance.png)](figures/tiny_acceptance.png)
+
+图源为 [delivery_validation.json](delivery_validation.json) 的 cpu 三格，历史提交 934dac3，version rpipe-v030-20261013-delivery，CPU/float32/eager、四个 synthetic prompt、seed=123、32-token 预算、T=0、EOS 不停止；TF32 与完整环境见原证据。每个 Experiment n=1，accepted=28/31/8，accept_d1=27/31/8，exact-match 全为 1；mean/min/max 为单 Run 值、std=0，不表示跨 seed 稳定性。accepted 沿用所有深度的预算/EOS 截断前口径。图仅呈现原始计数，不用于速度或论文结论。training-free 没有训练 learning curve，使用真实结果图适配上游报告要求。
+
+交付 CPU Run 为 5afa2281f1bdb3e4、0ebb2f566e0b46b5、de876f8232440e79，顺序对应三 variant；日志路径见 NUMBERS 的本机文本，raw 不随 clone 提供。历史统一 est/actual 墙钟未保留，未补造估计或速度排名。GPU/恢复/并行/长矩阵的未验证范围保持前述记录。
+
+图的可复跑入口：[plot_validation.py](../plot_validation.py)。在仓库根运行 `python studies/smoke/plot_validation.py`，读取已入库的 delivery JSON 并只更新图片，不启动 Run、改动 index 或来源锁。该手动图工具不参与解码阶段。
+
+本次 Study 重写的本机验证：现有回归 236 个全部通过，使用独立 basetemp，包含模板与 smoke 配置展开、隔离 CPU tiny 实际 CLI、来源/证据/exact-match 失败边界；Ruff 0.17.0 与 mypy 2.4.0（40 源文件）通过，大小写敏感的 Git 文档链接与 YAML 语义保留检查通过。图脚本通过输入自检并生成已检查图片。科学源码和包配置未改，本次未重复旧新 36/555 格对照、GPU、安装包、恢复或并发验收；上文安装/GPU 数字仍是各自历史来源，不作为新结果。

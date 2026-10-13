@@ -138,7 +138,9 @@ def test_repository_studies_expand_and_validate(tmp_path, study):
     out = expand_study(dest)
     assert out['configs']
     for path in out['configs']:
-        recipe.validate(yaml.safe_load(Path(path).read_text(encoding='utf-8')))
+        config = yaml.safe_load(Path(path).read_text(encoding='utf-8'))
+        recipe.validate(config)
+        assert '{' not in config['description'], config['description']
 
 
 def test_layer_must_be_a_mapping():

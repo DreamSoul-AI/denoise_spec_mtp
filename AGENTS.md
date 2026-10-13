@@ -15,7 +15,7 @@
 | --- | --- |
 | 目录、vendored RPipe、`origin` 规则、shared | [layout.md](docs/layout.md) |
 | 解码、mask、和论文不一致的地方 | [architecture.md](docs/architecture.md) |
-| 怎么跑 Study | [studies/readme.md](studies/readme.md) |
+| 怎么跑 Study | [studies/README.md](studies/README.md) |
 | 测试与 CI | [testing.md](docs/testing.md) |
 | Windows | [windows.md](docs/windows.md) |
 | 还没拍板的下一步 | [brainstorm.md](docs/brainstorm.md) |
@@ -25,7 +25,7 @@
 | 开发记录 | [record.md](docs/record.md) |
 | 已经记下的接受数 | [history-extrapolation.md](docs/history-extrapolation.md) |
 
-文档文件名用小写，和 RPipe 一样，不要再用 `ARCHITECTURE.md` 这种大写。
+一般技术文档文件名用小写；Study 目录入口用 `README.md`，计划、报告和数字用 `docs/PLAN.md`、`docs/STUDY_REPORT.md`、`docs/NUMBERS.md`，与固定 RPipe 合同一致。不要维护第二套大小写文档。
 
 ## 3. 协作
 
@@ -41,7 +41,7 @@
 
 ## 5. 实验
 
-- 开跑前写 `studies/<name>/docs/plan.md`（问题、对照、指标、停止规则、[studies/readme.md](studies/readme.md) §3 排班）。
+- 开跑前写 `studies/<name>/docs/PLAN.md`（问题、对照、指标、停止规则、[studies/README.md](studies/README.md) §5 排班）。
 - `python -m spec_mtp make studies/<name>`，再 `python -m spec_mtp launch studies/<name>`。
 - `flow.prepare_shared: false`（RPipe make 下载只认 torchvision）。Run prepare 仍把 SpecBench 和权重写进 `shared/`。**不要写 `origin: foreign`**（[layout.md](docs/layout.md)）。权重用 ModelScope。
 - `exact_match_rate` 必须是 1。表里的数是接受的 draft 数。速度和 `tau` 不决定结论。不把 γ 叫成 slope。

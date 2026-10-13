@@ -9,14 +9,14 @@ description: one-line question
 experiment:
   name: first26
 
-# SpecMTP sources are registered by the recipe (import also registers, so make can fill shared/).
+# Recipe import only registers sources; Run prepare constructs and fills shared/.
 recipe: recipe.py
 
 flow:
-  study_phases: true      # flow/write = exact_match gate, flow/process = Study-scope gate
+  study_phases: true      # summarize/write = evidence gate; process = Study-scope gate
   prepare_shared: false   # make-time download is torchvision-only; Run prepare still fills shared/
 
-# freeze: true            # optional: refuse to run if Study, rpipe or spec_mtp sources change after make
+# freeze: true            # recommended for formal research; existing SpecMTP locks always reject drift
 
 fixed:
   data:
@@ -58,4 +58,4 @@ fixed:
 
 seeds: [123]
 
-run_description: "{mask} seed={seed}"
+run_description: "{experiment} seed={seed}"

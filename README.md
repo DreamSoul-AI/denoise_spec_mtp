@@ -7,7 +7,7 @@ Training-free multi-token prediction:
 1. **ESP** (Embedding-Space Probing), [arXiv:2603.17942](https://arxiv.org/abs/2603.17942). PDF is local-only: [docs/papers/index.md](docs/papers/index.md).
 2. **EMA-velocity**: the same pipeline, mask from EMA of input-embedding differences.
 
-Agent notes: [AGENTS.md](AGENTS.md). Layout and the SpecMTP `origin` / shared rule: [docs/layout.md](docs/layout.md). Decode / paper mismatches: [docs/architecture.md](docs/architecture.md). How to run a Study: [studies/readme.md](studies/readme.md). Recorded accepts: [docs/history-extrapolation.md](docs/history-extrapolation.md).
+Agent notes: [AGENTS.md](AGENTS.md). Layout and the SpecMTP `origin` / shared rule: [docs/layout.md](docs/layout.md). Decode / paper mismatches: [docs/architecture.md](docs/architecture.md). How to run a Study: [studies/README.md](studies/README.md). Recorded accepts: [docs/history-extrapolation.md](docs/history-extrapolation.md).
 
 `src/rpipe/` is a file copy of `diaoenmao/RPipe` `main` at `804b3823ab6d2af46cbda1a65688ca8b76c60b22` (v0.3.0). SpecMTP registers onto that copy through a Study recipe.
 
@@ -24,7 +24,7 @@ set PYTHONUTF8=1
 python -m pytest tests/spec_mtp
 ```
 
-Smoke: `python -m spec_mtp make studies/smoke` then `python -m spec_mtp launch studies/smoke`. Every Run must have `exact_match_rate=1` and complete raw evidence. Change `algorithm.config.version` before accepting new sources/inputs with make/remake. See [acceptance report](studies/smoke/docs/study_report.md).
+For a fresh [smoke](studies/smoke/README.md), copy `studies/smoke` to an isolated directory and set a new Study name and `algorithm.config.version` before `python -m spec_mtp make <copy>` and `launch <copy>`. Every Run must have `exact_match_rate=1` and complete raw evidence. Source/input changes require explicit make/remake; do not rerun historical Run IDs. See the [acceptance report](studies/smoke/docs/STUDY_REPORT.md).
 
 GPU cells are new Studies under `studies/`. Copy `_template/`. SpecBench lives in `datasets/spec_bench/` and is copied into that Study's `shared/data` on the first Run. ModelScope / HF weights land in `shared/model`. Do not start from `src/main.py`.
 

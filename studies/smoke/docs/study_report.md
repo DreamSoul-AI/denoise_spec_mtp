@@ -68,3 +68,5 @@ GPU 仅完成随机 tiny 串行门。没有校准真实权重的 KV/树/mask/进
 PR #4 的首轮 Actions 38367588147 在 CPU 依赖提取脚本失败（tomllib.loads 接收 bytes），lint/type/tests 均未执行。这是本项目 CI 缺陷 B-004，改为 UTF-8 文本读取后进行新提交复验；不将首轮远端失败算作通过。工作流触发、CPU torch 策略与启用状态保持。
 
 第二轮远端安装/lint 通过，mypy 在 38367956325 复现根 datasets/ 的 namespace 遮蔽（B-005）。已设置 namespace_packages=false，项目 src 包均有 __init__.py，现有严格类型规则保持。本机在根目录 40 files passed；从目录外的早期本机通过不代替此次远端验收。此修订不改 scientific 包源码、数据或解码配方。
+
+第三轮 Actions 38368656580 的实际测试 228 passed，唯一失败为 Numbers 的本机 raw log 超链接在 clone 中不可取得（B-006），本机存在原目录掩盖了该问题。正式 Numbers 已将这些路径改为明确标注的本机文本引用，数字保持；入库的报告和验证 JSON 提供正式依据。没有放宽链接测试或删失败证据。

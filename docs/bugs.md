@@ -14,5 +14,6 @@
 | C-005 / 固定 RPipe 聚合先于 Study 终验 | RPipe 先写通用 process.json，再调用 Study process；专项来源/证据门失败时通用 complete 可能仍为 true | Study hook 将自身质量结论写回同一 process envelope，失败设置 complete=false；薄 report 先复验当前 index，不从失败矩阵生成新数字表。保留 Run 的成功状态与证据 |
 | B-004 / 本项目 CI 安装脚本 | Actions run 38367588147 在 Install CPU dependencies 将 read_bytes 传给 tomllib.loads，TypeError；lint/type/tests 全未执行 | 改为 read_text(encoding=utf-8)，本机执行同一依赖提取片段通过；保持 CPU torch 排除解析与 Actions 启用，远端新提交复验 |
 | B-005 / 本项目数据目录与类型解析 | 本机及 Actions 38367956325 的 mypy 把根 datasets/ 识别为 namespace package，遮蔽已安装 Hugging Face datasets，报 load_dataset 不存在 | 本项目 src 包均有 __init__.py；设置 mypy namespace_packages=false，保持所有现有严格规则，根目录直接复验 40 files passed。早期从目录外检查虽通过但未根除该命名冲突，现已明确记录 |
+| B-006 / 本次正式 readout 文档 | Actions 38368656580 的运行测试 228 passed，仅 NUMBERS.md 三个本机 raw log 超链接在 clone 中失效；本机目录存在掩盖了文档依赖缺失 | 正式 Numbers 保留原数字，将 raw log 改成明确标注不随 clone 提供的文本路径；正式证据链接指向入库 JSON/报告，不放宽链接测试 |
 
 上述 C 项描述固定上游与本项目的边界，不是对 RPipe 上游的修改请求。正式数字与验证范围见 [smoke 报告](../studies/smoke/docs/study_report.md)。

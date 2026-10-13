@@ -1,6 +1,6 @@
 # layout
 
-`src/rpipe/` 是上游 RPipe `main` 的文件拷贝，提交 `804b3823ab6d2af46cbda1a65688ca8b76c60b22`（`src/rpipe/ORIGIN`，v0.3.0）。`src/spec_mtp/` 只放 SpecMTP，经 Study recipe 注册。不要把 SpecMTP 写进 `rpipe` 的默认 source。
+`src/rpipe/` 是上游 RPipe `main` 的文件拷贝，提交 `7a15c46b75c5eb951cccd60ed7b9fc3463db90f5`（`src/rpipe/ORIGIN`，v0.3.1）。`src/spec_mtp/` 只放 SpecMTP，经 Study recipe 注册。不要把 SpecMTP 写进 `rpipe` 的默认 source。
 
 ```text
 src/
@@ -15,7 +15,7 @@ datasets/spec_bench/       SpecBench 源文件；Run prepare 拷进 shared/data
 studies/                   见 studies/README.md
 configs/hf/                论文格子的旧 YAML；不是入口
 tools/                     ci_local.py, windows_selfcheck.py, profile_cpu.py,
-                           decode_fingerprint.py
+                           decode_fingerprint.py, package_selfcheck.py
 tests/spec_mtp/            跟着 src/spec_mtp
 docs/                      architecture, layout, testing, windows, brainstorm,
                            history-extrapolation；research/；papers/

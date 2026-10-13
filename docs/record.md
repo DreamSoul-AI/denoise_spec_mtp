@@ -30,3 +30,9 @@
 - PR #4 面向 dev；首次 push CI 38367588147 发现本项目既有 tomllib.loads(bytes) 安装脚本错误，未进入 lint/tests。仅改 UTF-8 文本读取并执行同一依赖提取片段验证，不覆盖本机 GPU 环境、不关闭 Actions，后续远端门单独核对。
 - 60fd569 的远端安装/lint 通过，mypy 38367956325 复现本项目 datasets/ namespace 遮蔽。设置 namespace_packages=false（所有 src 包已有 __init__.py），不屏蔽 attr-defined 或模块检查；在仓库根目录固定 mypy 复验全部 40 文件通过。科学源码与 Run 配方仍与 934dac3 一致。
 - 4f104bb 的远端门已通过安装/lint/mypy/入口，运行测试 228 passed，仅正式 NUMBERS 的本机 raw log 链接失败（B-006）。保留数字、改为明确本机文本路径，正式链接只依赖入库报告/JSON，未改测试门限或科学实现。
+
+## 2026-10-14 v0.3.1 当前设备接续
+
+从49dec9c接续，交接提交cpu-checks已通过。先审阅固定新版本文档/接口并改设计，再备份/比较101文件、升级完整vendor到7a15c46；唯一源码差异Windows torch-first和MIT保留，不改上游仓库。发现并修复下游report拒绝raw缺失后旧complete仍true的问题，专项门与上游身份/原子门共存。固定36格严格相等，新设备251回归、Ruff/mypy、Windows与wheel/sdist全链通过；失败日志和边界见smoke报告/JSON。
+
+C-004全新Toy/Stub最小复现、公开Issue/PR去重及脱敏完成，实际提交 [RPipe#36](https://github.com/DreamSoul-AI/RPipe/issues/36)。真实四格只make新version，缓存缺失有ModelScope E1022证据，未launch/未校准/未声明研究质量通过。阶段commit/push与面向dev草稿PR按当次授权进行，不自动合并、发布或改变远端规则。

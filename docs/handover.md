@@ -1,6 +1,17 @@
 # 异机交接
 
-## 2026-10-14 本机收尾状态
+## v0.3.1 当前设备接续（2026-10-14）
+
+已从交接提交49dec9c接续 refactor/spec-rpipe，保留未跟踪 history_mtp.code-workspace。当前完整 vendor 为固定7a15c46 / v0.3.1，Windows torch-first 唯一例外与MIT保留；旧副本只备份，不删除。职责映射沿用既有迁移，科学 Algorithm、Data、Model 与数值配方未改。
+
+- report 采用上游身份/原子门，专项先只读身份校验再做真实 process envelope 质量写回。B-007 已修：缺 raw 拒绝并写 complete=false，旧身份与写入失败保全旧表。
+- 新设备安装不覆盖CUDA torch；本机251项全量、Ruff、55文件mypy、固定36格CPU token/AR/接受/KV轨迹、Windows双导入与新version smoke、新设备三variant CUDA tiny、wheel/sdist真实全链均通过。模板与随机tiny不替代真实模型质量；正式证据在 smoke/v031_validation.json 与报告。
+- C-004 在当前main同一v0.3.1的两步Toy/Stub新Run复现并备份前后result，已提交 [Issue #36](https://github.com/DreamSoul-AI/RPipe/issues/36)。未改上游代码或权限。
+- input_mask_baseline 新version为input-mask-baseline-v031-win5090-20261014-v2，四Run已make，succeeded=0/failed=0/pending=4。Study/default ModelScope离线核验均CacheNotFound E1022；等待Qwen3-0.6B snapshot路径。资源inventory不等于校准，真实四格尚未launch，研究质量未通过。
+
+接手先读取当前工作树、远端/CI与 [四格PLAN](../studies/input_mask_baseline/docs/PLAN.md) / [前检](../studies/input_mask_baseline/docs/v031_device_preflight.json)。权重可取得后只核对原配方并串行校准/执行四格，不能以其他规模模型或Tiny替代。PLAN已经进入锁；任何来源/输入调整先明确变更与新version，不对旧成功Run重新make。原始工程日志/raw在本机.tmp/v031-20261014，clone只有正式摘要；历史下面49dec9c段保留当时状态。
+
+## 49dec9c 原交接（2026-10-14）
 
 本次按用户要求先提交推送检查点，然后在另一设备接续。研究验收未完成，不能将本记录当作整体通过。接手先检查实际工作区、HEAD、远端和本机环境，保留已有修改，不切回默认分支旧设计。
 

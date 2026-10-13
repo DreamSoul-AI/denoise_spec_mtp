@@ -13,8 +13,9 @@ import platform
 import shutil
 import subprocess
 import sys
-import tempfile
 import time
+
+import yaml
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,38 +56,59 @@ def run_case(name, first, timeout):
     return out
 
 
-def run_smoke(timeout):
-    env = dict(os.environ, PYTHONUTF8='1')
-    with tempfile.TemporaryDirectory() as tmp:
-        dest = Path(tmp) / 'smoke'
-        shutil.copytree(ROOT / 'studies' / 'smoke', dest,
-                        ignore=shutil.ignore_patterns('runs', 'shared', 'scripts', '__pycache__'))
+def run_smoke(timeout, output_dir):
+    env = dict(os.environ, PYTHONUTF8='1', MPLBACKEND='Agg', OMP_NUM_THREADS='1', MKL_NUM_THREADS='1')
+    identity = f'windows-v031-{time.time_ns()}-{os.getpid()}'
+    dest = output_dir / identity
+    shutil.copytree(ROOT / 'studies' / 'smoke', dest,
+                    ignore=shutil.ignore_patterns('runs', 'shared', 'scripts', 'docs', 'index.json',
+                        'process.json', 'provenance.json', 'spec_mtp_*.json', 'activity.json', '__pycache__'))
+    declared = yaml.safe_load((dest / 'study.yaml').read_text(encoding='utf-8'))
+    declared['study'] = identity
+    declared['fixed']['algorithm']['config']['version'] = identity
+    declared['freeze'] = True
+    (dest / 'study.yaml').write_text(yaml.safe_dump(declared, sort_keys=False), encoding='utf-8')
+    start = time.monotonic()
+    commands = []
+    for verb, options in [('make', ['--num-gpus', '0', '--round', '1']),
+                          ('launch', ['--num-gpus', '0', '--console', 'shared']),
+                          ('process', []), ('report', [])]:
+        argv = [sys.executable, '-m', 'spec_mtp', verb, str(dest), *options]
         try:
-            proc = subprocess.run([sys.executable, '-m', 'spec_mtp', 'run', str(dest)], env=env,
-                                  capture_output=True, text=True, timeout=timeout, cwd=ROOT)
+            proc = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=timeout, cwd=ROOT)
         except subprocess.TimeoutExpired:
-            return {'case': 'smoke', 'ok': False, 'error': f'timeout {timeout}s'}
-        return {'case': 'smoke', 'ok': proc.returncode == 0, 'returncode': proc.returncode,
-                **({} if proc.returncode == 0 else {'error': (proc.stderr or proc.stdout)[-1500:]})}
+            return {'case': 'smoke', 'ok': False, 'error': f'{verb} timeout {timeout}s', 'study': str(dest)}
+        (dest / f'{verb}.stdout.log').write_text(proc.stdout, encoding='utf-8')
+        (dest / f'{verb}.stderr.log').write_text(proc.stderr, encoding='utf-8')
+        commands.append({'argv': argv, 'returncode': proc.returncode})
+        if proc.returncode:
+            return {'case': 'smoke', 'ok': False, 'returncode': proc.returncode, 'commands': commands,
+                    'study': str(dest), 'error': (proc.stderr or proc.stdout)[-1500:]}
+    body = json.loads((dest / 'process.json').read_text(encoding='utf-8'))
+    complete = body.get('complete') is True and body.get('spec_mtp', {}).get('passed') is True
+    return {'case': 'smoke', 'ok': complete, 'seconds': time.monotonic() - start,
+            'study': str(dest), 'complete': complete, 'commands': commands}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     parser.add_argument('--smoke', action='store_true', help='also run studies/smoke')
     parser.add_argument('--timeout', type=int, default=300)
-    parser.add_argument('--out', default='windows_selfcheck.json')
+    parser.add_argument('--out', default='.tmp/windows_selfcheck.json')
     args = parser.parse_args()
     print(f'python {sys.version.split()[0]} on {platform.platform()} ({sys.platform})')
+    output_path = Path(args.out).resolve()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     results = [run_case('spec_mtp-first', 'spec_mtp', args.timeout),
                run_case('rpipe-first', 'rpipe', args.timeout)]
     if args.smoke:
-        results.append(run_smoke(args.timeout * 4))
+        results.append(run_smoke(args.timeout * 4, output_path.parent))
     for r in results:
         status = 'ok  ' if r['ok'] else 'FAIL'
         extra = (f"torch={r.get('torch')} numpy={r.get('numpy')}"
                  if r['ok'] and 'torch' in r else (r.get('error', '').strip().splitlines() or [''])[-1])
         print(f'{status} {r["case"]:<20} {extra}')
-    Path(args.out).write_text(json.dumps({'platform': platform.platform(), 'python': sys.version,
+    output_path.write_text(json.dumps({'platform': platform.platform(), 'python': sys.version,
                                           'results': results}, indent=2), encoding='utf-8')
     print(f'wrote {args.out}')
     return 0 if all(r['ok'] for r in results) else 1

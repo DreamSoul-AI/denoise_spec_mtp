@@ -29,3 +29,9 @@ knowledge 固定 09078015ad8c80971ac4abd5b5ad2e322cd0e1a1：完整读取 researc
 文献提供基线范围；数据使用本仓库固定 SpecBench 文件的 q171、translation 单 prompt，不进入原 first/next/last 的前 10 条/类，避免重复正式数字格子。模型沿用 Qwen3-0.6B float32/eager/非 thinking 配方，不更新权重。算法复用 named mask 的原 static [14]、一 mask、BC30、β/λ/γ，不实现输出空间新方法。主门为 exact-match=1 与完整证据，accepted/各深度、new_tokens/committed/τ 分开；AR 与 alignment 的指标语义单独报告。实验为四个固定 case × seed123 的串行前置门，无选参、无多重比较或总体显著性主张。
 
 100-token/EOS/T=0 沿用既有真实模型协议。每格对应一个 Run，先核对完整 config 和来源，再运行；任一门失败保留反例并停止扩大。alignment 四个 hindsight 步只验接口和计数，不以单样本复现 ESP Figure 2。资源先串行测量，不并行性能排名；大规模矩阵和解码恢复另需计划与授权。细节与结果留在该 Study。
+
+## 2026-10-14 v0.3.1 接续读取范围
+
+当前执行副本升级到固定 7a15c46；本轮审阅该提交 README 的源码模板/Study/CI 指南、concept/layout/code、structure 的 artifact/readout 合同、flow 的阶段扩展/冻结/报告合同、research/feedback、测试入口和 v0.3.1 发布变化，核对 report.py、原子 IO、Runner 和 provenance 实际代码。既有文献事实沿交接的阅读范围，未重新检索其余论文或宣称再做完整综述；宏观 v6 定向核对 §5.11、H1–H13、E1–E2 与附录 C 的已测/待测边界。
+
+knowledge 固定 09078015，本轮读取 research-plan 与 pytorch-project SKILL.md，中文研究计划指南的六方面/模板及 PyTorch guide 的环境、tensor、评价/权重章节；仅作为参考，不安装或执行未列工具。Study 问题和四格科学配方保留，仅升级执行来源和独立 Run version。当前设备暂无 Qwen3-0.6B snapshot，未产生新的真实接受数或支持任何 H1–H13 的证据。

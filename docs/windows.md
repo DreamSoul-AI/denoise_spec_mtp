@@ -11,3 +11,5 @@ set PYTHONUTF8=1
 python tools\windows_selfcheck.py
 python tools\windows_selfcheck.py --smoke
 ```
+
+2026-10-14 新设备使用 Python3.13.9、CUDA torch2.11.0+cu130、NumPy2.4.4。当前 selfcheck 保留双入口导入结果；--smoke 先以新 version 显式 make，再 launch/process/report，保存原始日志，不从旧成功 Run 重签来源。wheel/sdist 通过不表示另一设备或所有 HF 场景已通过。

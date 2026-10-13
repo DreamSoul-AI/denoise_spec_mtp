@@ -52,7 +52,7 @@ line-length = 120
 select = ["F", "E9"]
 
 [tool.ruff.lint.per-file-ignores]
-# RPipe v0.3.0 public facades intentionally reexport these imports; keep upstream bytes.
+# RPipe v0.3.1 public facades intentionally reexport these imports; keep upstream bytes.
 "src/rpipe/structure/api/algorithm_api.py" = ["F401"]
 "src/rpipe/structure/api/data_api.py" = ["F401"]
 "src/rpipe/structure/api/model_api.py" = ["F401"]

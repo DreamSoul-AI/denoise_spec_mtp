@@ -82,9 +82,14 @@ def main(argv: list[str] | None = None) -> int:
             check_rpipe(study, declared)
             if _command(argv) == 'report':
                 from rpipe.flow.context import StudyProcessContext
+                from rpipe.structure.artifact.readout.report import render_numbers
+                from rpipe.structure.artifact.result import load_result
                 from spec_mtp.flow.process.run import study_gate
 
-                study_gate(StudyProcessContext(study))
+                # Reject stale identity before the quality gate can update the envelope.
+                render_numbers(study)
+                context = StudyProcessContext(study, state={'process': load_result(study / 'process.json')})
+                study_gate(context)
     from rpipe.flow.cli import main as rpipe_main
 
     return int(rpipe_main(argv) or 0)

@@ -26,3 +26,4 @@ studies/**/provenance.json
 studies/**/activity.json
 studies/**/spec_mtp_sources.json
 studies/**/spec_mtp_study_check.json
+studies/**/docs/*.tmp

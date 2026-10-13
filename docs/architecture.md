@@ -114,3 +114,7 @@ history-extrapolation 和论文设置（长上下文、100/256 new tokens）碰�
 - 不改变 decoder 的采样、mask、树、cache、EOS 或预算语义。增加观测不构成新论文实现；历史接受数保留原日期和来源。
 
 此次需触及 recipe/CLI、专项来源与证据、Algorithm 适配、Study collect/summarize/write/process、对应测试与使用文档；不恢复已删除 runner，不实现研究草案。
+
+## v0.3.1 report 身份与质量共存（2026-10-14）
+
+当前执行库固定 7a15c46，report 使用上游当前 index/process 的 Study、Run ID、seed、factors 身份门与原子 NUMBERS 写入。专项入口先只读校验身份，再将真实 process envelope 传入 Study gate；证据/来源/完整性失败同步 complete=false，并保留旧数字表。上游合法部分聚合可 readout，本项目研究 report 仍要求完整矩阵与专项质量通过，不放宽 exact-match。解码和全部科学配方不变；已完成的 v0.3.0 数字仍绑定原来源。

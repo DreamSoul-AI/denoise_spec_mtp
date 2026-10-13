@@ -6,7 +6,7 @@
 
 ## 二、因素与固定条件
 
-四 Experiment 的轴为完整 algorithm.config 补丁：ESP frozen_mean、ESP gamma_last、AR、alignment frozen_mean；基底保留共同 eval 与 version，每 case × seeds=[123] 为四个 Run。make 后核对父 config 的递归合并，避免丢失共同预算。新 version=input-mask-baseline-20261014-v1。
+四 Experiment 的轴为完整 algorithm.config 补丁：ESP frozen_mean、ESP gamma_last、AR、alignment frozen_mean；基底保留共同 eval 与 version，每 case × seeds=[123] 为四个 Run。make 后核对父 config 的递归合并，避免丢失共同预算。新 version=input-mask-baseline-v031-win5090-20261014-v2。
 
 - 数据：本仓库 datasets/spec_bench/question.jsonl，translation skip=10/take=1，q171；第一回合、Qwen 非 thinking 聊天模板、max_prompt_len=2048。独立单位为一 prompt，未用于选参，不重跑历史前 10 条/类的正式格子。
 - 模型：Qwen3-0.6B，使用既有 ModelScope 缓存；cache 首次准备到 shared/model/modelscope。local_files_only=true，不下载或替换 snapshot。实际权重/tokenizer/config 哈希由构造/执行与终验锁定；master 不是固定 revision，不能宣称已核对远端版本。
@@ -16,7 +16,7 @@
 
 ## 三、来源、阶段与成功条件
 
-执行库固定 804b3823，唯一 Python 例外为 Windows torch-first；完整 ORIGIN/许可证保留。Study 的两份声明/recipe/阶段 Python 与 PLAN 显式进入 provenance，专项 manifest 补齐 src/spec_mtp；数据、模型/tokenizer、输入、配置和运行条件进入 raw 证据。文件新增/删除/修改与终验漂移必须拒绝。源码/输入变更先换 version，再 make/remake，不能签收旧成功 Run。
+执行库固定 v0.3.1 / 7a15c46，唯一 Python 例外为 Windows torch-first；完整 ORIGIN/许可证保留。Study 的两份声明/recipe/阶段 Python 与 PLAN 显式进入 provenance，专项 manifest 补齐 src/spec_mtp；数据、模型/tokenizer、输入、配置和运行条件进入 raw 证据。文件新增/删除/修改与终验漂移必须拒绝。源码/输入变更先换 version，再 make/remake，不能签收旧成功 Run。
 
 默认 prepare 构造输入与模型，execute 调用原 Algorithm；collect 写 CSV/Tracker，summarize/write 拒绝失配后才由库定稿，process 的 Study scope 只终验当前四个 case×seed。所有 Run succeeded、ESP exact_match_rate=1、来源一致且 complete/专项质量同时通过，才称前置门通过。AR 需真实 output/summary，alignment 需真实 sums/counts；二者不伪造投机 exact-match 指标。
 
@@ -45,3 +45,9 @@ python -m spec_mtp report studies/input_mask_baseline
 ## 五、报告与边界
 
 结果、原始输出与图保留在本 Study，报告区分执行完成、流程质量与研究假设支持；n=1 前置门不证明接受率提升、跨域泛化或论文复现。raw runs/shared/.tmp 仅本机，正式精选 JSON/图/报告随 Git。旧失败和历史数字不改写。
+
+## 六、2026-10-14 新设备执行准备
+
+v0.3.1 升级及下游 report 质量写回修复改变源码来源，采用新 version / Run ID；原 v1 无真实成功格子，不复用历史正式输入空间格子。Qwen3-0.6B、q171、float32/eager/CUDA、seed123、100-token、EOS、mask 配方与四 case 不变。设备为 RTX 5090 D v2，torch 2.11.0+cu130、CUDA13、Transformers5.12.1。资源清单不等于真实模型串行校准。
+
+检查本项目缓存、用户 ModelScope 默认缓存及常见 Hugging Face 缓存，未找到计划所需 Qwen3-0.6B snapshot。不同规模 Qwen 或图像模型不替代本模型；local_files_only=true 保持。先完成无权重展开与明确离线缺资源核验，不 launch 真实 Run，不补造 token、接受数或峰值。提供原 snapshot 后，先复核来源/模型文件，再串行校准并按当前 PLAN 执行四格；若需要下载新 snapshot，须明确实际来源与原缓存协议的差异，不能悄然替换。

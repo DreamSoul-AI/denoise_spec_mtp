@@ -100,3 +100,21 @@ PR #4 的首轮 Actions 38367588147 在 CPU 依赖提取脚本失败（tomllib.l
 运行时工作树尚未提交，源码指纹 893ba3aff98171dc（55 文件）。完整 tiny JSON 与原生 Run/log 在本机 .tmp/rpipe-goal-20261014，不随 clone 提供；入库参考 tiny_decode_reference.json 可用于异机逐项比较。改名后 editable import 已核验指向新 checkout，不改历史原始证据里的执行路径。当前真实模型 Study 仅完成计划、展开检查和既有 ModelScope 缓存的离线解析，尚未 make/launch。本轮没有安装分发包全链、GPU/恢复/并行或大矩阵验收，前面历史验收不能替代它们。v0.3.1 只完成固定标签和实际源码/文档差异核对，尚未升级副本。
 
 目录迁移和交接文档完成后再次执行全量 pytest，239 passed / 0 skipped（111.25 秒）；Ruff、55 文件 mypy、editable 导入、模块/console CLI 和 Git 连通性检查通过。该复验使用独立 basetemp，不重复正式模型 Run。
+
+## 九、v0.3.1 当前 Windows 设备验收（2026-10-14）
+
+固定执行来源 7a15c46，完整 101 文件副本只保留 Windows torch-first 例外和 MIT。当前设备为 RTX5090D v2 / Windows11 / Python3.13.9 / torch2.11.0+cu130 / CUDA13 / Transformers5.12.1，CUDA torch 未替换。依赖补齐 Hypothesis、固定 Ruff/mypy/types-PyYAML 与 kornia/kornia_rs；不是旧设备数字的重记。
+
+[当前验收 JSON](v031_validation.json) 给出来源指纹与条件。36 格 CPU tiny 的 token、AR token、所有深度接受/预算、逐步 KV 轨迹严格等于入库旧链，digest 为 12a8ce5363f1118a2dc651805c24b95682e759e5204349c90455a4dcef903493。它是随机 tiny 数值回归，不是真实 Qwen 研究质量。
+
+report 新门最初复验为 250 passed / 1 failed：发现缺 raw 后 report 拒绝但旧 process.complete=true。先改设计，再让只读身份核验先于专项写回，46 项针对性通过；原子写失败与旧身份拒绝保全原 NUMBERS，缺 raw 写 complete=false，解码不变。随后全量249 passed，新增工具尚缺导航/用法两项失败，已补齐，最终状态在本节补记。首轮依赖缺失和所有失败日志保留。
+
+Windows 双导入顺序均通过，新 version 的 make→launch→process→report 三 variant tiny 完整 gate 通过。第一次 selfcheck 的 freeze 缺锁拒绝保留；工具已改为先显式 make，未放宽来源门。新工具保留 raw，而非销毁临时 Run。
+
+wheel 与 sdist 各自在源码外目录安装到独立 target，导入确认来自 installed，不取 editable src；ORIGIN/LICENSE、rpipe/spec_mtp 模块与两个 console 入口通过。各自四 Run Toy/Stub train/eval × seeds0/1，以及三 Run SpecMTP tiny 实际 make/launch/process/status/logs/report 和重复 launch 字节保全通过，共14 Run。共享本机依赖，不声称从零依赖环境或真实权重验收。运行命令见 testing 与 tools/package_selfcheck.py。
+
+原始命令/stdout/stderr、index/process/result 在本机 .tmp/v031-20261014，路径为文本说明，不随 clone；正式摘要随 Git。模板/Tiny 的预算、single seed 和相应运行时长见原始 validation.json，每条命令记录 wall；没有性能排名或伪造科学重复。新真实四格与串行模型资源校准因缺0.6B snapshot 未执行，见对应 PLAN/report。C-004 新 Toy 复现已反馈 Issue #36，不改变上游 Runner。
+
+最终本机全量回归 251 passed / 0 failed / 0 errors / 0 skipped，131.71秒；Ruff0.17.0、mypy2.4.0（55 源文件）通过。两项工具导航问题均修复，未放宽任何数值/证据门。文档、中文编码、Git diff 格式与产物忽略检查通过。完整工程门不代替未执行的真实四格。
+
+当前设备又用 v031-win5090-cuda-tiny-20261014-v1 / round1 串行验证随机 tiny 的三个 variant：make→launch→process→report 全通过，各自同GPU AR逐token exact-match=1、来源/原始证据与Study完整性门通过。Run ID为293b3842490db338、a3d4ba109c68aca1、cf7821d233f3e167（variant映射及原metrics见JSON）。float32/eager、4固定synthetic prompts、seed123、32-token、EOS关闭；不是q171/真实Qwen格子，不代表真实模型显存或速度校准，不比较CPU与GPU性能。raw保留于本机.tmp/v031-20261014/cuda-tiny-01。

@@ -1,6 +1,6 @@
 # 问题与兼容性记录
 
-## 2026-10-14
+## 2026-10-14 交接前记录
 
 - v0.3.1 接入待验：发布固定为 7a15c46b75c5eb951cccd60ed7b9fc3463db90f5；B-030 修复旧 process 与新 index 身份不一致时仍 report 成功，以及 NUMBERS 写入保全。当前专项 report 已先执行 Study 终验，升级时须复用上游身份/原子写入门并回归专项拒绝路径；不能用上游发布结果代替本项目验收。执行副本尚未更新，C-004/C-005 等边界未据此关闭。
 - 本轮数据/API/阶段职责迁移及 ModelScope 离线参数传递的针对性与全量回归通过。详细验证和迁移过程的失败留 [smoke 报告](../studies/smoke/docs/STUDY_REPORT.md#八职责重构检查点2026-10-14)。
@@ -26,3 +26,15 @@
 Study 文档适配边界 C-006：固定上游 Study 指南的 learning curve、训练 resume 与 torchvision data 命令服务于训练案例；本项目为 training-free 解码。报告保留真实接受数/轨迹图和来源，不添加训练曲线、KV/mask/RNG 恢复承诺或额外下载入口。模板与 smoke 计划/报告按此合同核对，未修改上游。
 
 上述 C 项描述固定上游与本项目的边界，不是对 RPipe 上游的修改请求。正式数字与验证范围见 [smoke 报告](../studies/smoke/docs/STUDY_REPORT.md)。
+
+## v0.3.1 当前设备检查（2026-10-14）
+
+完整副本已升级到固定 7a15c46，101 文件仅 Windows torch-first 本地例外，MIT 保留。首轮 pytest 因新设备缺 Hypothesis 停在收集；补齐后 250 passed / 1 failed，新增 report 共存检查发现专项入口在质量拒绝后未更新旧 process.complete（B-007，下游问题）。已先更新设计，再让上游只读身份校验先于专项终验，并传入真实 process envelope；针对性 46 项已通过；最终全量回归另见当前 smoke 验收。旧身份拒绝和原子写失败保全旧 NUMBERS，不更改 vendor Runner 或科学配方。
+
+C-004 已在新隔离 Toy/Stub 单 Run、两步 CPU、v0.3.1（当前 main 也是同一 7a15c46）复现：先成功，再给 Study YAML 添加无语义注释以触发 freeze 拒绝，native run-one 退出 1，但相同 ID 的 result 从 succeeded 覆盖为 failed，前后 SHA256 不同。拒绝发生在计算前，原日志和 raw 未清理；本轮保存了 result.before/after。专项 CLI 的预检保全仍通过。属于通用证据保全改进，Runner 当前文档允许 failed 回写，不将其描述成未文档化的算法缺陷。Issue 去重完成（open/closed Issues 空；PR #29/#33 的恢复/报告修复未处理此入口），待反馈真实 URL。
+
+C-004 已反馈：[RPipe Issue #36](https://github.com/DreamSoul-AI/RPipe/issues/36)，2026-10-14 实际创建。只提交合成 Toy/Stub 配方、公开 commit 与脱敏现象，未提交本地路径、私有资料、数据/权重、凭据，未修改上游代码或权限。
+
+C-007 / readout 显示边界：四格实际 config 与 jobs 均为 eval，但 pending Run 的 status mode 显示 train。v0.3.1 的 _mode 仅从轴或已落 result.control 读取，未成功 Run 又没有 algorithm.mode 轴时回退 train；这不改变真实调度的 mode。当前设备尚缺真实权重，不能从该显示推断训练发生；专项未修补 vendor。
+
+B-007 当前设备最终 251 项全量通过，新增 report 字节保全/质量写回检查通过。Windows 工具初次 freeze 缺锁拒绝与工具导航两项失败均保留，修正为显式 make 和登记用法后通过。当前未解除的真实模型限制是 Qwen3-0.6B cache 缺失；不是 CUDA 不可用。

@@ -9,7 +9,7 @@ Training-free multi-token prediction:
 
 Agent notes: [AGENTS.md](AGENTS.md). Layout and the SpecMTP `origin` / shared rule: [docs/layout.md](docs/layout.md). Decode / paper mismatches: [docs/architecture.md](docs/architecture.md). Structure mapping: [docs/rpipe-migration.md](docs/rpipe-migration.md). How to run a Study: [studies/README.md](studies/README.md). Recorded accepts: [docs/history-extrapolation.md](docs/history-extrapolation.md).
 
-`src/rpipe/` is a file copy of `diaoenmao/RPipe` `main` at `804b3823ab6d2af46cbda1a65688ca8b76c60b22` (v0.3.0). SpecMTP registers onto that copy through a Study recipe.
+`src/rpipe/` is a file copy of `diaoenmao/RPipe` `main` at `7a15c46b75c5eb951cccd60ed7b9fc3463db90f5` (v0.3.1). SpecMTP registers onto that copy through a Study recipe.
 
 ## Quick start
 
@@ -34,4 +34,6 @@ Repository: [DreamSoul-AI/denoising-speculative-decoding](https://github.com/Dre
 
 Research-to-Study extraction: [protocol](docs/research/rpipe-study-extraction.md), with the real-model [input-mask baseline](studies/input_mask_baseline/README.md). This prerequisite does not implement or validate the output-space / Kalman hypotheses.
 
-Current checkpoint and the v0.3.1 migration queue: [handover](docs/handover.md). The execution copy remains v0.3.0 until the documented upgrade and regression pass.
+Current checkpoint, validation and remaining real-model prerequisite: [handover](docs/handover.md). The execution copy is fixed at v0.3.1; current-device acceptance is tracked in the handover and Study reports.
+
+Current-device v0.3.1 checks: [smoke acceptance](studies/smoke/docs/STUDY_REPORT.md) and [validation](studies/smoke/docs/v031_validation.json). Real-model input-mask Runs are planned but pending a Qwen3-0.6B cache; see the [report](studies/input_mask_baseline/docs/STUDY_REPORT.md).

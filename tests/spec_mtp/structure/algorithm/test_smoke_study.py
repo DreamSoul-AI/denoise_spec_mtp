@@ -200,3 +200,26 @@ def test_source_preflight_preserves_existing_result(study_copy):
         proc = cli(command, study, *([run_id] if command == 'run-one' else []))
         assert proc.returncode != 0 and 'sources changed' in proc.stderr
         assert result.read_bytes() == original
+
+
+def test_nested_config_axis_validates_effective_factors_and_rejects_subsets(study_copy):
+    def patch(study):
+        study['axes'] = {'algorithm.config': [
+            {'task': 'esp_mtp', 'mask': 'frozen_mean'},
+            {'task': 'esp_mtp', 'mask': 'gamma_last'},
+        ]}
+    study = study_copy(patch, name='nested_config_axis')
+    cli('make', study, '--num-gpus', '0', check=True)
+    cli('launch', study, '--num-gpus', '0', '--console', 'shared', check=True)
+    cli('report', study, check=True)
+    process = json.loads((study / 'process.json').read_text())
+    assert process['complete'] and process['spec_mtp']['expected_factors_match']
+    index = json.loads((study / 'index.json').read_text())
+    assert all('eval' in exp['factors']['algorithm.config'] for exp in index['experiments'])
+    previous = (study / 'docs/NUMBERS.md').read_bytes()
+    index['experiments'] = index['experiments'][:1]
+    (study / 'index.json').write_text(json.dumps(index))
+    result = cli('process', study)
+    assert result.returncode != 0 and 'incomplete' in result.stdout + result.stderr
+    result = cli('report', study)
+    assert result.returncode != 0 and (study / 'docs/NUMBERS.md').read_bytes() == previous

@@ -44,3 +44,11 @@ C-007 最小复现补充：固定v0.3.1，两步Toy/Stub声明但不launch，仅
 缓存范围补查：未发现MODELSCOPE_CACHE/HF_HOME/HF_HUB_CACHE/TRANSFORMERS_CACHE有效覆盖；D盘模型目录只有Qwen3-4B和8B，不替代计划中的0.6B。不能据此断言所有磁盘位置都不存在权重，仍需实际缓存路径。
 
 C-007 已完成真实CLI过滤复验，三命令均exit0，未改index/config/jobs字节；已公开反馈 [RPipe Issue #37](https://github.com/DreamSoul-AI/RPipe/issues/37)。反馈仅合成Toy/Stub声明与公开commit，未提交内部路径、真实权重或资料；保留vendor，不擅改四格轴来绕过显示问题。
+
+B-008 / 下游Study完整性：v3 Qwen3-0.6B四Run全部succeeded，ESP各exact_match=1、source/evidence门通过，Study却incomplete。原因是原declared_factors比较轴补丁，上游index保存合并后配置；algorithm.config嵌套轴的version/eval/继承字段使expected_factors_match=false。先改设计，待复验有效因素推导，不放宽门；v3 artifacts已保留。
+
+B-008回归过程：嵌套轴CPU make/launch/process/report与子集拒绝用例通过；一条新增单元用例错误假定whole mapping轴会递归保留Study fixed里的version。实际expand_patches.set_dotted先用整个轴值覆盖该fixed子树，再与基底合并，因此期望应为base-v1。已核对接口并纠正用例，未修改上游或科学配方；首轮full在已采集该错误用例后中止并保存日志。当前真实四格version在基底，未受该覆盖边界影响。
+
+B-008最终来源验证首轮full为253 passed/1 failed，唯一失败为test_recipe复制Study时笼统排除所有JSON，漏带新增provenance.include的正式snapshot/校准JSON。已改为只排除明确的生成artifact，保留正式来源材料，不取消provenance冻结或改路径匹配；fixture与源码门分别复验。
+
+B-008实际v4终验通过：四Run succeeded、expected_factors_match=true、seed/source/evidence/complete/passed均真。嵌套轴CPU端到端/子集拒绝、真实q171新身份四格和v3-v4原始数值对照均通过。旧v3结果/失败不重签。ModelScope master revision未确认警告保留，实际模型与文件digest锁定；原缓存缺失条件由用户授权的显式下载解决。

@@ -118,3 +118,9 @@ wheel 与 sdist 各自在源码外目录安装到独立 target，导入确认来
 最终本机全量回归 251 passed / 0 failed / 0 errors / 0 skipped，131.71秒；Ruff0.17.0、mypy2.4.0（55 源文件）通过。两项工具导航问题均修复，未放宽任何数值/证据门。文档、中文编码、Git diff 格式与产物忽略检查通过。完整工程门不代替未执行的真实四格。
 
 当前设备又用 v031-win5090-cuda-tiny-20261014-v1 / round1 串行验证随机 tiny 的三个 variant：make→launch→process→report 全通过，各自同GPU AR逐token exact-match=1、来源/原始证据与Study完整性门通过。Run ID为293b3842490db338、a3d4ba109c68aca1、cf7821d233f3e167（variant映射及原metrics见JSON）。float32/eager、4固定synthetic prompts、seed123、32-token、EOS关闭；不是q171/真实Qwen格子，不代表真实模型显存或速度校准，不比较CPU与GPU性能。raw保留于本机.tmp/v031-20261014/cuda-tiny-01。
+
+## 十、ModelScope四格与B-008最终回归（2026-10-14）
+
+最终源码digest ff2212ccbccb0e4e，254项全量通过（177.46秒，0 failed/errors/skipped）；Ruff0.17.0、55文件mypy2.4.0通过。36格tiny完整token/AR/接受/KV严格等值，沿用原参考digest。wheel/sdist在源码外独立target的41条真实CLI命令全部通过，8原生模板Run与6专项tiny Run，不声称全新依赖环境。新证据追加在 [v031_validation.json](v031_validation.json) 的b008_modelscope_followup，不覆盖初轮251项来源。
+
+B-008修复只复用原生声明/基底的有效合并与分组，新增真实嵌套轴完整/子集拒绝回归；算法、Data、Model未改。首次253通过/1失败是复制fixture排除了正式来源JSON，已按生成文件名修正，最终全量通过。真实四格ModelScope/Qwen3-0.6B的v4质量门通过，见 [前置报告](../../input_mask_baseline/docs/STUDY_REPORT.md)，n=1不能用于宏观/方法优势结论。原始失败和v3终验拒绝均保留。

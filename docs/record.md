@@ -42,3 +42,11 @@ C-004全新Toy/Stub最小复现、公开Issue/PR去重及脱敏完成，实际�
 接续补查：缓存环境覆盖为空，本机D盘模型目录只有4B/8B。四个0.6B Run仍无result，未launch；不把缓存目录未知写成整个设备绝对不存在权重。核对当前源码digest、251项JUnit、41条包验收命令、CUDA raw源码身份及Data/Model/Algorithm与交接的空diff，工程证据保持成立。CUDA实测发生在49dec9c的未提交树，源digest8573dfa6b73d44fb已与当前实现核对相同。
 
 C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eval而pending读数train，eval过滤0条；readout保持文件哈希。已按授权去重脱敏反馈 [Issue #37](https://github.com/DreamSoul-AI/RPipe/issues/37)。源码未改；仅补充兼容事实、正式精选证据及本地交接，不重新运行已通过的工程批次。
+
+## 2026-10-14 ModelScope四格与B-008纠错
+
+用户要求ModelScope下载并继续工作后，在Study shared准备新0.6B缓存，记录实际文件哈希和加载/解码资源，保留CUDA torch及全部科学配方。v3四Run成功，但整轮因素门误拒绝；先设计、红例，再从声明/基底复用Rpipe有效合并分组修复B-008，不信任当前index作为期望，不放宽子集/seed/source/evidence门。新的v4四Run/Study全部通过，v3-v4原始token/AR/接受/KV和alignment数值相等；AR计时误比较仅修对照脚本，所有失败保留。正式事实在四格报告/JSON/图，不重复长矩阵。
+
+新增来源JSON使复制fixture的*.json排除过宽，最终首轮253 passed/1 failed；已只排除生成artifact，声明3用例复验通过。36格tiny等值，最终源码wheel/sdist全链通过，Ruff/mypy通过；最终全量单独保存，未把Toy/Stub或旧批次算真实模型质量。
+
+最终本机全量254 passed（177.46秒，0 failed/errors/skipped），Ruff/mypy、36格严格数值、wheel/sdist 41命令全部通过。正式证据追加smoke/v031_validation.json，不覆盖历史来源；真实v4 complete/passed=true，v3拒绝保留。

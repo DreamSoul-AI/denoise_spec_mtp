@@ -26,7 +26,7 @@ algorithm:
   mode: eval
   source: spec_mtp
   config:
-    version: input-mask-baseline-v031-win5090-20261014-v2
+    version: input-mask-baseline-v031-ms-20261014-v4
     task: esp_mtp
     mask: frozen_mean
     eval:

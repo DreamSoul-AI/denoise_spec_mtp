@@ -42,3 +42,9 @@ prepare 读 make 产生的完整 config、来源锁和输入，recipe 构造 Dat
 配置与阶段输入输出不变；新来源需新 version 和 Run ID。先验证 import、离线模板六阶段、专项 tiny 数值/来源/证据失败门，再验证 wheel/sdist 源码外安装、Windows 和原计划真实四格。CUDA torch 保留，真实四格先串行校准，不更改配方或扩大矩阵。C-004 另做新隔离复现，不在 vendor 中修改 Runner。
 
 report 共存回归发现专项 CLI 用空 StudyProcessContext 复验，缺 raw 时虽然拒绝 report，旧 process.complete 仍为 true。修正为先用上游 render_numbers 只读核对当前计划身份，再加载已核对的 process 到上下文，最后执行专项 Study gate；失败写 complete=false，成功继续调用原 report 原子导出。旧身份拒绝发生在专项写回之前，保持旧 process/NUMBERS。解码与指标不变。
+
+## B-008 有效因素终验设计（2026-10-14）
+
+v3四个真实Run成功，但Study expected_factors_match=false：上游index的factors是合并后的有效Run取值，原专项把它与cartesian轴补丁比较。含嵌套algorithm.config轴时，version/eval与继承mask在index存在而补丁不含这些字段。不是数值或上游执行失败。
+
+修复从冻结experiment_config.yaml与study声明独立推导期望：复用上游expand_patches、experiment_config_from_mapping/run_config_from_merge及experiment_entries分组；不读取当前index/result作为期望，不改配置、轴、阈值或科学Algorithm。Study hook传入实际基底；已有单参declared_factors保留仅轴展开兼容。子集、继承固定字段被篡改、seed或来源失败仍拒绝。先用嵌套轴CPU真实CLI做红/绿回归。v3 raw/index/process/失败保留，不重签成功Run；源码变化后以新version v4复验同四case，这是失败整轮的纠错验收，不重跑历史正式矩阵。

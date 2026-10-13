@@ -273,5 +273,47 @@
     ],
     "readout_input_hashes_unchanged": true
   },
-  "pending_readout_issue": "https://github.com/DreamSoul-AI/RPipe/issues/37"
+  "pending_readout_issue": "https://github.com/DreamSoul-AI/RPipe/issues/37",
+  "b008_modelscope_followup": {
+    "date": "2026-10-14",
+    "source_digest": "ff2212ccbccb0e4e",
+    "scope": "B-008 effective factors fix and ModelScope v4 prerequisite; original v031 evidence retained",
+    "full_pytest": {
+      "tests": "254",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "177.452"
+    },
+    "ruff": {
+      "version": "0.17.0",
+      "passed": true
+    },
+    "mypy": {
+      "version": "2.4.0",
+      "files": 55,
+      "passed": true
+    },
+    "tiny": {
+      "cells": 36,
+      "strictly_equal_to_archived_reference": true,
+      "sha256": "12a8ce5363f1118a2dc651805c24b95682e759e5204349c90455a4dcef903493"
+    },
+    "package": {
+      "passed": true,
+      "commands": 41,
+      "wheel_and_sdist": true,
+      "independent_target_imports": true,
+      "native_template_runs": 8,
+      "spec_mtp_tiny_runs": 6,
+      "deps_reused_not_clean_environment": true
+    },
+    "real_study": {
+      "evidence": "../../input_mask_baseline/docs/v4_execution.json",
+      "execution_completed": true,
+      "quality_passed": true,
+      "cases": 4
+    },
+    "local_raw": "checkout .tmp/input-mask-ms-20261014; not included in Git"
+  }
 }

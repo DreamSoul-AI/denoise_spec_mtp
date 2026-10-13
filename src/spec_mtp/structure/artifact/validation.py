@@ -62,13 +62,30 @@ def _overall_any(assets: Path) -> Path | None:
     path = assets / 'summary.csv'
     return path if path.is_file() else None
 
-def declared_factors(study: dict[str, Any]) -> list[dict[str, Any]]:
-    """Cartesian product of ``study.yaml`` axes: the Experiments a complete index must list."""
+def declared_factors(study: dict[str, Any], base_config: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    """Expected Experiment factors from declarations, never from the current index.
+
+    With a base, reproduce RPipe's effective merge/group contract. The one-arg
+    compatibility form exposes raw axes only; Study verification always supplies
+    its base so inherited fields inside mapping-valued axes are checked too.
+    """
     from rpipe.structure.make.expand import cartesian
 
     axes = dict(study.get('axes') or {})
     axes.pop('seed', None)
-    return cartesian(axes)
+    if base_config is None:
+        return cartesian(axes)
+    from rpipe.structure.artifact.index import experiment_entries
+    from rpipe.structure.control import experiment_config_from_mapping, run_config_from_merge
+    from rpipe.structure.make.expand import axis_keys_from_study, expand_patches
+
+    base = experiment_config_from_mapping(base_config)
+    runs = [run_config_from_merge(base, patch) for patch in expand_patches(study)]
+    entries = experiment_entries(
+        configs=[(Path('runs') / str(run.id) / 'config.yaml', run.to_mapping()) for run in runs],
+        axis_keys=axis_keys_from_study(study),
+    )
+    return [entry['factors'] for entry in entries]
 
 def verify_evidence(config: dict[str, Any], assets: Path) -> None:
     """Recompute correctness from raw tokens, and reject execution/finalisation drift."""

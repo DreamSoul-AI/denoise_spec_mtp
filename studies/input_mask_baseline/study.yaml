@@ -7,6 +7,8 @@ freeze: true
 provenance:
   include:
   - docs/PLAN.md
+  - docs/modelscope_snapshot.json
+  - docs/resource_load_calibration.json
 flow:
   study_phases: true
   prepare_shared: false

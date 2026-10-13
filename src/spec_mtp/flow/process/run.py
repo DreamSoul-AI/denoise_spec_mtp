@@ -54,7 +54,10 @@ def study_gate(ctx: StudyProcessContext | FlowContext, expected_factors: list[di
     if expected_factors is None and (study_dir / 'study.yaml').is_file():
         from rpipe.structure.make.expand import load_study_yaml
 
-        expected_factors = declared_factors(load_study_yaml(study_dir))
+        from rpipe.structure.artifact.config import load_config
+
+        expected_factors = declared_factors(load_study_yaml(study_dir),
+                                            load_config(study_dir / 'experiment_config.yaml'))
     seeds_ok = True
     if (study_dir / 'study.yaml').is_file():
         from rpipe.structure.make.expand import load_study_yaml

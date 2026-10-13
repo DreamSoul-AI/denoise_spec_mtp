@@ -88,3 +88,15 @@ PR #4 的首轮 Actions 38367588147 在 CPU 依赖提取脚本失败（tomllib.l
 图的可复跑入口：[plot_validation.py](../plot_validation.py)。在仓库根运行 `python studies/smoke/plot_validation.py`，读取已入库的 delivery JSON 并只更新图片，不启动 Run、改动 index 或来源锁。该手动图工具不参与解码阶段。
 
 本次 Study 重写的本机验证：现有回归 236 个全部通过，使用独立 basetemp，包含模板与 smoke 配置展开、隔离 CPU tiny 实际 CLI、来源/证据/exact-match 失败边界；Ruff 0.17.0 与 mypy 2.4.0（40 源文件）通过，大小写敏感的 Git 文档链接与 YAML 语义保留检查通过。图脚本通过输入自检并生成已检查图片。科学源码和包配置未改，本次未重复旧新 36/555 格对照、GPU、安装包、恢复或并发验收；上文安装/GPU 数字仍是各自历史来源，不作为新结果。
+
+## 八、职责重构检查点（2026-10-14）
+
+本轮工程基于 1b6d59c，执行副本仍为 RPipe v0.3.0 / 804b3823。专项 collect、成功门、Study process、CLI 和 recipe 按职责迁入 flow / structure.api / structure.artifact，Study 只导入 src；旧 facade 保留真实调用兼容。ModelScope 构造补齐既有 local_files_only 的传递，默认行为不变。mask、autograd、树、KV、接受/回退和停止规则未改。完整映射见 [职责文档](../../../docs/rpipe-migration.md)。
+
+[本轮验证摘要](refactor_validation.json) 记录来源指纹、环境及真实 Run ID。迁移完成后的 pytest 为 239 passed / 0 failed / 0 skipped，Ruff 0.17.0 和 mypy 2.4.0（55 源文件）通过。过程中先后出现两项迁移测试失败与一项 fixture 缺 PLAN 的失败：修正 raw mismatch 注入调用、Agent 导航和复制规则后复验；原始失败日志保留，没有放宽门限。固定 36 格 CPU tiny 的全部 token、AR token、接受计数和 KV 轨迹与入库旧链参考逐项相等，digest 仍为 12a8ce5363f1118a2dc651805c24b95682e759e5204349c90455a4dcef903493；不是新的真实模型接受数。
+
+在隔离目录用原生 RPipe make --num-gpus 0 --round 1 → launch --num-gpus 0 --console shared，Toy/Stub/Linear、train/eval × seeds 0/1、每 Run 两步，四个新 Run 成功且 process.complete=true。它验证同一份执行库的实际六阶段和模板入口，不证明 SpecMTP 科学质量。可复跑 YAML 见 [template_smoke_study.yaml](template_smoke_study.yaml) 与 [template_smoke_config.yaml](template_smoke_config.yaml)：复制到新的隔离 Study，分别命名 study.yaml、experiment_config.yaml，改新 Study 名和 version 后再执行摘要中的命令。
+
+运行时工作树尚未提交，源码指纹 893ba3aff98171dc（55 文件）。完整 tiny JSON 与原生 Run/log 在本机 .tmp/rpipe-goal-20261014，不随 clone 提供；入库参考 tiny_decode_reference.json 可用于异机逐项比较。改名后 editable import 已核验指向新 checkout，不改历史原始证据里的执行路径。当前真实模型 Study 仅完成计划、展开检查和既有 ModelScope 缓存的离线解析，尚未 make/launch。本轮没有安装分发包全链、GPU/恢复/并行或大矩阵验收，前面历史验收不能替代它们。v0.3.1 只完成固定标签和实际源码/文档差异核对，尚未升级副本。
+
+目录迁移和交接文档完成后再次执行全量 pytest，239 passed / 0 skipped（111.25 秒）；Ruff、55 文件 mypy、editable 导入、模块/console CLI 和 Git 连通性检查通过。该复验使用独立 basetemp，不重复正式模型 Run。

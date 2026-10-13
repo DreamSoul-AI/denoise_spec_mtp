@@ -32,7 +32,7 @@ studies/<name>/
     figures/                    真实结果图和图注
 ```
 
-从 [_template](_template/README.md) 复制，改目录和 `study` 名称，再写计划。只有已有的 `smoke` 与模板；研究草案不是可执行 Study，历史接受数见 [history-extrapolation.md](../docs/history-extrapolation.md)。一次性环境排错放 `.tmp/diagnostics/`，必要结论并入关联报告。
+从 [_template](_template/README.md) 复制，改目录和 `study` 名称，再写计划。现有 `smoke`、`input_mask_baseline` 与模板；只有提取并写明 PLAN 的部分进入执行，其余研究草案不是可执行 Study，历史接受数见 [history-extrapolation.md](../docs/history-extrapolation.md)。一次性环境排错放 `.tmp/diagnostics/`，必要结论并入关联报告。
 
 SpecMTP 声明使用 `recipe: recipe.py` 和 `source: spec_mtp`。Study recipe 的 import 调用 `register_sources()`，Run prepare 的 `register(ctx)` 检查构造合同；注册不读取 prompt、下载权重或执行大模型。库默认 source 保持原状。复用的 ESP/EMA/AR/alignment、mask、tree、KV cache 和数据/模型适配在 `src/spec_mtp/`，只有本轮独有实现才放 Study `structure/`。
 
@@ -95,3 +95,5 @@ RPipe 要求报告附图：解码使用真实接受数或轨迹图及来源图�
 | --- | --- | --- |
 | [smoke](smoke/README.md) | 随机 tiny 三 variant 的可复用门；历史 CPU/CUDA 串行验收已完成 | [PLAN](smoke/docs/PLAN.md)、[报告](smoke/docs/STUDY_REPORT.md)、[NUMBERS](smoke/docs/NUMBERS.md) |
 | [_template](_template/README.md) | 新研究起点，不能直接运行，不代表真实模型已通过 | [计划模板](_template/docs/PLAN.md)、[报告模板](_template/docs/STUDY_REPORT.md) |
+
+新增 [input_mask_baseline](input_mask_baseline/README.md) 使用真实 Qwen3-0.6B / SpecBench q171，四个固定 case 是宏观方案 §5.11 / E1–E2 的前置门；计划与结果分别见其 docs。通用四阶段从 src/spec_mtp/flow 同名包导入，研究包内的默认 prepare/execute/make 不填空实现。

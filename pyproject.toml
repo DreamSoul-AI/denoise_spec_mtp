@@ -78,7 +78,9 @@ warn_redundant_casts = true
 # Strict tier: new modules written for the RPipe dependency.
 module = [
   "spec_mtp.recipe",
+  "spec_mtp.structure.api.recipe",
   "spec_mtp.cli",
+  "spec_mtp.flow.cli",
   "spec_mtp.flow.checks",
   "spec_mtp.structure.artifact.sources",
   "spec_mtp.structure.algorithm.config_bridge",

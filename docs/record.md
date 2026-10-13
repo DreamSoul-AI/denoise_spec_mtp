@@ -1,5 +1,14 @@
 # 开发记录
 
+## 2026-10-14
+
+- 继续 refactor/spec-rpipe，保留用户及上游工作区修改。前次 PR #5 已进入 dev（1b6d59c），当前分支快进到同树集成提交后继续；不推送 dev/main，不发布版本。
+- 先写 rpipe-migration 职责映射，再迁移专项阶段、API 桥和证据核验。Study 阶段仅导入 src；默认 prepare/execute 不复制空壳，旧 CLI/recipe/checks/prompts 只保留兼容导出。业务从 data/__init__ 移出；科学解码核心保持。ModelScope 的现有 local_files_only 传至 snapshot_download，并有边界回归。
+- 从宏观方案提取 input_mask_baseline 的四格真实模型前置门，先写 PLAN，核对研究六方面与固定 knowledge skills。只完成配置/来源和离线缓存解析，未运行真实模型；研究范围见该 Study。工程验证、失败和 tiny 轨迹见 [smoke 本轮报告](../studies/smoke/docs/STUDY_REPORT.md#八职责重构检查点2026-10-14)，不把旧正式接受数改成新结果。
+- 用户要求改本地目录：Windows Move-Item 返回错误并部分移动。逐文件核对目的路径与碰撞后补齐 28875 个文件，无覆盖；Git HEAD/索引及历史证据保留。实际 checkout 为 denoising-speculative-decoding，editable 无依赖重装并核对 import / direct_url。旧路径只剩临时目录残留，未强删或修改系统设置。历史证据中的执行路径原样保留。
+- 改名与交接文档后再次全量 239 passed / 0 skipped，Ruff、55 文件 mypy、模块/console CLI 和 Git 连通性门通过；没有重复历史正式模型格子。
+- 用户要求本机收尾、push 并异机交接。已查 RPipe v0.3.1 的 annotated tag cd7a750de0d13889916eba84b53ed4a339d47a32，实际 commit 为 7a15c46b75c5eb951cccd60ed7b9fc3463db90f5。两项 src 变化为版本号和 readout/report.py 的 B-030 身份与原子写入修复；实际 research/feedback/README/flow 文档已取得。当前执行副本仍是 v0.3.0，升级及异机验证按 [交接记录](handover.md) 接续，不提前报告通过。
+
 ## 2026-10-13
 
 - 按用户要求继续 refactor/spec-rpipe；fetch 后工作树与 origin/dev 的科学内容一致，保留当前分支，未修改 RPipe 上游。依据固定 v0.3.0 Study 合同重写指南、模板和 smoke 计划，统一 README / PLAN / STUDY_REPORT 命名并更新导航。历史计划保留，正式 JSON、smoke 配方与 accepted 数字不变。

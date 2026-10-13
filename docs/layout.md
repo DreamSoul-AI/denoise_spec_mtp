@@ -6,9 +6,9 @@
 src/
   rpipe/                   vendored RPipe；Windows 上 __init__.py 先 import torch
   spec_mtp/
-    recipe.py              register_sources + register(ctx)
-    cli.py                 薄入口：make 写源码锁，其余转给 rpipe
-    flow/checks.py         summarize/write 证据门、Study scope 门
+    recipe.py              compatibility exports for structure/api/recipe.py
+    flow/cli.py            薄入口；根 cli.py 保留 console script 兼容导出
+    flow/{collect,summarize,write,process}/   专项阶段；checks.py 兼容导出
     structure/artifact/evidence.py   实际权重/输入/runtime 证据
     structure/             algorithm / data / model / system / control / artifact
 datasets/spec_bench/       SpecBench 源文件；Run prepare 拷进 shared/data
@@ -41,3 +41,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 ## Study 合同（2026-10-13）
 
 目录入口统一 README.md，docs/PLAN.md 与 docs/STUDY_REPORT.md 分别保存计划和人类结论；NUMBERS 保留 report 数字。两份 YAML 仍按基底 → fixed → axes/seed 合并，不搬动已有研究配置。smoke 的原交付 version 和正式 JSON 保留，新实测采用隔离目录与新 version。阶段仅保留 collect/summarize/write/process 的专项扩展，默认 prepare/execute 通过 recipe、builder 与 Algorithm 执行。training-free 报告用真实解码结果图适配上游学习曲线要求，不增加训练或恢复承诺。完整合同见 [Study 指南](../studies/README.md)。
+
+当前结构迁移详见 [rpipe-migration.md](rpipe-migration.md)：data 的业务从 __init__ 移至 datasets，跨层输入与注册由 structure/api 组装，纯证据核验在 structure/artifact/validation。make、prepare 与 execute 无专项编排时直接复用库；不补空壳。

@@ -1,7 +1,4 @@
-"""Gate the Run before RPipe writes result.json: exact_match_rate must be 1."""
+"""Use the SpecMTP write phase; no Study-local implementation."""
+from spec_mtp.flow.write import run
 
-
-def run(ctx):
-    from spec_mtp.flow.checks import run_gate
-
-    run_gate(ctx)
+__all__ = ['run']

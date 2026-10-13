@@ -164,7 +164,10 @@ def test_ar_baseline_runs_the_same_stage_chain(study_copy):
 def test_raw_mismatch_fails_before_success_is_written(study_copy):
     study = study_copy(name='raw_mismatch')
     hook = study / 'flow/collect/run.py'
-    hook.write_text(hook.read_text() + """
+    hook.write_text("""from spec_mtp.flow.collect import run as collect
+
+def run(ctx):
+    collect(ctx)
     import json
     from pathlib import Path
     path = Path(ctx.layout.assets_dir) / 'decode_observations.json'

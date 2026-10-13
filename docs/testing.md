@@ -18,3 +18,5 @@ python -m pytest tests/spec_mtp
 CPU 剖析：`python tools/profile_cpu.py`。输出身份：`python tools/decode_fingerprint.py`。Windows：`python tools/windows_selfcheck.py`。
 
 分支门：`.github/workflows/branch-flow.yml` 的 `Branch flow` 只核对 PR metadata，不 checkout 或运行 PR 代码。工作分支先进入 dev；main 只接受同仓库 dev。默认分支为 main，两个长期分支均要求现有 cpu-checks 与 Branch flow，保留既有审批、防强推和防删除规则。
+
+本次职责重构新增初始化器无业务定义、ModelScope local_files_only 参数和真实 Study 无权重展开回归。结构检查补充实际 tiny CLI、source 增删改/证据失败门，不能替代数值验收。真实模型前置门及其来源/图留 [input_mask_baseline](../studies/input_mask_baseline/README.md)，Toy/Stub 模板检查与随机 tiny 分开报告。

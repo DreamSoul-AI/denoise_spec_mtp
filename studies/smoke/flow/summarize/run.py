@@ -1,7 +1,4 @@
-"""SpecMTP summarize extension."""
+"""Use the SpecMTP summarize phase; no Study-local implementation."""
+from spec_mtp.flow.summarize import run
 
-
-def run(ctx):
-    from spec_mtp.flow.checks import run_gate
-
-    run_gate(ctx)
+__all__ = ['run']

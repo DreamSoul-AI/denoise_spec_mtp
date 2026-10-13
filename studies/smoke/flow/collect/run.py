@@ -1,7 +1,4 @@
-"""SpecMTP collect extension."""
+"""Use the SpecMTP collect phase; no Study-local implementation."""
+from spec_mtp.flow.collect import run
 
-
-def run(ctx):
-    from spec_mtp.structure.algorithm.eval import collect
-
-    collect(ctx)
+__all__ = ['run']

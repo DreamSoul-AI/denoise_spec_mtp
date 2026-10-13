@@ -16,6 +16,7 @@
 | 目录、vendored RPipe、`origin` 规则、shared | [layout.md](docs/layout.md) |
 | 解码、mask、和论文不一致的地方 | [architecture.md](docs/architecture.md) |
 | 怎么跑 Study | [studies/README.md](studies/README.md) |
+| RPipe 职责映射与迁移边界 | [rpipe-migration.md](docs/rpipe-migration.md) |
 | 测试与 CI | [testing.md](docs/testing.md) |
 | Windows | [windows.md](docs/windows.md) |
 | 还没拍板的下一步 | [brainstorm.md](docs/brainstorm.md) |
@@ -23,6 +24,7 @@
 | 论文 PDF | [papers/index.md](docs/papers/index.md)。PDF 不进 git |
 | 问题与兼容性 | [bugs.md](docs/bugs.md) |
 | 开发记录 | [record.md](docs/record.md) |
+| 异机接手与待验范围 | [handover.md](docs/handover.md) |
 | 已经记下的接受数 | [history-extrapolation.md](docs/history-extrapolation.md) |
 
 一般技术文档文件名用小写；Study 目录入口用 `README.md`，计划、报告和数字用 `docs/PLAN.md`、`docs/STUDY_REPORT.md`、`docs/NUMBERS.md`，与固定 RPipe 合同一致。不要维护第二套大小写文档。
@@ -36,7 +38,7 @@
 ## 4. 代码放在哪
 
 - `src/rpipe/`：调度、Flow、Tracker、artifact、make。提交见 `ORIGIN`。
-- `src/spec_mtp/`：Data / Model / Algorithm（`(eval, spec_mtp)`）、`recipe.py`、`flow/checks.py`、专项 artifact/evidence。注册发生在 Study `recipe.py`（import 时 `register_sources()`，Run 时 `register(ctx)`）。
+- `src/spec_mtp/`：Data / Model / Algorithm（`(eval, spec_mtp)`）、`structure/api/recipe.py`、`flow/<phase>/run.py`、专项 artifact/evidence/validation；根 recipe/cli 与 flow.checks 仅兼容导出。注册发生在 Study `recipe.py`（import 时 `register_sources()`，Run 时 `register(ctx)`）。
 - 入口：`python -m spec_mtp` 是薄封装，其余转给这份 `rpipe`。不恢复 `src/main.py`。不要加 `sitecustomize.py`。
 
 ## 5. 实验

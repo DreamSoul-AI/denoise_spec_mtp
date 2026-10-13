@@ -14,6 +14,8 @@ RPipe 的 `provenance.json` 只哈希 `rpipe` 包和 Study 文件。SpecMTP 在 
 
 Float32 greedy、共享 seed，必须和普通生成逐 token 一致。`exact_match` 是这个审计，不是质量指标。质量指标是接受的 draft 数（[history-extrapolation.md](history-extrapolation.md)）。
 
+专项阶段职责实现位于 `spec_mtp.flow/{collect,summarize,write,process}/run.py`；证据判断位于 `structure/artifact/validation.py`，跨层输入和 recipe 经 `structure/api/`。Study 仅导入阶段 run，prepare/execute 继续复用库默认阶段。根 cli/recipe、flow.checks 和 data.prompts 保留兼容导出；详细旧新映射见 [rpipe-migration.md](rpipe-migration.md)。
+
 ## One decode step
 
 1. 已提交 token：`e = E[x]`。

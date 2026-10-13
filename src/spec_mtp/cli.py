@@ -70,6 +70,21 @@ def main(argv: list[str] | None = None) -> int:
     lock = write_lock_for(argv)
     if lock is not None:
         print(f'spec_mtp sources: {lock}', flush=True)
+    if _command(argv) in ('run', 'launch', 'run-one', 'process', 'report'):
+        study = _study_arg(argv)
+        if study is not None:
+            from rpipe.structure.make.expand import load_study_yaml
+            from rpipe.structure.artifact.provenance import check_frozen as check_rpipe
+            from spec_mtp.structure.artifact.sources import check_frozen, manifest
+
+            declared = load_study_yaml(study)
+            check_frozen(study, declared, manifest())
+            check_rpipe(study, declared)
+            if _command(argv) == 'report':
+                from rpipe.flow.context import StudyProcessContext
+                from spec_mtp.flow.checks import study_gate
+
+                study_gate(StudyProcessContext(study))
     from rpipe.flow.cli import main as rpipe_main
 
     return int(rpipe_main(argv) or 0)

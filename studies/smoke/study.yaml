@@ -42,7 +42,7 @@ fixed:
     mode: eval
     source: spec_mtp
     config:
-      version: rpipe-v030-20261013-final03
+      version: rpipe-v030-20261013-delivery
       task: esp_mtp
       eval:
         device: cpu

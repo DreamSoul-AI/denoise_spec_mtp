@@ -191,6 +191,13 @@ def study_gate(ctx: StudyProcessContext | FlowContext, expected_factors: list[di
     }
     atomic_write_text(study_dir / STUDY_CHECK_NAME, json.dumps(body, indent=2, ensure_ascii=False) + '\n')
     ctx.state[GATE_KEY] = body
+    process = ctx.state.get('process')
+    if isinstance(process, dict):
+        from rpipe.structure.artifact.result.format import encode_result
+
+        process[GATE_KEY] = body
+        process['complete'] = bool(process.get('complete')) and body['passed']
+        atomic_write_text(study_dir / 'process.json', encode_result(process))
     if not body['passed']:
         state = 'incomplete' if not complete else 'failed'
         raise SpecMtpGateError(f'SpecMTP Study gate {state}; see {study_dir / STUDY_CHECK_NAME}')

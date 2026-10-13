@@ -107,8 +107,8 @@ history-extrapolation 和论文设置（长上下文、100/256 new tokens）碰�
 - 继续使用固定提交的 vendored RPipe；唯一允许的框架例外是 Windows torch-first 导入。Factory、调度、Tracker、日志、状态、provenance 和 readout 由库承担。
 - 专项 execute 保存原始 prompt/output/AR token、逐步接受与 cache 观测；collect 从原始观测计算 CSV 和 Tracker 指标；summarize 拒绝 exact-match 失败；write 再核对证据、来源、实际输入与运行环境后由库定稿。
 - recipe 注册和构造检查不解码。现有 prepare_shared:false 是本项目 Data builder 与上游 torchvision-only make 的实际边界，Run prepare 继续使用 shared/data 与 shared/model，不取消共享约定。
-- 专项源码锁覆盖新增、删除、修改；终验比较执行快照与当前来源、输入 token、配置、模型权重/tokenizer 文件和运行条件。普通 run/launch 保留锁；make/remake 只可为新 version 接受来源变化，已有成功 Run 不重新签收。
-- Study process 重新核验当前 index 的 Run 证据，拒绝缺失、混合来源和声明子集；不扫描历史 Run。
+- 专项源码锁覆盖新增、删除、修改；终验比较执行快照与当前来源、输入 token、配置、模型权重/tokenizer 文件和运行条件。普通 run/launch 保留锁，并在进入库前预检来源（拒绝时不改旧 result）；make/remake 只可为新 version 接受来源变化，已有成功 Run 不重新签收。
+- Study process 重新核验当前 index 的 Run 证据，拒绝缺失、混合来源和声明子集；不扫描历史 Run。专项失败同时把通用 process envelope 标记 complete=false；report 在生成数字表前复验当前 index。
 - 不改变 decoder 的采样、mask、树、cache、EOS 或预算语义。增加观测不构成新论文实现；历史接受数保留原日期和来源。
 
 此次需触及 recipe/CLI、专项来源与证据、Algorithm 适配、Study collect/summarize/write/process、对应测试与使用文档；不恢复已删除 runner，不实现研究草案。

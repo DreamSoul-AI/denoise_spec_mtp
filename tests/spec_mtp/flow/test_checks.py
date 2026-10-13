@@ -296,3 +296,13 @@ def test_cuda_device_alias_does_not_look_like_config_drift(tmp_path):
     raw['inputs_digest'] = digest(inputs)
     raw_path.write_text(json.dumps(raw))
     checks.verify_evidence(_config(), assets)
+
+
+def test_study_quality_failure_marks_generic_envelope_incomplete(tmp_path):
+    ctx = _study(tmp_path, [('a', 'succeeded', True, 'd'), ('b', 'succeeded', True, 'd')])
+    ctx.state['process'] = {'complete': True}
+    (ctx.study_dir / 'runs/run_b/assets/decode_observations.json').unlink()
+    with pytest.raises(checks.SpecMtpGateError):
+        checks.study_gate(ctx)
+    envelope = json.loads((ctx.study_dir / 'process.json').read_text())
+    assert not envelope['complete'] and not envelope['spec_mtp']['passed']

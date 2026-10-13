@@ -113,8 +113,8 @@ def test_freeze_rejects_spec_mtp_change_after_make(study_copy):
     run_id = json.loads((study / 'index.json').read_text())['experiments'][0]['runs'][0]['id']
     proc = cli('run-one', study, run_id)
     assert proc.returncode != 0
-    result = json.loads((study / 'runs' / run_id / 'result.json').read_text(encoding='utf-8'))
-    assert result['status'] == 'failed' and 'tree.py' in result['error']
+    assert not (study / 'runs' / run_id / 'result.json').exists()
+    assert 'tree.py' in proc.stderr
 
 
 def test_freeze_rejects_study_change_after_make(study_copy):
@@ -180,3 +180,20 @@ def test_raw_mismatch_fails_before_success_is_written(study_copy):
         if (root / 'result.json').is_file():
             result = json.loads((root / 'result.json').read_text())
             assert result['status'] == 'failed' and 'raw exact_match' in result['error']
+
+
+def test_source_preflight_preserves_existing_result(study_copy):
+    study = study_copy(name='preserve_previous_result')
+    cli('make', study, check=True)
+    run_id = json.loads((study / 'index.json').read_text())['experiments'][0]['runs'][0]['id']
+    result = study / 'runs' / run_id / 'result.json'
+    original = b'{"status":"succeeded","previous_evidence":"do not replace"}'
+    result.write_bytes(original)
+    lock = study / 'spec_mtp_sources.json'
+    saved = json.loads(lock.read_text())
+    saved['files']['spec_mtp/new.py'] = 'old'
+    lock.write_text(json.dumps(saved))
+    for command in ('run', 'launch', 'run-one', 'process'):
+        proc = cli(command, study, *([run_id] if command == 'run-one' else []))
+        assert proc.returncode != 0 and 'sources changed' in proc.stderr
+        assert result.read_bytes() == original

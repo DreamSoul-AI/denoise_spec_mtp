@@ -41,7 +41,7 @@ jobs:
           import sys, tomllib
           from pathlib import Path
           from subprocess import check_call
-          data = tomllib.loads(Path('pyproject.toml').read_bytes())
+          data = tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
           skip = {'torch', 'torchvision'}
           def name(dep: str) -> str:
               return dep.split()[0].split('@')[0].split('>')[0].split('<')[0].split('=')[0].strip().lower()

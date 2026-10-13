@@ -64,3 +64,5 @@ GPU 仅完成随机 tiny 串行门。没有校准真实权重的 KV/树/mask/进
 934dac3 新增进入库前的来源预检和 Study readout 合同，decoder 数值实现未再变化。实际该提交、新 version rpipe-v030-20261013-delivery 的三 CPU Run，以及 delivery-934dac3-cuda 的三 CUDA tiny Run 均成功，原始 token、证据、专项质量和通用 complete 同时通过。CPU 每格 accept_d1 仍为 27/31/8；CUDA tiny 同样为 27/31/8。安装包各使用独立目录和新的 package version/Run ID，wheel/sdist 各六条实际命令、三个 tiny Run 通过，分发包没有 runs/shared/.tmp，最终 JSON 保留完整来源与包哈希。
 
 最终 pytest 229 passed；固定 Ruff/mypy 通过。来源拒绝时旧 result 保全，以及专项失败时通用 envelope 不完整都有针对性回归。C-004 仍保留原始旧 Run 终态无法恢复的事实；直接 native RPipe/FlowRunner 仍有库的失败回写行为，正常入口用 spec_mtp，实测必须新 version。此验收不改变前述真实模型、恢复、GPU 并发与长矩阵边界。交付后的文档提交不改变包源码或 Study 声明。
+
+PR #4 的首轮 Actions 38367588147 在 CPU 依赖提取脚本失败（tomllib.loads 接收 bytes），lint/type/tests 均未执行。这是本项目 CI 缺陷 B-004，改为 UTF-8 文本读取后进行新提交复验；不将首轮远端失败算作通过。工作流触发、CPU torch 策略与启用状态保持。

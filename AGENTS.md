@@ -40,7 +40,7 @@
 
 ## 5. 实验
 
-- 开跑前写 `docs/plan.md`（问题、对照、指标、停止规则、[studies/readme.md](studies/readme.md) §3 排班）。
+- 开跑前写 `studies/<name>/docs/plan.md`（问题、对照、指标、停止规则、[studies/readme.md](studies/readme.md) §3 排班）。
 - `python -m spec_mtp make studies/<name>`，再 `python -m spec_mtp launch studies/<name>`。
 - `flow.prepare_shared: false`（RPipe make 下载只认 torchvision）。Run prepare 仍把 SpecBench 和权重写进 `shared/`。**不要写 `origin: foreign`**（[layout.md](docs/layout.md)）。权重用 ModelScope。
 - `exact_match_rate` 必须是 1。表里的数是接受的 draft 数。速度和 `tau` 不决定结论。不把 γ 叫成 slope。

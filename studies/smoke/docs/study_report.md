@@ -3,11 +3,11 @@
 ## 一、摘要
 
 - 目标：接通固定 RPipe v0.3.0 的真实阶段职责，保留 ESP/EMA/AR/alignment 研究语义，拒绝无证据的成功。
-- 实现提交：`7c89d7cb1abbf5560a842b4ff52e571b59984437`，工作分支 `refactor/spec-rpipe`；上游固定 `804b3823ab6d2af46cbda1a65688ca8b76c60b22`。接入主体在本次开始前的 c3263c0 已存在，本次只补齐缺口。
-- 结果：227 passed；固定版本 Ruff/mypy 通过；旧/新 36 格 token/接受/cache 完全相同，555 格改动前/后 fingerprint 完全相同。CPU/CUDA tiny 三 variant 均 exact-match=1，wheel/sdist 各通过实际安装与阶段链。
+- 当前实现提交：`934dac3fd3b1662664ebf71d8317b49183e22f0b`（含此前 `7c89d7c` 的适配），工作分支 `refactor/spec-rpipe`；上游固定 `804b3823ab6d2af46cbda1a65688ca8b76c60b22`。接入主体在本次开始前的 c3263c0 已存在，本次只补齐缺口。
+- 最终结果：229 passed；固定版本 Ruff/mypy 通过；旧/新 36 格 token/接受/cache 完全相同，555 格改动前/后 fingerprint 完全相同。CPU/CUDA tiny 三 variant 均 exact-match=1，wheel/sdist 各通过实际安装与阶段链。
 - 边界：真实预训练模型、ModelScope 下载、严格解码恢复、GPU 并发容量、完整大模型矩阵未验收；没有重跑历史正式接受数。
 
-详细机器数字与来源见 [migration_validation.json](migration_validation.json)，固定原始 token/接受/cache 参考见 [tiny_decode_reference.json](tiny_decode_reference.json)。它们是正式 tiny 验收证据，不是历史论文实验的新结果。
+最终提交的阶段链、包哈希与 Run 见 [delivery_validation.json](delivery_validation.json)。此前适配提交的详细机器数字与来源见 [migration_validation.json](migration_validation.json)，固定原始 token/接受/cache 参考见 [tiny_decode_reference.json](tiny_decode_reference.json)。它们是正式 tiny 验收证据，不是历史论文实验的新结果。
 
 ## 二、实现与兼容边界
 
@@ -57,3 +57,10 @@ accept_d1 是深度 1 的接受；accepted 是所有深度的接受（沿用原�
 旧/新 probe 可由 Git archive b1f6191 src 后设 PYTHONPATH 指向归档 src，调用 validate_migration.py --out；切回当前 src，再加 --compare。完整 token/trace 参考已经入库；完整 555 格原始文件、实际 Run/assets/logs 和安装目录在 `.tmp/acceptance-20261013/`，不会随 clone 提供。Study 的正式报告与参考 JSON 可独立取得，完整 Run 需要按新 version 重跑。
 
 GPU 仅完成随机 tiny 串行门。没有校准真实权重的 KV/树/mask/进程预算，没有扩大 GPU 并发、执行完整大模型矩阵或新增 baseline。解码状态/采样 RNG/KV/mask 的 checkpoint/resume 不宣称已实现或验收。保持论文解释差异与历史接受数原记录。
+
+
+## 六、最终交付复验（2026-10-13）
+
+934dac3 新增进入库前的来源预检和 Study readout 合同，decoder 数值实现未再变化。实际该提交、新 version rpipe-v030-20261013-delivery 的三 CPU Run，以及 delivery-934dac3-cuda 的三 CUDA tiny Run 均成功，原始 token、证据、专项质量和通用 complete 同时通过。CPU 每格 accept_d1 仍为 27/31/8；CUDA tiny 同样为 27/31/8。安装包各使用独立目录和新的 package version/Run ID，wheel/sdist 各六条实际命令、三个 tiny Run 通过，分发包没有 runs/shared/.tmp，最终 JSON 保留完整来源与包哈希。
+
+最终 pytest 229 passed；固定 Ruff/mypy 通过。来源拒绝时旧 result 保全，以及专项失败时通用 envelope 不完整都有针对性回归。C-004 仍保留原始旧 Run 终态无法恢复的事实；直接 native RPipe/FlowRunner 仍有库的失败回写行为，正常入口用 spec_mtp，实测必须新 version。此验收不改变前述真实模型、恢复、GPU 并发与长矩阵边界。交付后的文档提交不改变包源码或 Study 声明。

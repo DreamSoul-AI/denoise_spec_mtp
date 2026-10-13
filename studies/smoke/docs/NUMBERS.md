@@ -26,6 +26,6 @@ Generated from `process.json`. The conclusion stays in `STUDY_REPORT.md`.
 
 | factors | seed | id | metrics | log |
 |---|---:|---|---|---|
-| algorithm.config.variant=esp_static | 123 | `645b84ea388479c7` | test_accepted=28.0000, test_committed=124.0000, test_decodecalls=97.0000, test_exactmatchrate=1.0000, test_tau=1.2784 | [run.log](../runs/645b84ea388479c7/assets/logs/run.log) |
-| algorithm.config.variant=esp_dynamic | 123 | `8f3e559fef677edc` | test_accepted=31.0000, test_committed=124.0000, test_decodecalls=94.0000, test_exactmatchrate=1.0000, test_tau=1.3191 | [run.log](../runs/8f3e559fef677edc/assets/logs/run.log) |
-| algorithm.config.variant=ema_velocity | 123 | `771aff2519c05382` | test_accepted=8.0000, test_committed=124.0000, test_decodecalls=116.0000, test_exactmatchrate=1.0000, test_tau=1.0690 | [run.log](../runs/771aff2519c05382/assets/logs/run.log) |
+| algorithm.config.variant=esp_static | 123 | `5afa2281f1bdb3e4` | test_accepted=28.0000, test_committed=124.0000, test_decodecalls=97.0000, test_exactmatchrate=1.0000, test_tau=1.2784 | [run.log](../runs/5afa2281f1bdb3e4/assets/logs/run.log) |
+| algorithm.config.variant=esp_dynamic | 123 | `0ebb2f566e0b46b5` | test_accepted=31.0000, test_committed=124.0000, test_decodecalls=94.0000, test_exactmatchrate=1.0000, test_tau=1.3191 | [run.log](../runs/0ebb2f566e0b46b5/assets/logs/run.log) |
+| algorithm.config.variant=ema_velocity | 123 | `de876f8232440e79` | test_accepted=8.0000, test_committed=124.0000, test_decodecalls=116.0000, test_exactmatchrate=1.0000, test_tau=1.0690 | [run.log](../runs/de876f8232440e79/assets/logs/run.log) |

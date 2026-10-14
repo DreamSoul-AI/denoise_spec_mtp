@@ -173,3 +173,7 @@ gh run list --branch feature/output-space-prerequisite --limit 1 --json database
 ```
 
 本次授权记录的本地检查：`D:/anaconda3/python.exe -m ruff check src tests studies tools`、`D:/anaconda3/python.exe -m mypy`（56个源码文件）、`D:/anaconda3/python.exe -m pytest tests/spec_mtp -q`均exit0；CPU测试子进程使用`CUDA_VISIBLE_DEVICES`为空，不占用正在运行的GPU。Rpipe ORIGIN、两个console entry points及工作分支→dev方向检查通过。运行环境是本机Windows/Python3.13.9，未把这些结果写成Ubuntu/Python3.12远端CI已运行；最新已推送37a6f2d的远端cpu-checks实际SUCCESS。
+
+## 2026-10-15 全480首格完成（BC10）
+
+[全量报告](../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)已从真实Run dfe1b9c8d5d12e92读取全480结果：pooledτ=1.399047、prompt mean=1.431766、category mean=1.403034；79,757个提交token全部通过对应验证forward argmax自检，独立AR188/480=39.17%。原生Run仍为failed（历史AR严格门），不冒称native成功，也不阻止τ或后续格。BC30 Run b9b54923b1b9ea9f已启动，BC60/1及60/2串行排队；四格总体未完成，不宣布Table1复现成功、不提前开4B。临时protocol_pending.json保留本机，完整四格后生成冻结公开证据及结果图。

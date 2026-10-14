@@ -47,3 +47,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/diagnose_output_windows.py` follows the existing direct-decoder profiling utilities. It observes fixed q173 windows, binds tool/PLAN/native raw/source hashes and refuses mismatching replay. Full selected tensors stay in a new .tmp directory; scalar diagnosis belongs to the Study. Scientific src, original Run and source locks are retained.
 
 `tools/diagnose_mask_scale.py` uses the saved window tensors to cross the two observed directions/norms at one predeclared position, with four isolated causal forwards. It reuses the existing model wrapper and scalar helpers; it does not alter decoder/provider/config or choose a new default.
+
+`tools/diagnose_proxy_transfer.py` scopes one predeclared provider-return vector replacement to a diagnostic replay. It infers seed ownership from actual root progress and verifies the returned trace, keeping post-intervention paths rather than forcing baseline acceptance. Its PLAN/results and offline `analyze_transfers.py` live in output_space_small_matrix; no scientific source/default/Run changes.

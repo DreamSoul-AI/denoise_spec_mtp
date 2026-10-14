@@ -1,5 +1,9 @@
 # 异机交接
 
+## q173单槽历史代理移植（2026-10-14）
+
+按预声明TRANSFER_PLAN完成三次单槽重放，均33token与独立AR一致、前缀/原值回填/单槽范围/实际owner门通过。一阶root83第二槽换零阶后，root94/97均失去命中，五固定根committed anchor/velocity与原一阶逐元素不变；反向零阶在velocity为零时恢复root94而未恢复root97。离线张量逐元素确认83→84(owner0)→86(owner1)代理传播边。只证明单qid/seed/入口的局部历史影响，不能宣称全局EMA机制或双向完全转移。正式合同、scalar结果、可复现工具与raw SHA见[Study报告](../studies/output_space_small_matrix/docs/STUDY_REPORT.md)；科学src670c744e0535dcad/default/旧Run与NUMBERS保留，未推送、合并或删数据。
+
 ## q173固定窗口与尺度诊断（2026-10-14）
 
 按WINDOW_PLAN/SCALE_PLAN完成只读q173 root83/94/97重放和4个尺度反事实前向。三case完整token/接受/KV不变、src670c744e0535dcad保持；观察器不新增decoder调用，1teacher+9prefix辅助后，窗口/模型/runtime一致性均通过。root94/97一阶seed target margin从零阶负值转正；root83的2×2方向/范数对照排除这两个尺度的范数差异单独解释错误。事后结构复算显示owner0 slot1为Phi(proxy0)，清零当时velocity不改slot1，收益不能表述为当前速度直接相加。科学配方/旧Run未改，未推送、合并或删数据；正式证据与复跑入口见[Study报告](../studies/output_space_small_matrix/docs/STUDY_REPORT.md)，本机selected张量SHA在报告保存。

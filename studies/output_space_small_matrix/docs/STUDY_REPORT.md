@@ -113,3 +113,34 @@ root83实际输入/输出seed范数=.1912895/.9250697，原观察同时改变方
 本机张量/全词表logits存在.tmp/output-windows-20261014-v1，sha47166a3b41e0c00ed39110593fe7f83b20323c2e3714fe0355f2a43aaa9dc14c；不随Git。正式scalar JSON和复跑工具入库，无权重/凭据导出。测量命令见两个工具docstring，out必须新目录；源码/模型/原矩阵不一致即停止并保存失败，不自动重签。未推送、合并或删除任何原始证据。
 
 这一步将接受计数差异推进到同prefix的实际mask输入与候选margin，并用固定尺度介入排除一个局部替代解释。保留其有限范围；未实现自适应Kalman、未优化映射/超参、未扩大完整矩阵。
+
+## q173单次历史代理移植（2026-10-14）
+
+按测量前冻结的 [TRANSFER_PLAN](TRANSFER_PLAN.md)，只在root83返回的mask张量中替换owner0第二槽（零基[0,1]），进行一阶←零阶、零阶←一阶、以及一阶原值回填三次重放。固定donor来自已保留窗口张量；没有修改committed状态、其他mask、默认配方或科学源码。转移的是完整向量，范数分别.925069749/.925069809，L2差.053660285；未再归一化，不能称为数学上严格等范数的纯方向介入。这里的差异主要为方向，范数仅有浮点末位差异；本轮不靠该近似作跨尺度结论。
+
+[干预证据](transfer_diagnosis_v1.json)保留完整实际验证/提交/KV轨迹、source/model/runtime/PLAN/tool/raw绑定及全部预定窗口。[离线路径核验](transfer_path_diagnosis_v1.json)来自本机张量的逐元素比较，无新增forward。新工具不复用原观察器的baseline接受路径：先按实际root步进确定preceding seed owner，再核对真实trace；五个预定根83/84/86/94/97本轮全部访问，没有强制访问或替换窗口。
+
+| q173方法/干预 | root94正确target margin | root97正确target margin | accepted | decode calls | 命中根 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 原零阶（已保存矩阵） | -2.061214 | -3.272995 | 1 | 31 | 84 |
+| 一阶原值回填（完整复现原一阶） | 1.941534 | 1.837038 | 3 | 29 | 84、94、97 |
+| 一阶，仅root83第二槽换为零阶 | -2.061214 | -3.272995 | 1 | 31 | 84 |
+| 零阶，仅root83第二槽换为一阶 | 1.941534 | -1.643641 | 2 | 30 | 84、94 |
+
+三次均生成33token，逐token与原独立AR一致，无context缩短。干预前及root83完整语义轨迹一致，root83的preceding first seed未变；只修改一次指定provider返回槽位，其他坐标逐元素不变。原值回填完整token/接受/KV与原一阶一致。两真实移植允许后续接受路径变化，结果全部保留，没有将它们当作新正式Run或稳定收益。
+
+### 历史传播与当前速度的边界
+
+一阶←零阶的root84 incoming proxy0未变，proxy1相对一阶原值回填L2变化1.404191；root84仍接受一个draft，于是选择owner1的mask输出。其root86 incoming proxy0变化3.522655。保留张量逐元素证明两个边：root83 owner0 mask hidden→root84 incoming proxies，以及root84 owner1 mask hidden→root86 incoming proxies；对应mask输入→下一块实际seed输入也逐元素相同。该结果支持这次早期第二槽扰动沿原decoder代理历史传播，改变后续first-seed候选，而非观察器强行沿旧路径取owner。
+
+同一一阶recipient在83/84/86/94/97五个固定根的committed anchor和velocity与原值回填均逐元素相同，但root94/97 first seed向量及完整词表seed logits变为原零阶对应值（max_abs_delta=0），两次一阶额外接受消失。由此可收紧为：在本q173干预中，保持这些同位committed速度状态不足以保持原两次命中；单个历史代理入口能够改变结果。此结论不说明整个解码过程velocity无作用，也未单独隔离所有中间slot/owner。
+
+反向零阶←一阶时，五窗口committed velocity均为零，root94 first seed及完整词表logits与原一阶逐元素相同，并新增一次接受；root97未恢复，仍负margin。因而当前非零committed velocity并非本root94命中的必要条件，这次历史移植在零阶上下文中足以恢复root94，但不足以恢复root97或完整一阶结果。不能把前一方向的完整消除和后一方向的部分恢复概括成双向完全等价，不能推广为普遍EMA归因。
+
+这仍是单qid、单seed124、单干预位置和五个有限窗口。两方法的历史与后续其他槽位仍不同，没有连续全位置中介观测或跨prompt复现；原接受差异与当前速度的关系已被局部介入收紧，尚未建立全局机制或优化配方。后续扩展应先冻结其他prompt/失败窗口，再按同样单槽和原值回填门复验；本轮不据负/正结果追加根搜索。
+
+### 复现与资源
+
+实测wall15.710秒，0.5秒采样进程树RSS峰5568364544 bytes、线程13、GPU全局峰5557MiB、系统可用内存最低12413997056 bytes；包含背景占用并可能漏短峰，不作性能/allocator结论。实际模型forward32/31/30（合计93）等于三case各1+实际decode_calls，新增token99，辅助forward0，低于预声明300-token预算。源码670c744e0535dcad、模型digest/runtime、原Run inputs/config/raw、11文件snapshot及PLAN/tool在前后核验一致。
+
+复跑工具 [diagnose_proxy_transfer.py](../../../tools/diagnose_proxy_transfer.py) 用同一ModelScope缓存和保存窗口证据，out必须新目录；失败保留且停止。离线重核 [analyze_transfers.py](../analyze_transfers.py) 的命令见docstring，既存正式JSON不一致则拒绝覆盖。干预张量19588880 bytes，仅本机.tmp/output-transfer-20261014-v1，SHA473a7f470fc8158a0627e9b5e3f80216a75a73fd04f7fe112d78021fd1089b33，不随Git。3项新小模型测试覆盖单槽范围/实际owner/逐token一致/原值回填/异常清理；文档和静态检查另存日志。没有改旧NUMBERS、重签原Run、推送、合并或删数据。

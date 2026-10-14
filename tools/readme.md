@@ -23,3 +23,6 @@ python tools/<name>.py --help
 ```
 
 Package check: `python tools/package_selfcheck.py --workspace .tmp/package-<new-id>`. The directory must be new. It reuses installed scientific dependencies, so it checks distribution isolation rather than a fresh dependency environment. Windows check: `python tools/windows_selfcheck.py --smoke --out .tmp/<new-id>/windows.json`; each smoke uses a fresh version and preserves its raw logs.
+
+`diagnose_q178_norm_kernel.py --out .tmp/<new-id>`：固定q178 CUDA norm图对照，保存实际kernel关联、entry/post和numerical-effect flags。
+`diagnose_q178_qproj.py --out .tmp/<new-id>`：固定85块layer0 row4 packing／FP64对照，4克隆cache块精确重放。

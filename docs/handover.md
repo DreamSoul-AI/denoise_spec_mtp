@@ -97,3 +97,7 @@ root85之后provider槽计算S64、norm精度N64、norm后端N32各self/一阶�
 ## 当前未完成
 
 v0.3.1 源码升级与完整回归；当前重构安装包/Windows selfcheck；新真实模型四格 Study 与串行资源校准；上游 C-004 新最小复现和实际 Issue。真实权重 GPU 容量、并发、解码恢复、长矩阵与新设备科学验收均未完成。用户要求本机先收尾交接，因此本轮不启动新的正式解码任务。
+
+## q178 CUDA图／固定行与cross-task checker（2026-10-14）
+
+[最新报告](../studies/output_space_extension/docs/STUDY_REPORT.md)保存norm8格／q_proj6格全部AR一致和完整路径8/27、9/26。norm实际换NormTwoOps→mul/sum/sqrt，但所有返回值bit相同，不能当新数值鲁棒性证据；q_proj第0层85块row4换GEMM→GEMV或FP64-rounded确有微差并传播，但接受不变。4克隆cache块重放logits/finalhidden精确相同。q241–244已有[可跑checker](../studies/output_space_cross_task/check_hypotheses.py)与[状态](../studies/output_space_cross_task/docs/STUDY_REPORT.md)，仅合成MRE/质量边界测试，未launch真实batch；H2未检。入口Phi／其他层行／q179182canonical仍开放，下一target须新固定合同。scientificsrc/default/旧PLAN/helpers未改，rawKV/tensor/profiler/cache不入Git，未远程／PR／删数据。

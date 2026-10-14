@@ -76,3 +76,9 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 固定旧canonical state，先写OPERATOR_PLAN，再执行native及S64/N64/N32的self/单槽移植共8格，288tokens/220forwards全部AR一致且完整路径保持8/27和9/26。实际CUDA profiler记录NormTwoOps归约kernel关联；变体mask有<=5.96e-8差异，不能当作无效干预，也不能由此锁定transformer舍入源。入口85未变，后续provider必要性受限；未测入口舍入、组合干预或反向。原工具和合同冻结不改，新离线分析/报告分开。新cross_task固定q241–244、分词692/647/595/901，复用原生配方与flow，只草案；q_proj固定行协议另列未执行。最小功能候选437f201依赖PR6，33提交文件哈希清单和PR正文仅本地，不新建PR、推送、合并或删除。验收以本轮实际记录为准，未重跑历史全量／完整矩阵。
 
 本轮相关检查累计26项通过，Ruff/mypy56通过，四旧来源冻结／16原始门与候选33blob SHA通过。新draft YAML冒号与工具导航首轮失败保留并修复；测量源码／分析器原字节归档，当前CLI只补docstring且AST一致，旧测量不重签。
+
+## CUDA norm图、q_proj固定行和证伪checker（2026-10-14）
+
+先冻结新norm／q_proj执行合同，再串行8+6生成共504tokens/385生成forward+4块辅助forward，全部独立AR一致。norm实际kernel图不同但返回值完全相同，标为数值无效对照；q_proj row4 GEMM/GEMV/FP64替换有效并传入后续proxy/hidden，完整路径仍self8、graft9。4source blocks的独立cache重放全bit通过，来源/strict/model/snapshot绑定保持。q241–244写export/check/mre脚本及缺格/重复/非法depth2/未检H2规则，只跑合成逻辑与配置验证，不启动真实cross-task。报告收紧入口Phi和未测算子／prompt范围，不改源/default/旧合同，不推远程、开合PR或删数据。
+
+本轮28项相关检查、Ruff/mypy56通过，四旧来源锁／两新raw tensor SHA保持；无真实cross-task index/runs。工具先满足运行示例／导航合同再测量，测量工具、common及合同原字节未改。

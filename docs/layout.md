@@ -59,3 +59,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/diagnose_study_windows.py` is the manifest-bound four-prompt coordinator for output_space_followup. Existing choose_window/observe/transfer/compare/slots implementations are imported unchanged and individually hash-bound. It records both slot rankings and validity with actual/noncommon paths. New-study native phases stay thin imports; raw tensors/weights remain local.
 
 `tools/diagnose_q178_operators.py`提供固定q178后续provider槽精度／norm归约后端对照。测量v1源码原文在`studies/output_space_extension/docs/operator_tool_v1.py.txt`，当前CLI只补运行示例；分析核对除模块docstring外AST一致，原报告tool哈希不重签。
+
+`tools/diagnose_q178_norm_kernel.py`比较固定入口／后续CUDA norm实现图，区分返回值等价与有效干预；`tools/diagnose_q178_qproj.py`执行固定layer0行的FP32 packing／FP64-rounded对照及独立cache块重放。两者共享Study局部`kernel_common.py`来源加载门，不改科学模型或默认配方。

@@ -9,6 +9,8 @@ provenance:
   - docs/PLAN.md
   - docs/modelscope_snapshot.json
   - docs/prompts_manifest.json
+  - check_hypotheses.py
+  - docs/CHECKER_PROTOCOL.md
 flow:
   study_phases: true
   prepare_shared: false

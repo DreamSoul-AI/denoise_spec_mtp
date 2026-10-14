@@ -113,3 +113,38 @@ CPU/CUDA profiler捕获一次规范self root86 provider mapping，共84个CUDA l
 工具导航验收发现新CLI缺少docstring运行示例，补齐示例和layout导航；测量时原文以[源码快照](operator_tool_v1.py.txt)保留并核对旧tool SHA，执行AST除模块docstring外一致，旧报告未重签。初次分析原JSON保留，[后续离线复核](operator_analysis_v2.json)绑定当前分析器。草案description冒号未加引号被配置展开拒绝，已就地修复，失败发生在make／模型运行前并保留记录。
 
 本轮累计26项相关测试／展开／文档检查通过，Ruff与mypy56通过；四旧Study的来源／PLAN锁及16份原始证据门复核通过。首次草案YAML与工具导航检查失败已保留，修复后仅重验受影响项。两份测量源码快照用局部.gitattributes保留原字节，暂存Git blob与旧证据SHA一致；未改旧测量JSON或重签合同。
+
+## 固定 CUDA norm 图与 q_proj 行对照（2026-10-14）
+
+本轮以[norm新增合同](NORM_KERNEL_PLAN.md)和[q_proj执行增补](../../output_space_cross_task/docs/KERNEL_EXECUTION_PLAN.md)推进，原OPERATOR_PLAN／KERNEL_PLAN、科学src/default与旧成功Run不改。两组都是旧q178的局部诊断，不是新的cross-task结果。证据为[norm完整记录](norm_kernel_diagnosis_v1.json)、[q_proj完整记录](qproj_kernel_diagnosis_v1.json)和[离线核验](kernel_analysis_v1.json)。
+
+| 实验 | 固定干预 | self accepted / calls | 一阶←零阶 accepted / calls | 完整语义路径 | 数值干预有效性 |
+| --- | --- | ---: | ---: | --- | --- |
+| norm native | 原规范状态控制 | 8 / 27 | 9 / 26 | 精确复现旧控制 | 基准 |
+| norm entry | 85仅替换donor/self第二槽 | 8 / 27 | 9 / 26 | 同对应native | 向量逐元素相同 |
+| norm post | 85后每个实际provider norm | 8 / 27 | 9 / 26 | 同对应native | 全映射返回值逐元素相同 |
+| norm entry+post | 两段同时替换 | 8 / 27 | 9 / 26 | 同对应native | 返回值逐元素相同 |
+| q_proj native | 两源块只读capture | 8 / 27 | 9 / 26 | 精确复现旧控制 | 基准 |
+| q_proj singleton | 第0层、85块row4改1行FP32 linear | 8 / 27 | 9 / 26 | 同对应native | 有非零差异 |
+| q_proj reference64 | 同一行CPU FP64 linear转回FP32 | 8 / 27 | 9 / 26 | 同对应native | 有非零差异 |
+
+**norm结果属于实现等价性对照。** 相同FP32 slot下，把vector_norm换成sqrt(sum(slots*slots))，profiler实际从NormTwoOps reduce_kernel换成mul、sum_functor reduce_kernel和sqrt三类CUDA launch。入口85两个donor状态、规范86两个状态以及后续所有实际调用的映射返回值仍逐元素相同，proxy/hidden/已检查seed logits也相同。所以它证明本批两种实现数值等价；**不能把接受不变当作新的舍入鲁棒性证据，也不能声称入口norm舍入已排除**。替换算法包含中间square舍入，并非只改一条kernel指令。部分非入口slot的native norm与FP64参考有1 ULP差，但被换的入口owner0第二槽的norm与FP64-rounded参考也相同。保留这个数值无效对照，没有临时搜索另一个实现来制造差异。
+
+**q_proj结果提供了有效的局部数值对照。** 真实第0层输入[1,9,1024]、输出[1,9,2048]，固定85块owner0第二mask槽row4，其他输出行逐元素保持。packed9行和singleton1行的aten::mm通过External id分别关联实际gemmSN_TN_kernel与internal gemvx kernel，完整符号和shape在正式JSON，不由名称推断归约指令。源85同一输入行的FP32 singleton对native差max1.430511e-6（self）／2.861023e-6（graft）；FP64-rounded差1.907349e-6／9.536743e-7。实际四个替换都有非零值，不能解释为无效干预。
+
+后续被捕获窗口确有传播差异：reference64 graft的proxy max_abs约.005686、mask final hidden约.034302、root86/91/108所查seed logits最大约.003431，全部接受／提交／KV语义路径仍相同。它约束的是该固定行在这两种计算实现间的微差对本次8/9对照的必要性，不是删除q_proj算子的必要性，也不排除其他行、层、RMSNorm／attention或组合数值扰动。不同self/graft的原输入方向本来就不同，不能把二者hidden差当作舍入误差。
+
+capture前完整KV独立克隆并检查storage／stride，四个85/86块使用新的cache克隆重放，全部logits／final hidden逐元素相同，保存的cache未变。完整14输出均与独立AR相同、canonical同位anchor/v一致，hook和patch移除，来源/模型/11文件snapshot/旧raw/新PLAN/tool/common前后绑定通过。norm为288tokens/220生成forward，q_proj为216tokens/165生成forward+4辅助块forward；合计504tokens/389模型forward，没有teacher或预热。
+
+norm实际wall27.943秒、RSS5438509056 bytes、全局GPU5654MiB；q_proj wall26.301秒、RSS5110779904 bytes、GPU5796MiB。均.5s采样含背景／漏短峰，不用于速度排名。raw tensor分别182573805／238083125 bytes，仅本机.tmp；完整KV／tensor／profiler trace不入Git。直接linear数值诊断的requires_grad标量提示与profiler单cycle提示保留；没有反向计算或权重更新，完整生成由原HFCausalLM.no_grad执行，前后model digest相同。
+
+### 收紧后的结论与待验证事项
+
+1. 已有有效N32/N64/S64只约束85后的provider运算；本轮GPU norm图替换数值无效，补充的是实现等价性。入口Phi完整乘除／舍入仍开放。下一次应预声明85单槽完整FP64映射→FP32与native的自值／移植对照，先记录是否真的改变向量；若相同，不将它记为数值鲁棒性证据。
+2. 该85块第0层row4的GEMM／GEMV与FP64-rounded微差可传播，却未改接受路径。局部稳定不等于全transformer数值稳定；不按负结果继续搜索有利层／行。其他算子需要新的固定target和预算。
+3. q241–244的H1/H3现在有[可跑checker](../../output_space_cross_task/check_hypotheses.py)和[边界协议](../../output_space_cross_task/docs/CHECKER_PROTOCOL.md)。本轮仅合成最小复现，不存在新任务实测。缺格／失败／重复格拒绝判定；infeasible不作null，错误第一槽／EOS／无第二target不作depth2证据。
+4. q179/q182尚未做完整canonical self/graft，不能把q178中“committed微差非必要”外推给它们。新cross-task阳性也须单独冻结canonical跟进，H2目前明确未检。累计12条仍是translation开发样本，60/45/47不证明一阶优势或统计泛化。
+
+未推远程、未开／合PR、未改默认配方／科学源码、未删除数据。
+
+本轮28项相关检查通过（含15项cross-task判定边界、3项算子／独立缓存检查及既有规范／文档／展开回归），Ruff与mypy56通过。四个旧Study来源／PLAN锁保持，两个新raw tensor SHA复核通过。mre输出明确synthetic_only_no_model_evidence，不生成真实Study index／runs。未重跑历史全量测试、安装包或完整矩阵。

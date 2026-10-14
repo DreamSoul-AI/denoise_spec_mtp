@@ -177,3 +177,11 @@ gh run list --branch feature/output-space-prerequisite --limit 1 --json database
 ## 2026-10-15 全480首格完成（BC10）
 
 [全量报告](../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)已从真实Run dfe1b9c8d5d12e92读取全480结果：pooledτ=1.399047、prompt mean=1.431766、category mean=1.403034；79,757个提交token全部通过对应验证forward argmax自检，独立AR188/480=39.17%。原生Run仍为failed（历史AR严格门），不冒称native成功，也不阻止τ或后续格。BC30 Run b9b54923b1b9ea9f已启动，BC60/1及60/2串行排队；四格总体未完成，不宣布Table1复现成功、不提前开4B。临时protocol_pending.json保留本机，完整四格后生成冻结公开证据及结果图。
+
+## 2026-10-15 ESP协议与首格PR已合dev
+
+[PR #8](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/8)已于2026-10-14T22:05:27Z合dev，merge bf1fffaf043e5edfd6a7acc149318b587d105ffa，合并head为4c7a3d045a33d0ce4e9b7388ba7f673229300001。[push CPU检查](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38644515800)、[PR CPU检查](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38644607611)、[Branch flow](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38644607459)均SUCCESS；本机检查亦通过。合并依据为上述Enmao长期授权，未提问、未合main、未强推、未删除分支或数据。
+
+仓库未启用auto-merge：`gh pr merge 8 --auto --merge --match-head-commit 4c7a3d045a33d0ce4e9b7388ba7f673229300001`返回`GraphQL: Auto merge is not allowed for this repository (enablePullRequestAutoMerge)`，该动作未合并。此为GitHub功能设置，不是自动审批拒绝；未修改仓库设置或绕过保护。检查全过后执行普通`gh pr merge 8 --merge --match-head-commit 4c7a3d045a33d0ce4e9b7388ba7f673229300001`成功。
+
+合并时BC30已完成48/480条、9,722个提交token自检全过。合并仅改变远端dev，没有切换本地源码或修改运行中冻结文件；两格BC60仍排队。四格总体未完成，BC10数学自检通过与独立AR差异分别报告，后续4B仍待全480结果。

@@ -1,12 +1,14 @@
 # tools
 
-Local utilities. No Docker, no weights, no network (except what an installed package already cached).
+Local utilities. Model-window diagnostics use explicitly prepared local weights; no automatic downloads.
 
 | **script** | **purpose** |
 | --- | --- |
 | `ci_local.py` | Replay `.github/workflows/cpu-checks.yml` in a fresh worktree and Python 3.12 venv. |
 | `decode_fingerprint.py` | Capture tokens and decode stats for every shipped preset; `--compare` proves a change is output-identical. |
 | `profile_cpu.py` | cProfile of `esp_mtp.evaluate` on a tiny model. tau / speed are not paper numbers. |
+| `diagnose_output_windows.py` | Read-only q173 matched-window replay around the unchanged decoder; requires identical tokens/traces, records previous seed masks/logits and exact hidden consistency. |
+| `diagnose_mask_scale.py` | Four fixed root83 prefix forwards cross two actual seed-mask directions with two observed norms; no generated tokens or tuned default. |
 | `package_selfcheck.py` | Build wheel/sdist, install into separate targets, validate both module/console entries and native + SpecMTP CLI chains; no dependency replacement. |
 | `windows_selfcheck.py` | Windows native import order (`python -m rpipe` vs `python -m spec_mtp`). |
 

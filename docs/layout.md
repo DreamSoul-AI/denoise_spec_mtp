@@ -43,3 +43,7 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 目录入口统一 README.md，docs/PLAN.md 与 docs/STUDY_REPORT.md 分别保存计划和人类结论；NUMBERS 保留 report 数字。两份 YAML 仍按基底 → fixed → axes/seed 合并，不搬动已有研究配置。smoke 的原交付 version 和正式 JSON 保留，新实测采用隔离目录与新 version。阶段仅保留 collect/summarize/write/process 的专项扩展，默认 prepare/execute 通过 recipe、builder 与 Algorithm 执行。training-free 报告用真实解码结果图适配上游学习曲线要求，不增加训练或恢复承诺。完整合同见 [Study 指南](../studies/README.md)。
 
 当前结构迁移详见 [rpipe-migration.md](rpipe-migration.md)：data 的业务从 __init__ 移至 datasets，跨层输入与注册由 structure/api 组装，纯证据核验在 structure/artifact/validation。make、prepare 与 execute 无专项编排时直接复用库；不补空壳。
+
+`tools/diagnose_output_windows.py` follows the existing direct-decoder profiling utilities. It observes fixed q173 windows, binds tool/PLAN/native raw/source hashes and refuses mismatching replay. Full selected tensors stay in a new .tmp directory; scalar diagnosis belongs to the Study. Scientific src, original Run and source locks are retained.
+
+`tools/diagnose_mask_scale.py` uses the saved window tensors to cross the two observed directions/norms at one predeclared position, with four isolated causal forwards. It reuses the existing model wrapper and scalar helpers; it does not alter decoder/provider/config or choose a new default.

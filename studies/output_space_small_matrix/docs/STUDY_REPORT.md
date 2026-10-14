@@ -39,7 +39,7 @@
 - q173：输入链在root79/83/88/92分别接受1/2/1/1，输出一阶均0；一阶又在root94/97各接受1而输入均0。不同方法命中不同区间，输入最终5、一阶3，不能只展示一阶胜的两个区间。
 - q174：共同root42输入0/输出1；输出提交句号token13及bonus EOS151645并终止，输入需要下一root43取EOS。因而输出11calls、输入12calls；收益集中在该句末位置，不能宣称整段机制优势。
 
-完整未共同访问根列表、停止标志、提交token与两两比较都在trajectory_diagnosis.json保留。保存数据缺草稿logits、完整mask向量及同位proxy/exact hidden配对，故无法计算候选概率margin/hidden误差或作机制归因。范数差异是统计量差异，不声称证明完整向量关系。
+完整未共同访问根列表、停止标志、提交token与两两比较都在trajectory_diagnosis.json保留。矩阵本身的保存数据缺草稿logits、完整mask向量及同位proxy/exact hidden配对；下方按新诊断合同补充固定窗口测量，不能从矩阵原数据补造这些量。范数差异是统计量差异，不声称证明完整向量关系。
 
 ## Run与资源
 
@@ -56,6 +56,60 @@
 
 ## 结论与可复现下一步
 
-执行完成=true；质量通过=true；稳定方法优势尚未建立。q173首次出现一阶超过零阶的两个具体匹配前缀，q174有单个句末优势，整体输入链在此三prompt仍领先。下一项高信息量诊断应冻结q173的root94/97及输入领先的root83作为正/负窗口，记录同位proxy/exact hidden误差、映射后mask和top1/top2 margin；同时重放token与接受链必须一致，禁止为了得到改善而调beta/映射或换窗口。它需要另写instrumentation合同、版本与额外前向预算；当前数据无法提供这些未记录值，故本轮不补造机制结论、不直接扩完整矩阵。
+执行完成=true；质量通过=true；稳定方法优势尚未建立。q173首次出现一阶超过零阶的两个具体匹配前缀，q174有单个句末优势，整体输入链在此三prompt仍领先。随后已冻结q173 root94/97与输入领先的root83，按独立instrumentation/尺度合同补测，保持token/接受链和科学配方不变；实际测量与有限解释见下节，不直接扩完整矩阵。
 
 复跑本矩阵：准备同ModelScope来源后改新version，`python -m spec_mtp make studies/output_space_small_matrix --num-gpus 1 --init-gpu 0 --round 1`，再launch/process/status/logs/report。正式JSON/图/PLAN/报告与只读分析/图工具可随源码复现；Run/raw/log/weights和.tmp/output-matrix-20261014仅本机，不随clone。NUMBERS仅将本机log引用改为文本，数值不变。
+
+
+## q173固定窗口测量与反事实对照（2026-10-14）
+
+上述矩阵之后，按独立 [WINDOW_PLAN](WINDOW_PLAN.md) 固定root83/94/97，只读观察原SpecDecoder/provider/model；再按 [SCALE_PLAN](SCALE_PLAN.md) 对root83作固定2×2方向/范数介入。[窗口证据](window_diagnosis_v1.json)、[尺度证据](scale_diagnosis_v1.json)记录源码/tool/PLAN/原矩阵/本机张量SHA与实际runtime。三次q173重放各33token，完整output/接受/提交/KV与原生Run一致；observer模型调用次数28/32/30均等于1+原decode_calls。另有1个完整AR序列teacher-force与9个隔离prefix+seedmask前向；尺度对照仅4个前向、0新生成token。没有新增正式接受格子、重签旧Run或改变科学src/参数。
+
+### 起草证据的正确时序
+
+root p的当前draft由上一块最深已接受owner的mask logits给出，其第一个mask输入位置为p、预测目标为AR[p+1]。它不是当前块新构造的mask。三个窗口都核对seed位置[p,p+1]、实际草稿embedding、同位精确hidden，以及隔离正确prefix+实际seedmask的top1/hidden一致性。精确hidden与teacher、代理hidden与隔离seed的cosine均>=.99999；原块与隔离块的target margin差异绝对值最大约1.72e-5，没有跨过任何此处的margin符号。
+
+| case | root | seed来源block root | owner | slot1正确target margin | target概率 | proxy/exact cosine | 相对L2误差 | 接受长度 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| frozen_mean_chain | 83 | 82 | 0 | 0.639807 | 0.469612 | 0.456241 | 0.920022 | 2 |
+| frozen_mean_chain | 94 | 92 | 1 | -0.78651 | 0.111423 | 0.557233 | 0.856108 | 0 |
+| frozen_mean_chain | 97 | 96 | 0 | -0.531294 | 0.175262 | 0.471613 | 0.895813 | 0 |
+| output_order0 | 83 | 82 | 0 | -5.517139 | 0.003209 | 0.330888 | 1.101792 | 0 |
+| output_order0 | 94 | 93 | 0 | -2.061214 | 0.045804 | 0.447117 | 1.074323 | 0 |
+| output_order0 | 97 | 96 | 0 | -3.272995 | 0.02665 | 0.173248 | 1.114228 | 0 |
+| output_order1 | 83 | 82 | 0 | -5.517139 | 0.003209 | 0.330888 | 1.101792 | 0 |
+| output_order1 | 94 | 93 | 0 | 1.941534 | 0.579934 | 0.526143 | 0.934342 | 1 |
+| output_order1 | 97 | 96 | 0 | 1.837038 | 0.699188 | 0.793944 | 0.640971 | 1 |
+
+margin是正确target logit减去最高其他token logit（T0），不是速度或接受率。root94/97处，一阶target margin从零阶的-2.0612/-3.2730变为+1.9415/+1.8370，正确target成为top1，具体解释了此前两次额外贪心接受；隔离同prefix重放的top1相同，差异不来自当前prefix错位或约1e-5的块计算差异。此处两个输出mask范数同为约.925，第一seed向量的零/一阶cosine分别.98035/.24585（相对L2=.19823/1.22813）。proxy/exact误差也同时降低，但未对误差作独立介入，不能将相关性等同于滤波机制已证明。
+
+root83则输入margin+.63981、输出0/1均-5.51714，两输出的第一seed向量逐元素相同，实际top1为11而正确target为7602。虽其第二slot对AR第二target11有较高概率，第一草稿前缀已错，这个second-slot AR对照无效，不能记为真实depth2命中。所有second_AR_prefix_valid标志保留；输入在该位置两层均合法接受。
+
+### 分开方向与范数
+
+root83实际输入/输出seed范数=.1912895/.9250697，原观察同时改变方向与范数。固定四查询只交叉这两个已观察方向和两种已观察范数，没有搜索、挑最优或替换科学默认值；观察组合的top1复现，margin差<=1e-3。
+
+| seed方向 | 范数 | top1 ID | 正确target margin | target概率 | 原观察组合 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| input | 0.19129 | 7602 | 0.639812 | 0.469613 | True |
+| input | 0.92507 | 7602 | 0.531311 | 0.405206 | False |
+| output | 0.19129 | 11 | -5.545199 | 0.002923 | False |
+| output | 0.92507 | 11 | -5.517136 | 0.003209 | True |
+
+在这一个固定prefix和这两个尺度下，输入方向均使target7602为top1，输出方向均使11为top1；缩小输出范数不能修复这里的first-slot错误，增大输入范数也未使其失败。可排除“这两个尺度中的范数差异单独解释root83失败”，方向/内容在该局部对照中决定了正确target是否排第一。它不排除其他尺度、位置或prompt的范数效应，不是完整decoder配方的接受改善试验，更不授权将范数事后调为较优值。
+
+### velocity的局部结构检查
+
+[事后离线结构证据](structural_diagnosis_v1.json)从保留张量复算实际原provider，无模型前向。这里两个输出方法的三窗口seed来源均为owner0，其第一个slot(j=0)为Phi(proxy[0])；一阶来源velocity norm约8.04/8.00/10.74，但将它置零后这个first-slot向量完全相同，原seed重构max_abs_error<=2.98e-8。因此不能把root94/97的收益说成当前velocity直接加到了slot1；直接变化是此前代理hidden及其映射方向，velocity可通过更早slot/owner历史传播，具体起点和中介路径还未逐步介入确认。复算入口 [analyze_windows.py](../analyze_windows.py) 需要本机原selected_tensors.pt并检查SHA，拒绝用未知张量覆盖记录。
+
+![窗口margin与固定尺度介入](figures/windows_v1.png)
+
+图源上述正式JSON：左图为原preceding seed logits，右图为root83四个隔离prefix查询；不是总体接受收益、置信区间或速度图。重画：`python studies/output_space_small_matrix/plot_windows.py`。
+
+### 执行与保留边界
+
+窗口测量wall15.621秒，进程RSS采样峰6102249472 bytes/GPU全局5731MiB；尺度测量wall12.170秒，RSS5550583808 bytes/GPU5575MiB，线程峰均13、OMP/MKL1。均0.5秒采样，包含背景占用且可能漏短峰，不作精确allocator或性能结论。工具会同步复制张量，因此计时不可与正式矩阵排名。模型/11文件snapshot/runtime/srcdigest在测量前后均核验一致。6项observer清理/原轨迹/时序/margin/固定交叉测试通过；新增工具与本轮文档静态检查另有日志，不把旧270全量改写为新的全量计数。
+
+本机张量/全词表logits存在.tmp/output-windows-20261014-v1，sha47166a3b41e0c00ed39110593fe7f83b20323c2e3714fe0355f2a43aaa9dc14c；不随Git。正式scalar JSON和复跑工具入库，无权重/凭据导出。测量命令见两个工具docstring，out必须新目录；源码/模型/原矩阵不一致即停止并保存失败，不自动重签。未推送、合并或删除任何原始证据。
+
+这一步将接受计数差异推进到同prefix的实际mask输入与候选margin，并用固定尺度介入排除一个局部替代解释。保留其有限范围；未实现自适应Kalman、未优化映射/超参、未扩大完整矩阵。

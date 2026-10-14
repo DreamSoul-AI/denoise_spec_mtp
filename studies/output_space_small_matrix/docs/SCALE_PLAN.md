@@ -1,0 +1,9 @@
+# q173 root83 direction/norm counterfactual plan
+
+Predeclared2026-10-14 after the window diagnosis: at root83, frozen-input seed mask norm=.1912895292, output-order0/1 seed mask norm=.9250697494 (4.84x); output0/order1 first vectors are exactly equal. Their correct-target margins are+.63981 versus-5.51714. The first-slot target is7602, same true prefixAR[:83]. Direction and norm differ simultaneously; original observations do not separate them.
+
+Fixed 2x2: input/output recorded seed-vector direction crossed with the two observed norms, not a searched grid. Use q173 root83 only, seed input from selected_tensors.pt bound by the window diagnosis SHA. No new generated tokens, decoder replay, prompts, gain/norm optimization or scientific-source change. Four teacher-forced prefix+mask forwards maximum (two observed combinations reproduce the window isolated checks, two are counterfactuals), FP32/eager/CUDA/current runtime, same verified ModelScope snapshot. At most84 positions each, serial/threads1; version output-space-q173-scale-20261014-v1. Copy neither weights nor originalRun, delete nothing.
+
+Require source/model/snapshot/runtime/input hash consistency, raw first vectors as saved, nonzero finite norms, observed combinations identical top1 and target-margin agreement<=1e-3 with recorded isolated logits. Preserve all four outcomes, including failures. Report target probability, top1/top2 and margin, distinguishing these isolated mask-position predictions from full-decoder accepted counts: counterfactual queries do not establish a stable method improvement and are not retroactive selection of a new default scale. No push/merge/full matrix.
+
+The follow-up may separate a local direction effect from a local norm effect, including interaction. It cannot show generalization, select global beta/mapping, or explain every trajectory. The original3prompt matrix, q171 negative result and locked science recipe remain unchanged.

@@ -1,5 +1,9 @@
 # 异机交接
 
+## q173固定窗口与尺度诊断（2026-10-14）
+
+按WINDOW_PLAN/SCALE_PLAN完成只读q173 root83/94/97重放和4个尺度反事实前向。三case完整token/接受/KV不变、src670c744e0535dcad保持；观察器不新增decoder调用，1teacher+9prefix辅助后，窗口/模型/runtime一致性均通过。root94/97一阶seed target margin从零阶负值转正；root83的2×2方向/范数对照排除这两个尺度的范数差异单独解释错误。事后结构复算显示owner0 slot1为Phi(proxy0)，清零当时velocity不改slot1，收益不能表述为当前速度直接相加。科学配方/旧Run未改，未推送、合并或删数据；正式证据与复跑入口见[Study报告](../studies/output_space_small_matrix/docs/STUDY_REPORT.md)，本机selected张量SHA在报告保存。
+
 ## 输出空间三prompt小矩阵（2026-10-14）
 
 依据最新单prompt报告与offline_diagnosis，先固定q172–q174和预算，再用同源码670c744e0535dcad、FP32/eager/ModelScope snapshot/链式配方完成4新Run×3prompt。全部来源/原始证据/逐token AR/Study完整性门通过；accepted（输入/零阶/一阶）为1/1/1、5/1/3、0/1/1。q173 root94/97定位一阶相对零阶的2次额外接受，root83输入链仍领先；q174改善集中在句末。不调参、不宣称稳定优势。正式[小矩阵报告](../studies/output_space_small_matrix/docs/STUDY_REPORT.md)与可复算的paired-prefix诊断已保存。源码/旧成功/失败Run保持不变，本轮不推分支、不合PR、不删数据。

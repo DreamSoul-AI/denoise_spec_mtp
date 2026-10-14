@@ -107,3 +107,19 @@ def test_new_full_contract_keeps_original_settings_and_480_inputs():
     assert 'argmax_audit.py' in after['provenance']['include']
     assert (previous/'docs/prompts_manifest.json').read_bytes()==(current/'docs/prompts_manifest.json').read_bytes()
     assert len(json.loads((current/'docs/prompts_manifest.json').read_text())['rendered_prompts'])==480
+
+
+def test_pending_report_does_not_link_unpublished_local_evidence(tmp_path,monkeypatch):
+    monkeypatch.syspath_prepend(str(ROOT/'studies/esp_table1_bf16_full_argmax'))
+    spec=importlib.util.spec_from_file_location('pending_argmax_report',ROOT/'studies/esp_table1_bf16_full_argmax/analyze_results.py')
+    report=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(report)
+    (tmp_path/'docs').mkdir()
+    (tmp_path/'docs/prompts_manifest.json').write_text(json.dumps({'rendered_prompts':[{'question_id':1}]}))
+    (tmp_path/'docs/modelscope_snapshot.json').write_text('{}')
+    (tmp_path/'index.json').write_text(json.dumps({'experiments':[]}))
+    monkeypatch.setattr(report,'__file__',str(tmp_path/'analyze_results.py'))
+    report.main()
+    text=(tmp_path/'docs/STUDY_REPORT.md').read_text(encoding='utf-8')
+    assert '`protocol_pending.json`' in text and '](protocol_pending.json)' not in text
+    assert not json.loads((tmp_path/'docs/protocol_pending.json').read_text())['quality_passed']

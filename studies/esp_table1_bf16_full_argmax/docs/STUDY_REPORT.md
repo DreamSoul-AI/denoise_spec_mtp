@@ -15,4 +15,4 @@
 
 Mean mask按Eq5 λ=.1更新，与后续4B用户指定的ESP frozen mean不同。四格全部新Run，旧冻结PLAN不回写；原生AR门失败状态独立保留，不伪称native成功。新增argmax必须全过。
 
-逐prompt计数、AR首分叉位置和自检覆盖及哈希见[protocol_pending.json](protocol_pending.json)。完整原始tokens/argmax选择记录/Run仅在本机保留，未运行格不能用预检外推。
+逐prompt计数、AR首分叉位置和自检覆盖及哈希见本机临时文件 `protocol_pending.json`（未入Git）。完整原始tokens/argmax选择记录/Run仅在本机保留，未运行格不能用预检外推。

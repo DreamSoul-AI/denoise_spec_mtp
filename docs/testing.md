@@ -68,3 +68,7 @@ test_sampling_continuation.py新增12项：首命中使用真实seed、零/全�
 真实六单位4200new/3806forward全AR；163840native条件draw含T=2命中2/7，原温度仍零且检测力不足。H10检查34共有原冻结窗口无合法depth2翻转；回归与合成fixture不替代上述GPU或有限捕获边界。
 
 收尾核验：80项相关回归、Ruff与5个Study科学source/RPipe冻结门通过。新增19项统计/合法性回归，六单位42生成4200new3806forward、163840native条件draw、H10零新增forward均在冻结预算；正式分析再次执行逐项一致，来源/model/输入/旧helpers核对保持。源/default/旧合同/成功Run未改，未推送/PR/合并/删除。新sampled同KV四因素、原温度native极小尾可达性、安装包/速度/多设备/长矩阵未重验。
+
+## 4B模型接续与禁用计时（2026-10-15）
+
+test_4b_untimed验证三method tiny token/全部语义/calls保持、全局时钟不改及异常恢复、CUDA loader dtype/kwargs/恢复。test_4b_phases验证四phase的函数导出；test_4b_pairs保留正负零及拒绝缺配对。test_4b_input_control验证历史EMA字段/同链/原26与4输入manifest复用。原native配置展开新增4B Study，仍不加载真实权重。实际模型硬门来自10个成功4B native Runs，而非tiny fixture：first26/new4四格+EMA两格，所有输出和两类AR逐token一致。

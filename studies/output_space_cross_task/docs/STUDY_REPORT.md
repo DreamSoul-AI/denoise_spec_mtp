@@ -314,3 +314,12 @@ H8报告写回后另冻[SAMPLED_DEPTH_PLAN](SAMPLED_DEPTH_PLAN.md)，在查看�
 下一问题已收紧：用预声明的新sampled同上下文固定帧，分开即时state与代理内容；若仅代理替换不能复现原候选/命中差，则限制旧source719解释的泛化。该同KV四因素对照尚未执行。原温度native极小尾可达性亦未验证，不能靠进一步小量零命中或T=2命中解决。
 
 收尾核验：80项相关回归、Ruff与5个Study科学source/RPipe冻结门通过。新增19项统计/合法性回归，六单位42生成4200new3806forward、163840native条件draw、H10零新增forward均在冻结预算；正式分析再次执行逐项一致，来源/model/输入/旧helpers核对保持。源/default/旧合同/成功Run未改，未推送/PR/合并/删除。新sampled同KV四因素、原温度native极小尾可达性、安装包/速度/多设备/长矩阵未重验。
+
+## 0.6B 阶段归档与4B接续（2026-10-15）
+
+依据用户新指示，1274bb2及此前0.6B完整路径／固定窗口／罕见事件证据保留为历史阶段，暂停新增0.6B rare和单位置机理实验。没有本任务的0.6B生成进程待停止，未终止其他项目进程。已测结论仍限于0.6B；未执行的sampled同KV因素分解、原温度极小尾可达性保留为未验证，当前不继续消耗其预算。
+
+主模型转为Qwen3-4B，优先执行[4B同prompt配对复验](../../output_space_4b_recheck/docs/PLAN.md)及独立新prompt确认。先查历史结果，再区分旧输入空间EMA与新输出零/一阶，接受数／主路径调用数／逐token独立AR为指标；不测速、不推送或合并。权重、cache和旧raw仍在本机原位置，未移动、删除或重签。
+
+
+2026-10-15：本阶段已暂停归档。4B FP32 完成结果见 [recheck v2](../../output_space_4b_recheck_v2/docs/STUDY_REPORT.md)；当前最高优先为 ESP Table 1 BF16 复现。

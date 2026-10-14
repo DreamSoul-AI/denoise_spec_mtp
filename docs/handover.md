@@ -1,6 +1,6 @@
 # 异机交接
 
-最新状态见本文末尾“新prompt／seed反例与罕见压力测试”：六新单位的H8两项预测均被反驳，T=2条件下首次罕见命中2/7，H10已执行。下列历史记录保留当时范围，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
+当前主模型Qwen3-4B；0.6B rare/单位置阶段已归档暂停。first26同链复验、4条新prompt负结果及历史输入EMA控制均已实际完成，见本文末尾“4B主模型配对接续”及[主报告](../studies/output_space_4b_recheck_v2/docs/STUDY_REPORT.md)。下列0.6B记录保留其历史范围。
 
 ## q178算子对照与下一Study草案（2026-10-14）
 
@@ -127,3 +127,14 @@ v0.3.1 源码升级与完整回归；当前重构安装包/Windows selfcheck；�
 ## 新prompt／seed反例与罕见压力测试（2026-10-15）
 
 新增q242244 seed126及q245246 seeds126127共六单位，42生成／4200new／3806forward全AR；graft-self为-5,+1,+3,-6,-3,-4，q242此前三正和q244此前三负都在新seed反转。总18单位8增10减、六prompt不平衡样本，不作人口泛化。固定旧owner1/verifier的T=.8/1各16384 fresh native draw仍零，T=2另131072实际候选11/323命中2/7、首seed52396/21263；改变温度只证明对应条件可观测，不证明原温度尾可达性或全路径收益。报告写回后新冻H10并执行34共有固定窗口检查，无合法depth2反例；q244126和q245127首方向/最终方向反转也保留。新统计与合法性回归已落地；源/default/旧helper/协议/Run不改，不推送/PR/合并/删除。下一缺口是新sampled同KV四因素state/proxy实验，而不是继续小量零命中。
+
+## 4B主模型配对接续（2026-10-15）
+
+按用户新指示转Qwen3-4B，0.6B报告/commits/raw原位归档，不再扩大rare或单位置。检索只找到旧4B输入空间EMA结果，未定位完整旧output0/output1正结果；旧树[14]/[7,2]不与新同链计数混比。既存14文件ModelScope离线目录复用，实际SHA/model digest绑定，原下载origin/immutable revision仍未确认。
+
+同FP32/eager/T0/nonthinking/EOS/max100/[1,1]/k2/BC9：first26输入/零/一accepted238/329/321、主calls1955/1866/1876，独立AR2191；全source/model/token/Run/Study门通过。写回报告后执行预声明新4条：51/39/47、189/201/194，负结果全留。随后固定历史输入EMAβ.9999/λ.1/γ1两新Run，first26为240/1952、new4为39/202；输出/独立AR成功格按哈希复用不重跑。结论限于first26总收益，新prompt不稳定，一阶未普遍超过零阶，不推速度结论。
+
+eval.warmup=false，Study局部仅关闭decoder clock，兼容时长字段是0占位；同权重直接CUDA载入避免完整host副本，不改科学src/default。原v1基线execute26全AR后collect导出模块失败，失败Run/锁/raw保留；v2新身份修正四phase callable后成功，不重签旧成功。后续4B应先冻结新的跨类别/长度/预算全路径计数协议，不恢复0.6Brare；no push/PR/merge/delete。正式主/new4/EMA报告分别在output_space_4b_recheck_v2、output_space_4b_holdout、output_space_4b_input_control。
+
+
+2026-10-15 最新执行顺序：已有 Qwen3-4B 结果全部为 **FP32**，本轮先按主题提交、工作分支 PR 经 CI 合入 dev。其他研究暂停；最高优先复现 ESP Table 1（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=0.1）。8B 仅用于该复现；随后 Qwen3-4B/BF16 五方法加 AR 配对。新增实验不用 FP32、不测速。不得强推、合 main、删分支或数据。

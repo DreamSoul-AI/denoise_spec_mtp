@@ -118,3 +118,14 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 985c7c1后另冻两协议，扩展六单位、42生成4200new3806forward全AR，H8的q242126正/q244126负均被-5/+1反驳；q245混合、q246两负均保留。原温度各16384native draw仍零；独立标记T=2条件131072draw出现候选11/323首命中seed52396/21263、计数2/7，不能外推原温度可达性或完整路径收益。写回报告后继续H10，原固定捕获34共有窗口无合法depth2翻转；新增两H7符号反转事例。19新增统计/合法性回归，不改科学源/default/旧工具/成功Run，不推/PR/合并/删。
 
 收尾核验：80项相关回归、Ruff与5个Study科学source/RPipe冻结门通过。新增19项统计/合法性回归，六单位42生成4200new3806forward、163840native条件draw、H10零新增forward均在冻结预算；正式分析再次执行逐项一致，来源/model/输入/旧helpers核对保持。源/default/旧合同/成功Run未改，未推送/PR/合并/删除。新sampled同KV四因素、原温度native极小尾可达性、安装包/速度/多设备/长矩阵未重验。
+
+## 4B主模型配对接续（2026-10-15）
+
+按用户新指示转Qwen3-4B，0.6B报告/commits/raw原位归档，不再扩大rare或单位置。检索只找到旧4B输入空间EMA结果，未定位完整旧output0/output1正结果；旧树[14]/[7,2]不与新同链计数混比。既存14文件ModelScope离线目录复用，实际SHA/model digest绑定，原下载origin/immutable revision仍未确认。
+
+同FP32/eager/T0/nonthinking/EOS/max100/[1,1]/k2/BC9：first26输入/零/一accepted238/329/321、主calls1955/1866/1876，独立AR2191；全source/model/token/Run/Study门通过。写回报告后执行预声明新4条：51/39/47、189/201/194，负结果全留。随后固定历史输入EMAβ.9999/λ.1/γ1两新Run，first26为240/1952、new4为39/202；输出/独立AR成功格按哈希复用不重跑。结论限于first26总收益，新prompt不稳定，一阶未普遍超过零阶，不推速度结论。
+
+eval.warmup=false，Study局部仅关闭decoder clock，兼容时长字段是0占位；同权重直接CUDA载入避免完整host副本，不改科学src/default。原v1基线execute26全AR后collect导出模块失败，失败Run/锁/raw保留；v2新身份修正四phase callable后成功，不重签旧成功。后续4B应先冻结新的跨类别/长度/预算全路径计数协议，不恢复0.6Brare；no push/PR/merge/delete。正式主/new4/EMA报告分别在output_space_4b_recheck_v2、output_space_4b_holdout、output_space_4b_input_control。
+
+
+2026-10-15 最新执行顺序：已有 Qwen3-4B 结果全部为 **FP32**，本轮先按主题提交、工作分支 PR 经 CI 合入 dev。其他研究暂停；最高优先复现 ESP Table 1（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=0.1）。8B 仅用于该复现；随后 Qwen3-4B/BF16 五方法加 AR 配对。新增实验不用 FP32、不测速。不得强推、合 main、删分支或数据。

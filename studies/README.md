@@ -103,3 +103,8 @@ RPipe 要求报告附图：解码使用真实接受数或轨迹图及来源图�
 [output_space_cross_task](output_space_cross_task/README.md)是q241–244 summarization证伪草案，只有输入分词预检，未make/launch，不存在新测量结果。q178后续provider算子对照见[extension报告](output_space_extension/docs/STUDY_REPORT.md)。
 
 [output_space_cross_task](output_space_cross_task/README.md)已按独立EXECUTION_PLAN完成q241–244真实四格和20固定移植，全部AR一致但正负混合；第一阳性q241另冻canonical跟进出现11/12→14/14反例（路径仍不同）。此前“草案未执行”是历史状态，以[当前报告](output_space_cross_task/docs/STUDY_REPORT.md)为准，未改旧PLAN或重签Run。
+
+[4B同链复验](output_space_4b_recheck_v2/README.md)及[固定新4条](output_space_4b_holdout/README.md)真实四Run/Study门通过；[固定输入EMA](output_space_4b_input_control/README.md)两新Run复用其输出/AR。当前只比较接受/主calls/AR，不测速。output_space_4b_recheck是失败v1原位归档，勿继续其pending或重签锁。
+
+
+2026-10-15 最新执行顺序：已有 Qwen3-4B 结果全部为 **FP32**，本轮先按主题提交、工作分支 PR 经 CI 合入 dev。其他研究暂停；最高优先复现 ESP Table 1（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=0.1）。8B 仅用于该复现；随后 Qwen3-4B/BF16 五方法加 AR 配对。新增实验不用 FP32、不测速。不得强推、合 main、删分支或数据。

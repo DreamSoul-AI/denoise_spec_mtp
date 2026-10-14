@@ -41,3 +41,8 @@ Current-device v0.3.1 checks: [smoke acceptance](studies/smoke/docs/STUDY_REPORT
 Next stage: [output-space chain prerequisite](studies/output_space_prerequisite/README.md), tied final-hidden order0/order1 with a matched frozen-input chain. Implementation and four-case real-model correctness gates passed. On the fixed development prompt the output masks accepted10 drafts each versus17 for the matched input chain; no superiority or Kalman claim.
 
 Follow-up: [three-prompt small matrix](studies/output_space_small_matrix/README.md) and matched-prefix analysis. All outputs remain AR-identical; q172–q174 acceptance counts for input/order0/order1 are1/1/1,5/1/3,0/1/1. These mixed development observations do not establish stable superiority.
+
+当前主研究模型为Qwen3-4B：[同prompt first26复验](studies/output_space_4b_recheck_v2/docs/STUDY_REPORT.md)两阶总接受均高于输入，[固定4条新输入](studies/output_space_4b_holdout/docs/STUDY_REPORT.md)未保持收益，[历史输入EMA同链控制](studies/output_space_4b_input_control/docs/STUDY_REPORT.md)已执行。三批全AR一致，计时关闭；此前0.6B机理/罕见事件记录作为归档，不再扩大。
+
+
+2026-10-15 最新执行顺序：已有 Qwen3-4B 结果全部为 **FP32**，本轮先按主题提交、工作分支 PR 经 CI 合入 dev。其他研究暂停；最高优先复现 ESP Table 1（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=0.1）。8B 仅用于该复现；随后 Qwen3-4B/BF16 五方法加 AR 配对。新增实验不用 FP32、不测速。不得强推、合 main、删分支或数据。

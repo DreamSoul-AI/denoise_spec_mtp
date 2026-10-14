@@ -1,0 +1,21 @@
+# Qwen3-4B matched output-space recheck
+
+Frozen before new model forwards,2026-10-15 after1274bb2. User directs primary model4B, suspend0.6B rare/single-position analysis, no speed tests/push/PR/merge. Located old4B input-space first26 single-slot680/704/777, two-depth[7,2]621/704 and full48012809/15009; actual prior output0/output1 raw/result/config not found in stated search. History inventory distinguishes evidence from user recollection; this validates a new matched chain, not exact reproduction of unlocated positive output-space numbers.
+
+## Fixed input and comparisons
+
+SpecBench category file order skip2/take2, categories=['summarization', 'translation'], 4 prompts, manifest IDs/rendered tokens frozen before make. Seed123, per-prompt generator123+index, nonthinking first-turn template, no shortening/drop/replacement. Qwen3-4B existing14-file local snapshot whose paths/sizes match official ModelScope listing; reuse via shared/model/modelscope junction, local_files_only=true. Actual SHA/config/index/tied-storage/model digest/dtype/backend/source/runtime gates; remote immutable revision and original download origin remain unconfirmed. Source670c744e0535dcad unchanged.
+
+Four native Runs: matched input frozen-mean ESP, output0, output1 and fresh independent AR. All methods same static unpruned[1,1], k2/BC9, FP32/eager/CUDA, max100/EOS/T0. Outputbeta.9/beta_prime.99 and mapping/state semantics unchanged; no tuning. The input method is current research ESP frozen mean, not historical selected EMA or single-slot[14]; those numbers are background only. Actual tied weight storage mandatory. Declare H1 zero-input accepted total>0 and one-input accepted total>0; any nonpositive contrast contradicts that bounded gain prediction, not a correctness failure. Separate one-zero contrast and per-prompt/category signs. No superiority/population assertion from these fixed prompts.
+
+Count accepted drafts before budget/EOS clipping; count main generation model calls as prefill+decode for spec and ar_calls for AR. Internal AR audit calls separate, not added to main-path call comparison. Pair by exact qid/input/output and seed; every spec output must equal own AR AND separate AR Run token-for-token. Retain complete depth/accepted/cache/call traces and all negative/tie rows. Source/input/model/context/OOM/nonfinite/AR failure stops expansion, preserve failed Runs; never relax gate or change precision for a good result.
+
+## No benchmarking and resource schedule
+
+eval.warmup=false. Study-only UntimedEval replaces decoder module clock with constant zero during execute, without touching global time or scientific src; native-required timing fields are explicit disabled zero sentinels, no latency/throughput/speedup measurement or conclusion. Native collect/report compatibility fields may be zero, and formal report excludes them. Wrapper tests prove clock restoration/token/state/call identity. Build same HF model directly onCUDA via device_map to avoid a full16GB FP32 host copy; same wrapper/config/actual model digest, no offload/quantization. Study-local adapters/hash frozen and restore scoped construction hooks.
+
+SingleGPU/round1 serial. First Run is capacity calibration (same planned prompts, no repeated successful cells), then remaining three; .5s RSS/available-RAM/globalGPU sampling for OOM risk only. Est first26~15min/all4 (planning, not throughput); stop resource failure rather than kill another task. Budget4x4x100 plus3x4x100 internal AR audits = 2800new tokens, zero teacher/warmup, no single-window interventions. Realized EOS lower bound reported. Model loading/hashing/native finalization may be substantial but no timing ranking.
+
+## Follow-up and archival
+
+After first26 all quality gates pass, execute separately versioned predeclared holdout: summarization/translation skip2/take2 (qid243244163164), four new prompts, same four Runs/configs; regardless positive/negative primary signs, no selection by outcomes. Its purpose is limited out-of-development paired confirmation, not full matrix or mechanistic analysis. Old0.6B reports/raw/weights/cache/commits remain historical, no new rare/window work. Archive status and unresolved questions with links, not deletion/moving raw. Formal tables/paired count plots/provenance/report/local commit; raw Runs/model/cache local only. No remote, new PR or merge.

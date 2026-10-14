@@ -73,3 +73,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/diagnose_sampling_expansion.py`补固定四prompt三seed全采样路径；`tools/diagnose_rare_events.py`按旧owner1上下文做native抽样及稳定Bernoulli检测能力计算，零模型forward。
 
 `tools/diagnose_sampling_continuation.py`固定六新prompt/seed诊断；`tools/diagnose_rare_stress.py`分开原温度零观测与T=2条件压力测试，不改变默认采样器/配置。Study局部analyze_continuation与analyze_sampled_depth复用旧计数/观察器，只保存统计和语义轨迹，完整draw/tensors仍在.tmp。
+
+4B Study局部untimed_4b.py仅关闭decoder模块计时并以相同权重directCUDA materialize；注册范围是该原生Run进程，科学src/default不变。四phase导出沿用from .run import run；v1失败源保留，v2/native holdout/control为有效入口。两个analyze_results与write_report复核原生计数/AR/来源，selectedEMA复用已测输出，权重/全Run/shared仍不入Git。

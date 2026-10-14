@@ -69,3 +69,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/diagnose_q241_local_factors.py`固定source719/current720 cache/tree并交换state/proxy；`tools/diagnose_state_extension.py`执行预声明q242/q243两seed状态因素矩阵，不改正式解码器。
 
 `tools/diagnose_sampling_paths.py`做真实非T0 AR耦合路径及旧source719条件抽样；`tools/diagnose_q241_owner1.py`固定实际source717／owner1映射，只核对应rows5/6的seed。
+
+`tools/diagnose_sampling_expansion.py`补固定四prompt三seed全采样路径；`tools/diagnose_rare_events.py`按旧owner1上下文做native抽样及稳定Bernoulli检测能力计算，零模型forward。

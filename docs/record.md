@@ -106,3 +106,9 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 另冻两协议，q241/T=.8 seeds123/124两独立AR路径不同，14生成全token审计一致，固定实际entry697/715移植10→9与9→10。原source719条件multinomial(T=.8/1，各64)代理恢复0→64/63，属于旧固定上下文。新增source717 owner1四格三重复精确重现下一719 seed logits，候选11→323却均不等于AR1008，随机验证各0/64但概率非零。总1600生成new、12额外块、256条件draw，零teacher；全负结果、概率精度与泛化边界正式保存。科学source/default/旧helpers/合同无变，不远程/PR/合并/删数据。
 
 收尾核验：47项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；联合分析重跑与原formal证据一致，34个精确字节路径暂存blob与本机文件一致。1600生成new、12额外块、256条件draw在新协议预算内；旧source/default/配方/工具/Run未改。未做多prompt采样泛化、罕见事件统计检验或安装包／长矩阵重跑。
+
+## 多prompt完整采样、rare功效与后续H7（2026-10-15）
+
+新增10单位70生成／7000new／6328forward全AR，补12单位4prompt×3seed，6增6减，q242全正/q244全负/q241243混合。rare两温度各4096native抽样仍零候选命中，Bernoulli0/4096上界.000731远高于10^-11～10^-9，不能排除罕见效应或证明GPU尾可达性。先写回Study，再冻并执行H7：q242123/125第一-1最终+5/+2两个反例，计数通过共有/独有root严格重构；不强迫后期对齐、不冒充state因果分解。原source/default/helper/合同/Run不改，不远程/PR/合并/删数据。
+
+收尾核验：58项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；矩阵/rare/H7分析重跑与正式证据一致，45个精确字节路径暂存blob与本机文件一致。新7000生成new、8192条件draw、H7零新forward均在新合同范围。旧science/default/helper/Run不改，未扩展多任务/多温度/硬件，也未证明native rare尾可达性。

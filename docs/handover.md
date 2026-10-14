@@ -1,6 +1,6 @@
 # 异机交接
 
-最新状态见本文末尾“非T0完整路径／owner1范围”：两条真实采样路径、原source719随机验证和另一真实owner1对照已执行。下列历史交接中的未运行状态保留为当时记录，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
+最新状态见本文末尾“多prompt采样／罕见功效／H7反例”：完整四prompt三seed矩阵、rare检测边界与后续H7已执行。下列历史交接中的未运行状态保留为当时记录，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
 
 ## q178算子对照与下一Study草案（2026-10-14）
 
@@ -119,3 +119,7 @@ v0.3.1 源码升级与完整回归；当前重构安装包/Windows selfcheck；�
 ## 非T0完整路径／owner1范围（2026-10-15）
 
 [最新报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)：真正T=.8两seed独立AR输出不同，14生成全token一致，实际窗口697/715效果-1/+1；旧source719条件抽样恢复0→64/63不泛化为新路径稳定收益。source717实际owner1 rows5/6交换proxy精确复制真实下一719 seed，11→323但均不命中1008，64draw各零但概率非零。12块三重复/两原值控制全tensor验证，条件与full-path证据严格分开；下一缺口是新 sampled窗口等state decomposition、更多prompt/温度和罕见候选效应，不声称已解决。未远程/PR/合并/删除。
+
+## 多prompt采样／罕见功效／H7反例（2026-10-15）
+
+[最新报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)：4prompt×3seed12单位，旧2保留、新10全部sampled AR，6增6减；q244重复负限于当前输入/T=.8/k2/100预算，q242重复正。4096draw每温度仍零罕见候选命中，检测功效不足且GPU极小概率可达性未验。矩阵报告写回后另冻FIRST_DELTA_PLAN并执行H7，新q242123/125首变-1终+5/+2收紧局部预测。下一缺口是新sampled窗口等state decomposition/原生samplerrare数值尾，不声称已完成。raw本机、科学source/default/旧工具不改，未远程/PR/合并/删数据。

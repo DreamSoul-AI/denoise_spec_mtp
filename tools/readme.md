@@ -38,3 +38,6 @@ Package check: `python tools/package_selfcheck.py --workspace .tmp/package-<new-
 
 `diagnose_sampling_paths.py`：`python tools/diagnose_sampling_paths.py --out .tmp/<new-id>`，两T=.8 seed各独立AR+四格/观测，冻结实际窗口，旧source719条件multinomial接受检查。
 `diagnose_q241_owner1.py`：`python tools/diagnose_q241_owner1.py --out .tmp/<new-id>`，两canonical原值控制、owner1四格三重复、独立上下文条件draw；保留不恢复命中的负结果。
+
+`diagnose_sampling_expansion.py`：`python tools/diagnose_sampling_expansion.py --out .tmp/<new-id>`，10新单位补完整4prompt×3seed，复用旧q241两单位不重跑。
+`diagnose_rare_events.py`：`python tools/diagnose_rare_events.py --out .tmp/<new-id>`，两温度各4096native verifier draw，保留tiny质量与检测上界，不把零命中当无效概率。

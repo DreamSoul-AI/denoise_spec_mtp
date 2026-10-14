@@ -52,3 +52,11 @@ test_local_state_proxy.py覆盖固定state/proxy输入保全、fresh cache与因
 test_sampling_causality.py检查原multinomial RNG被消耗且四因素共享draw、seed重复可复现而抽样token有变化、positive-temperature draft仍按top1构树、output_hidden在两温度／两seed／两order下等于fresh AR，以及owner1 rows5/6/PIDs719/720。真实权重另完成两条T=.8完整AR路径／self/graft门、原owner0和新owner1各128条件draw、12owner1固定块三重复，见[最新报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)。条件draw不是完整生成，也不以64次罕见候选零命中证明概率为零。
 
 收尾核验：47项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；联合分析重跑与原formal证据一致，34个精确字节路径暂存blob与本机文件一致。1600生成new、12额外块、256条件draw在新协议预算内；旧source/default/配方/工具/Run未改。未做多prompt采样泛化、罕见事件统计检验或安装包／长矩阵重跑。
+
+## 多prompt采样与罕见事件边界（2026-10-15）
+
+test_rare_path_boundaries.py新增p=0/1端点、越界/N0拒绝、tiny p非零概率稳定计算、零观测单侧上界与最小95%命中检测数回归。真实10新单位70生成／7000new全部sampled AR／self／单槽scope门通过；两温度各4096native条件draw均零候选命中但不能排除10^-11～10^-9质量，见[报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)。不以分布质量证明有限精度sampler的极小概率可达性。
+
+H7轨迹计数回归继续覆盖第一次收益／最终损失、净零抵消、方向保留、非语义metadata忽略、错误总计数与不共享前缀拒绝。真实新10单位中q242/123及125首变-1而净+5/+2，报告写回后实际执行下一假设，零额外model forward。
+
+收尾核验：58项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；矩阵/rare/H7分析重跑与正式证据一致，45个精确字节路径暂存blob与本机文件一致。新7000生成new、8192条件draw、H7零新forward均在新合同范围。旧science/default/helper/Run不改，未扩展多任务/多温度/硬件，也未证明native rare尾可达性。

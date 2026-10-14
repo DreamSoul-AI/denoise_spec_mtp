@@ -15,3 +15,5 @@ The local q178 operator results are in [the extension report](../output_space_ex
 新固定帧对照在source719分离即时state与代理，并新增q242/q243两greedy seed因素矩阵；q242零交互、q243非零，root720当前映射与候选构建时序见[最新报告](docs/STUDY_REPORT.md)。
 
 非T0两完整采样路径独立AR一致，移植效果-1/+1；原source719条件随机验证恢复，另一owner1候选改变但未恢复命中。新协议、概率数值口径和回归见[最新报告](docs/STUDY_REPORT.md)。
+
+完整4prompt×3seed含旧2、新10，6增6减；rare4096draw仍零但功效不足。报告更新后继续H7得到首变负、最终正的两新反例，见[最新报告](docs/STUDY_REPORT.md)。

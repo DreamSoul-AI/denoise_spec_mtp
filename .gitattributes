@@ -40,3 +40,16 @@
 /studies/output_space_cross_task/docs/sampling_owner_analysis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/sampling_diagnosis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/owner1_diagnosis_v1.json -text whitespace=cr-at-eol
+
+# Preserve sampled expansion, rare-event and H7 evidence bytes.
+/tools/diagnose_sampling_expansion.py -text whitespace=cr-at-eol
+/tools/diagnose_rare_events.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_sampling_expansion.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_first_delta.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/SAMPLING_EXPANSION_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/RARE_EVENT_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/FIRST_DELTA_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_expansion_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_expansion_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/rare_event_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/first_delta_analysis_v1.json -text whitespace=cr-at-eol

@@ -205,3 +205,64 @@ sampling wall47.418秒，.5s采样RSS5500076032 bytes、GPU全局7129MiB、最�
 新增回归覆盖multinomial消耗RNG与共享draw、不同seed实际随机性、正温度draft仍top1而verifier采样、output_hidden两order两seed两温度对fresh AR的token一致，以及owner1 rows5/6与positions719/720，防止误读owner0 rows3/4。本轮证据允许：固定原上下文中的首槽恢复在非T0仍成立，另owner内容变化不必恢复接受，新的完整采样路径存在正负效应。未证明多prompt／多温度／多设备泛化，未将full-path sampled新窗口做等state causal分解，也未证明极小概率事件无效。不推送、不开PR、不合并、不删数据。
 
 收尾核验：47项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；联合分析重跑与原formal证据一致，34个精确字节路径暂存blob与本机文件一致。1600生成new、12额外块、256条件draw在新协议预算内；旧source/default/配方/工具/Run未改。未做多prompt采样泛化、罕见事件统计检验或安装包／长矩阵重跑。
+
+## 四prompt三seed完整采样扩展与罕见事件检测边界（2026-10-15）
+
+按a5ede78后新冻结[SAMPLING_EXPANSION_PLAN](SAMPLING_EXPANSION_PLAN.md)与[RARE_EVENT_PLAN](RARE_EVENT_PLAN.md)，执行[多prompt工具](../../../tools/diagnose_sampling_expansion.py)、[罕见抽样工具](../../../tools/diagnose_rare_events.py)和[离线复核](../analyze_sampling_expansion.py)。旧q241 seeds123/124两行保留为development，不重跑；新加q241 seed125及q242/243/244 seeds123/124/125，共10新单位。全部T=.8、max100/EOS和原源/默认配方，独立AR、两native、两观测和两self/graft门通过，模型/输入/来源/窗口范围保持。
+
+### 完整矩阵的正负边界
+
+| qid | seed | 来源 | 实际entry | 零阶accepted | 一阶self | graft | graft-self |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| 241 | 123 | 旧development | 697 | 11 | 10 | 9 | -1 |
+| 241 | 124 | 旧development | 715 | 9 | 9 | 10 | +1 |
+| 241 | 125 | 本轮 | 713 | 9 | 8 | 10 | +2 |
+| 242 | 123 | 本轮 | 647 | 16 | 13 | 18 | +5 |
+| 242 | 124 | 本轮 | 648 | 8 | 7 | 12 | +5 |
+| 242 | 125 | 本轮 | 659 | 16 | 12 | 14 | +2 |
+| 243 | 123 | 本轮 | 600 | 13 | 14 | 9 | -5 |
+| 243 | 124 | 本轮 | 600 | 11 | 12 | 10 | -2 |
+| 243 | 125 | 本轮 | 600 | 13 | 10 | 15 | +5 |
+| 244 | 123 | 本轮 | 905 | 12 | 10 | 9 | -1 |
+| 244 | 124 | 本轮 | 905 | 10 | 12 | 9 | -3 |
+| 244 | 125 | 本轮 | 923 | 12 | 12 | 11 | -1 |
+
+正式[完整诊断](sampling_expansion_diagnosis_v1.json)与[分析](sampling_expansion_analysis_v1.json)覆盖全部12单位，其中6增／6减、0null、0infeasible，各prompt三个独立AR输出均不同。汇总zero140／self129／graft136只是这组固定单位的描述，不代表方法稳定优势。q242三次都正、q244三次都负，q241／q243混合；原窗口局部恢复不能预测跨prompt的一致方向。负结果在固定q244、T=.8、当前Qwen3-0.6B FP32/eager、100预算／链k2范围重复，不把3seed称为随机prompt人口统计或一般负结论。
+
+每单位7次完整生成均含自身新AR审计。新70生成／7000new／6328forward，旧14生成／1400new保留不重签；接受计数仍在预算最终裁剪前。旧Source719没有强制访问，entry按原choose_window冻结，capture六root，后续actual owner/root与完整trace不强迫对齐。新probe只换[0,1]，原值self全部重现；全输出逐token等于该seed自己的sampled AR。没有canonical等state分解，不能把完整路径净差唯一归为proxy因素。
+
+### 重复零命中与检测能力
+
+在原实际owner1验证root719上，T=.8／1各用fresh seeds300–4395运行4096个native CUDA select_token单token抽样，共8192draw，零Qwen forward／teacher／生成续写；四S/P格共用各温度的一条draw bank，不当四组独立实验。候选11/323在两温度都0/4096；RNG消耗门通过，T=.8观察1种token、T=1观察2种，不用零命中代替随机性验证。[完整rare记录](rare_event_diagnosis_v1.json)保存全部draw和native CUDA-FP32及CPU-FP64质量。
+
+| 温度／候选 | native softmax mass | 理想4096次至少一命中概率 | 理想95%至少一命中所需draw |
+| --- | ---: | ---: | ---: |
+| .8／11 | 1.4170972e-11 | 5.8044298e-8 | 211399213797 |
+| .8／323 | 2.2575285e-11 | 9.2468365e-8 | 132699641295 |
+| 1／11 | 2.0935800e-9 | 8.5752668e-6 | 1430913701 |
+| 1／323 | 3.0386205e-9 | 1.2446112e-5 | 985885636 |
+
+理想独立Bernoulli模型下，0/4096的单侧95%上界为.0007311125564754343，仍远大于所有记录质量。用-log1p/expm1稳定计算小概率，避免把1-p舍成1产生假零；95%检测量仅指至少一次命中，不等于检验两极小概率差的样本量。**零命中在本预算下重复，不是概率为零或已排除罕见影响。** 不运行10^9–10^11次暴力采样，不扩大温度或改logits制造有利事件；native有限精度sampler对极小概率的数值可达性未验证，理想Bernoulli功效也不冒充该实现的真实尾概率。
+
+### 资源、复现与下一假设
+
+新完整矩阵wall178.287秒、.5s采样RSS5076901888 bytes、GPU全局7661MiB、最低主存10350784512；raw312037981 bytes、SHA6db9b1e5f387657de37b8e62aa38250c6099554809f199448797091ad474ea5f。rare wall6.967秒、RSS1086337024、GPU3193MiB、8192draw；所有weights/cache/tensors保留本机.tmp，GPU含背景、采样非allocator峰，不作速度排名。零teacher/warmup、旧科学source/default/配方/helper/Run未改，不推送／PR／合并／删除。
+
+本轮补稀有事件端点、无效输入、tiny p稳定性、零观测上界、最小95%检测数回归。完整路径方向具有prompt与seed依赖，下一项按最小成本检验“首个局部接受变化符号能预测最终净差”，将另冻协议、读取同一批完整语义trace，不增加有利窗口、不将已有总数当新独立证据。
+
+## 报告更新后继续H7：首个局部方向不能预测净方向（2026-10-15）
+
+完成上节矩阵／rare报告后、查看首次分叉前，另冻[FIRST_DELTA_PLAN](FIRST_DELTA_PLAN.md)，执行[完整轨迹计数工具](../analyze_first_delta.py)，结果存[结构化分析](first_delta_analysis_v1.json)。这是对已知最终数的解释性检验，不称新held-out样本；没有新模型forward、draw、prompt或窗口搜索。
+
+H7要求：首个按时间出现的self/graft语义分叉之accepted-node数差符号，应与最终净接受差符号相同。仅比较TRACE_KEYS，排除mask norm等早期诊断元数据。每侧accepted须等于全部trace accepted_nodes计数和，首个分叉真实root必须相同；后续只按实际共有／独有root作计数，不强迫对齐或只选能解释净差的根。
+
+| 新单位 | 第一次分叉root | 第一accepted差 | 最终差 | 共同root总差 | graft-only减self-only接受差 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| q242／123 | 651 | -1 | +5 | +6 | -1 |
+| q242／125 | 685 | -1 | +2 | +1 | +1 |
+
+10个新单位中两例反驳H7：第一次损失不决定完整路径损失。其余8新单位方向一致；两旧development行单列，未用它们代替新检验。上述共同／独有root和最终数严格满足计数恒等式，所有根与双方记录保存；它说明后期收益和路径访问变化能反转早期方向，不是把这些根称为彼此可替换的hidden状态，也不是各state/proxy张量的因果百分比。
+
+q244三seed的首变和最终都是负，属于当前prompt／温度／预算下的重复负结果；q242三seed最终正，其中两seed首变负。局部即时恢复、第一次接受变化和完整路径净差是不同指标。新回归覆盖早期收益后净损失、收益抵消为零、方向保留、忽略非语义metadata、缺失count或不共享前缀拒绝。下一项仍未验证的是新sampled窗口的canonical等state因素分解与有限精度sampler的极小概率可达性；不从H7计数恒等式推断已完成它们。
+
+收尾核验：58项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；矩阵/rare/H7分析重跑与正式证据一致，45个精确字节路径暂存blob与本机文件一致。新7000生成new、8192条件draw、H7零新forward均在新合同范围。旧science/default/helper/Run不改，未扩展多任务/多温度/硬件，也未证明native rare尾可达性。

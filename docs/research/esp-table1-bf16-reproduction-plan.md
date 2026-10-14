@@ -73,3 +73,7 @@ Study局部观察器绑定每个选择行到对应验证forward的logits，记�
 无argmax记录的全量v1部分日志保留。新argmax Study v2首次四Run在模型加载前因ModelScope缓存接入失败，未执行解码；失败Run保留。补接此前同一已校验本地snapshot后以v3新Run执行，未改模型或实验设置。
 
 永久停止BF16 ESP相对独立AR的全部算子级数值机理排查。既有[reduction报告](../../studies/esp_table1_bf16_reduction_check/docs/STUDY_REPORT.md)、[shape报告](../../studies/esp_table1_bf16_shape_check/docs/STUDY_REPORT.md)和测试已按主题提交推送，仅作历史归档；不再启动归约开关、单行linear/RMSNorm、compact attention或逐层BF16算子追踪。权重、缓存和完整Run留本机；全480结束后仅按第4节推进4B BF16五方法加AR，不测速、不恢复机理链、不合main、不force push。
+
+## 6. 执行授权与检查依据
+
+依据2026-10-15 Enmao本任务长期授权，正常工作分支推送、PR、合dev、本地检查替代远端CI直接执行；不使用提问弹窗。报告注明实际验证命令、结果及覆盖范围；保留平台强制分支保护。删除数据/分支、强推、合main、花钱前暂停相应动作并写报告。自动审批拒绝记录具体命令、拒绝理由及执行状态，继续未受阻工作，交监督助手处理。[授权与审批记录](../handover.md)。

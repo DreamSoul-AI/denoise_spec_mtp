@@ -33,7 +33,10 @@
 
 - 保留工作区里已有改动。临时输出放 `.tmp/`。Study 产物（`runs/`、`shared/`、`scripts/`、`index.json`、`process.json`）不进 git。
 - 默认分支为 `main`。工作分支通过 PR 先进入 `dev`，再由同仓库 `dev` 的 PR 进入 `main`；不直接推 `dev`/`main`，不强推或删除长期分支。
-- PR 必须通过 `cpu-checks` 和 `Branch flow`；保留现有审批要求。提交、推送、合并和实验仍按当次授权。
+- Enmao已长期授权：本仓库范围内的正常提交、按PR流程推工作分支、合入`dev`及用本地检查代替远端CI直接执行，不重复询问、不使用提问弹窗。授权依据及审批记录见[handover.md](docs/handover.md)。
+- PR按`cpu-checks`和`Branch flow`的检查范围完成验证；可提供远端结果或等价本地检查证据，写明实际命令、结果及未验证范围，不把未运行的远端CI写成通过。保留平台实际强制的分支保护和评审要求。
+- 自动审批拒绝时，在报告写明准确命令、工作目录、拒绝理由和执行状态，继续不依赖该动作的工作，交监督助手处理，不弹提问窗。
+- 删除数据、删除分支、强推、合入`main`或花钱前暂停相应动作，在报告记录待处理事项，不弹提问窗。普通工作不因这些未请求的动作而停止。
 
 ## 4. 代码放在哪
 
@@ -46,7 +49,7 @@
 - 开跑前写 `studies/<name>/docs/PLAN.md`（问题、对照、指标、停止规则、[studies/README.md](studies/README.md) §5 排班）。
 - `python -m spec_mtp make studies/<name>`，再 `python -m spec_mtp launch studies/<name>`。
 - `flow.prepare_shared: false`（RPipe make 下载只认 torchvision）。Run prepare 仍把 SpecBench 和权重写进 `shared/`。**不要写 `origin: foreign`**（[layout.md](docs/layout.md)）。权重用 ModelScope。
-- `exact_match_rate` 必须是 1。表里的数是接受的 draft 数。速度和 `tau` 不决定结论。不把 γ 叫成 slope。
+- 实验验收遵循最新用户确认及冻结协议。当前BF16/T0研究的正确性门是全部提交token等于对应验证前向logits的argmax；独立AR一致率仅报告、不作失败门，见[当前研究计划](docs/research/esp-table1-bf16-reproduction-plan.md)。历史Run及原生门状态不重签。永久停止BF16 ESP相对独立AR的算子数值机理排查。接受数、τ及其口径写入报告，不把γ叫成slope。
 - 已有数字的格子不重跑。不复用一个 Run 目录。源码或输入变化用新的 algorithm.config.version；make/remake 不签收旧成功 Run。
 - Study collect 从 execute 的原始观测计算指标，summarize 跑成功门，write 再核验，process 只终验当前 index。
 - Windows：`PYTHONUTF8=1`，`D:\anaconda3\python.exe`，不另建 venv。

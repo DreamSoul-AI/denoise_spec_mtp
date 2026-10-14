@@ -147,3 +147,29 @@ eval.warmup=false，Study局部仅关闭decoder clock，兼容时长字段是0�
 
 
 2026-10-15 最新τ主线：[全480 argmax审计](../studies/esp_table1_bf16_full_argmax/README.md)替代无argmax记录的v1。BF16/T0/默认归约/λ=.1 updating mean/动态树剪枝完全保留，BC60单mask为主、双mask仅对照。AR一致率及逐条首分叉独立报告，不作为τ执行门；全部提交token必须等于对应验证forward的argmax。v1部分日志/旧冻结合同保留；v2四Run在模型加载前缓存接入失败，保留失败后补接同一ModelScope本地snapshot，以v3新四Run串行运行。当前第一格BC10 Run dfe1b9c8d5d12e92已开始真实BF16解码，未完成全480。停止compact attention、单行RMSNorm与逐层数值机理；4B五方法仍等待Table1结果。新增观察器无额外forward，首token、截断尾部、错误argmax与恢复回归通过；上一push的CI两项launcher文档遗漏已用378c6a9修复，尚待新远端CI。
+
+
+## 2026-10-15 长期执行授权与自动审批记录
+
+依据Enmao本任务明确指示：“合 dev、按 PR 流程推工作分支、本地检查代替远端 CI，这些都已长期授权，直接做，并在报告里写明依据。”因此普通工作直接按PR流程执行，不重复询问，不使用提问弹窗；删除数据、删除分支、强推、合main、花钱前暂停相应动作并写报告。自动审批拒绝记录命令、理由和实际执行状态，继续未受阻工作，由监督助手处理。平台实际分支保护与评审要求保留；本地验证不冒充远端CI。
+
+当前全480 BF16/默认设置调度链继续，数学argmax自检是正确性门，AR一致率独立报告；算子机理永久停止，全480后做4B BF16五方法加AR同prompt配对。GPU运行和冻结Run/source/PLAN未因授权记录而修改。
+
+已发生的审批服务超时（只读查询）如下，工作目录为`D:/GitHub/DreamSoul/denoising-speculative-decoding`。被拦截的是一次包含下面进程查询、Python读取argmax JSONL及`gh run list`的命令；未执行该次查询。拒绝原文为“The automatic permission approval review did not finish before its deadline. Do not assume the action is unsafe based on the timeout alone.”该理由是审批服务超时，并未判定命令危险。按当时工具提示重试一次已成功，GPU Run未受影响；后续拒绝按上段流程记录处理。
+
+```powershell
+Get-CimInstance Win32_Process | Where-Object { $_.Name -match 'python' -and $_.CommandLine -match 'esp_table1_bf16_full_argmax' } | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json
+@'
+from pathlib import Path
+import json
+s=Path('studies/esp_table1_bf16_full_argmax')
+for cell in json.loads((s/'index.json').read_text())['experiments']:
+    spec=cell['factors']['algorithm.config']['spec'];run=cell['runs'][0]['id'];assets=s/'runs'/run/'assets';p=assets/'argmax_audit.jsonl'
+    records=[json.loads(line) for line in p.read_text().split('\n')[:-1] if line] if p.exists() else []
+    assert all(r['passed'] and len(r['committed'])==r['checked_committed_tokens'] and all(c['chosen']==c['argmax'] for c in r['committed']) for r in records)
+    print(json.dumps({'BC':spec['block_complexity'],'masks':spec['num_masks'],'run':run,'spec_prompts_completed':len(records),'checked_tokens':sum(r['checked_committed_tokens'] for r in records),'execute_complete':(assets/'decode_observations.json').exists()}))
+'@ | D:/anaconda3/python.exe -
+gh run list --branch feature/output-space-prerequisite --limit 1 --json databaseId,headSha,status,conclusion,url
+```
+
+本次授权记录的本地检查：`D:/anaconda3/python.exe -m ruff check src tests studies tools`、`D:/anaconda3/python.exe -m mypy`（56个源码文件）、`D:/anaconda3/python.exe -m pytest tests/spec_mtp -q`均exit0；CPU测试子进程使用`CUDA_VISIBLE_DEVICES`为空，不占用正在运行的GPU。Rpipe ORIGIN、两个console entry points及工作分支→dev方向检查通过。运行环境是本机Windows/Python3.13.9，未把这些结果写成Ubuntu/Python3.12远端CI已运行；最新已推送37a6f2d的远端cpu-checks实际SUCCESS。

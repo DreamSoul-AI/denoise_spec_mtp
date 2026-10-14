@@ -1,0 +1,46 @@
+study: esp_table1_bf16_shape_check
+description: ESP-only BF16 q81 native-versus-rowwise linear geometry control
+experiment:
+  name: esp_table1_bf16_shape_check
+recipe: recipe.py
+freeze: true
+provenance:
+  include:
+  - docs/PLAN.md
+  - docs/modelscope_snapshot.json
+  - docs/prompts_manifest.json
+  - docs/specbench-source.json
+  - untimed_4b.py
+  - numerics.py
+  - docs/preceding_results.json
+  - shape_control.py
+flow:
+  study_phases: true
+  prepare_shared: false
+axes:
+  algorithm.config:
+  - task: esp_mtp
+    spec: &id001
+      method: esp
+      num_masks: 1
+      block_complexity: 10
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      mask:
+        init: mean_prompt
+        lam: 0.1
+        update: true
+    numerics: &id002
+      bf16_reduced_precision_reduction: false
+      deterministic: false
+    shape_control:
+      linear_rows: false
+  - task: esp_mtp
+    spec: *id001
+    numerics: *id002
+    shape_control:
+      linear_rows: true
+seeds:
+- 123

@@ -54,3 +54,9 @@ FP32收尾：PR #7 已经CI通过并合dev，merge8677376，main未操作。BF16
 
 
 03:36 后续：三预算原设置均失配（6/13、6/13、5/13）。q81四格token exact为no/yes/no/yes；仅reduction=False、deterministic=False原生全链通过，deterministic=True组合格因阶段恢复引起runtime终验失败，未冒称成功。已启动新Study esp_table1_bf16_reduction_check 原13条/三BC/256上限扩大验证，仍不启动4B。
+
+
+03:47 扩大验证完成：reduction=False的BC10/30/60 exact为4/13、3/13、5/13，三格全失败；部分AR自身也随归约模式变化，局部q81前32token修复不能推广。已串行启动esp_table1_bf16_shape_check，q81/96token仅控制线性投影单行几何，BF16/ESP其他设置不变。16项控制/形状回归通过；仍不跑4B或全480，不把失配τ认作Table1成功。
+
+
+03:50 线性形状对照两格均失败，native q81首分叉index74，253个linear单行对照index9；权重digest相同/BF16不变。只固定linear行数不是充分修复。下一项协议：每query仅按attention mask保留有效KV，再比较compact attention单独、compact+单行linear、compact+单行linear+单行RMSNorm（三格q81/96token，BF16、同ESP）；所有数学/权重与接受语义保持，明确这是数值约定控制不是作者已公开实现。先验证可见KV集合/因果位置/patch恢复，再串行执行；若仍失配，按首分叉同prefix逐层BF16算子追踪，禁止切FP32/放宽exact门。目标仍进行中，不将当前负结果标记Table1复现完成。

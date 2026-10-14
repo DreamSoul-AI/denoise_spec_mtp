@@ -167,3 +167,25 @@
 /studies/esp_table1_bf16_reduction_check/docs/preceding_results.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_preflight/docs/preflight_evidence_v1.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_numerics/docs/numerics_evidence_v1.json -text whitespace=cr-at-eol
+
+/studies/esp_table1_bf16_shape_check/numerics.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/recipe.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/shape_control.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/untimed_4b.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/flow/collect/run.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/flow/collect/__init__.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/flow/process/run.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/flow/process/__init__.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/flow/summarize/run.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/flow/summarize/__init__.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/flow/write/run.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/flow/write/__init__.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/study.yaml -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/experiment_config.yaml -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/docs/preceding_results.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/docs/prompts_manifest.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/docs/shape_evidence_v1.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/docs/specbench-source.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_shape_check/docs/PLAN.md -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_reduction_check/docs/reduction_evidence_v1.json -text whitespace=cr-at-eol

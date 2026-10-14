@@ -1,5 +1,8 @@
 # history-extrapolation
 
+精度范围：本页历史 Qwen3-4B 结果均标注为 FP32；不作为 BF16 复现证据。新增实验仅使用 BF16，当前最高优先见 [ESP Table 1 计划](research/esp-table1-bf16-reproduction-plan.md)。
+
+
 Recorded cells. The run directories were not kept. These numbers are not rerun.
 
 Qwen3, float32, tree `[14]`, one mask slot, block complexity 30. Greedy, temperature 0, at most 100 new tokens, seed 123, Qwen3 thinking off. Branch `feature/research-ema-history-audit`.
@@ -28,7 +31,7 @@ SpecBench, file order within each category. The three groups share no question. 
 | Next | the next 4 | 52 |
 | Last | the 4 after those | 52 |
 
-## Qwen3-4B
+## Qwen3-4B — FP32
 
 Recorded 2026-10-06, except the last-52 frozen mean and last token, which were run on 2026-10-08. Those two commit the same 4600 tokens as the other last-52 rows.
 

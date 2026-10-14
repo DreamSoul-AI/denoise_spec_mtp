@@ -6,3 +6,6 @@
 [PLAN](docs/PLAN.md) and [historical inventory](docs/history_inventory.json). Fixed4 prompts, matched input/output0/output1 plusAR; timing disabled. No new result before launch. Native source/defaults unchanged.
 
 当前[报告](docs/STUDY_REPORT.md)已完成原生四格与配对计数，计时禁用；新4条负结果及历史输入EMA控制见报告后续，原0.6B机理阶段归档暂停。
+
+
+FP32 收尾状态：[PR #7](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/7) 经 CI 已合 dev，merge8677376；main未操作。

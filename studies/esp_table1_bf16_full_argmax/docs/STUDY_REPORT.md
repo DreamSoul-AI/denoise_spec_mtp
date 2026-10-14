@@ -4,7 +4,7 @@
 
 | BC/masks | role | AR exact/n (rate) | argmax checked/pass | pooled τ | τ − target | prompt mean τ | mean − target | category mean τ | category − target |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 10/1 | auxiliary | pending | pending | pending | n/a | pending | n/a | pending | n/a |
+| 10/1 | primary | pending | pending | pending | n/a | pending | n/a | pending | n/a |
 | 30/1 | primary | pending | pending | pending | pending | pending | pending | pending | pending |
 | 60/1 | primary | pending | pending | pending | pending | pending | pending | pending | pending |
 | 60/2 | control | pending | pending | pending | pending | pending | pending | pending | pending |

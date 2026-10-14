@@ -5,7 +5,7 @@ from pathlib import Path
 from spec_mtp.structure.artifact.evidence import digest
 from argmax_audit import token_digest
 
-CELLS = ((10,1,'auxiliary',None),(30,1,'primary',1.63),(60,1,'primary',1.74),(60,2,'control',1.74))
+CELLS = ((10,1,'primary',None),(30,1,'primary',1.63),(60,1,'primary',1.74),(60,2,'control',1.74))
 
 
 def summarize(rows):

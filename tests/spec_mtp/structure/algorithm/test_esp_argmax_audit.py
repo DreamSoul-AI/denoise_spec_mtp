@@ -88,7 +88,8 @@ def test_tau_aggregation_does_not_gate_on_ar_and_keeps_all_weights(monkeypatch):
     rows[0]['argmax_passed']=False
     assert not report.summarize(rows)['argmax_all_passed']
     cells = report.ordered_cells({(60,1):summary,(60,2):{'pooled_tau':3}})
-    assert cells[2]['role']=='primary' and cells[3]['role']=='control'
+    assert [c['role'] for c in cells]==['primary','primary','primary','control']
+    assert cells[0]['target'] is None
 
 
 def test_new_full_contract_keeps_original_settings_and_480_inputs():

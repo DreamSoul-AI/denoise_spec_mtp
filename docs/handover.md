@@ -1,5 +1,9 @@
 # 异机交接
 
+## q178数值隔离与q179–q182（2026-10-14）
+
+严格FP32 q178重复全selected张量/语义路径相同，microdelta首个共同根89来自pos88的块/row计算路径不同；规范前缀anchor/v同步两self为8、两移植为9，轨迹与strict移植相同，排除committed微差作为这次收益必要条件，不排除proxy内舍入或锁定具体CUDA kernel。新4Run/16outputs/20诊断AR一致，q179原8/9→双10、q182原4/3→双4，q180/181null；q182 root47合法second hit恢复且source45/root47 state相同。累计12prompt表和所有坏点见[后续报告](../studies/output_space_followup/docs/STUDY_REPORT.md)，原PLAN保持冻结，结果单独PLAN_REVIEW。科学src/default/旧helper/Run不改，不推送合并删除，fullweights/cache不入Git。
+
 ## q175–q178扩展与累计8prompt（2026-10-14）
 
 先在新PLAN写H1排序边界/H2实际owner历史/H3终止或未使用owner，再固定4新prompt并完成原生4Run与20次诊断，全部AR一致。q175/176/177 null；q178原零/一accepted均8但深度分布不同，root85单槽双向各变9，存在损失/收益相抵，初次root86第二槽在相同anchor/v下翻转depth2。后期state有微小浮点差异，不当作完整q173机制复现。第二槽分析明确事后，raw及全部坏点/新旧root保存，8prompt表与详细事实见[扩展报告](../studies/output_space_extension/docs/STUDY_REPORT.md)。科学src670/default/旧helper/Run保持，不推送、合并或删数据。

@@ -8,6 +8,8 @@ Local utilities. Model-window diagnostics use explicitly prepared local weights;
 | `decode_fingerprint.py` | Capture tokens and decode stats for every shipped preset; `--compare` proves a change is output-identical. |
 | `profile_cpu.py` | cProfile of `esp_mtp.evaluate` on a tiny model. tau / speed are not paper numbers. |
 | `diagnose_output_windows.py` | Read-only q173 matched-window replay around the unchanged decoder; requires identical tokens/traces, records previous seed masks/logits and exact hidden consistency. |
+| `diagnose_q178_numerics.py` | Process-only strict FP32 repeats and AR-prefix canonical committed-state controls, with actual KV-root checks and two self-value controls. |
+| `diagnose_study_windows.py` | Manifest-bound four-prompt runner reusing frozen window/observer/transfer/slot helpers; intended for the q179–q182 follow-up. |
 | `diagnose_extension.py` | Fixed q175–q178 selection and transfer replications; reuse unchanged observer/transfer/compare helpers, allow measured path/state differences and preserve planned fallback controls. |
 | `diagnose_cross_prompt.py` | Fixed q171/q172/q174 replication: reuse unchanged observer/transfer helpers, both directions and original-value placebo; retain nulls, full traces and matched committed-state differences. |
 | `diagnose_proxy_transfer.py` | Three fixed q173 single-slot transfers around the unchanged decoder, with original-value placebo, actual post-intervention owner selection and lossless-output gates. |

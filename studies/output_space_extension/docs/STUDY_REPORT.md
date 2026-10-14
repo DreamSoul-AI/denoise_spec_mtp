@@ -66,3 +66,25 @@ native launch实际wall103.791秒，.5秒采样RSS峰6592802816 bytes、线程55
 ModelScope缓存通过同目录junction复用11文件，未重新下载、改环境或权重；snapshot provider default/master仍不能声称远端immutable revision，实际hash绑定本地文件。原生make→launch→process→report及来源/输入/模型/独立AR/完整性门均通过，diagnostic前后PLAN/选择/tool/helpers/原raw/runtime/src也一致。首次独立tokenizer清单的BatchEncoding JSON失败发生在make/解码前，改为模板文本再分词并与原生IDs核验相同；未改变选择或源代码，说明保留.tmp。
 
 正式复跑需新version和Run目录，按[PLAN](PLAN.md)执行；诊断工具[diagnose_extension.py](../../../tools/diagnose_extension.py)消费已冻结的窗口文件，out必须新目录。离线[analyze_results.py](../analyze_results.py)检查SHA并拒绝覆盖不同既存JSON。完整selected张量333134109 bytes，仅本机.tmp/extension-transfer-20261014-v1，SHA1ea61e0ae8566854a81dafc8806f82dd3144a3fc135a7e87483b7440cf97f2ef，不随Git。14项针对性/新Study展开/文档检查、Ruff及mypy56通过；完整旧科学回归不重跑冒充新批次。没有推送、合并或删数据。
+
+## q178确定性与规范committed-state对照（2026-10-14）
+
+按测量前 [NUMERICAL_PLAN](NUMERICAL_PLAN.md) 执行11次生成与1次112-position teacher前向。原native/default/src不改，原两个工具不改；严格FP32/eager、TF32两项关闭、matmul highest、CUBLAS_WORKSPACE_CONFIG=:4096:8、deterministic algorithms=true且warn_only=false、cudnn deterministic=true/benchmark=false只覆盖该诊断子进程。新prompt原生实验继续原deterministic=false配方。结果见[测量证据](numerical_diagnosis_v1.json)、[离线核验](numerical_analysis_v1.json)、[PLAN评审](NUMERICAL_PLAN_REVIEW.md)，原预声明文件未改或重签。
+
+| q178固定模式 | 无移植零阶 | 无移植一阶 | 一阶←零阶 | 零阶←一阶 | decode calls（无移植/移植） |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 原FP32已保存 | 8 | 8 | 9 | 9 | 27 / 26 |
+| 严格FP32确定性 | 8 | 8 | 9（重复两次） | 9（重复两次） | 27 / 26 |
+| 规范同位anchor/v | 8 | 8 | 9 | 9 | 27 / 26 |
+
+两方向严格重复的全部已捕获mask/logits/hidden/state逐元素相同，完整实际语义轨迹相同。严格模式两baseline复现原native trace，原值回填也复现；变路径对baseline的anchor max_abs3.05176e-5、一阶velocity2.38419e-6仍在。故开启确定性并不会让不同packing的浮点计算逐元素相同；本批差异能重复，不是同一路径的随机漂移。
+
+首个可匹配状态差异在root89。一阶原路径root86接受[1,2]，其精确position88在该块row2被观测并成为下一anchor；一阶←零阶root86只接受[1]，再访问root88，以row0计算同一position88。后者root89 anchor与所保留root88 exact hidden逐元素相同；前者strict root89 anchor又与旧runtime原baseline相同。两anchor差max_abs1.52588e-5、velocity差1.43051e-6。位置来源由native观察规则和实际trace定位，改变的块/attention/KV布局是模型层面的来源证据；本轮未用CUDA profiler独立锁定某个GEMM/softmax kernel，也未保存所有中间验证row hidden，不能声称完整低层证明。
+
+规范对照只做一次完整AR teacher，再用原provider.observe_committed按时间顺序重建每个prefix长度p的anchor/v（至p-1），root85不覆盖、其后每个实际root回填对应同位状态，保留输入proxies。root由真实mutable KV长度读取且在modelprehook再核对，不用旧trace强制根或owner。两无移植自值控制均8/27，两移植均9/26，且规范移植与严格移植的完整接受/提交/KV语义轨迹相同。在规范同阶控制与移植共同root>85的anchor/v已逐元素一致时，后期命中模式仍在，排除了这些committed-state微差作为本固定效果的必要条件。规范teacher和CPU EMA重算本身也可能带入不同舍入，故两自值控制不可省；并未隔离proxy hidden内部数值差。
+
+解释因此分层：root86第二槽直接跨过候选排序边界，导致最深owner1/2改变；随后实际owner/proxy路线改变未来候选排序。排序是T0直接判定规则，owner历史是上游可能机制，不能当作二选一。没有强制固定候选或伪造owner，规范状态对照仅收紧committed微差解释，不证明所有owner中介或全局EMA收益。
+
+11次输出均与原独立AR36token相同，396new tokens，302生成forward+1teacher=303；实际采样wall24.883秒、RSS4901736448 bytes、线程13、GPU全局5659MiB、可用主存最低13485785088 bytes。采样.5s含背景/漏短峰，不用于速度排名。teacher与观察exact hidden cosine>=.99999，source/model/snapshot/PLAN/tool/oldraw绑定前后通过。selected244790261 bytes仅本机.tmp/q178-numerical-20261014-v1，SHA2f71c78210b1609a889b0d3cfec223fd818dd74c625d6eed32540d91008d86a0。首次离线脚本导入路径失败在加载数据/模型前，改同目录import后复算通过，说明保留；测量tool/data没改。3项新针对性覆盖prefix末位、实际cache根与异常恢复，完整本轮验收另有日志，不更新旧全量计数。
+
+新q179–q182的独立原生与双向结果见[后续报告](../../output_space_followup/docs/STUDY_REPORT.md)。完整权重/缓存/selected张量不入Git，未改默认、科学src、推送、合并或删数据。

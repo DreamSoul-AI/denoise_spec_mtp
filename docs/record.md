@@ -68,3 +68,5 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 2026-10-14 接续6a953bc跨prompt验证，按预声明首个共同hit前根固定q171/172/174 root63/42/41。旧两tool完整保留，新runner复用函数，15次AR逐token与原轨迹/单槽/实际owner/state门通过，accepted仍10/1/1。q171/172代理和first seed/margin受影响但不跨排序边界；q174 EOS边界仅下一proxy改变。全部null与有限解释入STUDY_REPORT，资源/raw SHA/离线复算正式归档，新2项针对性检查不一致状态也保留。未改科学源码/默认，未重签旧Run，不推送合并或删数据。
 
 2026-10-14 接续7a02501，先写q173位置/margin/owner历史假设，再固定q175–178与fallback。原生make/launch/process/report四Run和20诊断均AR逐token通过，q175/176/177 null，q178双向各8→9但有深度2损失/恢复、first层收益/损失和末尾depth2补偿。同位root86状态完全相同，后期浮点delta保留不声称纯代理全中介。初次tokenizer BatchEncoding JSON失败在make前，修独立清单步骤并核对IDs，不改源码；所有raw/失败说明保留。14项针对性/新Study展开/docs、Ruff/mypy56通过，累计8prompt矩阵与正式证据本地归档，不推送合并删数据。
+
+2026-10-14 接续a42313d，先冻结NUMERICAL_PLAN和q179–182 PLAN。q178 strictFP32双向各两次重复selected全bit相同；规范AR前缀state同步两self8、两移植9且全语义trace同strict，定位root89anchor pos88不同块row来源，不锁定低层kernel。q179–182四Run与20对照AR一致，原0/1为8/9、3/3、2/2、4/3，双向为10/10、3/3、2/2、4/4，坏点/微差保留。q182source45/root47 state相同但secondmargin跨界，12prompt表与PLAN_REVIEW正式归档，原合同sha不变。离线import错误在数据/模型前修同目录import并保留说明；17针对性/展开/docs及Ruff/mypy56通过。科学source670/default/旧helper未改，不推送合并删数据，fullweights/cache/selected仅本机。

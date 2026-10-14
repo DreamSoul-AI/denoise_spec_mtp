@@ -205,3 +205,28 @@ q174只有41→42(owner0)这一段：终止块root42的incoming proxy pair改变
 q178复现了局部接受可被同一个单槽动作改变，但具体模式不同：root86第一槽不变，合法第二槽margin零/一为-.904274/+.141495，双向分别移除/恢复深度2；随后收益和损失相抵且root108新增depth2，两方向净8→9/calls27→26。q175/177传播有变化但仍null，q176为无共同命中fallback且owner1没有被利用的对照。没有按新margin换prompt或窗口。
 
 q173为何特殊目前可收紧为有限假设：晚位置与注入幅度不单独决定结果；有效候选在具体prefix是否跨过排序边界，以及实际接受owner切换如何重新混入历史，更有解释力。q178在初次root86 anchor/v完全不变，但后期state存在小数值差异（anchor max_abs3.05e-5、一阶velocity2.38e-6），不能声称完整复现q173后期严格相同状态下的效果；所有合法第二槽标志和反向损失都保留，第二槽scalar扩展为事后从已保存logits复算。总体仍不足以声明稳定一阶优势、普遍EMA因果或新默认配方。已本地保存，无推送、合并或数据清理。
+
+## q178数值对照与q179–q182：累计12prompt（2026-10-14）
+
+[数值预声明](../../output_space_extension/docs/NUMERICAL_PLAN.md)/[PLAN评审](../../output_space_extension/docs/NUMERICAL_PLAN_REVIEW.md)和[后续四prompt PLAN](../../output_space_followup/docs/PLAN.md)/[PLAN_REVIEW](../../output_space_followup/docs/PLAN_REVIEW.md)分别保存固定合同与结果反馈，不重签旧成功Run。
+
+q178严格FP32确定性重复的全部已捕获张量与实际语义轨迹逐元素相同，变路径microdelta仍存在。首个同位状态漂移root89的anchor来自同一真实position88在不同块的row2（原86块）或row0（新88块）；变路径anchor与其88块exact hidden逐元素相同。这定位到确定性块/KV/owner路径变化，未做低层CUDA kernel profiler。规范teacher前缀anchor/v同步的两个self控制仍8/27，双向移植仍9/26且与严格移植全语义路径相同，因此这些committed-state微差不是该固定效果的必要条件；proxy内部舍入未独立隔离。详细事实在[数值报告](../../output_space_extension/docs/STUDY_REPORT.md)。
+
+| qid | 输入accepted | 原零阶 | 原一阶 | 固定根 | 一阶←零阶 | 零阶←一阶 | 一阶原值 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 171 | 17 | 10 | 10 | 63 | 10 | 10 | 10 |
+| 172 | 1 | 1 | 1 | 42 | 1 | 1 | 1 |
+| 173 | 5 | 1 | 3 | 83 | 1 | 2 | 3 |
+| 174 | 0 | 1 | 1 | 41 | 1 | 1 | 1 |
+| 175 | 4 | 3 | 3 | 38 | 3 | 3 | 3 |
+| 176 | 1 | 0 | 0 | 46 | 0 | 0 | 0 |
+| 177 | 7 | 4 | 4 | 57 | 4 | 4 | 4 |
+| 178 | 7 | 8 | 8 | 85 | 9 | 9 | 8 |
+| 179 | 8 | 8 | 9 | 103 | 10 | 10 | 9 |
+| 180 | 2 | 3 | 3 | 35 | 3 | 3 | 3 |
+| 181 | 4 | 2 | 2 | 43 | 2 | 2 | 2 |
+| 182 | 4 | 4 | 3 | 44 | 4 | 4 | 3 |
+
+新q179–q182原16份输出和20次双向/原值回填均完整AR一致。Q179双向都有净增与局部损失；q180/181有seed变化而null；q182一阶←零阶在root47合法第二层恢复、margin-.039644→+.334106，此处与source45 anchor/v保持相同，反向保持4但代理变化。新四prompt完整正负点与数值边界见[后续STUDY_REPORT](../../output_space_followup/docs/STUDY_REPORT.md)。默认/source/旧helper/Run保留，未推送、合并或删数据；完整weights/cache/selected仍仅本机。
+
+归因应分层：候选排序边界决定当下T0接受，实际owner/proxy历史影响后续排序，二者不是互斥原因。规范状态对照只约束q178的committed微差，未直接排除所有proxy数值影响。累计12条仍同模型同translation任务的开发样本、每条固定入口，4条有接受数变化/8条null并非概率估计；原生累计输入/零/一60/45/47不建立稳定一阶优势或统计泛化。

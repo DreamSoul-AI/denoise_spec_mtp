@@ -133,7 +133,7 @@ def test_pending_report_does_not_link_unpublished_local_evidence(tmp_path,monkey
     report.main()
     text=(tmp_path/'docs/STUDY_REPORT.md').read_text(encoding='utf-8')
     assert 'completed=1/4; 全四格验收=pending' in text
-    assert '| 10/1 | primary | valid | 0/1 (0.00%) | 3/True |' in text
+    assert '| 10/1 | primary | valid | pending | 0/1 (0.00%) | 3/True |' in text
 
 
 def test_tau_plot_requires_full_argmax_pass_but_not_ar_exact(tmp_path,monkeypatch):

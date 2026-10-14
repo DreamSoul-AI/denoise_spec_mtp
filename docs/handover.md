@@ -211,3 +211,7 @@ for cell in json.loads((s/'index.json').read_text())['experiments']:
 用户明确授权修改evaluate_run/verify_evidence及summarize/process：独立AR一致率只诊断，全部提交token的verifier argmax审计为正确性门。修复在fix/verifier-argmax-gate隔离工作树完成，当前GPU执行目录不切换源码、不杀BC30。原生T0解码新增审计元数据，不改变token选择、mask配方、缓存或forward数量；采样验收未在本次扩展。AR诊断从原始tokens重算，缓存exact标记/汇总仅记录，不当失败门；输入、来源、计数、提交trace、argmax覆盖/哈希/forward行归属继续严格核验。
 
 全套CPU测试、Ruff及mypy（56源码文件）通过；收尾增加缓存AR汇总回归后，对验收、文档索引、argmax观察器再次测试通过。此前隔离测试临时目录权限问题与工具入口文档遗漏已修复，未影响GPU。BC10用新门只读核验480条/79,757提交token全过，AR188/480不阻塞；将使用tools/revalidate_run.py仅重做summarize验收与原生write，旧失败result按SHA保留，raw/输入/argmax JSONL/执行来源锁字节不变，新validator SHA另列。全格收尾后同门跑原生process。不测速、不恢复算子机理，不重跑BC10 execute；8B仅此Table1，4B仍等待。
+
+BC10原生重新验收已执行：dfe1b9c8d5d12e92为succeeded，新门480条/79,757提交token全过，AR188/480、τ1.399047不变。仅summarize gate与write，execute_rerun=false；四项原始证据SHA保持，旧失败result SHA9031990696995ef210fb5d7c162812db6c1d1d2dece6a5a7a8b99f440c9b6bd6留存。[原生验收证据](../studies/esp_table1_bf16_full_argmax/docs/bc10-native-revalidation-v1.json)绑定validator代码3c602ec及实际SHA8c5f065f038c32f699c4167eebde0aa17c01fc98ccacd5a3be2c205f6752b9f8，与执行源digest670c744e0535dcad分开。修复PR为[#9](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/9)，按长期授权经检查合dev。BC30不停，后续格亦只重做验收；全队列结束后新门运行原生process，再冻结全四格证据，AR失配不阻塞。
+
+原生门修复PR #9已于2026-10-14T22:55:18Z合dev，merge712d61646e451725e7071656c2f8049f466acf36。两个cpu-checks（38649881410、38650062847）及Branch flow（38650062745）均SUCCESS；合并依据Enmao长期授权。当前执行目录保持旧冻结科学来源，仅新门验收独立加载，不切换/杀BC30，不改配方或权重。

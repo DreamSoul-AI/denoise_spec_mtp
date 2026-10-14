@@ -50,3 +50,5 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 新增来源JSON使复制fixture的*.json排除过宽，最终首轮253 passed/1 failed；已只排除生成artifact，声明3用例复验通过。36格tiny等值，最终源码wheel/sdist全链通过，Ruff/mypy通过；最终全量单独保存，未把Toy/Stub或旧批次算真实模型质量。
 
 最终本机全量254 passed（177.46秒，0 failed/errors/skipped），Ruff/mypy、36格严格数值、wheel/sdist 41命令全部通过。正式证据追加smoke/v031_validation.json，不覆盖历史来源；真实v4 complete/passed=true，v3拒绝保留。
+
+用户明确批准具体公开内容与仓库/分支后，推送ae86c3c成功并创建PR #6（refactor/spec-rpipe→dev）：https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/6 。Branch flow和push/PR cpu-checks已启动，本交接更新后核验PR最新head检查；不自动合并或发布。既有用户workspace文件保持未跟踪。

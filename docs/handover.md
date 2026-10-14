@@ -2,13 +2,15 @@
 
 ## ModelScope四格正式接续（2026-10-14）
 
+用户已明确批准本轮代码、脱敏研究报告与验收证据公开推送及dev PR，权重/缓存/完整Run与内部资料仍排除。refactor/spec-rpipe已推送，实际 [PR #6](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/6) 已创建，base=dev、head=refactor/spec-rpipe、状态OPEN且可合并，无合并或发布。ae86c3c的Branch flow与push/PR cpu-checks已启动；本段文档提交后以PR最新head的实际checks为准，不把旧提交CI当成最终结果。下方拒绝/待授权文字为推送前历史检查点。
+
 用户明确要求ModelScope下载并继续工作后，已显式准备新Qwen3-0.6B snapshot，保留CUDA torch，Run保持离线。加载与解码资源按单GPU/round1串行核验。v3四Run成功但Study因B-008嵌套轴期望误比较失败；修复从冻结基底/声明复用原生合并分组，不放宽门，v3 raw/失败完整保留。v4新身份四格全部成功，Study/source/evidence/有效因素/完整性质量门通过。科学decoder/Data/Model、q171/FP32/eager/T0/seed123/预算100/EOS/原mask配方未改。
 
 两ESP各accepted19、生成47，独立AR相同输出；alignment四步accepted1/rejected3，28层raw核对通过。v3/v4全部token/接受/KV/AR计数/对齐sums等值（不比较耗时）。本次n=1只是实际前置门，不支持输出空间/Kalman或完整矩阵结论。正式资料见 [四格报告](../studies/input_mask_baseline/docs/STUDY_REPORT.md) / [v4证据](../studies/input_mask_baseline/docs/v4_execution.json)；下载snapshot、资源、原始证据与图均保存，weights/raw不入Git。
 
 新工程验证已实际完成36格tiny严格等值及最终源码wheel/sdist双入口全链。B-008新增嵌套轴/子集回归通过；全量曾253通过/1复制fixture漏正式JSON失败，复制范围已修正并单独3声明用例通过，最终全量254 passed（177.46秒，0 failed/errors/skipped），Ruff与55文件mypy通过；正式增量记录在smoke/v031_validation.json，不将旧251批次替代新源码验收。上游Issues36/37保持真实链接，不改上游源码或权限。旧拒绝推送状态留在下方历史段；当前继续按工作分支→PR/dev流程，不自动合并或发布。
 
-本轮实现和验收已提交为5cfdacc9b0386d490cfc4d741b72305c450c5983。推送refactor/spec-rpipe再次被自动审批拒绝，理由是需对这批代码、研究报告和证据向该公开仓库/分支的特定授权；已向用户明确请求。实查远端仍49dec9c，dev仍1b6d59c，没有新PR，当前提交没有远端CI。旧49dec9c的cpu-checks成功不代表本轮；具体PR正文与同步状态保存在本机.tmp/input-mask-ms-20261014。除这一外部同步步骤外，当前范围本机实现、工程与真实四格前置验收均完成。
+推送前历史检查点：本轮实现和验收已提交为5cfdacc9b0386d490cfc4d741b72305c450c5983。当时推送refactor/spec-rpipe再次被自动审批拒绝，理由是需对这批代码、研究报告和证据向该公开仓库/分支的特定授权；已向用户明确请求。实查远端仍49dec9c，dev仍1b6d59c，没有新PR，当前提交没有远端CI。旧49dec9c的cpu-checks成功不代表本轮；具体PR正文与同步状态保存在本机.tmp/input-mask-ms-20261014。除这一外部同步步骤外，当前范围本机实现、工程与真实四格前置验收均完成。
 
 ## v0.3.1原工程检查点（2026-10-14，95c0887）
 

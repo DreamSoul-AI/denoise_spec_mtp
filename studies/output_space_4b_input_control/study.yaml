@@ -1,0 +1,39 @@
+study: output_space_4b_input_control
+description: Previously selected input EMA on matched 4B chain, reuse measured output/AR
+  cells
+experiment:
+  name: output_space_4b_input_control
+recipe: recipe.py
+freeze: true
+provenance:
+  include:
+  - docs/PLAN.md
+  - docs/modelscope_snapshot.json
+  - docs/history_inventory.json
+  - docs/prompts_manifest.json
+  - docs/preceding_results.json
+  - untimed_4b.py
+flow:
+  study_phases: true
+  prepare_shared: false
+axes:
+  data.config:
+  - path: datasets/spec_bench/question.jsonl
+    skip_per_category: 0
+    take_per_category: 2
+    apply_chat_template: true
+    chat_template_kwargs:
+      enable_thinking: false
+    max_prompt_len: 2048
+  - path: datasets/spec_bench/question.jsonl
+    skip_per_category: 2
+    take_per_category: 2
+    apply_chat_template: true
+    chat_template_kwargs:
+      enable_thinking: false
+    max_prompt_len: 2048
+    categories:
+    - summarization
+    - translation
+seeds:
+- 123

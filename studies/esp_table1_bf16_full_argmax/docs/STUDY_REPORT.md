@@ -1,11 +1,11 @@
 # ESP Table 1 Qwen3 BF16 protocol report
 
-480 prompts; completed=1/4; 全四格验收=pending. 已完成格的τ/argmax有效性单列，AR失配不否定该格。BC60/1 is primary and BC60/2 is control, fixed before results.
+480 prompts; completed=2/4; 全四格验收=pending. 已完成格的τ/argmax有效性单列，AR失配不否定该格。BC60/1 is primary and BC60/2 is control, fixed before results.
 
 | BC/masks | role | τ/argmax结果 | native状态 | AR exact/n (rate) | argmax checked/pass | pooled τ | τ − target | prompt mean τ | mean − target | category mean τ | category − target |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 10/1 | primary | valid | succeeded | 188/480 (39.17%) | 79757/True | 1.399047 | n/a | 1.431766 | n/a | 1.403034 | n/a |
-| 30/1 | primary | pending | pending | pending | pending | pending | pending | pending | pending | pending | pending |
+| 30/1 | primary | valid | succeeded | 175/480 (36.46%) | 79762/True | 1.563378 | -0.066622 | 1.593232 | -0.036768 | 1.563387 | -0.066613 |
 | 60/1 | primary | pending | pending | pending | pending | pending | pending | pending | pending | pending | pending |
 | 60/2 | control | pending | pending | pending | pending | pending | pending | pending | pending | pending | pending |
 

@@ -51,3 +51,6 @@ BC=(k+1)(1+draft_nodes)，本次实际 draft budget=4/14/19；检查每步真实
 FP32收尾：PR #7 已经CI通过并合dev，merge8677376，main未操作。BF16预检已串行执行BC10与BC30，各13条，仅6条与独立AR完全一致，原生summarize门均失败；BC60仍在执行。不得把失败格子的τ称为可用复现结论，也不进入4B五方法。首个writing/q81在生成第10个token分叉（零基index9），是后续最小控制入口。
 
 已冻结新Study esp_table1_bf16_numerics v2：q81、BC10、32-token上限，2×2 BF16归约/确定性设置，保持ESP树与mask公式。8项后台设置成功/异常恢复测试通过，待当前launch退出后执行。v1仅make未执行GPU，CPU测试暴露属性mock恢复问题，v2用显式try/finally恢复、新version/Run；旧目录保留。
+
+
+03:36 后续：三预算原设置均失配（6/13、6/13、5/13）。q81四格token exact为no/yes/no/yes；仅reduction=False、deterministic=False原生全链通过，deterministic=True组合格因阶段恢复引起runtime终验失败，未冒称成功。已启动新Study esp_table1_bf16_reduction_check 原13条/三BC/256上限扩大验证，仍不启动4B。

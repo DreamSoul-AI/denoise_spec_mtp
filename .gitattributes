@@ -1,3 +1,3 @@
 # Preserve measured source snapshots as exact bytes for provenance checks.
-/studies/output_space_extension/docs/operator_tool_v1.py.txt -text
-/studies/output_space_extension/docs/operator_analyzer_v1.py.txt -text
+/studies/output_space_extension/docs/operator_tool_v1.py.txt -text whitespace=cr-at-eol
+/studies/output_space_extension/docs/operator_analyzer_v1.py.txt -text whitespace=cr-at-eol

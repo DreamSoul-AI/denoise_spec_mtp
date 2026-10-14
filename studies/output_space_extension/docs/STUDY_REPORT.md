@@ -148,3 +148,15 @@ norm实际wall27.943秒、RSS5438509056 bytes、全局GPU5654MiB；q_proj wall26
 未推远程、未开／合PR、未改默认配方／科学源码、未删除数据。
 
 本轮28项相关检查通过（含15项cross-task判定边界、3项算子／独立缓存检查及既有规范／文档／展开回归），Ruff与mypy56通过。四个旧Study来源／PLAN锁保持，两个新raw tensor SHA复核通过。mre输出明确synthetic_only_no_model_evidence，不生成真实Study index／runs。未重跑历史全量测试、安装包或完整矩阵。
+
+## 入口Phi与另一算子RMSNorm（2026-10-14）
+
+根据[PHI_RMS_PLAN](PHI_RMS_PLAN.md)单独冻结8格。入口85 owner0第二槽先按native FP32构造slot并保持native FP32 scale，再用CPU FP64完整norm/乘/除，最终一次cast回FP32；没有修改EMA或重新估scale。两个donor/self向量均真正变化，max_abs1.490116e-8、L2约4.04e-8至4.17e-8，因此本轮是有效入口映射数值干预，区别于上轮返回值bit相同的norm图控制。
+
+另固定第0层post_attention_layernorm、85块row4。FP32 singleton替换两格返回值bit同native，是数值无效等价控制；FP64参考按原FP32 input/weight/epsilon表述计算square/mean/rsqrt/product再cast回F32，两格max_abs1.192093e-7／2.384186e-7，其他行逐元素保持。绑定实际Qwen3RMSNorm实现源码、shape/stride及native/singleton CUDA事件，不用该行结果代表其它层或attention。未随机加噪或按结果挑新行。
+
+全部8输出独立AR一致，完整语义路径保持self8/27、graft9/26，canonical anchor/v和真KV-root门通过。有效Phi及RMS64只约束本固定数值实现变化的必要性，不能声称每种入口舍入／整个Transformer都稳健；原先未检入口Phi已推进这一类具体对照，singleton无效格明确分开。[完整证据](phi_rms_diagnosis_v1.json)和[离线分析](phi_rms_analysis_v1.json)保留每格状态／传播／语义路径与哈希。
+
+本轮288newtokens/220forwards、无teacher/辅助模型forward，wall26.844秒、RSS5133893632 bytes、GPU全局5679MiB、最低可用主存10140618752。.5s采样含背景/漏短峰，不作速度比较。raw183227469 bytes仅本机.tmp/q178-phi-rms-20261014-v1，SHAb8318d3fef010c8bfbac60be52078cc27c6e8781923d24e0498bf1bf56673140，完整tensor/profiler/权重/cache不入Git。
+
+与此同时[真实cross-task报告](../../output_space_cross_task/docs/STUDY_REPORT.md)已完成q241–244原生四格和20诊断。首个阳性q241另冻canonical合同，原11→12变为14→14，自值也变化且两canonical完整路径仍不同，是“计数收益不保持”的局部反例，不能称移植全无效或committed微差唯一因果。q178的稳定不得外推到新prompt。科学source/default/旧成功Run与测量工具保持，不远程、不PR、不删数据。

@@ -26,7 +26,7 @@ algorithm:
   mode: eval
   source: spec_mtp
   config:
-    version: output-space-summarization-241-244-draft-v1
+    version: output-space-summarization-241-244-20261014-v1
     task: esp_mtp
     eval:
       max_new_tokens: 100

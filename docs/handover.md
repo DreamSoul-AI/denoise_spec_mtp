@@ -1,5 +1,7 @@
 # 异机交接
 
+最新状态见本文末尾“真实cross-task与入口Phi／RMS推进”：真实批次和独立canonical跟进已完成。下列历史交接中的未运行状态保留为当时记录，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
+
 ## q178算子对照与下一Study草案（2026-10-14）
 
 root85之后provider槽计算S64、norm精度N64、norm后端N32各self/一阶←零阶，共8次AR一致；所有完整语义路径保持self8/27、移植9/26。profiler真实关联provider的NormTwoOps reduce_kernel；这只收紧后续provider运算的必要性，入口85和transformer内部舍入仍未独立隔离。正式[报告](../studies/output_space_extension/docs/STUDY_REPORT.md)保留完整边界、scalar和资源。新[跨任务Study](../studies/output_space_cross_task/README.md)固定summarization q241–244并已分词，仅草案、未make/launch；固定行q_proj kernel隔离协议未执行。[最小提交候选](research/publication-plan.md)为依赖PR6树的437f201，33文件逐blob哈希与PR草稿本地保存，后续研究暂缓。源码/default/旧合同与工具不改，未推送/合并/删除，用户workspace保留。
@@ -101,3 +103,7 @@ v0.3.1 源码升级与完整回归；当前重构安装包/Windows selfcheck；�
 ## q178 CUDA图／固定行与cross-task checker（2026-10-14）
 
 [最新报告](../studies/output_space_extension/docs/STUDY_REPORT.md)保存norm8格／q_proj6格全部AR一致和完整路径8/27、9/26。norm实际换NormTwoOps→mul/sum/sqrt，但所有返回值bit相同，不能当新数值鲁棒性证据；q_proj第0层85块row4换GEMM→GEMV或FP64-rounded确有微差并传播，但接受不变。4克隆cache块重放logits/finalhidden精确相同。q241–244已有[可跑checker](../studies/output_space_cross_task/check_hypotheses.py)与[状态](../studies/output_space_cross_task/docs/STUDY_REPORT.md)，仅合成MRE/质量边界测试，未launch真实batch；H2未检。入口Phi／其他层行／q179182canonical仍开放，下一target须新固定合同。scientificsrc/default/旧PLAN/helpers未改，rawKV/tensor/profiler/cache不入Git，未远程／PR／删数据。
+
+## 真实cross-task与入口Phi／RMS推进（2026-10-14）
+
+新cross-task fourRuns/16outputs、20窗口诊断全部独立AR一致，input/zero/one85/58/45；四条及八移植方向都有语义/计数变化，混合正负而无一阶优势。q178 entryPhi64两向量1.49e-8有效差、RMS64 row4有效差，8格路径保持8/9；singleton RMSbit相同单列。首个阳性q241另冻canonical合同，native11/12→canonical14/14，自值也变且两canonical路径仍不同，是接受计数差不保持的反例，不是移植全失效／committed唯一因果。完整[实际报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)及[精度报告](../studies/output_space_extension/docs/STUDY_REPORT.md)给来源、图、窗口坏点、资源和哈希。旧草案/批次hypotheses状态保留，真实执行与H2跟进分别增补，不重签成功Run。源码/default/旧工具不改，weights/cache/raw/profiler不入Git，不远程/PR/删数据。

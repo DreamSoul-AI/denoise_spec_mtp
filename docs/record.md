@@ -82,3 +82,9 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 先冻结新norm／q_proj执行合同，再串行8+6生成共504tokens/385生成forward+4块辅助forward，全部独立AR一致。norm实际kernel图不同但返回值完全相同，标为数值无效对照；q_proj row4 GEMM/GEMV/FP64替换有效并传入后续proxy/hidden，完整路径仍self8、graft9。4source blocks的独立cache重放全bit通过，来源/strict/model/snapshot绑定保持。q241–244写export/check/mre脚本及缺格/重复/非法depth2/未检H2规则，只跑合成逻辑与配置验证，不启动真实cross-task。报告收紧入口Phi和未测算子／prompt范围，不改源/default/旧合同，不推远程、开合PR或删数据。
 
 本轮28项相关检查、Ruff/mypy56通过，四旧来源锁／两新raw tensor SHA保持；无真实cross-task index/runs。工具先满足运行示例／导航合同再测量，测量工具、common及合同原字节未改。
+
+## 真实跨任务、入口映射与canonical反例（2026-10-14）
+
+为固定q241–244写EXECUTION_PLAN并更换version，新make四Run。首格43秒Flow/资源/AR门通过后，只launch其余3格，全部成功；process/report/checker export后冻结Root716/658/600/905，20诊断1950tokens/1704forwards全AR一致。原生input/zero/one85/58/45、移植双向有得失。其后q178 Phi64+post-attention RMS8格288tokens/220forwards：Phi/RMS64有效微差、singleton等价，路径仍8/9。按原准则单独冻结第一阳性q241 canonical4格400tokens/349生成forward+792-position teacher，native11→12、canonical14→14且路径不同，限制H2数量差保持及自值干预解释；源/default/合同不改，不推/PR/删。详见正式报告。
+
+收尾核验：30项针对性测试、Ruff、mypy56源码与5Study冻结门通过；10个测量工具/协议/快照Git blob逐字节一致，修复旧operator_analyzer快照CRLF存档差异，源码/default不变。

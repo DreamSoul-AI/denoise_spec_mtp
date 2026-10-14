@@ -1,5 +1,5 @@
 study: output_space_cross_task
-description: 'DRAFT: fixed cross-task falsification after 12 translation development units'
+description: 'fixed cross-task falsification after 12 translation development units'
 experiment:
   name: output_space_cross_task
 recipe: recipe.py
@@ -7,6 +7,7 @@ freeze: true
 provenance:
   include:
   - docs/PLAN.md
+  - docs/EXECUTION_PLAN.md
   - docs/modelscope_snapshot.json
   - docs/prompts_manifest.json
   - check_hypotheses.py

@@ -1,3 +1,12 @@
 # Preserve measured source snapshots as exact bytes for provenance checks.
 /studies/output_space_extension/docs/operator_tool_v1.py.txt -text whitespace=cr-at-eol
 /studies/output_space_extension/docs/operator_analyzer_v1.py.txt -text whitespace=cr-at-eol
+# Keep new measured tools and frozen protocols byte-identical on checkout.
+/tools/diagnose_q178_phi_rms.py -text whitespace=cr-at-eol
+/tools/diagnose_q241_canonical.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_canonical.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_results.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/plot_results.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/CANONICAL_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/EXECUTION_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_extension/docs/PHI_RMS_PLAN.md -text whitespace=cr-at-eol

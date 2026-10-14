@@ -26,3 +26,6 @@ Package check: `python tools/package_selfcheck.py --workspace .tmp/package-<new-
 
 `diagnose_q178_norm_kernel.py --out .tmp/<new-id>`：固定q178 CUDA norm图对照，保存实际kernel关联、entry/post和numerical-effect flags。
 `diagnose_q178_qproj.py --out .tmp/<new-id>`：固定85块layer0 row4 packing／FP64对照，4克隆cache块精确重放。
+
+`diagnose_q178_phi_rms.py --out .tmp/<new-id>`：固定entry Phi和post-attention RMSNorm精度对照，区分有效／bit等价。
+`diagnose_q241_canonical.py --out .tmp/<new-id>`：首个跨任务阳性的独立canonical合同，保留自值变化及等计数不同路径。

@@ -110,3 +110,23 @@
 /studies/output_space_4b_input_control/docs/preceding_results.json -text whitespace=cr-at-eol
 /studies/output_space_4b_input_control/docs/execution_v1.json -text whitespace=cr-at-eol
 /studies/output_space_4b_input_control/analyze_results.py -text whitespace=cr-at-eol
+
+/studies/esp_table1_bf16_preflight/recipe.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_preflight/untimed_4b.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_preflight/study.yaml -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_preflight/experiment_config.yaml -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_preflight/docs/PLAN.md -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_preflight/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_preflight/docs/prompts_manifest.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_preflight/docs/specbench-source.json -text whitespace=cr-at-eol
+
+/studies/esp_table1_bf16_numerics/recipe.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_numerics/untimed_4b.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_numerics/numerics.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_numerics/study.yaml -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_numerics/experiment_config.yaml -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_numerics/docs/PLAN.md -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_numerics/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_numerics/docs/prompts_manifest.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_numerics/docs/specbench-source.json -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_numerics/docs/preceding_results.json -text whitespace=cr-at-eol

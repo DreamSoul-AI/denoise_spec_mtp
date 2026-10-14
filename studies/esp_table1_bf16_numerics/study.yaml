@@ -1,0 +1,53 @@
+study: esp_table1_bf16_numerics
+description: ESP-only BF16 q81 first-divergence backend controls, no FP32 or timing
+experiment:
+  name: esp_table1_bf16_numerics
+recipe: recipe.py
+freeze: true
+provenance:
+  include:
+  - docs/PLAN.md
+  - docs/modelscope_snapshot.json
+  - docs/prompts_manifest.json
+  - docs/specbench-source.json
+  - untimed_4b.py
+  - numerics.py
+  - docs/preceding_results.json
+flow:
+  study_phases: true
+  prepare_shared: false
+axes:
+  algorithm.config:
+  - task: esp_mtp
+    spec: &id001
+      method: esp
+      num_masks: 1
+      block_complexity: 10
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      mask:
+        init: mean_prompt
+        lam: 0.1
+        update: true
+    numerics:
+      bf16_reduced_precision_reduction: true
+      deterministic: false
+  - task: esp_mtp
+    spec: *id001
+    numerics:
+      bf16_reduced_precision_reduction: false
+      deterministic: false
+  - task: esp_mtp
+    spec: *id001
+    numerics:
+      bf16_reduced_precision_reduction: true
+      deterministic: true
+  - task: esp_mtp
+    spec: *id001
+    numerics:
+      bf16_reduced_precision_reduction: false
+      deterministic: true
+seeds:
+- 123

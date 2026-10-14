@@ -50,11 +50,11 @@ BC=(k+1)(1+draft_nodes)，本次实际 draft budget=4/14/29，另保留60/2的19
 
 四任务共用 24GB GPU。记录启动前空闲显存及运行容量采样（含其他进程，非精确 allocator peak）；不使用受干扰的墙钟或 timing 占位做性能比较。四格预检约 13×4×2×256=26624（其中旧三格已执行，新补单格上限6656） 生成 token 上界；全量四格含独立 AR 审计约 480×4×2×256=983040 上界。串行，没有额外 teacher/warmup。容量不足先暂停该 GPU 启动，继续证据/实现核对。
 
-## 4. 4B BF16 配对设计（本轮暂停）
+## 4. 全480完成后的4B BF16配对
 
 同批 prompt、同树/预算/长度/随机种子，比较 ESP frozen mean、输入零阶 updating mean λ=0.1、输入一阶 mean+gamma、输出零阶 final-normalized hidden 范数映射、输出一阶 final hidden+EMA velocity，另跑独立 AR。逐 prompt 列 accepted/model calls、每个对照的赢平输及 token exact。不得用此前 FP32 数字代替。
 
-这里的 ESP frozen mean 是用户指定的后续基线，区别于 Table 1 updating mean。tied 权重直接用输出 hidden 的尺度映射，不做逆映射。当前 output provider 只支持 unpruned static chain；后续若统一采用 dynamic/pruned，必须先最小扩展并验证 owner/proxy 对齐，不能让方法使用不同树再配对。4B 子实验开始前单独冻结 PLAN、beta/gamma、精度内部计算与实际 tied-storage 检查。本轮不运行4B，不自动在本矩阵结束后启动；以下设计保留供后续另行安排。
+这里的 ESP frozen mean 是用户指定的后续基线，区别于 Table 1 updating mean。tied 权重直接用输出 hidden 的尺度映射，不做逆映射。当前 output provider 只支持 unpruned static chain；后续若统一采用 dynamic/pruned，必须先最小扩展并验证 owner/proxy 对齐，不能让方法使用不同树再配对。4B 子实验开始前单独冻结 PLAN、beta/gamma、精度内部计算与实际 tied-storage 检查。按最新最终指示，先完成8B四格全480并写回三种τ、目标差值、AR一致率及verifier argmax自检，再启动4B BF16五方法加AR的同prompt配对；不因BF16相对独立AR的数值失配转入算子机理。不得提前与8B矩阵并发启动4B。
 
 ## 5. 当前执行与归档（2026-10-15）
 
@@ -66,8 +66,8 @@ FP32收尾：PR #7 已经CI通过并合dev，merge8677376；main未操作。此�
 
 Study局部观察器绑定每个选择行到对应验证forward的logits，记录argmax/选择值及forward/行号；覆盖prefill首token和全部实际提交token，EOS/预算裁剪后的未提交尾部不混入覆盖数。不增加模型前向，不改精度、算子、采样或树。argmax自检失败立即阻止该Run的execute完成；独立AR运行不安装此观察器。
 
-原有native AR严格门可能使summarize标为失败，其生命周期如实保留，不伪称native成功。该状态不阻止下一τ格执行；本次研究报告按全480覆盖、协议核验及数学argmax自检验收，AR一致率独立列示。关闭自动失败重试，避免因AR诊断重复运行。旧冻结Run/PLAN不回写、不重签。
+原有native生命周期可能含旧AR严格门产生的失败状态，原记录如实保留，不重签；该历史状态不得作为本次研究的失败门或阻塞下一τ格。本次研究报告只按全480覆盖、协议核验及数学argmax自检验收，AR一致率独立列示。关闭自动失败重试，避免因AR诊断重复运行。旧冻结Run/PLAN不回写、不重签。
 
 无argmax记录的全量v1部分日志保留。新argmax Study v2首次四Run在模型加载前因ModelScope缓存接入失败，未执行解码；失败Run保留。补接此前同一已校验本地snapshot后以v3新Run执行，未改模型或实验设置。
 
-全部算子级数值排查已停止。既有[reduction报告](../../studies/esp_table1_bf16_reduction_check/docs/STUDY_REPORT.md)、[shape报告](../../studies/esp_table1_bf16_shape_check/docs/STUDY_REPORT.md)和测试已按主题提交推送，仅作历史归档；不再启动归约开关、单行linear/RMSNorm、compact attention或逐层BF16算子追踪。权重、缓存和完整Run留本机；本轮不测速、不跑4B。
+永久停止BF16 ESP相对独立AR的全部算子级数值机理排查。既有[reduction报告](../../studies/esp_table1_bf16_reduction_check/docs/STUDY_REPORT.md)、[shape报告](../../studies/esp_table1_bf16_shape_check/docs/STUDY_REPORT.md)和测试已按主题提交推送，仅作历史归档；不再启动归约开关、单行linear/RMSNorm、compact attention或逐层BF16算子追踪。权重、缓存和完整Run留本机；全480结束后仅按第4节推进4B BF16五方法加AR，不测速、不恢复机理链、不合main、不force push。

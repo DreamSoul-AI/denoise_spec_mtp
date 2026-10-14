@@ -187,3 +187,21 @@ gh run list --branch feature/output-space-prerequisite --limit 1 --json database
 合并时BC30已完成48/480条、9,722个提交token自检全过。合并仅改变远端dev，没有切换本地源码或修改运行中冻结文件；两格BC60仍排队。四格总体未完成，BC10数学自检通过与独立AR差异分别报告，后续4B仍待全480结果。
 
 2026-10-15 BC10有效性确认：按Enmao数学无损门，dfe1b9c8d5d12e92为有效τ/argmax结果，不因独立AR失配重跑。报告新增逐格valid/pending，四格总体pending不再写成token quality failed。改动只涉及非冻结结果阅读器/报告与回归，不改科学源码、gate、冻结配置或运行中观察器；8项相关CPU回归及Ruff通过。launch_once的retry_failed=False已确认，BC30在真实解码、BC60/1和60/2排队，无算子数值机理、无测速，8B仅用于Table1。
+
+### 全480进度只读查询审批超时（第二次事件）
+
+工作目录：`D:/GitHub/DreamSoul/denoising-speculative-decoding`。下面命令被自动审批服务超时拒绝，未执行；拒绝原文：`The automatic permission approval review did not finish before its deadline. Do not assume the action is unsafe based on the timeout alone. You may retry once, or ask the user for guidance or explicit approval.`。监督助手无需解除GPU执行：既有monitor等待仍存活。一次不升级权限的只读重试可读取真实argmax JSONL，BC30进展到74/480、15,285个提交token全过；该重试的CIM查询受沙箱限制不可用，不能伪称重新核验了PID。未弹窗、未停队列、未重跑BC10。
+
+```powershell
+Get-CimInstance Win32_Process | Where-Object { $_.Name -match 'python' -and $_.CommandLine -match 'esp_table1_bf16_full_argmax' } | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json
+@'
+from pathlib import Path
+import json
+s=Path('studies/esp_table1_bf16_full_argmax')
+for cell in json.loads((s/'index.json').read_text())['experiments']:
+    spec=cell['factors']['algorithm.config']['spec'];run=cell['runs'][0]['id'];assets=s/'runs'/run/'assets';p=assets/'argmax_audit.jsonl'
+    rows=[json.loads(line) for line in p.read_text().split('\n')[:-1] if line] if p.exists() else []
+    assert all(r['passed'] and len(r['committed'])==r['checked_committed_tokens'] and all(c['chosen']==c['argmax'] for c in r['committed']) for r in rows)
+    print(json.dumps({'BC':spec['block_complexity'],'masks':spec['num_masks'],'run':run,'completed_spec_prompts':len(rows),'checked_tokens':sum(r['checked_committed_tokens'] for r in rows),'execute_complete':(assets/'decode_observations.json').exists()}))
+'@ | D:/anaconda3/python.exe -
+```

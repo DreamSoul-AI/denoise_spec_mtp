@@ -32,3 +32,6 @@ Package check: `python tools/package_selfcheck.py --workspace .tmp/package-<new-
 
 `diagnose_q178_rounding_factors.py`：`python tools/diagnose_q178_rounding_factors.py --out .tmp/<new-id>`，原输入Phi三因素/RMS五因素算术矩阵，零模型forward，绑定缓存gamma和原值。
 `diagnose_q241_state_factors.py`：`python tools/diagnose_q241_state_factors.py --out .tmp/<new-id>`，q241两native审计+四单坐标同步生成；固定协议、AR及原值审计失败即停止。
+
+`diagnose_q241_local_factors.py`：`python tools/diagnose_q241_local_factors.py --out .tmp/<new-id>`，两原值完整生成+24固定块，定位候选构建与当前映射的时序。
+`diagnose_state_extension.py`：`python tools/diagnose_state_extension.py --out .tmp/<new-id>`，两prompt两greedy seed、36生成／四teacher，复用原helpers，保留零交互和非加性反例。

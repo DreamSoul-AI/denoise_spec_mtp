@@ -92,3 +92,63 @@ native自值对双同步自值的首个接受分叉发生在root756，共同根7
 本轮生成wall35.397秒、.5s采样RSS5132173312 bytes、GPU全局6172MiB、最低可用主存11330322432，含背景且非allocator峰。raw485128429 bytes，SHA914b8331d633f299a089364de5e8556866dc7a5be1637af26c9ae6cc81d5b65b，本机.tmp保留；只有正式scalar/trace证据入Git。现有cross-task四prompt范围未扩大，H5/H6是对已见q241的解释性新假设，不作为独立泛化证据。科学src/default与原PLAN/helpers保持，不推送、不开PR、不删数据。
 
 本轮收尾核验：37项针对性测试及Ruff通过，5个Study的科学source/RPipe冻结门通过，80格保存向量的标量差重新计算一致，18个精确字节路径的暂存blob与本机文件一致。完整原生矩阵、安装包、更多seed/层未重跑；科学源码/default/旧helper/成功Run无改动。
+
+## 固定帧state／proxy分离与两prompt两seed扩展（2026-10-15）
+
+本轮在4a02551之后另冻[LOCAL_FACTOR_PLAN](LOCAL_FACTOR_PLAN.md)与[STATE_EXTENSION_PLAN](STATE_EXTENSION_PLAN.md)，实现[固定帧工具](../../../tools/diagnose_q241_local_factors.py)和[扩展工具](../../../tools/diagnose_state_extension.py)，正式[诊断](local_factor_diagnosis_v1.json)、[扩展诊断](state_extension_diagnosis_v1.json)及[独立离线复核](local_extension_analysis_v1.json)保留所有格与质量门。旧工具／协议／成功Run未修改。
+
+### 首次分叉的时序与真实owner链
+
+源码实读说明：当前树先由上个块选定owner的mask logits生成，之后才调用当前provider.masks_per_owner。因而root720当前state相同这个事实，本身不能定位已经构建的root720候选来源；应检验source719的映射。下表来自两次新canonical完整重放，AR、trace、stats及所有旧captured张量精确复现。
+
+| 实际root | seed来自root／owner | self候选 | graft候选 | self／graft接受节点 |
+| --- | --- | --- | --- | --- |
+| 716 | 715／0 | 323, 323 | 323, 323 | []／[] |
+| 717 | 716／0 | 323, 323 | 323, 323 | [1]／[1] |
+| 719 | 717／1 | 11, 11 | 323, 11 | []／[] |
+| 720 | 719／0 | 13, 13 | 264, 13 | []／[1] |
+
+717接受一阶节点后进到719；718不是访问点。候选身份在719已经不同但均未命中，首次接受语义分叉仍在720。719 owner0两mask位于720／721，第一logit预测721位置的AR token264；这是root720树的第一候选来源，不是root720当前mask的输出。
+
+### 固定source719：代理替换足以恢复第一候选
+
+以canonical self的完整source719输入／KV／树节点／positions／attention为固定帧。S0=canonical committed anchor/v，S1=同位native self的anchor/v；P0=canonical self incoming proxies，P1=canonical graft incoming proxies。每格只重新计算六mask embeddings，root/node三行和KV保持bit相同，用新cache重放三次。全部原值格完整logits/finalhidden复现，三次结果bit一致，所有格验证三行输出bit相同。
+
+| source719格 | 最大mask差 | root720第一候选 | 对AR264 margin |
+| --- | ---: | ---: | ---: |
+| S0P0原值 | 0 | 13 | -2.7185325622558594 |
+| S1P0只换state | 5.960464477539063e-8 | 13 | -2.7185325622558594 |
+| S0P1只换proxy | .011132031679153442 | 264 | +1.2852745056152344 |
+| S1P1同时换 | .011132031679153442 | 264 | +1.2852745056152344 |
+
+即时state替换确有非零差：anchor3.814697265625e-5、velocity2.9802322387695312e-6，mask也改变；它不是无效数值控制，但在这组固定输入上未改变第一候选判定。P1与P0最大差1.6823768615722656。**只换代理所得两条owner0 seed logits与真实canonical graft在root720保存的seed logits全向量bit一致**，而root720原值帧的验证root预测确为264。由此在这个固定上下文中，累计到source719的代理内容足以恢复导致root720命中的候选；该对比不需要即时committed微差变化，也未借助更换cache或树节点。
+
+这是owner0、该输入的局部充分性与时序证据，不是全解码因果百分比；没有证明全程state回填对其他位置无影响，也未拆解代理内容每个上游分量。S1是一次同位native-state交换，与上一轮每个root反复回填的总效应不同。
+
+### 当前root720：即时映射影响后续seed，不影响已构建树
+
+固定canonical self的root720帧再做同样四格三重复。state交换anchor2.288818359375e-5、velocity2.4139881134033203e-6，P1差5.195926666259766；state-only mask差4.470348358154297e-8，proxy-only约.037551105。所有格当前root/node验证logits与finalhidden完全相同，因此不改变固定树当前是否命中。后续第一seed对下一AR42377的margin从-1.5146942138671875变为proxy-only的-1.5333003997802734，两者top1仍13，变化保留为非命中结果。没有将24个直接块重放称为24次完整生成或新接受率矩阵。
+
+### 非加性并不普遍，两组greedy seed仅为重放控制
+
+按原文件顺序新增q242、q243各两个固定seed，以原entry658／600、100新token、T0同配方测试。每单位两次原生观测+七次移植，共36次生成／3600新token／3124生成forward；四次747／747／695／695-position teacher，captured exact-root cosine最低.9999997615814209，原样构造canonical状态。全输出与原独立AR一致，baseline全语义／stats相同，单坐标另一state与incoming proxies保全、真KV根、双同步和全部captured回填状态门通过。
+
+| qid／seed | self：native／anchor／velocity／both | graft：native／anchor／velocity／both | self交互 | graft交互 |
+| --- | --- | --- | ---: | ---: |
+| 241／123（旧证据） | 11／13／13／14 | 12／13／13／14 | -1 | 0 |
+| 242／124 | 14／15／14／15 | 18／16／15／13 | 0 | 0 |
+| 242／127 | 14／15／14／15 | 18／16／15／13 | 0 | 0 |
+| 243／125 | 10／12／9／17 | 9／11／11／10 | +6 | -3 |
+| 243／128 | 10／12／9／17 | 9／11／11／10 | +6 | -3 |
+
+交互仍定义为both-anchor-velocity+native，接受数沿用预算裁剪前draft验证口径。q242是“每个单位都非零交互”的反例；q243复现非加性，但符号／幅度不同。它收紧了普遍性假设，不支持稳定收益或统计泛化。q242 native graft相对self+4，双同步为-2；q243分别-1／-7，原值基线改变继续影响配对结论。
+
+T0的select_token走argmax，output_hidden初始化／映射无随机抽样；两个seed在完整trace/stats和六固定窗口的seed logits/masks都bit一致。因此本轮增加两个prompt，不把它们描述成四个独立随机样本。每单位只capture预声明entry+前三+后两共六root（q242：658/659/661/662/744/745；q243：600/601/603/604/692/693）；完整实际trace保留，未访问与新增根明确。六窗口内未出现新的合法同第一正确候选depth2翻转，不能外推为全路径H3成立。
+
+### 成本、证据与剩余边界
+
+local两完整控制200new／172forward+24固定块／零teacher，wall22.613秒、.5s采样RSS4971773952 bytes、GPU全局6580MiB；raw385504563 bytes、SHA712edc1cd3403236c47782bdffb2d73b8617a7413e5bef3df4be0f450b973540。extension wall96.031秒、RSS4920774656、GPU6576MiB；raw318391853 bytes、SHAf04c2199397daf77e35538e2a202d9c79cda1e3b6c7f00e5f35e79878996df17。本机.tmp保留cache帧与张量；GPU值包含背景，采样不是allocator峰，不能用于性能排行。
+
+新增回归覆盖单因素输入保全、固定帧因果注意力／当前验证不变／后续mask输出改变、独立cache、冻结六root规则、greedy seed解释以及716→717→719→720的真实source-owner/候选时序一致性。scope限于q241两个固定块及另两个greedy prompt；未做采样温度、多设备、长路径干预或其他owner充分性试验。科学源码/default、旧helper与原合同不变，未推送、未开PR、未删除数据。
+
+收尾核验：42项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；新分析重跑保持原证据逐项一致，26个精确字节路径暂存blob与本机文件一致。旧helper/协议/科学src/default无改动，本轮3800生成新token、24额外固定块、4teacher均在预声明预算内。完整安装包/长矩阵/随机采样温度未重跑。

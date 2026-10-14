@@ -94,3 +94,9 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 按c4cb011证据另冻两个协议，完成80直接算术格与六生成／600new／525forward。Phi/RMS所有单因素最终都等于native，多阶段FP64保留才非零；q241 anchor-only/velocity-only13／13，旧native11／12、双同步14／14，自值交互-1反驳局部可加性。canonical同位root720 state相同、proxy不同且第一margin翻转，四收益四损失相抵；自值首变756三收益。正式报告保留唯一归因边界和未执行局部直接效应；未改科学src/default/旧helpers/成功Run，未远程／PR／删除。
 
 本轮收尾核验：37项针对性测试及Ruff通过，5个Study的科学source/RPipe冻结门通过，80格保存向量的标量差重新计算一致，18个精确字节路径的暂存blob与本机文件一致。完整原生矩阵、安装包、更多seed/层未重跑；科学源码/default/旧helper/成功Run无改动。
+
+## source719即时因素与跨prompt非加性（2026-10-15）
+
+新协议下q241两canonical原值完整重现，source719/current720四格各三重复。固定KV/tree/state，只换source719 proxy精确恢复真实graft两条seed logits，正确第一候选13→264；即时state微差改mask但未改判定，root720当前映射不改变当前验证，影响后续输出。q242两seed交互0/0、q243两seed+6/-3，36生成/3600new/3124forward+四teacher全AR一致，贪心seed完全重复，不当独立样本。原source/default/旧合同/工具不改，不远程/PR/删数据。
+
+收尾核验：42项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；新分析重跑保持原证据逐项一致，26个精确字节路径暂存blob与本机文件一致。旧helper/协议/科学src/default无改动，本轮3800生成新token、24额外固定块、4teacher均在预声明预算内。完整安装包/长矩阵/随机采样温度未重跑。

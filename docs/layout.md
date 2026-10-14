@@ -65,3 +65,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/diagnose_q178_phi_rms.py`固定入口Phi完整高精度映射与layer0 post-attention RMSNorm row4对照；`tools/diagnose_q241_canonical.py`按首个cross-task阳性准则执行q241原值／移植canonical状态跟进。复用旧canonical/transfer helpers，raw mmap只读、真KV root门不变。
 
 工具诊断：`tools/diagnose_q178_rounding_factors.py`只做已存输入的算术分解；`tools/diagnose_q241_state_factors.py`只在固定真实KV根选择性回填anchor/velocity，沿用原decoder与transfer。
+
+`tools/diagnose_q241_local_factors.py`固定source719/current720 cache/tree并交换state/proxy；`tools/diagnose_state_extension.py`执行预声明q242/q243两seed状态因素矩阵，不改正式解码器。

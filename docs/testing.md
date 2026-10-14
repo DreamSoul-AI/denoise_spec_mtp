@@ -40,3 +40,9 @@ package_selfcheck 构建 wheel/sdist，分别 target 安装，不建新 venv、�
 GPU实际检查另见[状态因素报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)与[算术因素报告](../studies/output_space_extension/docs/STUDY_REPORT.md)：六生成AR／native全张量／单坐标门和80直接算术格原值门通过。原生16输出与旧8格不重跑；本轮算术格不声称新的下游接受路径验收。
 
 本轮收尾核验：37项针对性测试及Ruff通过，5个Study的科学source/RPipe冻结门通过，80格保存向量的标量差重新计算一致，18个精确字节路径的暂存blob与本机文件一致。完整原生矩阵、安装包、更多seed/层未重跑；科学源码/default/旧helper/成功Run无改动。
+
+## source719／root720与跨prompt因素扩展（2026-10-15）
+
+test_local_state_proxy.py覆盖固定state/proxy输入保全、fresh cache与因果attention阻止未来mask影响当前验证、mask变化确实改变后续输出、冻结六窗口、T0 seed不抽样、真实root720 source-owner与候选时序回归。实际24固定块三次bit重复、两canonical原值生成全张量/AR重现、四单位36生成AR/单坐标/teacher门见[最新报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)。不将greedy seed当独立随机样本，也不将direct block当完整生成。
+
+收尾核验：42项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；新分析重跑保持原证据逐项一致，26个精确字节路径暂存blob与本机文件一致。旧helper/协议/科学src/default无改动，本轮3800生成新token、24额外固定块、4teacher均在预声明预算内。完整安装包/长矩阵/随机采样温度未重跑。

@@ -11,3 +11,5 @@ The local q178 operator results are in [the extension report](../output_space_ex
 真实输入／零／一汇总85/58/45；q241 native11→12，canonical14→14且路径仍不同。完整事实与图见[STUDY_REPORT](docs/STUDY_REPORT.md)，计数对比不代替语义轨迹或纯因果证明。
 
 2026-10-15：新冻结STATE_FACTOR_PLAN完成六生成与H5/H6反例，anchor-only/velocity-only13／13，双canonical等数但路径不同的root720归因见[最新报告](docs/STUDY_REPORT.md)。
+
+新固定帧对照在source719分离即时state与代理，并新增q242/q243两greedy seed因素矩阵；q242零交互、q243非零，root720当前映射与候选构建时序见[最新报告](docs/STUDY_REPORT.md)。

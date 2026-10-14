@@ -20,3 +20,13 @@
 /studies/output_space_cross_task/docs/state_factor_analysis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/state_factor_diagnosis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_extension/docs/rounding_factor_diagnosis_v1.json -text whitespace=cr-at-eol
+
+# Preserve fixed-frame and state-extension evidence bytes.
+/tools/diagnose_q241_local_factors.py -text whitespace=cr-at-eol
+/tools/diagnose_state_extension.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_local_extension.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/LOCAL_FACTOR_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/STATE_EXTENSION_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/local_extension_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/local_factor_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/state_extension_diagnosis_v1.json -text whitespace=cr-at-eol

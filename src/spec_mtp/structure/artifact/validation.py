@@ -152,6 +152,26 @@ def verify_evidence(config: dict[str, Any], assets: Path) -> None:
                     raise SpecMtpGateError('cache prefix mismatch')
                 if not trace['stopped'] and trace['cache_after'] != trace['root_position'] + 1 + len(trace['accepted_nodes']):
                     raise SpecMtpGateError('cache eviction mismatch')
+            if settings['spec'].get('method') == 'output_hidden':
+                import math
+
+                prefill = stats.get('output_hidden_prefill') or {}
+                scale = prefill.get('scale', 0)
+                k = int(settings['spec']['num_masks'])
+                if (prefill.get('observed_positions') != len(item['input_ids'])
+                        or prefill.get('state_dtype') != 'float32' or prefill.get('final_normalized') is not True
+                        or not math.isfinite(scale) or scale <= 0):
+                    raise SpecMtpGateError('output hidden prefill evidence invalid')
+                for trace in stats['trace']:
+                    observation = trace.get('output_hidden') or {}
+                    expected_rows = [] if trace['stopped'] else [0] + trace['accepted_nodes']
+                    if (observation.get('observed_block_rows') != expected_rows
+                            or observation.get('owner_count') != k + 1 or observation.get('slot_count') != k):
+                        raise SpecMtpGateError('output hidden owner/observation evidence invalid')
+                    for key in ('mask_norm_min', 'mask_norm_max'):
+                        value = observation.get(key, float('nan'))
+                        if not math.isfinite(value) or not math.isclose(value, scale, rel_tol=1e-5):
+                            raise SpecMtpGateError('output hidden mapping norm evidence invalid')
             for key in ('accepted', 'committed', 'decode_calls', 'new_tokens'):
                 if row[key] != stats[key]:
                     raise SpecMtpGateError(f'{key} evidence mismatch')

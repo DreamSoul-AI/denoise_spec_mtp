@@ -52,3 +52,9 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 最终本机全量254 passed（177.46秒，0 failed/errors/skipped），Ruff/mypy、36格严格数值、wheel/sdist 41命令全部通过。正式证据追加smoke/v031_validation.json，不覆盖历史来源；真实v4 complete/passed=true，v3拒绝保留。
 
 用户明确批准具体公开内容与仓库/分支后，推送ae86c3c成功并创建PR #6（refactor/spec-rpipe→dev）：https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/6 。Branch flow和push/PR cpu-checks已启动，本交接更新后核验PR最新head检查；不自动合并或发布。既有用户workspace文件保持未跟踪。
+
+2026-10-14 用户要求自主继续，不反复询问。下一最小阶段在feature/output-space-prerequisite上按v6提取tied零/一阶链式Study，先写PLAN与职责映射再实现。已接入最后归一化hidden、按owner代理状态和精确观测时序，12初轮针对性通过，后补EOS/真实前缀hidden等值共14项通过；原生CLI专项门通过，owner证据篡改拒绝。尚未声明真实模型结果/整体完成，完整回归与旧轨迹对照继续。
+
+输出空间v1四格真实Run已成功、Study complete/passed=true；源码670c744e0535dcad，三个投机输出均与47token独立AR相同。匹配输入均值链17、输出零阶10、一阶10；负结果保留，没有调整超参或扩大矩阵。串行资源与正式JSON/图/报告已记录，完整270测试/36格严格对照通过。
+
+最终源码wheel/sdist 41CLI命令全部通过，两安装target的新输出方法真实解码均与AR一致；来源/PLAN/inputs最终只读核验，无重复实验或重新签来源。正式成果本地分支保存，PR6保持原提交与绿色CI，不自动合并。

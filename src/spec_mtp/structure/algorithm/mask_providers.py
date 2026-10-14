@@ -268,4 +268,8 @@ def build_mask_provider(spec_cfg, embedding_table, generator=None):
             lam=ema_cfg.get('lam', 0.1),
             generator=generator,
         )
+    if method == 'output_hidden':
+        from spec_mtp.structure.algorithm.output_masks import OutputHiddenMaskProvider
+
+        return OutputHiddenMaskProvider(num_masks, embedding_table, **dict(spec_cfg.get('output', {})))
     raise ValueError(f'Unsupported spec.method: {method}')

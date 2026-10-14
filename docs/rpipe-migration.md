@@ -48,3 +48,7 @@ report 共存回归发现专项 CLI 用空 StudyProcessContext 复验，缺 raw 
 v3四个真实Run成功，但Study expected_factors_match=false：上游index的factors是合并后的有效Run取值，原专项把它与cartesian轴补丁比较。含嵌套algorithm.config轴时，version/eval与继承mask在index存在而补丁不含这些字段。不是数值或上游执行失败。
 
 修复从冻结experiment_config.yaml与study声明独立推导期望：复用上游expand_patches、experiment_config_from_mapping/run_config_from_merge及experiment_entries分组；不读取当前index/result作为期望，不改配置、轴、阈值或科学Algorithm。Study hook传入实际基底；已有单参declared_factors保留仅轴展开兼容。子集、继承固定字段被篡改、seed或来源失败仍拒绝。先用嵌套轴CPU真实CLI做红/绿回归。v3 raw/index/process/失败保留，不重签成功Run；源码变化后以新version v4复验同四case，这是失败整轮的纠错验收，不重跑历史正式矩阵。
+
+## Output-space next-stage contract (2026-10-14)
+
+New [Study PLAN](../studies/output_space_prerequisite/docs/PLAN.md) defines tied order0/order1, two-slot chain, fixed gains and normalized final-hidden mapping. Output provider owns state/owner masks; Model exposes final normalized hidden without all-layer storage; decoder owns observation timing and keeps existing verifier/tree/cache. Existing input providers and scientific presets remain unchanged. No untied/general-tree/Kalman claim.

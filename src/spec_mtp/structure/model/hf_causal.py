@@ -31,6 +31,7 @@ class HFCausalLM(nn.Module):
             from transformers import LlamaConfig, LlamaForCausalLM
             config = LlamaConfig(  # type: ignore[call-arg]  # attn_implementation goes to PretrainedConfig kwargs
                 vocab_size=int(tiny_config.get('vocab_size', 256)),
+                tie_word_embeddings=bool(tiny_config.get('tie_word_embeddings', False)),
                 hidden_size=int(tiny_config.get('hidden_size', 64)),
                 intermediate_size=int(tiny_config.get('intermediate_size', 128)),
                 num_hidden_layers=int(tiny_config.get('num_layers', 2)),
@@ -78,21 +79,39 @@ class HFCausalLM(nn.Module):
 
     @torch.no_grad()
     def forward(self, inputs_embeds, position_ids, attention_mask_4d=None,
-                past_key_values=None, output_hidden_states=False):
+                past_key_values=None, output_hidden_states=False, last_hidden_only=False):
         """One forward pass over a (tree-)block of embeddings.
 
         attention_mask_4d: additive float mask [1, 1, q_len, kv_len] with 0 for
         attend and dtype-min for blocked, or None for the plain causal prefill
         path. Returns the full model output (logits at every block position).
         """
-        return self.hf(
-            inputs_embeds=inputs_embeds,
-            position_ids=position_ids,
-            attention_mask=attention_mask_4d,
-            past_key_values=past_key_values,
-            use_cache=past_key_values is not None,
-            output_hidden_states=output_hidden_states,
-        )
+        captured = []
+        handle = None
+        if last_hidden_only:
+            # Llama/Qwen expose their final normalization here. Capture only
+            # its output; request no intermediate layer hidden-state tuple.
+            norm = getattr(getattr(self.hf, 'model', None), 'norm', None)
+            if norm is None or output_hidden_states:
+                raise ValueError('last_hidden_only requires Llama/Qwen final norm and no all-layer output')
+            handle = norm.register_forward_hook(lambda _module, _args, output: captured.append(output))
+        try:
+            out = self.hf(
+                inputs_embeds=inputs_embeds,
+                position_ids=position_ids,
+                attention_mask=attention_mask_4d,
+                past_key_values=past_key_values,
+                use_cache=past_key_values is not None,
+                output_hidden_states=output_hidden_states,
+            )
+            if last_hidden_only:
+                if len(captured) != 1:
+                    raise RuntimeError('expected one final norm observation')
+                out.last_hidden_state = captured[0]
+            return out
+        finally:
+            if handle is not None:
+                handle.remove()
 
     def min_mask_value(self):
         return torch.finfo(self.dtype).min

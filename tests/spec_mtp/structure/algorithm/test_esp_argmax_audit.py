@@ -124,3 +124,23 @@ def test_pending_report_does_not_link_unpublished_local_evidence(tmp_path,monkey
     text=(tmp_path/'docs/STUDY_REPORT.md').read_text(encoding='utf-8')
     assert '`protocol_pending.json`' in text and '](protocol_pending.json)' not in text
     assert not json.loads((tmp_path/'docs/protocol_pending.json').read_text())['quality_passed']
+
+
+def test_tau_plot_requires_full_argmax_pass_but_not_ar_exact(tmp_path,monkeypatch):
+    monkeypatch.syspath_prepend(str(ROOT/'studies/esp_table1_bf16_full_argmax'))
+    from plot_results import write_plot
+    cells=[{'BC':bc,'num_masks':k,'n':480,'argmax_all_passed':True,
+        'pooled_tau':1.4,'prompt_mean_tau':1.5,'category_mean_pooled_tau':1.45,'accepted':100}
+        for bc,k in [(10,1),(30,1),(60,1),(60,2)]]
+    body={'all_cells_observed':False,'quality_passed':True,'AR_all_exact':False,'cells':cells}
+    path=tmp_path/'tau.png'
+    with pytest.raises(AssertionError):
+        write_plot(body,path)
+    assert not path.exists()
+    body['all_cells_observed']=True
+    body['quality_passed']=False
+    with pytest.raises(AssertionError):
+        write_plot(body,path)
+    body['quality_passed']=True
+    write_plot(body,path)
+    assert path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n') and path.stat().st_size>10000

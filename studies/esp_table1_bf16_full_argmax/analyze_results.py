@@ -123,6 +123,11 @@ def main():
             '[PLAN](PLAN.md)引用G.2具体说明：Qwen3 BC60单mask/29节点，双mask/19节点为对照；保持动态树剪枝，BF16/T0/256/seed123，无测速/预热。','',
             'Mean mask按Eq5 λ=.1更新，与后续4B用户指定的ESP frozen mean不同。四格全部新Run，旧冻结PLAN不回写；原生AR门失败状态独立保留，不伪称native成功。新增argmax必须全过。',
             '',f'逐prompt计数、AR首分叉位置和自检覆盖及哈希见{reference}。完整原始tokens/argmax选择记录/Run仅在本机保留，未运行格不能用预检外推。']
+    if body['all_cells_observed'] and body['quality_passed']:
+        from plot_results import write_plot
+        write_plot(body,study/'docs/figures/tau_acceptance.png')
+        lines+=['','![Full480 tau and accepted draft counts](figures/tau_acceptance.png)',
+                '',f'图：同一四格480条，三种τ聚合及真实accepted draft总数（EOS/预算裁剪前）；黑菱形为论文目标。来源[{filename}]({filename})，AR一致率另列，不含测速。']
     (study/'docs/STUDY_REPORT.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
     print(json.dumps({'n':len(prompts),'observed':body['all_cells_observed'],'quality_passed':body['quality_passed'],
                       'cells':[{k:c.get(k) for k in ('BC','num_masks','role','pending','exact_count','pooled_tau','pooled_tau_target_delta')} for c in cells]}))

@@ -1,0 +1,9 @@
+# q241 actual owner1 fixed-frame state/proxy control
+
+Frozen after6cca8fc before new forwards/draws, 2026-10-15. Next different actual owner issource717 owner1, selected from the already measured716→717→719 chain, not by favorable margins. Owner1 masks rows5/6 atpositions719/720 seedroot719; do not score owner0 rows3/4 as the next-path seeds.
+
+Two q241 seed123/T0 canonical self/graft full generation controls must match prior AR/trace/stats/all captured tensors; capture canonical-self source717 input/positions/attention/cache/logits/hidden, fixed root/tree/KV. Reuse unchanged synchronized_transfer and prior teacher states, zero teacher. Four S/P cells (canonical versus native self committed state, canonical self versus graft proxies), three fresh-cache repeats per cell,12 block forwards. Only six mask embeddings change; preserve root/node verification outputs and saved cache, position, attention, state/proxy; native-equivalent cell exact, repeats exact. Compare actual owner1 seed logits with previous graft next-root719 seed, even if they fail to recover a correct greedy candidate. No arbitrary noise or alternative owner search.
+
+Conditional acceptance at this other owner uses the old actual verification root719 logits from the saved fixed-frame experiment, native sampler T=.8/1, seeds200..263, same64 verifier draws under each S/P cell, exact candidate softmax masses. Distinguish changed candidate/seed from a restored hit. Root719/root720 contexts and mass differences differ, not paired evidence that an owner index itself caused the effect.
+
+Budget200 full-generation tokens +12 direct blocks +128 conditional verifier draws, zero teacher/warmup. The sampled-path study remains separate. Bind old native/canonical reports+tensors/new plan/tool/old local helpers/scientific sources/11 snapshot/model/runtime before/after; .5s singleGPU monitoring. Raw cache/frame tensors local only; no source/default edits, old re-sign, remote/PR/merge/delete.

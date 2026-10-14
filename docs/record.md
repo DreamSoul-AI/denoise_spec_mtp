@@ -100,3 +100,9 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 新协议下q241两canonical原值完整重现，source719/current720四格各三重复。固定KV/tree/state，只换source719 proxy精确恢复真实graft两条seed logits，正确第一候选13→264；即时state微差改mask但未改判定，root720当前映射不改变当前验证，影响后续输出。q242两seed交互0/0、q243两seed+6/-3，36生成/3600new/3124forward+四teacher全AR一致，贪心seed完全重复，不当独立样本。原source/default/旧合同/工具不改，不远程/PR/删数据。
 
 收尾核验：42项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；新分析重跑保持原证据逐项一致，26个精确字节路径暂存blob与本机文件一致。旧helper/协议/科学src/default无改动，本轮3800生成新token、24额外固定块、4teacher均在预声明预算内。完整安装包/长矩阵/随机采样温度未重跑。
+
+## 非T0完整路径与owner1（2026-10-15）
+
+另冻两协议，q241/T=.8 seeds123/124两独立AR路径不同，14生成全token审计一致，固定实际entry697/715移植10→9与9→10。原source719条件multinomial(T=.8/1，各64)代理恢复0→64/63，属于旧固定上下文。新增source717 owner1四格三重复精确重现下一719 seed logits，候选11→323却均不等于AR1008，随机验证各0/64但概率非零。总1600生成new、12额外块、256条件draw，零teacher；全负结果、概率精度与泛化边界正式保存。科学source/default/旧helpers/合同无变，不远程/PR/合并/删数据。
+
+收尾核验：47项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；联合分析重跑与原formal证据一致，34个精确字节路径暂存blob与本机文件一致。1600生成new、12额外块、256条件draw在新协议预算内；旧source/default/配方/工具/Run未改。未做多prompt采样泛化、罕见事件统计检验或安装包／长矩阵重跑。

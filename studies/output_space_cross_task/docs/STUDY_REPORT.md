@@ -152,3 +152,56 @@ local两完整控制200new／172forward+24固定块／零teacher，wall22.613秒
 新增回归覆盖单因素输入保全、固定帧因果注意力／当前验证不变／后续mask输出改变、独立cache、冻结六root规则、greedy seed解释以及716→717→719→720的真实source-owner/候选时序一致性。scope限于q241两个固定块及另两个greedy prompt；未做采样温度、多设备、长路径干预或其他owner充分性试验。科学源码/default、旧helper与原合同不变，未推送、未开PR、未删除数据。
 
 收尾核验：42项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；新分析重跑保持原证据逐项一致，26个精确字节路径暂存blob与本机文件一致。旧helper/协议/科学src/default无改动，本轮3800生成新token、24额外固定块、4teacher均在预声明预算内。完整安装包/长矩阵/随机采样温度未重跑。
+
+## 非T0完整路径与实际owner1对照（2026-10-15）
+
+依据6cca8fc另冻[SAMPLING_PLAN](SAMPLING_PLAN.md)与[OWNER_PLAN](OWNER_PLAN.md)，执行[采样工具](../../../tools/diagnose_sampling_paths.py)、[owner1工具](../../../tools/diagnose_q241_owner1.py)及[复核](../analyze_sampling_owner.py)。正式[采样诊断](sampling_diagnosis_v1.json)、[owner诊断](owner1_diagnosis_v1.json)、[联合分析](sampling_owner_analysis_v1.json)保留完整路径、256条件验证draw、概率与负结果。原科学source/default/配方、旧诊断工具和合同保持。
+
+### 原source719上下文中的随机验证
+
+先固定上一轮root720真实验证root logits，让旧source719的四个S/P格供给首draft候选，用原生CUDA select_token的multinomial在T=.8／1、seeds200–263分别抽64次验证token。每个温度同一draw bank在所有格共享；state-only候选与原值相同，proxy-only与both候选相同。抽样确实消耗Generator状态；不是拿贪心argmax替代随机验证。这里只评首槽，第二槽的验证分布会依赖选中的第一节点，不能用第一槽结果冒充整条路径。
+
+| 原owner0候选因素 | 候选ID | T=.8首槽命中／64 | T=1首槽命中／64 |
+| --- | ---: | ---: | ---: |
+| 原值／state-only | 13 | 0 | 0 |
+| proxy-only／both | 264 | 64 | 63 |
+
+同位root720验证概率的native CUDA-FP32 mass：T=.8的13／264约5.4372435e-9／.999661922454834；T=1约2.4411347e-7／.9980924725532532。因此原固定上下文中，代理恢复的候选在随机验证下也有明显不同的接受机会；即时state交换仍未改候选。每个温度64个draw是条件Monte Carlo，不是64个新prompt或完整采样轨迹；T=.8恰好全draw为264，T=1有两种token，不因前者观察全同就称其非随机。
+
+raw中exact_candidate_probability字段是原生CUDA-FP32 softmax的数值结果，名称沿用而不宣称精确实数。复核用同后端重算bit一致，另存CPU-FP64参考；owner0候选264在T=.8的绝对差约1.8333e-7、T=1约2.7820e-9。跨后端CPU-FP32复核的失败不当作原生抽样失败，也不通过放宽抽样输出门掩盖；已保存的实际draw与命中数未修改。
+
+### 两条新的完整采样路径
+
+q241/T=.8/seeds123,124/max100/EOS；每单位新生成独立AR，再运行output0/output1，全部输出token精确等于对应AR。两个AR输出彼此不同，突破旧greedy前缀。entry只按原choose_window从实际语义trace选出，并在hidden/logits观测前写锁；没有逼迫访问旧719或选择收益最大的入口。每单位再观察两baseline，执行order1原值self及一阶←零阶；原值完整trace／stats复现，移植through-entry、单槽范围和全AR输出门通过。
+
+| seed／T | 实际entry | 零阶accepted | 一阶accepted | self | graft | graft-self |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 123／.8 | 697 | 11 | 10 | 10 | 9 | -1 |
+| 124／.8 | 715 | 9 | 9 | 9 | 10 | +1 |
+
+两移植都改变完整语义路径，符号相反。本轮接受数仍沿用最终预算裁剪前draft计数。原source719条件恢复不等于新采样prefix上的稳定收益；新窗口没有canonical等state因素分解，不把全程移植效应唯一归为proxy中介。这两seed是有限新采样路径，不是统计稳定性结论。
+
+每单位实际7次生成含独立AR，合计14次／1400new／1284forward（其中AR200token／200forward），零teacher／warmup；capture预声明六root，完整actual trace保留，未访问／新增根明确。不重签原生Study或将温度改入默认配置。
+
+### 另一个真实owner：内容改变，但未恢复接受
+
+选择旧真实source717／owner1，mask rows5/6位置719/720，seed下一root719。两次新的T0 canonical完整控制均精确复现旧AR／trace／stats／全部captured张量。固定self的source717 KV／树／根节点／positions／attention，四个S/P格三次fresh-cache重放；12块原值完整logits／hidden精确，重复bit一致，所有格验证三行输出保持，state/proxy/cache scope门通过。
+
+| owner1格 | 最大mask差 | root719首候选 | 对贪心AR1008 margin |
+| --- | ---: | ---: | ---: |
+| S0P0原值 | 0 | 11 | -18.067363739013672 |
+| S1P0只换state | 4.470348358154297e-8 | 11 | -18.067363739013672 |
+| S0P1只换proxy | .0055773258209228516 | 323 | -18.32495880126953 |
+| S1P1同时换 | .0055773258209228516 | 323 | -18.32495880126953 |
+
+proxy-only两条owner1 seed logits与真实graft下一root719保存值全向量bit一致。它复现了另一个owner的代理内容对候选的影响，却没有恢复greedy接受：11、323都不是1008。固定实际root719验证logits再抽T=.8／1、seeds200–263，所有格各0/64命中。其native candidate mass分别约1.4171e-11／2.2575e-11与2.0936e-9／3.0386e-9，确实非零且不同；64次零命中没有足够信息排除这些罕见概率差，不称为绝对无效。
+
+该owner1与原owner0不同prefix位置、不同正确token与验证概率，不把两者当“owner编号本身”的纯因果比较。结果收紧“代理内容改变就必恢复命中”的解释：内容传播在另一个真实owner存在，接受恢复依赖验证目标与分布。没有搜索其他owner来替换此负结果，也未做第二槽或全路径因果百分比分配。
+
+### 复现成本、回归与剩余范围
+
+sampling wall47.418秒，.5s采样RSS5500076032 bytes、GPU全局7129MiB、最低可用主存10042523648；raw62414293 bytes、SHA164c03066172732ece3eabea256871c9ea61a9f04992fbbf4831c8e57fd37d20。owner两控制200new／172forward+12直接块，wall22.812秒、RSS4972376064、GPU7114MiB；raw192179087 bytes、SHA69cb9734e2a19d5a48664d84982f2d64e6b7089bb1274629bbe46e14b8cf71a1。共1600生成新token、12额外块、256条件draw、零teacher；资源含背景、不是allocator峰。cache/weights/raw完整帧仅本机.tmp。
+
+新增回归覆盖multinomial消耗RNG与共享draw、不同seed实际随机性、正温度draft仍top1而verifier采样、output_hidden两order两seed两温度对fresh AR的token一致，以及owner1 rows5/6与positions719/720，防止误读owner0 rows3/4。本轮证据允许：固定原上下文中的首槽恢复在非T0仍成立，另owner内容变化不必恢复接受，新的完整采样路径存在正负效应。未证明多prompt／多温度／多设备泛化，未将full-path sampled新窗口做等state causal分解，也未证明极小概率事件无效。不推送、不开PR、不合并、不删数据。
+
+收尾核验：47项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；联合分析重跑与原formal证据一致，34个精确字节路径暂存blob与本机文件一致。1600生成new、12额外块、256条件draw在新协议预算内；旧source/default/配方/工具/Run未改。未做多prompt采样泛化、罕见事件统计检验或安装包／长矩阵重跑。

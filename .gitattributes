@@ -30,3 +30,13 @@
 /studies/output_space_cross_task/docs/local_extension_analysis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/local_factor_diagnosis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/state_extension_diagnosis_v1.json -text whitespace=cr-at-eol
+
+# Preserve sampling and owner1 measured tools/protocol/evidence bytes.
+/tools/diagnose_sampling_paths.py -text whitespace=cr-at-eol
+/tools/diagnose_q241_owner1.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_sampling_owner.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/SAMPLING_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/OWNER_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_owner_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/owner1_diagnosis_v1.json -text whitespace=cr-at-eol

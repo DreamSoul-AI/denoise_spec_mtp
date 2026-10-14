@@ -35,3 +35,6 @@ Package check: `python tools/package_selfcheck.py --workspace .tmp/package-<new-
 
 `diagnose_q241_local_factors.py`：`python tools/diagnose_q241_local_factors.py --out .tmp/<new-id>`，两原值完整生成+24固定块，定位候选构建与当前映射的时序。
 `diagnose_state_extension.py`：`python tools/diagnose_state_extension.py --out .tmp/<new-id>`，两prompt两greedy seed、36生成／四teacher，复用原helpers，保留零交互和非加性反例。
+
+`diagnose_sampling_paths.py`：`python tools/diagnose_sampling_paths.py --out .tmp/<new-id>`，两T=.8 seed各独立AR+四格/观测，冻结实际窗口，旧source719条件multinomial接受检查。
+`diagnose_q241_owner1.py`：`python tools/diagnose_q241_owner1.py --out .tmp/<new-id>`，两canonical原值控制、owner1四格三重复、独立上下文条件draw；保留不恢复命中的负结果。

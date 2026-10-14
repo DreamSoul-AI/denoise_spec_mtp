@@ -67,3 +67,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 工具诊断：`tools/diagnose_q178_rounding_factors.py`只做已存输入的算术分解；`tools/diagnose_q241_state_factors.py`只在固定真实KV根选择性回填anchor/velocity，沿用原decoder与transfer。
 
 `tools/diagnose_q241_local_factors.py`固定source719/current720 cache/tree并交换state/proxy；`tools/diagnose_state_extension.py`执行预声明q242/q243两seed状态因素矩阵，不改正式解码器。
+
+`tools/diagnose_sampling_paths.py`做真实非T0 AR耦合路径及旧source719条件抽样；`tools/diagnose_q241_owner1.py`固定实际source717／owner1映射，只核对应rows5/6的seed。

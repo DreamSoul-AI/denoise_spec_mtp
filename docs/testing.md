@@ -46,3 +46,9 @@ GPU实际检查另见[状态因素报告](../studies/output_space_cross_task/doc
 test_local_state_proxy.py覆盖固定state/proxy输入保全、fresh cache与因果attention阻止未来mask影响当前验证、mask变化确实改变后续输出、冻结六窗口、T0 seed不抽样、真实root720 source-owner与候选时序回归。实际24固定块三次bit重复、两canonical原值生成全张量/AR重现、四单位36生成AR/单坐标/teacher门见[最新报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)。不将greedy seed当独立随机样本，也不将direct block当完整生成。
 
 收尾核验：42项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；新分析重跑保持原证据逐项一致，26个精确字节路径暂存blob与本机文件一致。旧helper/协议/科学src/default无改动，本轮3800生成新token、24额外固定块、4teacher均在预声明预算内。完整安装包/长矩阵/随机采样温度未重跑。
+
+## 非T0耦合与owner1（2026-10-15）
+
+test_sampling_causality.py检查原multinomial RNG被消耗且四因素共享draw、seed重复可复现而抽样token有变化、positive-temperature draft仍按top1构树、output_hidden在两温度／两seed／两order下等于fresh AR，以及owner1 rows5/6/PIDs719/720。真实权重另完成两条T=.8完整AR路径／self/graft门、原owner0和新owner1各128条件draw、12owner1固定块三重复，见[最新报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)。条件draw不是完整生成，也不以64次罕见候选零命中证明概率为零。
+
+收尾核验：47项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；联合分析重跑与原formal证据一致，34个精确字节路径暂存blob与本机文件一致。1600生成new、12额外块、256条件draw在新协议预算内；旧source/default/配方/工具/Run未改。未做多prompt采样泛化、罕见事件统计检验或安装包／长矩阵重跑。

@@ -1,6 +1,6 @@
 # 异机交接
 
-最新状态见本文末尾“source719／root720时序与非加性扩展”：固定帧state/proxy分离及两个新增prompt两greedy seed矩阵已执行。下列历史交接中的未运行状态保留为当时记录，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
+最新状态见本文末尾“非T0完整路径／owner1范围”：两条真实采样路径、原source719随机验证和另一真实owner1对照已执行。下列历史交接中的未运行状态保留为当时记录，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
 
 ## q178算子对照与下一Study草案（2026-10-14）
 
@@ -115,3 +115,7 @@ v0.3.1 源码升级与完整回归；当前重构安装包/Windows selfcheck；�
 ## source719／root720时序与非加性扩展（2026-10-15）
 
 [最新报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)与新两个冻结协议：source719固定KV/tree/state，proxy-only把root720候选13变264并精确重现真实graft两seed logits；state-only有非零mask变化但第一判定不变。当前720映射在候选树之后，仅改变后续seed。24块三重复bit一致，两原值控制全AR/trace/tensor重现。q242交互0/0、q243+6/-3，两个T0 seed全语义和captured seed/mask bit一致，两个新增prompt反驳非加性普遍，不构成随机seed泛化。未做温度采样／其他owner／长路径直接效应；raw仅本地，不远程/PR/删数据。
+
+## 非T0完整路径／owner1范围（2026-10-15）
+
+[最新报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)：真正T=.8两seed独立AR输出不同，14生成全token一致，实际窗口697/715效果-1/+1；旧source719条件抽样恢复0→64/63不泛化为新路径稳定收益。source717实际owner1 rows5/6交换proxy精确复制真实下一719 seed，11→323但均不命中1008，64draw各零但概率非零。12块三重复/两原值控制全tensor验证，条件与full-path证据严格分开；下一缺口是新 sampled窗口等state decomposition、更多prompt/温度和罕见候选效应，不声称已解决。未远程/PR/合并/删除。

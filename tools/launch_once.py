@@ -1,4 +1,4 @@
-"""Native SpecMTP CLI with the optional failed-job retry disabled."""
+"""Native CLI without failed-job retry: python tools/launch_once.py launch studies/<name> --round 1."""
 import sys
 from functools import partial
 from unittest.mock import patch

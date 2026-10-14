@@ -66,3 +66,5 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 2026-10-14 接续77fe411，先固定q173 root83 owner0第二槽的零/一阶互换与一阶原值回填三case，无搜索/新增默认。实测99token全部与独立AR一致、单槽scope与实际接受owner门通过；一阶←零阶accepted3→1且两后期seed/logits等于零阶，反向零阶←一阶accepted1→2仅恢复root94。离线核验两段代理传播，前一方向五固定根committed anchor/v仍与一阶原值完全相同，后一方向v仍0，收紧历史/当前速度解释但保留单窗口边界。源码/旧Run/权重不改，资源与失败边界入库，新3项针对性通过；不推送、合并或删数据。
 
 2026-10-14 接续6a953bc跨prompt验证，按预声明首个共同hit前根固定q171/172/174 root63/42/41。旧两tool完整保留，新runner复用函数，15次AR逐token与原轨迹/单槽/实际owner/state门通过，accepted仍10/1/1。q171/172代理和first seed/margin受影响但不跨排序边界；q174 EOS边界仅下一proxy改变。全部null与有限解释入STUDY_REPORT，资源/raw SHA/离线复算正式归档，新2项针对性检查不一致状态也保留。未改科学源码/默认，未重签旧Run，不推送合并或删数据。
+
+2026-10-14 接续7a02501，先写q173位置/margin/owner历史假设，再固定q175–178与fallback。原生make/launch/process/report四Run和20诊断均AR逐token通过，q175/176/177 null，q178双向各8→9但有深度2损失/恢复、first层收益/损失和末尾depth2补偿。同位root86状态完全相同，后期浮点delta保留不声称纯代理全中介。初次tokenizer BatchEncoding JSON失败在make前，修独立清单步骤并核对IDs，不改源码；所有raw/失败说明保留。14项针对性/新Study展开/docs、Ruff/mypy56通过，累计8prompt矩阵与正式证据本地归档，不推送合并删数据。

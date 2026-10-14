@@ -186,3 +186,22 @@ q174只有41→42(owner0)这一段：终止块root42的incoming proxy pair改变
 本轮15次生成共370 new tokens，实际310 model forwards均等于各自1+decode_calls，辅助forward0，低于预声明1500-token预算。串行wall25.349秒；.5秒采样RSS峰5079793664 bytes、线程10、GPU全局5775MiB、可用主存最低11891093504 bytes。包含背景且可能漏短峰，instrumentation计时不作方法性能排名。两个Study model/snapshot、11文件hash、源digest、实际runtime、原config/inputs/raw及PLAN/tool/helper在前后核验一致。
 
 [diagnose_cross_prompt.py](../../../tools/diagnose_cross_prompt.py)直接复用先前两个已绑定工具；out必须新目录，失败保留并停止。[analyze_cross_prompt.py](../analyze_cross_prompt.py)复核传播、state和null，既存JSON不一致则拒绝覆盖。selected张量305797221 bytes仅保留于本机.tmp/output-cross-prompt-20261014-v1，SHAd1e5b9f03da0d705e7a2032ccd4718790fccb07a1e913e5501ed5c2f650e9fbe，不随Git。新增2项针对性测试检查按实际root交集选择和保留不一致状态/负margin；原单槽测试与文档/静态检查继续验证。科学源码、旧Run/NUMBERS和失败数据保留，未推送、合并或删数据。
+
+## 四个新prompt扩展与累计矩阵（2026-10-14）
+
+按[扩展PLAN](../../output_space_extension/docs/PLAN.md)先分析q173的晚窗口、局部正负margin与owner路径，再预声明q175–q178。已完成4新原生Run×4prompt和20次固定双向/原值回填诊断，全部输出与独立AR一致，科学源/default/旧Run保留。详细新结果与假设边界在[扩展STUDY_REPORT](../../output_space_extension/docs/STUDY_REPORT.md)；表是八个开发prompt的累计描述，不是八个独立seed或单个可部署新方法。
+
+| qid | 输入accepted | 原零阶 | 原一阶 | 干预根 | 一阶←零阶 | 零阶←一阶 | 一阶原值回填 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 171 | 17 | 10 | 10 | 63 | 10 | 10 | 10 |
+| 172 | 1 | 1 | 1 | 42 | 1 | 1 | 1 |
+| 173 | 5 | 1 | 3 | 83 | 1 | 2 | 3 |
+| 174 | 0 | 1 | 1 | 41 | 1 | 1 | 1 |
+| 175 | 4 | 3 | 3 | 38 | 3 | 3 | 3 |
+| 176 | 1 | 0 | 0 | 46 | 0 | 0 | 0 |
+| 177 | 7 | 4 | 4 | 57 | 4 | 4 | 4 |
+| 178 | 7 | 8 | 8 | 85 | 9 | 9 | 8 |
+
+q178复现了局部接受可被同一个单槽动作改变，但具体模式不同：root86第一槽不变，合法第二槽margin零/一为-.904274/+.141495，双向分别移除/恢复深度2；随后收益和损失相抵且root108新增depth2，两方向净8→9/calls27→26。q175/177传播有变化但仍null，q176为无共同命中fallback且owner1没有被利用的对照。没有按新margin换prompt或窗口。
+
+q173为何特殊目前可收紧为有限假设：晚位置与注入幅度不单独决定结果；有效候选在具体prefix是否跨过排序边界，以及实际接受owner切换如何重新混入历史，更有解释力。q178在初次root86 anchor/v完全不变，但后期state存在小数值差异（anchor max_abs3.05e-5、一阶velocity2.38e-6），不能声称完整复现q173后期严格相同状态下的效果；所有合法第二槽标志和反向损失都保留，第二槽scalar扩展为事后从已保存logits复算。总体仍不足以声明稳定一阶优势、普遍EMA因果或新默认配方。已本地保存，无推送、合并或数据清理。

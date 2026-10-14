@@ -1,5 +1,9 @@
 # 异机交接
 
+## q175–q178扩展与累计8prompt（2026-10-14）
+
+先在新PLAN写H1排序边界/H2实际owner历史/H3终止或未使用owner，再固定4新prompt并完成原生4Run与20次诊断，全部AR一致。q175/176/177 null；q178原零/一accepted均8但深度分布不同，root85单槽双向各变9，存在损失/收益相抵，初次root86第二槽在相同anchor/v下翻转depth2。后期state有微小浮点差异，不当作完整q173机制复现。第二槽分析明确事后，raw及全部坏点/新旧root保存，8prompt表与详细事实见[扩展报告](../studies/output_space_extension/docs/STUDY_REPORT.md)。科学src670/default/旧helper/Run保持，不推送、合并或删数据。
+
 ## q171/q172/q174固定跨prompt复现（2026-10-14）
 
 按CROSS_PROMPT_PLAN首个共同命中前根规则选择63/42/41，复用未修改的observe/transfer工具，完成6原轨迹观测+6双向移植+3原值回填。15次输出与独立AR相同、全部验证/提交/KV轨迹不变，六移植94同位窗口anchor/v与recipient原值逐元素相同。q171/q172 first seed分别每方向34/7根变化但margin未跨top1边界；q174 terminal proxy变化后EOS停止。未复现q173命中转移，不能概括代理传播必导致收益；也未证伪所有其他窗口。正式合同、完整scalar/轨迹与离线核验见[Study报告](../studies/output_space_small_matrix/docs/STUDY_REPORT.md)。src/default/原Run不改，本地保存，不推送/合并/删数据。

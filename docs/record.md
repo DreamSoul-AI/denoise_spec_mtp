@@ -58,3 +58,5 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 输出空间v1四格真实Run已成功、Study complete/passed=true；源码670c744e0535dcad，三个投机输出均与47token独立AR相同。匹配输入均值链17、输出零阶10、一阶10；负结果保留，没有调整超参或扩大矩阵。串行资源与正式JSON/图/报告已记录，完整270测试/36格严格对照通过。
 
 最终源码wheel/sdist 41CLI命令全部通过，两安装target的新输出方法真实解码均与AR一致；来源/PLAN/inputs最终只读核验，无重复实验或重新签来源。正式成果本地分支保存，PR6保持原提交与绿色CI，不自动合并。
+
+2026-10-14 按监督请求接续，先读最新STUDY_REPORT/offline_diagnosis，选最低新增实现成本的3新prompt小矩阵。预声明q172–174、4Runs、固定配方/预算，源码670c744e0535dcad不改；串行make/launch/process/report及9投机输出对独立AR完全一致。accepted为输入6/零阶3/一阶5，逐prompt和匹配prefix差异全保留；q173一阶与零阶root94/97接受差异对应2次calls减少，机制原因仍缺hidden/logit观测。正式报告/复算工具和资源证据保存；没有调参、大矩阵、远端写入或数据清理。

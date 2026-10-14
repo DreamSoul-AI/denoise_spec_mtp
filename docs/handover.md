@@ -1,5 +1,9 @@
 # 异机交接
 
+## 输出空间三prompt小矩阵（2026-10-14）
+
+依据最新单prompt报告与offline_diagnosis，先固定q172–q174和预算，再用同源码670c744e0535dcad、FP32/eager/ModelScope snapshot/链式配方完成4新Run×3prompt。全部来源/原始证据/逐token AR/Study完整性门通过；accepted（输入/零阶/一阶）为1/1/1、5/1/3、0/1/1。q173 root94/97定位一阶相对零阶的2次额外接受，root83输入链仍领先；q174改善集中在句末。不调参、不宣称稳定优势。正式[小矩阵报告](../studies/output_space_small_matrix/docs/STUDY_REPORT.md)与可复算的paired-prefix诊断已保存。源码/旧成功/失败Run保持不变，本轮不推分支、不合PR、不删数据。
+
 ## 输出空间最小阶段（2026-10-14）
 
 用户要求自主继续，采用feature/output-space-prerequisite（父1219a1d/PR6；PR6当前CI全部成功但未合并）。输出零/一阶normalized final-hidden masks只支持实际tied模型与unpruned静态链，复用验证/KV/RPipe六阶段。先写[PLAN](../studies/output_space_prerequisite/docs/PLAN.md)再实现；270全量、Ruff、56文件mypy与旧36格严格轨迹通过。四个新真实Qwen3-0.6B/q171/FP32/seed123/100token Run已成功，来源/原始证据/Study完整性门通过。输入均值链accepted17，输出order0/order1均10，三者均与独立AR的47token完全一致。保留负结果，不调参、不扩大矩阵。报告、数字和图见[新Study](../studies/output_space_prerequisite/README.md)。源码digest670c744e0535dcad，旧input baseline历史证据未改、未重签。wheel/sdist 41条CLI命令及两独立安装target的output-hidden解码通过；正式材料已保留，最终提交按本地分支核验。本轮无新公开推送、合并或发布。

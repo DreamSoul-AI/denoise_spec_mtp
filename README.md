@@ -39,3 +39,5 @@ Current checkpoint, validation and remaining real-model prerequisite: [handover]
 Current-device v0.3.1 checks: [smoke acceptance](studies/smoke/docs/STUDY_REPORT.md) and [validation](studies/smoke/docs/v031_validation.json). The four real-model input-mask prerequisite Runs completed with ModelScope Qwen3-0.6B, FP32/eager and strict source/evidence gates; see the [report](studies/input_mask_baseline/docs/STUDY_REPORT.md).
 
 Next stage: [output-space chain prerequisite](studies/output_space_prerequisite/README.md), tied final-hidden order0/order1 with a matched frozen-input chain. Implementation and four-case real-model correctness gates passed. On the fixed development prompt the output masks accepted10 drafts each versus17 for the matched input chain; no superiority or Kalman claim.
+
+Follow-up: [three-prompt small matrix](studies/output_space_small_matrix/README.md) and matched-prefix analysis. All outputs remain AR-identical; q172–q174 acceptance counts for input/order0/order1 are1/1/1,5/1/3,0/1/1. These mixed development observations do not establish stable superiority.

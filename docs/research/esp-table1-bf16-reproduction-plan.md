@@ -12,6 +12,8 @@ Table 1 Qwen3-8B 的 ESP τ 目标：BC30=1.63，BC60=1.74。BC10 是额外协�
 
 官方 SpecBench：[hemingkx/Spec-Bench](https://github.com/hemingkx/Spec-Bench)，固定提交 fd2c1cd7d2201ef71db4c5f4e455008f017967bf，data/spec_bench/question.jsonl。本地 480 条 JSON 对象及顺序与官方完全一致；远端 SHA256=4b6d33e79484f9841c487ee87d1cf6aa8c6066f61d5d482ff09e5a007fafdf04，本地 SHA256=7dd26882f31ada100c2aa7447019b5349bddc55697021acbc5643fdc8740aa21。只存在字节排版差异。保存原文件并绑定两哈希；不得为了对齐目标筛掉难样本。
 
+2026-10-15 模型内容补核验：[官方SHA256证据](../../studies/esp_table1_bf16_full_argmax/docs/modelscope-content-verification-v1.json)记录ModelScope master直接返回的Sha256。16个文件（含5个权重分片）均与原冻结模型清单及BC10 Run实际输入哈希一致。原冻结文件不修改、不重签；这证明核验时的官方内容一致，论文未给出immutable revision及历史下载渠道仍未确认，不冒称论文指定commit已验证。
+
 ## 2. 当前协议（Qwen3 BC60 修订）
 
 [Appendix G.2](https://arxiv.org/html/2603.17942v2#A7.SS2)，PDF第18页原句：

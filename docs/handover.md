@@ -185,3 +185,5 @@ gh run list --branch feature/output-space-prerequisite --limit 1 --json database
 仓库未启用auto-merge：`gh pr merge 8 --auto --merge --match-head-commit 4c7a3d045a33d0ce4e9b7388ba7f673229300001`返回`GraphQL: Auto merge is not allowed for this repository (enablePullRequestAutoMerge)`，该动作未合并。此为GitHub功能设置，不是自动审批拒绝；未修改仓库设置或绕过保护。检查全过后执行普通`gh pr merge 8 --merge --match-head-commit 4c7a3d045a33d0ce4e9b7388ba7f673229300001`成功。
 
 合并时BC30已完成48/480条、9,722个提交token自检全过。合并仅改变远端dev，没有切换本地源码或修改运行中冻结文件；两格BC60仍排队。四格总体未完成，BC10数学自检通过与独立AR差异分别报告，后续4B仍待全480结果。
+
+2026-10-15 BC10有效性确认：按Enmao数学无损门，dfe1b9c8d5d12e92为有效τ/argmax结果，不因独立AR失配重跑。报告新增逐格valid/pending，四格总体pending不再写成token quality failed。改动只涉及非冻结结果阅读器/报告与回归，不改科学源码、gate、冻结配置或运行中观察器；8项相关CPU回归及Ruff通过。launch_once的retry_failed=False已确认，BC30在真实解码、BC60/1和60/2排队，无算子数值机理、无测速，8B仅用于Table1。

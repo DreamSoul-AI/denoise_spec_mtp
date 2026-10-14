@@ -111,14 +111,15 @@ def main():
     if path.exists() and body['all_cells_observed']:assert path.read_text()==text
     else:path.write_text(text,encoding='utf-8')
     reference=f'[{filename}]({filename})' if body['all_cells_observed'] else f'本机临时文件 `{filename}`（未入Git）'
-    lines=['# ESP Table 1 Qwen3 BF16 protocol report','',f"{len(prompts)} prompts; observed={body['all_cells_observed']}, token quality passed={body['quality_passed']}. BC60/1 is primary and BC60/2 is control, fixed before results.",'',
-           '| BC/masks | role | AR exact/n (rate) | argmax checked/pass | pooled τ | τ − target | prompt mean τ | mean − target | category mean τ | category − target |',
-           '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |']
+    lines=['# ESP Table 1 Qwen3 BF16 protocol report','',f"{len(prompts)} prompts; completed={sum(not c['pending'] for c in cells)}/4; 全四格验收={'passed' if body['quality_passed'] else 'pending'}. 已完成格的τ/argmax有效性单列，AR失配不否定该格。BC60/1 is primary and BC60/2 is control, fixed before results.",'',
+           '| BC/masks | role | τ/argmax结果 | AR exact/n (rate) | argmax checked/pass | pooled τ | τ − target | prompt mean τ | mean − target | category mean τ | category − target |',
+           '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |']
     for c in cells:
         values=['n/a' if key.endswith('_target_delta') and c['target'] is None else 'pending' if c.get(key) is None else f'{c[key]:.6f}' for key in ('pooled_tau','pooled_tau_target_delta','prompt_mean_tau','prompt_mean_tau_target_delta','category_mean_pooled_tau','category_mean_pooled_tau_target_delta')]
         exact='pending' if c['pending'] else f"{c['exact_count']}/{c['n']} ({c['AR_exact_rate']:.2%})"
         audit='pending' if c['pending'] else f"{c['argmax_checked_tokens']}/{c['argmax_all_passed']}"
-        lines.append(f"| {c['BC']}/{c['num_masks']} | {c['role']} | {exact} | {audit} | "+' | '.join(values)+' |')
+        valid='pending' if c['pending'] else 'valid' if c['argmax_all_passed'] else 'invalid'
+        lines.append(f"| {c['BC']}/{c['num_masks']} | {c['role']} | {valid} | {exact} | {audit} | "+' | '.join(values)+' |')
     lines+=['','目标BC30=1.63，BC60双方均列相对1.74差值，不按τ选主配置。AR独立审计失配单列，不能宣称与独立AR一致；不阻止τ计算。τ验收要求全480、全部提交token的验证前向argmax自检通过，不以预检替代结果。','',
             '[PLAN](PLAN.md)引用G.2具体说明：Qwen3 BC60单mask/29节点，双mask/19节点为对照；保持动态树剪枝，BF16/T0/256/seed123，无测速/预热。','',
             'Mean mask按Eq5 λ=.1更新，与后续4B用户指定的ESP frozen mean不同。四格全部新Run，旧冻结PLAN不回写；原生AR门失败状态独立保留，不伪称native成功。新增argmax必须全过。',

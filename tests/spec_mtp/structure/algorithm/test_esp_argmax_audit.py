@@ -124,6 +124,16 @@ def test_pending_report_does_not_link_unpublished_local_evidence(tmp_path,monkey
     text=(tmp_path/'docs/STUDY_REPORT.md').read_text(encoding='utf-8')
     assert '`protocol_pending.json`' in text and '](protocol_pending.json)' not in text
     assert not json.loads((tmp_path/'docs/protocol_pending.json').read_text())['quality_passed']
+    assert '全四格验收=pending' in text and 'token quality passed=False' not in text
+    summary=report.summarize([{'category':'a','committed':2,'decode_calls':1,'accepted':1,
+        'exact':False,'argmax_passed':True,'argmax_checked_tokens':3}])
+    summary['model_digest']='synthetic-model'
+    cells=report.ordered_cells({(10,1):summary})
+    monkeypatch.setattr(report,'ordered_cells',lambda observed:cells)
+    report.main()
+    text=(tmp_path/'docs/STUDY_REPORT.md').read_text(encoding='utf-8')
+    assert 'completed=1/4; 全四格验收=pending' in text
+    assert '| 10/1 | primary | valid | 0/1 (0.00%) | 3/True |' in text
 
 
 def test_tau_plot_requires_full_argmax_pass_but_not_ar_exact(tmp_path,monkeypatch):

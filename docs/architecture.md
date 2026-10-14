@@ -8,11 +8,11 @@ Paper: *Efficient Training-Free Multi-Token Prediction via Embedding-Space Probi
 
 ## Run path and gates
 
-`python -m spec_mtp` / `python -m rpipe` → prepare → recipe（校验、注册、来源锁）→ 建构 Data / Model / Algorithm → execute 保存 raw → Study collect 计算指标 → Study summarize 拒绝失配 → Study write 再验来源与证据 → 库定稿 result → process。AR 基线开着且 `exact_match_rate != 1`，或缺少 overall 行，该 Run 为 `failed`。Study scope 的 process 在缺 Run、失败、或集合是 index 的真子集时不通过。
+`python -m spec_mtp` / `python -m rpipe` → prepare → recipe（校验、注册、来源锁）→ 建构 Data / Model / Algorithm → execute 保存 raw → Study collect 计算指标 → Study summarize 核验提交token的验证前向argmax → Study write 再验来源与证据 → 库定稿 result → process。T0的全部提交token必须有完整argmax审计，核对token、forward/row归属与输入/输出哈希；原生T0解码直接记录该审计，不增加模型forward。独立AR一致率及逐prompt首分叉仅作诊断，不因`exact_match_rate != 1`或`ar_ids != output_ids`判失败。AR诊断从原始tokens重算；缓存exact标记不符时记录诊断差异，不阻塞。指标/来源/配置/输入/trace漂移及argmax审计缺失仍失败。Study process继续核验Run、种子、声明集合及来源完整性。
 
 RPipe 的 `provenance.json` 只哈希 `rpipe` 包和 Study 文件。SpecMTP 在 Study 外面，所以 `spec_mtp.structure.artifact.sources` 哈希 `src/spec_mtp/**/*.py`，make 时写 `spec_mtp_sources.json`。存在专项锁时源码变更在建构前失败；freeze:true 还要求锁存在。执行快照与当前来源在 summarize/write/process 再核对。
 
-Float32 greedy、共享 seed，必须和普通生成逐 token 一致。`exact_match` 是这个审计，不是质量指标。质量指标是接受的 draft 数（[history-extrapolation.md](history-extrapolation.md)）。
+历史Float32 greedy与独立AR的一致结果保留；当前BF16树验证与单条AR的一致率单独报告，不决定原生成功状态。接受数与τ各自注明口径（[history-extrapolation.md](history-extrapolation.md)）。缺少verifier argmax证据的历史Run不能据AR一致率补签成功。当前原生验收门覆盖T0；采样分布无损验收未在本次实现。
 
 专项阶段职责实现位于 `spec_mtp.flow/{collect,summarize,write,process}/run.py`；证据判断位于 `structure/artifact/validation.py`，跨层输入和 recipe 经 `structure/api/`。Study 仅导入阶段 run，prepare/execute 继续复用库默认阶段。根 cli/recipe、flow.checks 和 data.prompts 保留兼容导出；详细旧新映射见 [rpipe-migration.md](rpipe-migration.md)。
 
@@ -122,3 +122,5 @@ history-extrapolation 和论文设置（长上下文、100/256 new tokens）碰�
 ## Output-hidden prerequisite (2026-10-14)
 
 Opt-in spec.method=output_hidden uses normalized final hidden observations, order0/1 FP32 state, and private proxy-conditioned masks per chain owner. Model captures only final norm output via a temporary hook; legacy forward remains unchanged. Exact state observes prompt positions, then verified root/accepted nodes, while bonus observation waits for the next block. Only actually tied weights and static unpruned chains are supported in this stage. Existing tree attention, verifier, KV eviction, presets and input providers are retained. Contract and fixed gains: [PLAN](../studies/output_space_prerequisite/docs/PLAN.md).
+
+`tools/revalidate_run.py`仅重新运行已完成失败Run的summarize门及原生write，不执行prepare/execute，不下载/加载模型。原始失败result按SHA256保留在assets/gate_revalidation，raw、输入、审计及执行来源哈希必须不变。用隔离工作树的validator文件和原执行包的PYTHONPATH完成验收，validator SHA另列，不修改执行来源锁；全格重新验收后可用同一工具的`--process`跑原生Study聚合/验收。

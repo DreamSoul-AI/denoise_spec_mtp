@@ -177,3 +177,37 @@ gh run list --branch feature/output-space-prerequisite --limit 1 --json database
 ## 2026-10-15 全480首格完成（BC10）
 
 [全量报告](../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)已从真实Run dfe1b9c8d5d12e92读取全480结果：pooledτ=1.399047、prompt mean=1.431766、category mean=1.403034；79,757个提交token全部通过对应验证forward argmax自检，独立AR188/480=39.17%。原生Run仍为failed（历史AR严格门），不冒称native成功，也不阻止τ或后续格。BC30 Run b9b54923b1b9ea9f已启动，BC60/1及60/2串行排队；四格总体未完成，不宣布Table1复现成功、不提前开4B。临时protocol_pending.json保留本机，完整四格后生成冻结公开证据及结果图。
+
+## 2026-10-15 ESP协议与首格PR已合dev
+
+[PR #8](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/8)已于2026-10-14T22:05:27Z合dev，merge bf1fffaf043e5edfd6a7acc149318b587d105ffa，合并head为4c7a3d045a33d0ce4e9b7388ba7f673229300001。[push CPU检查](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38644515800)、[PR CPU检查](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38644607611)、[Branch flow](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38644607459)均SUCCESS；本机检查亦通过。合并依据为上述Enmao长期授权，未提问、未合main、未强推、未删除分支或数据。
+
+仓库未启用auto-merge：`gh pr merge 8 --auto --merge --match-head-commit 4c7a3d045a33d0ce4e9b7388ba7f673229300001`返回`GraphQL: Auto merge is not allowed for this repository (enablePullRequestAutoMerge)`，该动作未合并。此为GitHub功能设置，不是自动审批拒绝；未修改仓库设置或绕过保护。检查全过后执行普通`gh pr merge 8 --merge --match-head-commit 4c7a3d045a33d0ce4e9b7388ba7f673229300001`成功。
+
+合并时BC30已完成48/480条、9,722个提交token自检全过。合并仅改变远端dev，没有切换本地源码或修改运行中冻结文件；两格BC60仍排队。四格总体未完成，BC10数学自检通过与独立AR差异分别报告，后续4B仍待全480结果。
+
+2026-10-15 BC10有效性确认：按Enmao数学无损门，dfe1b9c8d5d12e92为有效τ/argmax结果，不因独立AR失配重跑。报告新增逐格valid/pending，四格总体pending不再写成token quality failed。改动只涉及非冻结结果阅读器/报告与回归，不改科学源码、gate、冻结配置或运行中观察器；8项相关CPU回归及Ruff通过。launch_once的retry_failed=False已确认，BC30在真实解码、BC60/1和60/2排队，无算子数值机理、无测速，8B仅用于Table1。
+
+### 全480进度只读查询审批超时（第二次事件）
+
+工作目录：`D:/GitHub/DreamSoul/denoising-speculative-decoding`。下面命令被自动审批服务超时拒绝，未执行；拒绝原文：`The automatic permission approval review did not finish before its deadline. Do not assume the action is unsafe based on the timeout alone. You may retry once, or ask the user for guidance or explicit approval.`。监督助手无需解除GPU执行：既有monitor等待仍存活。一次不升级权限的只读重试可读取真实argmax JSONL，BC30进展到74/480、15,285个提交token全过；该重试的CIM查询受沙箱限制不可用，不能伪称重新核验了PID。未弹窗、未停队列、未重跑BC10。
+
+```powershell
+Get-CimInstance Win32_Process | Where-Object { $_.Name -match 'python' -and $_.CommandLine -match 'esp_table1_bf16_full_argmax' } | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json
+@'
+from pathlib import Path
+import json
+s=Path('studies/esp_table1_bf16_full_argmax')
+for cell in json.loads((s/'index.json').read_text())['experiments']:
+    spec=cell['factors']['algorithm.config']['spec'];run=cell['runs'][0]['id'];assets=s/'runs'/run/'assets';p=assets/'argmax_audit.jsonl'
+    rows=[json.loads(line) for line in p.read_text().split('\n')[:-1] if line] if p.exists() else []
+    assert all(r['passed'] and len(r['committed'])==r['checked_committed_tokens'] and all(c['chosen']==c['argmax'] for c in r['committed']) for r in rows)
+    print(json.dumps({'BC':spec['block_complexity'],'masks':spec['num_masks'],'run':run,'completed_spec_prompts':len(rows),'checked_tokens':sum(r['checked_committed_tokens'] for r in rows),'execute_complete':(assets/'decode_observations.json').exists()}))
+'@ | D:/anaconda3/python.exe -
+```
+
+## 2026-10-15 原生argmax验收门修复
+
+用户明确授权修改evaluate_run/verify_evidence及summarize/process：独立AR一致率只诊断，全部提交token的verifier argmax审计为正确性门。修复在fix/verifier-argmax-gate隔离工作树完成，当前GPU执行目录不切换源码、不杀BC30。原生T0解码新增审计元数据，不改变token选择、mask配方、缓存或forward数量；采样验收未在本次扩展。AR诊断从原始tokens重算，缓存exact标记/汇总仅记录，不当失败门；输入、来源、计数、提交trace、argmax覆盖/哈希/forward行归属继续严格核验。
+
+全套CPU测试、Ruff及mypy（56源码文件）通过；收尾增加缓存AR汇总回归后，对验收、文档索引、argmax观察器再次测试通过。此前隔离测试临时目录权限问题与工具入口文档遗漏已修复，未影响GPU。BC10用新门只读核验480条/79,757提交token全过，AR188/480不阻塞；将使用tools/revalidate_run.py仅重做summarize验收与原生write，旧失败result按SHA保留，raw/输入/argmax JSONL/执行来源锁字节不变，新validator SHA另列。全格收尾后同门跑原生process。不测速、不恢复算子机理，不重跑BC10 execute；8B仅此Table1，4B仍等待。

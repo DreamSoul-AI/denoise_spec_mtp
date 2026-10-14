@@ -23,6 +23,8 @@ def run_gate(ctx: FlowContext) -> dict[str, Any]:
     draft = ctx.state.get('result_draft')
     if draft is not None:
         draft[GATE_KEY] = report
+        if report['task'] == 'esp_mtp' and report.get('exact_match_rate') is not None:
+            draft.setdefault('metrics', {})['test_exactmatchrate'] = report['exact_match_rate']
         sources = Path(ctx.layout.assets_dir) / 'spec_mtp_sources.json'
         if sources.is_file():
             body = json.loads(sources.read_text(encoding='utf-8'))

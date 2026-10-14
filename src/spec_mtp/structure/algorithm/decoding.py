@@ -16,13 +16,16 @@ One `generate` call reproduces the ESP loop (Fig. 1):
             seed the next tree. Cache keeps only root + accepted path.
 
 Verification draws one sample per committed token in chain order, so with a
-shared torch.Generator the output equals plain autoregressive decoding
-token-for-token (greedy at temperature 0) — the audit used by the smoke
-tests. tau = committed tokens (accepted + bonus) per decode call.
+shared torch.Generator the mathematical verifier follows the same sampling
+chain. Independent AR equality is audited separately: BF16 forward shapes
+can differ numerically. At T0, every committed token records its own forward
+argmax. tau = committed tokens (accepted + bonus) per decode call.
 """
 
 from typing import Any
 import time
+import hashlib
+import json
 
 import torch
 
@@ -141,7 +144,14 @@ class SpecDecoder:
         cache = out.past_key_values
         logits = out.logits[0]                                        # [t+k, V]
 
-        root_token = select_token(logits[t - 1], self.temperature, self.generator)
+        choices = []
+        def select_verified(row, forward):
+            chosen = select_token(logits[row], self.temperature, self.generator)
+            if self.temperature <= 0:
+                choices.append({'forward': forward, 'row': row, 'chosen': chosen,
+                                'argmax': int(logits[row].argmax(dim=-1).item())})
+            return chosen
+        root_token = select_verified(t - 1, 0)
         if self.output_hidden:
             provider.init_hidden(out.last_hidden_state[0, :t])
             proxy_hiddens = out.last_hidden_state[0, t:t + k].clone()
@@ -209,7 +219,7 @@ class SpecDecoder:
             accepted_nodes: list[int] = []
             committed_now = []
             while True:
-                y = select_token(logits[cur], self.temperature, self.generator)
+                y = select_verified(cur, stats['decode_calls'])
                 committed_now.append(y)
                 children = tree.children_of(cur)
                 match = None
@@ -286,6 +296,18 @@ class SpecDecoder:
             prompt_ids,
             torch.tensor([committed], dtype=torch.long, device=device),
         ], dim=1)
+        if self.temperature <= 0:
+            records, offset = choices[:1], 1
+            for trace in stats['trace']:
+                records.extend(choices[offset:offset + len(trace['committed_tokens'])])
+                offset += len(trace['accepted_nodes']) + 1
+            token_hash = lambda ids: hashlib.sha256(json.dumps(ids).encode()).hexdigest()
+            stats['verification_argmax_audit'] = {
+                'passed': all(c['chosen'] == c['argmax'] for c in choices),
+                'checked_committed_tokens': len(records),
+                'selected_tokens_including_trimmed_tail': len(choices),
+                'input_sha256': token_hash(prompt_ids[0].tolist()),
+                'output_sha256': token_hash(output[0].tolist()), 'committed': records}
         return output, stats
 
 

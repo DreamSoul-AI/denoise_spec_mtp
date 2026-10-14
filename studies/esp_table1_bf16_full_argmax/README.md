@@ -11,3 +11,7 @@
 原始Run、逐prompt argmax JSONL与完整tokens只保留本机。原生AR严格门状态如实保留，正式τ验收另列。
 
 首次v2四Run均在模型加载前报ModelScope CacheNotFound，未执行解码；失败Run保留。补接shared/model/modelscope/Qwen/Qwen3-8B到此前同一已校验本地snapshot后，以v3新Run执行，不覆盖/重签v2。只修本地缓存接入，配置设置及源代码不变。
+
+BC10 Run dfe1b9c8d5d12e92已完成全480：τ/argmax结果有效（79,757个提交token全过），AR188/480仅作报告指标。原生AR严格门failed状态保留，不因该失配重跑BC10。串行入口显式retry_failed=False，BC30、BC60/1与60/2继续执行；未完成格仅标pending。不要在正在运行的冻结Study里修改gate或重签已有Run；本报告的τ/argmax验收不依赖原生AR门成功。
+
+2026-10-15原生门修订：按用户新指示改validation.evaluate_run/verify_evidence与原生T0审计记录。正在执行的v3使用原执行源码，不切换工作目录、不杀BC30。新validator在隔离工作树测试；旧AR门失败格用tools/revalidate_run.py仅重新验收/写结果，保留原失败result备份与新validator SHA，raw和来源锁不修改。全格重新验收后原生process也使用该门。此节覆盖此前“不改gate”的阶段安排，不覆盖原科学配置或重新执行。

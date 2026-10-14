@@ -49,7 +49,7 @@
 - 开跑前写 `studies/<name>/docs/PLAN.md`（问题、对照、指标、停止规则、[studies/README.md](studies/README.md) §5 排班）。
 - `python -m spec_mtp make studies/<name>`，再 `python -m spec_mtp launch studies/<name>`。
 - `flow.prepare_shared: false`（RPipe make 下载只认 torchvision）。Run prepare 仍把 SpecBench 和权重写进 `shared/`。**不要写 `origin: foreign`**（[layout.md](docs/layout.md)）。权重用 ModelScope。
-- 实验验收遵循最新用户确认及冻结协议。当前BF16/T0研究的正确性门是全部提交token等于对应验证前向logits的argmax；独立AR一致率仅报告、不作失败门，见[当前研究计划](docs/research/esp-table1-bf16-reproduction-plan.md)。历史Run及原生门状态不重签。永久停止BF16 ESP相对独立AR的算子数值机理排查。接受数、τ及其口径写入报告，不把γ叫成slope。
+- 实验验收遵循最新用户确认及冻结协议。当前BF16/T0研究的正确性门是全部提交token等于对应验证前向logits的argmax；独立AR一致率仅报告、不作失败门，见[当前研究计划](docs/research/esp-table1-bf16-reproduction-plan.md)。历史执行证据与已有成功Run不重签。按本次用户授权，旧AR门失败且execute完整的Run可仅重新验收：保留失败result备份、raw/输入/来源哈希及新validator SHA，不重跑execute。永久停止BF16 ESP相对独立AR的算子数值机理排查。接受数、τ及其口径写入报告，不把γ叫成slope。
 - 已有数字的格子不重跑。不复用一个 Run 目录。源码或输入变化用新的 algorithm.config.version；make/remake 不签收旧成功 Run。
 - Study collect 从 execute 的原始观测计算指标，summarize 跑成功门，write 再核验，process 只终验当前 index。
 - Windows：`PYTHONUTF8=1`，`D:\anaconda3\python.exe`，不另建 venv。

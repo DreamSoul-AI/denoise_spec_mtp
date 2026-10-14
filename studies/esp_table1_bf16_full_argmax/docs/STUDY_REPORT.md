@@ -1,13 +1,13 @@
 # ESP Table 1 Qwen3 BF16 protocol report
 
-480 prompts; observed=False, token quality passed=False. BC60/1 is primary and BC60/2 is control, fixed before results.
+480 prompts; completed=1/4; 全四格验收=pending. 已完成格的τ/argmax有效性单列，AR失配不否定该格。BC60/1 is primary and BC60/2 is control, fixed before results.
 
-| BC/masks | role | AR exact/n (rate) | argmax checked/pass | pooled τ | τ − target | prompt mean τ | mean − target | category mean τ | category − target |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 10/1 | primary | 188/480 (39.17%) | 79757/True | 1.399047 | n/a | 1.431766 | n/a | 1.403034 | n/a |
-| 30/1 | primary | pending | pending | pending | pending | pending | pending | pending | pending |
-| 60/1 | primary | pending | pending | pending | pending | pending | pending | pending | pending |
-| 60/2 | control | pending | pending | pending | pending | pending | pending | pending | pending |
+| BC/masks | role | τ/argmax结果 | AR exact/n (rate) | argmax checked/pass | pooled τ | τ − target | prompt mean τ | mean − target | category mean τ | category − target |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 10/1 | primary | valid | 188/480 (39.17%) | 79757/True | 1.399047 | n/a | 1.431766 | n/a | 1.403034 | n/a |
+| 30/1 | primary | pending | pending | pending | pending | pending | pending | pending | pending | pending |
+| 60/1 | primary | pending | pending | pending | pending | pending | pending | pending | pending | pending |
+| 60/2 | control | pending | pending | pending | pending | pending | pending | pending | pending | pending |
 
 目标BC30=1.63，BC60双方均列相对1.74差值，不按τ选主配置。AR独立审计失配单列，不能宣称与独立AR一致；不阻止τ计算。τ验收要求全480、全部提交token的验证前向argmax自检通过，不以预检替代结果。
 

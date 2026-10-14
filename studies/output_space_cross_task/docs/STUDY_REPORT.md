@@ -266,3 +266,51 @@ H7要求：首个按时间出现的self/graft语义分叉之accepted-node数差�
 q244三seed的首变和最终都是负，属于当前prompt／温度／预算下的重复负结果；q242三seed最终正，其中两seed首变负。局部即时恢复、第一次接受变化和完整路径净差是不同指标。新回归覆盖早期收益后净损失、收益抵消为零、方向保留、忽略非语义metadata、缺失count或不共享前缀拒绝。下一项仍未验证的是新sampled窗口的canonical等state因素分解与有限精度sampler的极小概率可达性；不从H7计数恒等式推断已完成它们。
 
 收尾核验：58项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；矩阵/rare/H7分析重跑与正式证据一致，45个精确字节路径暂存blob与本机文件一致。新7000生成new、8192条件draw、H7零新forward均在新合同范围。旧science/default/helper/Run不改，未扩展多任务/多温度/硬件，也未证明native rare尾可达性。
+
+## 新prompt／seed扩展：固定prompt方向预测被反驳（2026-10-15）
+
+按985c7c1后另冻[SAMPLING_CONTINUATION_PLAN](SAMPLING_CONTINUATION_PLAN.md)，新执行q242/244 seed126和按文件顺序新增q245/246 seeds126/127，共六单位。新输入见[渲染清单](sampling_continuation_inputs_v1.json)，长度647/901/405/745，旧prompt与native AR输入一致，新prompt无截断或替换。仍为T=.8/max100/同科学source/default/ModelScope snapshot。每单位七次生成，fresh AR／observer／原值self／单槽范围／完整输出门通过。
+
+| qid | seed | 实际entry | 零阶accepted | self | graft | graft-self |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 242 | 126 | 655 | 10 | 14 | 9 | -5 |
+| 244 | 126 | 905 | 12 | 10 | 11 | +1 |
+| 245 | 126 | 409 | 13 | 10 | 13 | +3 |
+| 245 | 127 | 415 | 9 | 13 | 7 | -6 |
+| 246 | 126 | 747 | 12 | 14 | 11 | -3 |
+| 246 | 127 | 747 | 7 | 10 | 6 | -4 |
+
+H8在新forward前预测q242/126为正、q244/126为负，两项均被相反符号反驳。q242此前+5/+5/+2，新seed为-5；q244此前-1/-3/-1，新seed为+1。先前三seed同方向不意味着prompt固定符号，不能把旧“重复负结果”外推为新seed或普遍规律。q245两个seed+3/-6，q246-3/-4，正负全部保留。新六单位2增/4减，累计18单位8增/10减（六prompt、不均衡seed，旧12与新6分层，不作人口统计）。本18单位的输出零阶／一阶self／一阶graft汇总203／200／193，graft-self净-7；这仍是固定且不均衡样本的描述，不是总体效果、显著性或速度结论。
+
+真实小批次wall112.265秒，.5s采样RSS5272109056 bytes、GPU全局7596MiB、最低可用主存9049366528 bytes；GPU含背景且非allocator峰，不作速度比较。完整本机raw/tensors保留；原温度rare对照与T=2压力测试随后完成，最终结论见下节。新压力测试不改变默认配方或原条件。
+
+报告写回后继续下一项：在本批已冻结六root上检验合法第二槽翻转，并区分current anchor/v相同与微差格；不扩大或选择有利窗口，不新增模型前向。
+
+### 罕见命中压力测试完成：仅证明改变温度后的可观测性
+
+[完整验收分析](sampling_continuation_analysis_v1.json)保存模型／source／runtime／工具／协议／输入绑定、全部生成语义路径与统计。全部六单位42生成／4200new／3806forward，无teacher或warmup；本机raw180745205 bytes、SHAc0ac1e1ba36ee9946593d712759a5d6ab56d34b29eec5e00bf0d9db69588a8d0。
+
+固定旧source717 owner1候选11/323与实际verifier root719，使用原生CUDA select_token、每格共享draw bank。原T=.8和1分别16384 fresh seeds10000–26383，所有格候选均0/16384。单侧95%零观测上界.0001828282722736015（双侧Clopper-Pearson上界.00022512598920985084），仍远高于1e-11～1e-9质量，未排除罕见影响或证明原温度尾可达性。旧4096 draw不重跑、不改判读。
+
+新T=2压力测试只改条件温度，固定原logits／上下文／候选，131072 seeds10000–141071，无模型forward或续写。前检按记录质量算出的理想至少一命中检测力为.983472／.992865，而不是原温度的检测力。结果：
+
+| 候选 | CUDA-FP32 mass | 命中／131072 | 首次命中seed | 理想期望命中 | 双侧95% Clopper-Pearson区间 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 11 | 3.1300668e-5 | 2 | 52396 | 4.102641 | [1.8479155e-6, 5.5118894e-5] |
+| 323 | 3.7709175e-5 | 7 | 21263 | 4.942617 | [2.1472147e-5, 1.1003316e-4] |
+
+H9的两候选至少一次命中预测在此改变条件下观测到。这些区间按理想独立Bernoulli模型计算，不是native有限精度尾行为的保证。两个区间均包含对应native质量；小计数和共享draw bank不支持宣称323比11“显著更容易接受”，不当四个S/P格为独立组。全部163840实际draw及seed保留本机raw，正式分析保存draw-bank hash、全部命中seed与计数；T=2的实际命中不能恢复旧greedy接受、不能证明T=.8/1极小尾概率可达，也不是一条完整T=2生成收益。零命中上界字段只在zero_upper_bound_applies=true时适用。
+
+rare实际wall41.474秒、.5s采样RSS1142521856 bytes、GPU全局3827MiB、最低可用主存13199749120；零Qwen forward／teacher／生成新token。资源含背景、采样非精确峰值，不作速度指标。SciPy现有beta.ppf仅用于离线统计区间，未新增package依赖。
+
+### 报告更新后执行H10：新采样捕获范围未出现合法第二槽反例
+
+H8报告写回后另冻[SAMPLED_DEPTH_PLAN](SAMPLED_DEPTH_PLAN.md)，在查看新selected tensors前声明合法事件与等state门；[二阶分析](sampled_depth_analysis_v1.json)保存原六root规则的全部34共有捕获窗口和各单元独有／未访问窗口，零额外forward/draw。要求两侧first candidate均等于本seed的sampled AR目标、两侧node1实际接受、第一目标非EOS且存在第二目标，再比较node2接受；bit相同的current anchor/v合法翻转才反驳H10。
+
+全部34窗口未出现合法second flip，故H10在此有限捕获未被反驳，不宣称完整路径只受第一槽影响。旧q178/q182的合法depth2反例仍保留；新负结果不推翻它们。current state相同不代表相同KV／全历史canonical控制，新sampled窗口的纯state/proxy分解仍未完成。
+
+新六单位的首次方向计数继续发现两反例：q244/126首次-1、最终+1；q245/127首次+1、最终-6。计数通过旧path_accounting按实际共有／独有root精确重构，不把路径计数当张量因果分解。连同旧两例，已知H7反例共有四个，但不是四个独立prompt人口样本。
+
+下一问题已收紧：用预声明的新sampled同上下文固定帧，分开即时state与代理内容；若仅代理替换不能复现原候选/命中差，则限制旧source719解释的泛化。该同KV四因素对照尚未执行。原温度native极小尾可达性亦未验证，不能靠进一步小量零命中或T=2命中解决。
+
+收尾核验：80项相关回归、Ruff与5个Study科学source/RPipe冻结门通过。新增19项统计/合法性回归，六单位42生成4200new3806forward、163840native条件draw、H10零新增forward均在冻结预算；正式分析再次执行逐项一致，来源/model/输入/旧helpers核对保持。源/default/旧合同/成功Run未改，未推送/PR/合并/删除。新sampled同KV四因素、原温度native极小尾可达性、安装包/速度/多设备/长矩阵未重验。

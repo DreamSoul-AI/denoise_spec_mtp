@@ -41,3 +41,7 @@ Package check: `python tools/package_selfcheck.py --workspace .tmp/package-<new-
 
 `diagnose_sampling_expansion.py`：`python tools/diagnose_sampling_expansion.py --out .tmp/<new-id>`，10新单位补完整4prompt×3seed，复用旧q241两单位不重跑。
 `diagnose_rare_events.py`：`python tools/diagnose_rare_events.py --out .tmp/<new-id>`，两温度各4096native verifier draw，保留tiny质量与检测上界，不把零命中当无效概率。
+
+`diagnose_sampling_continuation.py`：`python tools/diagnose_sampling_continuation.py --out .tmp/<new-id>`，固定六单位含q245/246新输入，原配置/源/AR/单槽scope硬门。
+`diagnose_rare_stress.py`：`python tools/diagnose_rare_stress.py --out .tmp/<new-id>`，原温度各16384draw与单独T=2的131072draw，首命中seed／检测力／区间记录，零模型forward；不得用改变温度命中外推原条件。
+复核：`python studies/output_space_cross_task/analyze_continuation.py --expansion .tmp/sampling-continuation-20261015-v1 --rare .tmp/rare-stress-20261015-v1`；固定二阶合法性：`python studies/output_space_cross_task/analyze_sampled_depth.py`。重跑正式复核只验证相同文件，不新增生成/draw或覆盖旧formal证据。

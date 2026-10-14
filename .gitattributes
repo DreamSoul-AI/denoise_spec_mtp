@@ -53,3 +53,14 @@
 /studies/output_space_cross_task/docs/sampling_expansion_diagnosis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/rare_event_diagnosis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/first_delta_analysis_v1.json -text whitespace=cr-at-eol
+
+# Preserve new sampled continuation and rare stress protocol bytes.
+/tools/diagnose_sampling_continuation.py -text whitespace=cr-at-eol
+/tools/diagnose_rare_stress.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/SAMPLING_CONTINUATION_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_continuation_inputs_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_continuation.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_continuation_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/SAMPLED_DEPTH_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_sampled_depth.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampled_depth_analysis_v1.json -text whitespace=cr-at-eol

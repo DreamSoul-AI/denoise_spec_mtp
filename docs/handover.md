@@ -1,6 +1,6 @@
 # 异机交接
 
-最新状态见本文末尾“多prompt采样／罕见功效／H7反例”：完整四prompt三seed矩阵、rare检测边界与后续H7已执行。下列历史交接中的未运行状态保留为当时记录，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
+最新状态见本文末尾“新prompt／seed反例与罕见压力测试”：六新单位的H8两项预测均被反驳，T=2条件下首次罕见命中2/7，H10已执行。下列历史记录保留当时范围，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
 
 ## q178算子对照与下一Study草案（2026-10-14）
 
@@ -123,3 +123,7 @@ v0.3.1 源码升级与完整回归；当前重构安装包/Windows selfcheck；�
 ## 多prompt采样／罕见功效／H7反例（2026-10-15）
 
 [最新报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)：4prompt×3seed12单位，旧2保留、新10全部sampled AR，6增6减；q244重复负限于当前输入/T=.8/k2/100预算，q242重复正。4096draw每温度仍零罕见候选命中，检测功效不足且GPU极小概率可达性未验。矩阵报告写回后另冻FIRST_DELTA_PLAN并执行H7，新q242123/125首变-1终+5/+2收紧局部预测。下一缺口是新sampled窗口等state decomposition/原生samplerrare数值尾，不声称已完成。raw本机、科学source/default/旧工具不改，未远程/PR/合并/删数据。
+
+## 新prompt／seed反例与罕见压力测试（2026-10-15）
+
+新增q242244 seed126及q245246 seeds126127共六单位，42生成／4200new／3806forward全AR；graft-self为-5,+1,+3,-6,-3,-4，q242此前三正和q244此前三负都在新seed反转。总18单位8增10减、六prompt不平衡样本，不作人口泛化。固定旧owner1/verifier的T=.8/1各16384 fresh native draw仍零，T=2另131072实际候选11/323命中2/7、首seed52396/21263；改变温度只证明对应条件可观测，不证明原温度尾可达性或全路径收益。报告写回后新冻H10并执行34共有固定窗口检查，无合法depth2反例；q244126和q245127首方向/最终方向反转也保留。新统计与合法性回归已落地；源/default/旧helper/协议/Run不改，不推送/PR/合并/删除。下一缺口是新sampled同KV四因素state/proxy实验，而不是继续小量零命中。

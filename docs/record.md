@@ -112,3 +112,9 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 新增10单位70生成／7000new／6328forward全AR，补12单位4prompt×3seed，6增6减，q242全正/q244全负/q241243混合。rare两温度各4096native抽样仍零候选命中，Bernoulli0/4096上界.000731远高于10^-11～10^-9，不能排除罕见效应或证明GPU尾可达性。先写回Study，再冻并执行H7：q242123/125第一-1最终+5/+2两个反例，计数通过共有/独有root严格重构；不强迫后期对齐、不冒充state因果分解。原source/default/helper/合同/Run不改，不远程/PR/合并/删数据。
 
 收尾核验：58项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；矩阵/rare/H7分析重跑与正式证据一致，45个精确字节路径暂存blob与本机文件一致。新7000生成new、8192条件draw、H7零新forward均在新合同范围。旧science/default/helper/Run不改，未扩展多任务/多温度/硬件，也未证明native rare尾可达性。
+
+## 新prompt／seed反例与罕见条件压力测试（2026-10-15）
+
+985c7c1后另冻两协议，扩展六单位、42生成4200new3806forward全AR，H8的q242126正/q244126负均被-5/+1反驳；q245混合、q246两负均保留。原温度各16384native draw仍零；独立标记T=2条件131072draw出现候选11/323首命中seed52396/21263、计数2/7，不能外推原温度可达性或完整路径收益。写回报告后继续H10，原固定捕获34共有窗口无合法depth2翻转；新增两H7符号反转事例。19新增统计/合法性回归，不改科学源/default/旧工具/成功Run，不推/PR/合并/删。
+
+收尾核验：80项相关回归、Ruff与5个Study科学source/RPipe冻结门通过。新增19项统计/合法性回归，六单位42生成4200new3806forward、163840native条件draw、H10零新增forward均在冻结预算；正式分析再次执行逐项一致，来源/model/输入/旧helpers核对保持。源/default/旧合同/成功Run未改，未推送/PR/合并/删除。新sampled同KV四因素、原温度native极小尾可达性、安装包/速度/多设备/长矩阵未重验。

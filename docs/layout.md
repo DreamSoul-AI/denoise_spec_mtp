@@ -71,3 +71,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/diagnose_sampling_paths.py`做真实非T0 AR耦合路径及旧source719条件抽样；`tools/diagnose_q241_owner1.py`固定实际source717／owner1映射，只核对应rows5/6的seed。
 
 `tools/diagnose_sampling_expansion.py`补固定四prompt三seed全采样路径；`tools/diagnose_rare_events.py`按旧owner1上下文做native抽样及稳定Bernoulli检测能力计算，零模型forward。
+
+`tools/diagnose_sampling_continuation.py`固定六新prompt/seed诊断；`tools/diagnose_rare_stress.py`分开原温度零观测与T=2条件压力测试，不改变默认采样器/配置。Study局部analyze_continuation与analyze_sampled_depth复用旧计数/观察器，只保存统计和语义轨迹，完整draw/tensors仍在.tmp。

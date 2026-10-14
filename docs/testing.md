@@ -60,3 +60,11 @@ test_rare_path_boundaries.py新增p=0/1端点、越界/N0拒绝、tiny p非零�
 H7轨迹计数回归继续覆盖第一次收益／最终损失、净零抵消、方向保留、非语义metadata忽略、错误总计数与不共享前缀拒绝。真实新10单位中q242/123及125首变-1而净+5/+2，报告写回后实际执行下一假设，零额外model forward。
 
 收尾核验：58项针对性测试、Ruff与5个Study科学source/RPipe冻结门通过；矩阵/rare/H7分析重跑与正式证据一致，45个精确字节路径暂存blob与本机文件一致。新7000生成new、8192条件draw、H7零新forward均在新合同范围。旧science/default/helper/Run不改，未扩展多任务/多温度/硬件，也未证明native rare尾可达性。
+
+## 新seed方向反例与罕见条件压力测试（2026-10-15）
+
+test_sampling_continuation.py新增12项：首命中使用真实seed、零/全命中Clopper-Pearson端点、空/错位/非法观察拒绝、压力条件命中不能提高原条件检测力、H8零/反向/保留/infeasible判读。test_sampled_depth.py新增7项：两侧相同正确第一候选且实际node1接受、合法node2翻转、第一候选不同/错误、未接受、EOS/缺少第二目标/无翻转控制。
+
+真实六单位4200new/3806forward全AR；163840native条件draw含T=2命中2/7，原温度仍零且检测力不足。H10检查34共有原冻结窗口无合法depth2翻转；回归与合成fixture不替代上述GPU或有限捕获边界。
+
+收尾核验：80项相关回归、Ruff与5个Study科学source/RPipe冻结门通过。新增19项统计/合法性回归，六单位42生成4200new3806forward、163840native条件draw、H10零新增forward均在冻结预算；正式分析再次执行逐项一致，来源/model/输入/旧helpers核对保持。源/default/旧合同/成功Run未改，未推送/PR/合并/删除。新sampled同KV四因素、原温度native极小尾可达性、安装包/速度/多设备/长矩阵未重验。

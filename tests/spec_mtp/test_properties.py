@@ -60,7 +60,7 @@ def test_declared_factors_is_the_full_product(axes):
 
 @PROFILE
 @given(st.floats(min_value=0, max_value=1, allow_nan=False))
-def test_gate_passes_only_at_rate_one(tmp_path_factory, rate):
+def test_ar_rate_never_substitutes_for_missing_argmax_audit(tmp_path_factory, rate):
     assets = tmp_path_factory.mktemp('a')
     with (assets / 'summary.csv').open('w', newline='', encoding='utf-8') as handle:
         writer = csv.DictWriter(handle, fieldnames=['category', 'exact_match_rate'])
@@ -68,7 +68,7 @@ def test_gate_passes_only_at_rate_one(tmp_path_factory, rate):
         writer.writerow({'category': 'overall', 'exact_match_rate': repr(rate)})
     (assets / 'spec_mtp_sources.json').write_text('{"digest": "d"}')
     config = {'algorithm': {'config': {'task': 'esp_mtp', 'eval': {}}}}
-    assert checks.evaluate_run(config, assets)['passed'] == (rate == 1.0)
+    assert not checks.evaluate_run(config, assets)['passed']
 
 
 # ------------------------------------------------------------ variants

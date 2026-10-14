@@ -205,3 +205,9 @@ for cell in json.loads((s/'index.json').read_text())['experiments']:
     print(json.dumps({'BC':spec['block_complexity'],'masks':spec['num_masks'],'run':run,'completed_spec_prompts':len(rows),'checked_tokens':sum(r['checked_committed_tokens'] for r in rows),'execute_complete':(assets/'decode_observations.json').exists()}))
 '@ | D:/anaconda3/python.exe -
 ```
+
+## 2026-10-15 原生argmax验收门修复
+
+用户明确授权修改evaluate_run/verify_evidence及summarize/process：独立AR一致率只诊断，全部提交token的verifier argmax审计为正确性门。修复在fix/verifier-argmax-gate隔离工作树完成，当前GPU执行目录不切换源码、不杀BC30。原生T0解码新增审计元数据，不改变token选择、mask配方、缓存或forward数量；采样验收未在本次扩展。AR诊断从原始tokens重算，缓存exact标记/汇总仅记录，不当失败门；输入、来源、计数、提交trace、argmax覆盖/哈希/forward行归属继续严格核验。
+
+全套CPU测试、Ruff及mypy（56源码文件）通过；收尾增加缓存AR汇总回归后，对验收、文档索引、argmax观察器再次测试通过。此前隔离测试临时目录权限问题与工具入口文档遗漏已修复，未影响GPU。BC10用新门只读核验480条/79,757提交token全过，AR188/480不阻塞；将使用tools/revalidate_run.py仅重做summarize验收与原生write，旧失败result按SHA保留，raw/输入/argmax JSONL/执行来源锁字节不变，新validator SHA另列。全格收尾后同门跑原生process。不测速、不恢复算子机理，不重跑BC10 execute；8B仅此Table1，4B仍等待。

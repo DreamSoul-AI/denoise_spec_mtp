@@ -1,6 +1,7 @@
 """Pure SpecMTP result and evidence validation; no Flow orchestration."""
 from __future__ import annotations
 import csv
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -18,35 +19,87 @@ def _overall(assets: Path) -> dict[str, str] | None:
         rows = [row for row in csv.DictReader(handle) if row.get('category') == 'overall']
     return rows[0] if len(rows) == 1 else None
 
+def _check_argmax(item: dict[str, Any]) -> int:
+    stats = item['stats']
+    audit = stats.get('verification_argmax_audit') or {}
+    prompt, output = item['input_ids'], item['output_ids']
+    tokens = output[len(prompt):]
+    records = audit.get('committed') or []
+    token_hash = lambda ids: hashlib.sha256(json.dumps(ids).encode()).hexdigest()
+    if (audit.get('passed') is not True or not tokens
+            or audit.get('checked_committed_tokens') != len(tokens)
+            or len(records) != len(tokens) or stats['new_tokens'] != len(tokens)
+            or audit.get('input_sha256') != token_hash(prompt)
+            or audit.get('output_sha256') != token_hash(output)):
+        raise SpecMtpGateError('missing or invalid verifier argmax coverage/hash')
+    owners = [(0, len(prompt) - 1)]
+    for step, trace in enumerate(stats['trace'], 1):
+        owners.extend((step, row) for row in ([0] + trace['accepted_nodes'])[:len(trace['committed_tokens'])])
+    if len(owners) != len(tokens):
+        raise SpecMtpGateError('verifier argmax owner coverage mismatch')
+    for record, token, owner in zip(records, tokens, owners):
+        if (record.get('chosen') != token or record.get('argmax') != token
+                or (record.get('forward'), record.get('row')) != owner):
+            raise SpecMtpGateError('committed token differs from verifier argmax/owner')
+    return len(tokens)
+
+
+def _argmax_evidence(assets: Path) -> dict[str, Any]:
+    raw = json.loads((assets / 'decode_observations.json').read_text(encoding='utf-8'))
+    evidence, rows = raw['out']['evidence'], raw['out']['rows']
+    inputs = json.loads((assets / 'decode_inputs.json').read_text(encoding='utf-8'))
+    if not evidence or len(evidence) != len(rows) or len(evidence) != len(inputs['prompts']):
+        raise SpecMtpGateError('missing prompt decode evidence')
+    checked = sum(_check_argmax(item) for item in evidence)
+    audit_path = assets / 'argmax_audit.jsonl'
+    if audit_path.is_file():
+        recorded = [json.loads(line) for line in audit_path.read_text(encoding='utf-8').splitlines()]
+        if recorded != [item['stats']['verification_argmax_audit'] for item in evidence]:
+            raise SpecMtpGateError('verifier argmax JSONL does not match raw evidence')
+    diagnostics, mismatches = [], []
+    for index, (item, row) in enumerate(zip(evidence, rows)):
+        ar, output = item.get('ar_ids'), item['output_ids']
+        exact = ar == output if ar is not None else None
+        if ar is not None and bool(row.get('exact_match')) != exact:
+            mismatches.append(index)
+        first = None if ar is None or exact else next(
+            (i for i, (a, b) in enumerate(zip(output, ar)) if a != b), min(len(output), len(ar))) - len(item['input_ids'])
+        diagnostics.append({'prompt_index': index, 'exact': exact, 'first_new_difference_index': first})
+    return {'argmax_all_passed': True, 'argmax_checked_prompts': len(evidence),
+            'argmax_checked_tokens': checked, 'AR_diagnostics': diagnostics,
+            'AR_reported_exact_mismatches': mismatches,
+            'exact_match_rate': sum(d['exact'] is True for d in diagnostics)/len(diagnostics)
+                if all(d['exact'] is not None for d in diagnostics) else None}
+
+
 def evaluate_run(config: dict[str, Any], assets: Path) -> dict[str, Any]:
     """Pure check of one Run's assets; no decoding."""
     algorithm = config.get('algorithm') or {}
     settings = algorithm.get('config') or {}
     task = str(settings.get('task', 'esp_mtp')).lower()
-    eval_cfg = settings.get('eval') or {}
-    out: dict[str, Any] = {'task': task, 'passed': False, 'reasons': []}
+    out: dict[str, Any] = {'task': task, 'passed': False, 'reasons': [],
+                           'validation_policy': 'verifier-argmax-v1',
+                           'validator_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     sources = assets / 'spec_mtp_sources.json'
     if sources.is_file():
         out['sources_digest'] = json.loads(sources.read_text(encoding='utf-8')).get('digest')
     else:
         out['reasons'].append('missing assets/spec_mtp_sources.json')
     if task == 'esp_mtp':
-        if not bool(eval_cfg.get('run_ar_baseline', True)):
-            out['reasons'].append('eval.run_ar_baseline is false; exact_match audit did not run')
         overall = _overall(assets)
         if overall is None:
             out['reasons'].append('summary.csv has no single overall row')
         else:
             raw = overall.get('exact_match_rate')
             rate = float(raw) if raw is not None and raw != '' else None
-            out['exact_match_rate'] = rate
+            out['reported_exact_match_rate'] = rate
             for key in ('prompts', 'accept_d1', 'accept_d2', 'accept_d3', 'tau', 'call_reduction'):
                 if overall.get(key) not in (None, ''):
                     out[key] = float(overall[key])
-            if rate is None:
-                out['reasons'].append('exact_match_rate missing')
-            elif rate != 1.0:
-                out['reasons'].append(f'exact_match_rate={rate} != 1')
+        try:
+            out.update(_argmax_evidence(assets))
+        except (RuntimeError, ValueError, KeyError, OSError) as error:
+            out['reasons'].append(str(error))
     elif task == 'ar_baseline':
         if _overall_any(assets) is None:
             out['reasons'].append('missing summary.csv')
@@ -129,14 +182,13 @@ def verify_evidence(config: dict[str, Any], assets: Path) -> None:
         raise SpecMtpGateError('decode task mismatch')
     # Runtime gates apply inside a Run; later readout compares the saved inputs and raw evidence.
     if task == 'esp_mtp':
+        _argmax_evidence(assets)
         evidence, rows = raw['out']['evidence'], raw['out']['rows']
         if not evidence or len(evidence) != len(inputs['prompts']) or len(rows) != len(evidence):
             raise SpecMtpGateError('missing prompt decode evidence')
         for item, row, prompt in zip(evidence, rows, inputs['prompts']):
             if item['input_ids'] != prompt['input_ids'] or item['output_ids'][:len(item['input_ids'])] != item['input_ids']:
                 raise SpecMtpGateError('prompt token evidence mismatch')
-            if item['ar_ids'] != item['output_ids'] or row.get('exact_match') != 1:
-                raise SpecMtpGateError('raw exact_match != 1')
             stats = item['stats']
             if stats['new_tokens'] != len(item['output_ids']) - len(item['input_ids']):
                 raise SpecMtpGateError('generated token count mismatch')
@@ -178,7 +230,7 @@ def verify_evidence(config: dict[str, Any], assets: Path) -> None:
         from spec_mtp.structure.algorithm.esp_mtp import _aggregate
         expected_summary = _aggregate(rows)['overall']
         actual = _overall(assets)
-        if actual is None or any(float(actual[k]) != float(v) for k, v in expected_summary.items()):
+        if actual is None or any(float(actual[k]) != float(v) for k, v in expected_summary.items() if k != 'exact_match_rate'):
             raise SpecMtpGateError('summary does not match raw decode evidence')
     elif task == 'ar_baseline':
         evidence, rows = raw['out']['evidence'], raw['out']['rows']

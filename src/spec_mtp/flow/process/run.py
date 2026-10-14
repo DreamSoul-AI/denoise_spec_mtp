@@ -44,6 +44,9 @@ def study_gate(ctx: StudyProcessContext | FlowContext, expected_factors: list[di
             row = {'run': run['id'], 'seed': run.get('seed'), 'factors': experiment.get('factors') or {},
                    'status': result.get('status'), 'gate_passed': gate.get('passed') is True,
                    'exact_match_rate': gate.get('exact_match_rate'), 'accept_d1': gate.get('accept_d1'),
+                   'argmax_all_passed': gate.get('argmax_all_passed'),
+                   'argmax_checked_tokens': gate.get('argmax_checked_tokens'),
+                   'validation_policy': gate.get('validation_policy'),
                    'sources_digest': gate.get('sources_digest'), 'evidence_error': gate.get('evidence_error')}
             rows.append(row)
             if row['status'] != 'succeeded' or not row['gate_passed'] or not row['sources_digest']:

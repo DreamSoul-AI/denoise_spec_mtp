@@ -89,8 +89,12 @@ def main():
             rows.append(dict(r,question_id=p['question_id'],exact=bool(r['exact_match']),
                              first_new_difference_index=first,argmax_passed=True,argmax_checked_tokens=len(continuation)))
         result_file=assets.parent/'result.json'
-        native_status=json.loads(result_file.read_text()).get('status') if result_file.exists() else 'pending finalisation'
+        native=json.loads(result_file.read_text()) if result_file.exists() else {}
+        native_status=native.get('status','pending finalisation')
+        gate=native.get('spec_mtp') or {}
         cell={'run_id':run_id,'native_status':native_status,
+              'native_validation_policy':gate.get('validation_policy'),'validator_sha256':gate.get('validator_sha256'),
+              'gate_revalidation':{k:v for k,v in (gate.get('revalidation') or {}).items() if k in ('previous_result_sha256','previous_status','evidence_sha256','execute_rerun')},
               'argmax_audit_sha256':hashlib.sha256((assets/'argmax_audit.jsonl').read_bytes()).hexdigest(),'actual_spec':spec,'dtype':inputs['dtype'],'model_digest':inputs['model_digest'],
               'runtime':inputs['runtime'],'numeric_policy':policy,'rows':rows,
               'token_audits':[{'question_id':p['question_id'],'output_sha256':hashlib.sha256(json.dumps(e['output_ids']).encode()).hexdigest(),'AR_sha256':hashlib.sha256(json.dumps(e['ar_ids']).encode()).hexdigest(),'first_new_difference_index':next((i-len(e['input_ids']) for i,(a,b) in enumerate(zip(e['output_ids'],e['ar_ids'])) if a!=b), min(len(e['output_ids']),len(e['ar_ids']))-len(e['input_ids'])) if e['output_ids']!=e['ar_ids'] else None} for p,e in zip(prompts,out['evidence'])],
@@ -106,11 +110,13 @@ def main():
           'quality_passed':all(not c['pending'] and c['argmax_all_passed'] for c in cells),
           'AR_all_exact':all(not c['pending'] and c['exact_count']==len(prompts) for c in cells),
           'no_best_mask_selection':True,'cells':cells}
-    filename='protocol_evidence_v1.json' if body['all_cells_observed'] else 'protocol_pending.json'
+    formal_ready=body['all_cells_observed'] and all(c.get('native_status')=='succeeded' and c.get('native_validation_policy')=='verifier-argmax-v1' for c in cells)
+    body['native_finalisation_complete']=formal_ready
+    filename='protocol_evidence_v1.json' if formal_ready else 'protocol_pending.json'
     path=study/'docs'/filename;text=json.dumps(body,indent=2)+'\n'
-    if path.exists() and body['all_cells_observed']:assert path.read_text()==text
+    if path.exists() and formal_ready:assert path.read_text()==text
     else:path.write_text(text,encoding='utf-8')
-    reference=f'[{filename}]({filename})' if body['all_cells_observed'] else f'本机临时文件 `{filename}`（未入Git）'
+    reference=f'[{filename}]({filename})' if formal_ready else f'本机临时文件 `{filename}`（未入Git）'
     lines=['# ESP Table 1 Qwen3 BF16 protocol report','',f"{len(prompts)} prompts; completed={sum(not c['pending'] for c in cells)}/4; 全四格验收={'passed' if body['quality_passed'] else 'pending'}. 已完成格的τ/argmax有效性单列，AR失配不否定该格。BC60/1 is primary and BC60/2 is control, fixed before results.",'',
            '| BC/masks | role | τ/argmax结果 | AR exact/n (rate) | argmax checked/pass | pooled τ | τ − target | prompt mean τ | mean − target | category mean τ | category − target |',
            '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |']
@@ -122,9 +128,9 @@ def main():
         lines.append(f"| {c['BC']}/{c['num_masks']} | {c['role']} | {valid} | {exact} | {audit} | "+' | '.join(values)+' |')
     lines+=['','目标BC30=1.63，BC60双方均列相对1.74差值，不按τ选主配置。AR独立审计失配单列，不能宣称与独立AR一致；不阻止τ计算。τ验收要求全480、全部提交token的验证前向argmax自检通过，不以预检替代结果。','',
             '[PLAN](PLAN.md)引用G.2具体说明：Qwen3 BC60单mask/29节点，双mask/19节点为对照；保持动态树剪枝，BF16/T0/256/seed123，无测速/预热。','',
-            'Mean mask按Eq5 λ=.1更新，与后续4B用户指定的ESP frozen mean不同。四格全部新Run，旧冻结PLAN不回写；原生AR门失败状态独立保留，不伪称native成功。新增argmax必须全过。',
+            'Mean mask按Eq5 λ=.1更新，与后续4B用户指定的ESP frozen mean不同。四格全部新Run，旧冻结PLAN不回写；旧AR门失败result归档；仅重新验收后记录真实native状态及新validator SHA，不重跑execute。新增argmax必须全过；独立AR差异不阻塞native summarize/process。',
             '',f'逐prompt计数、AR首分叉位置和自检覆盖及哈希见{reference}。完整原始tokens/argmax选择记录/Run仅在本机保留，未运行格不能用预检外推。']
-    if body['all_cells_observed'] and body['quality_passed']:
+    if formal_ready and body['quality_passed']:
         from plot_results import write_plot
         write_plot(body,study/'docs/figures/tau_acceptance.png')
         lines+=['','![Full480 tau and accepted draft counts](figures/tau_acceptance.png)',

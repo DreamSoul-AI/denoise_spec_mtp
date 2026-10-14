@@ -41,6 +41,15 @@ def _assets(tmp_path, rate='1.0', with_sources=True, overall=True, name='a'):
            'accept_d1': 5, 'attempt_d1': 5}
     item = {'input_ids': [1, 2], 'output_ids': [1, 2, 3, 4, 5, 6, 7, 8],
             'ar_ids': [1, 2, 3, 4, 5, 6, 7, 8], 'stats': stats}
+    import hashlib
+    token_hash = lambda ids: hashlib.sha256(json.dumps(ids).encode()).hexdigest()
+    stats['verification_argmax_audit'] = {'passed': True, 'checked_committed_tokens': 6,
+        'input_sha256': token_hash(item['input_ids']), 'output_sha256': token_hash(item['output_ids']),
+        'committed': [{'forward': 0, 'row': 1, 'chosen': 3, 'argmax': 3}] +
+            [{'forward': 1, 'row': i, 'chosen': token, 'argmax': token} for i, token in enumerate([4,5,6,7,8])]}
+    if rate not in ('1.0',''):
+        item['ar_ids'][-1] = 99
+        row['exact_match'] = 0
     raw = {'task': 'esp_mtp', 'inputs_digest': digest(inputs), 'out': {'rows': [row], 'evidence': [item]}}
     (assets / 'decode_inputs.json').write_text(json.dumps(inputs))
     (assets / 'decode_observations.json').write_text(json.dumps(raw))
@@ -64,8 +73,6 @@ def test_exact_match_one_passes(tmp_path):
 
 
 @pytest.mark.parametrize('kwargs, reason', [
-    ({'rate': '0.75'}, 'exact_match_rate=0.75'),
-    ({'rate': '0.9999'}, '!= 1'),
     ({'overall': False}, 'no single overall row'),
     ({'with_sources': False}, 'spec_mtp_sources'),
 ])
@@ -76,12 +83,18 @@ def test_gate_failures(tmp_path, kwargs, reason):
 
 
 def test_unaudited_esp_run_fails(tmp_path):
-    report = checks.evaluate_run(_config(run_ar=False), _assets(tmp_path))
-    assert not report['passed'] and 'run_ar_baseline' in report['reasons'][0]
+    assets = _assets(tmp_path)
+    path = assets / 'decode_observations.json'
+    raw = json.loads(path.read_text())
+    del raw['out']['evidence'][0]['stats']['verification_argmax_audit']
+    path.write_text(json.dumps(raw))
+    report = checks.evaluate_run(_config(), assets)
+    assert not report['passed'] and 'argmax' in report['reasons'][0]
 
 
 def test_run_gate_raises_and_records(tmp_path):
-    assets = _assets(tmp_path, rate='0.5')
+    assets = _assets(tmp_path)
+    _corrupt_audit(assets, 'passed', False)
     ctx = SimpleNamespace(config=_config(), layout=SimpleNamespace(assets_dir=assets),
                           state={'result_draft': {'metrics': {}}})
     with pytest.raises(checks.SpecMtpGateError):
@@ -175,7 +188,7 @@ def test_alignment_probe_needs_its_csv(tmp_path):
 
 def test_empty_rate_is_missing(tmp_path):
     report = checks.evaluate_run(_config(), _assets(tmp_path, rate=''))
-    assert report['reasons'] == ['exact_match_rate missing'] and report['exact_match_rate'] is None
+    assert report['passed'] and report['reported_exact_match_rate'] is None and report['exact_match_rate']==1
 
 
 def test_two_overall_rows_are_rejected(tmp_path):
@@ -192,9 +205,10 @@ def test_task_name_is_case_insensitive(tmp_path):
 def test_run_gate_without_draft_still_gates(tmp_path):
     ctx = SimpleNamespace(config=_config(), layout=SimpleNamespace(assets_dir=_assets(tmp_path)), state={})
     assert checks.run_gate(ctx)['passed']
-    bad = SimpleNamespace(config=_config(), layout=SimpleNamespace(assets_dir=_assets(tmp_path, '0.5', name='b')),
-                          state={})
-    with pytest.raises(checks.SpecMtpGateError, match='exact_match_rate=0.5 != 1'):
+    assets = _assets(tmp_path, name='b')
+    _corrupt_audit(assets, 'passed', False)
+    bad = SimpleNamespace(config=_config(), layout=SimpleNamespace(assets_dir=assets), state={})
+    with pytest.raises(checks.SpecMtpGateError, match='argmax'):
         checks.run_gate(bad)
 
 
@@ -224,15 +238,16 @@ def test_final_gate_requires_raw_evidence(tmp_path, name):
         checks.run_gate(ctx)
 
 
-def test_final_gate_rejects_token_mismatch_even_when_summary_passes(tmp_path):
+def test_final_gate_reports_ar_mismatch_without_blocking_argmax(tmp_path):
     assets = _assets(tmp_path)
     path = assets / 'decode_observations.json'
     body = json.loads(path.read_text())
     body['out']['evidence'][0]['ar_ids'][-1] = 99
     path.write_text(json.dumps(body))
     ctx = SimpleNamespace(config=_config(), layout=SimpleNamespace(assets_dir=assets), state={})
-    with pytest.raises(checks.SpecMtpGateError, match='raw exact_match'):
-        checks.run_gate(ctx)
+    report=checks.run_gate(ctx)
+    assert report['passed'] and report['exact_match_rate']==0
+    assert report['reported_exact_match_rate']==1 and report['AR_reported_exact_mismatches']==[0]
 
 
 def test_final_gate_rejects_source_drift(tmp_path):
@@ -334,3 +349,93 @@ def test_declared_factors_bind_inherited_conditions():
     first = {'algorithm': {'config': {'eval': {'max_new_tokens': 100}}}}
     second = {'algorithm': {'config': {'eval': {'max_new_tokens': 50}}}}
     assert checks.declared_factors(study, first) != checks.declared_factors(study, second)
+
+
+def _corrupt_audit(assets, key, value):
+    path = assets / 'decode_observations.json'
+    raw = json.loads(path.read_text())
+    raw['out']['evidence'][0]['stats']['verification_argmax_audit'][key] = value
+    path.write_text(json.dumps(raw))
+
+
+@pytest.mark.parametrize('key,value', [('passed',False), ('checked_committed_tokens',5),
+    ('input_sha256','bad'), ('output_sha256','bad'), ('committed',[])])
+def test_argmax_audit_required_even_when_ar_exact(tmp_path,key,value):
+    assets = _assets(tmp_path)
+    _corrupt_audit(assets,key,value)
+    assert not checks.evaluate_run(_config(),assets)['passed']
+    with pytest.raises(checks.SpecMtpGateError,match='argmax'):
+        checks.verify_evidence(_config(),assets)
+
+
+@pytest.mark.parametrize('key,value', [('chosen',99),('argmax',99),('forward',3),('row',3)])
+def test_argmax_token_and_owner_tampering_fails(tmp_path,key,value):
+    assets = _assets(tmp_path)
+    path = assets / 'decode_observations.json'
+    raw = json.loads(path.read_text())
+    raw['out']['evidence'][0]['stats']['verification_argmax_audit']['committed'][0][key] = value
+    path.write_text(json.dumps(raw))
+    assert not checks.evaluate_run(_config(),assets)['passed']
+
+
+def test_ar_mismatch_is_diagnostic_and_native_gate_passes(tmp_path):
+    from spec_mtp.structure.algorithm.esp_mtp import _aggregate
+    assets = _assets(tmp_path,rate='0.0')
+    raw = json.loads((assets/'decode_observations.json').read_text())
+    flat = [{'category':k,**v} for k,v in _aggregate(raw['out']['rows']).items()]
+    with (assets/'summary.csv').open('w',newline='') as handle:
+        writer=csv.DictWriter(handle,fieldnames=list(flat[0]));writer.writeheader();writer.writerows(flat)
+    ctx=SimpleNamespace(config=_config(),layout=SimpleNamespace(assets_dir=assets),state={'result_draft':{}})
+    report=checks.run_gate(ctx)
+    assert report['passed'] and report['argmax_checked_tokens']==6 and report['exact_match_rate']==0
+    assert report['AR_diagnostics']==[{'prompt_index':0,'exact':False,'first_new_difference_index':5}]
+    assert ctx.state['result_draft']['spec_mtp']['validation_policy']=='verifier-argmax-v1'
+    assert checks.evaluate_run(_config(run_ar=False),assets)['passed']
+
+
+def test_jsonl_argmax_audit_must_match_raw(tmp_path):
+    assets = _assets(tmp_path)
+    (assets/'argmax_audit.jsonl').write_text('{}\n')
+    assert not checks.evaluate_run(_config(),assets)['passed']
+
+
+def test_revalidation_keeps_failure_and_execute_bytes_and_is_idempotent(tmp_path,monkeypatch):
+    import importlib.util
+    from pathlib import Path
+    from spec_mtp.structure.artifact import validation
+    root=Path(__file__).resolve().parents[3]
+    spec=importlib.util.spec_from_file_location('revalidation_tool',root/'tools/revalidate_run.py')
+    tool=importlib.util.module_from_spec(spec);spec.loader.exec_module(tool)
+    ctx=_study(tmp_path,[('a','failed',False,'d')])
+    run=ctx.study_dir/'runs/run_a'
+    body=json.loads((run/'result.json').read_text())
+    body.update(control={},metrics={},error='SpecMtpGateError: old AR gate')
+    (run/'result.json').write_text(json.dumps(body))
+    previous=(run/'result.json').read_bytes()
+    raw=(run/'assets/decode_observations.json').read_bytes()
+    from spec_mtp.structure.algorithm import decoding
+    monkeypatch.setattr(decoding.SpecDecoder,'generate',lambda *a:pytest.fail('execute must not rerun'))
+    result=tool.revalidate_run(ctx.study_dir,'run_a',Path(validation.__file__))
+    assert result['status']=='succeeded' and result['spec_mtp']['argmax_all_passed']
+    migration=result['spec_mtp']['revalidation']
+    assert migration['execute_rerun'] is False
+    assert (run/'assets'/migration['previous_result_asset']).read_bytes()==previous
+    assert (run/'assets/decode_observations.json').read_bytes()==raw
+    saved=(run/'result.json').read_bytes()
+    tool.revalidate_run(ctx.study_dir,'run_a',Path(validation.__file__))
+    assert (run/'result.json').read_bytes()==saved
+
+
+def test_cached_ar_summary_does_not_block_argmax_gate(tmp_path):
+    assets=_assets(tmp_path)
+    path=assets/'summary.csv'
+    with path.open(newline='') as handle:
+        rows=list(csv.DictReader(handle))
+    for row in rows:
+        row['exact_match_rate']='0.2'
+    with path.open('w',newline='') as handle:
+        writer=csv.DictWriter(handle,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
+    ctx=SimpleNamespace(config=_config(),layout=SimpleNamespace(assets_dir=assets),state={'result_draft':{'metrics':{}}})
+    report=checks.run_gate(ctx)
+    assert report['passed'] and report['exact_match_rate']==1 and report['reported_exact_match_rate']==0.2
+    assert ctx.state['result_draft']['metrics']['test_exactmatchrate']==1

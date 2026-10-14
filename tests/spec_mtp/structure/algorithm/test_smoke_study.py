@@ -77,16 +77,17 @@ def test_context_limit_run_passes_on_reached_budget(study_copy):
     assert float(_overall(study, run_id)['exact_match_rate']) == 1.0
 
 
-def test_unaudited_run_fails_the_gate(study_copy):
+def test_argmax_audit_passes_without_independent_ar(study_copy):
     def patch(study):
         study['fixed']['algorithm']['config']['eval']['run_ar_baseline'] = False
         study['axes'] = {'algorithm.config.variant': ['esp_static']}
-    study = study_copy(patch, name='unaudited')
+    study = study_copy(patch, name='without_ar')
     proc = cli('run', study)
-    assert proc.returncode != 0
+    assert proc.returncode == 0, proc.stderr
     run_id = json.loads((study / 'index.json').read_text())['experiments'][0]['runs'][0]['id']
     result = json.loads((study / 'runs' / run_id / 'result.json').read_text(encoding='utf-8'))
-    assert result['status'] == 'failed' and 'run_ar_baseline' in result['error']
+    assert result['status'] == 'succeeded' and result['spec_mtp']['argmax_all_passed']
+    assert all(d['exact'] is None for d in result['spec_mtp']['AR_diagnostics'])
 
 
 def test_bad_config_fails_before_construction(study_copy):
@@ -161,7 +162,7 @@ def test_ar_baseline_runs_the_same_stage_chain(study_copy):
     assert all(len(item['output_ids']) == 64 for item in raw['out']['evidence'])
 
 
-def test_raw_mismatch_fails_before_success_is_written(study_copy):
+def test_ar_diagnostic_mismatch_does_not_block_native_success(study_copy):
     study = study_copy(name='raw_mismatch')
     hook = study / 'flow/collect/run.py'
     hook.write_text("""from spec_mtp.flow.collect import run as collect
@@ -176,13 +177,15 @@ def run(ctx):
     path.write_text(json.dumps(raw))
 """)
     proc = cli('run', study)
-    assert proc.returncode != 0
+    assert proc.returncode == 0, proc.stderr
     index = json.loads((study / 'index.json').read_text())
     for experiment in index['experiments']:
         root = study / 'runs' / experiment['runs'][0]['id']
         if (root / 'result.json').is_file():
             result = json.loads((root / 'result.json').read_text())
-            assert result['status'] == 'failed' and 'raw exact_match' in result['error']
+            assert result['status'] == 'succeeded' and result['spec_mtp']['argmax_all_passed']
+            assert result['spec_mtp']['exact_match_rate']==0.75
+            assert result['spec_mtp']['AR_reported_exact_mismatches']==[0]
 
 
 def test_source_preflight_preserves_existing_result(study_copy):

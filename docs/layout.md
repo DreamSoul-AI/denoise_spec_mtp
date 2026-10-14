@@ -77,3 +77,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 4B Study局部untimed_4b.py仅关闭decoder模块计时并以相同权重directCUDA materialize；注册范围是该原生Run进程，科学src/default不变。四phase导出沿用from .run import run；v1失败源保留，v2/native holdout/control为有效入口。两个analyze_results与write_report复核原生计数/AR/来源，selectedEMA复用已测输出，权重/全Run/shared仍不入Git。
 
 `tools/launch_once.py`调用原生SpecMTP/RPipe CLI，仅关闭可选失败重试，避免AR诊断失败格重复执行：`python tools/launch_once.py launch studies/<name> --round 1 --console shared`。退出恢复调度器，不修改vendored RPipe。
+
+`tools/revalidate_run.py` uses a separately loaded verifier-argmax gate with the unchanged execution package. It finalises existing raw evidence without prepare/execute, retains the previous failed result by SHA256, and supports native Study process after all declared cells are revalidated.

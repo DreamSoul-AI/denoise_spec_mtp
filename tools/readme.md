@@ -29,3 +29,6 @@ Package check: `python tools/package_selfcheck.py --workspace .tmp/package-<new-
 
 `diagnose_q178_phi_rms.py --out .tmp/<new-id>`：固定entry Phi和post-attention RMSNorm精度对照，区分有效／bit等价。
 `diagnose_q241_canonical.py --out .tmp/<new-id>`：首个跨任务阳性的独立canonical合同，保留自值变化及等计数不同路径。
+
+`diagnose_q178_rounding_factors.py`：`python tools/diagnose_q178_rounding_factors.py --out .tmp/<new-id>`，原输入Phi三因素/RMS五因素算术矩阵，零模型forward，绑定缓存gamma和原值。
+`diagnose_q241_state_factors.py`：`python tools/diagnose_q241_state_factors.py --out .tmp/<new-id>`，q241两native审计+四单坐标同步生成；固定协议、AR及原值审计失败即停止。

@@ -10,3 +10,13 @@
 /studies/output_space_cross_task/docs/CANONICAL_PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/EXECUTION_PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_extension/docs/PHI_RMS_PLAN.md -text whitespace=cr-at-eol
+
+# Preserve state/arithmetic factor measurement and analysis bytes.
+/tools/diagnose_q241_state_factors.py -text whitespace=cr-at-eol
+/tools/diagnose_q178_rounding_factors.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_state_factors.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/STATE_FACTOR_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_extension/docs/ROUNDING_FACTOR_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/state_factor_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/state_factor_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_extension/docs/rounding_factor_diagnosis_v1.json -text whitespace=cr-at-eol

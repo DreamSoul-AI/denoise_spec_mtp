@@ -32,3 +32,11 @@ python tools/package_selfcheck.py --workspace .tmp/package-<new-id>
 ```
 
 package_selfcheck 构建 wheel/sdist，分别 target 安装，不建新 venv、不替换 GPU 依赖；从源码外目录证明导入来自独立 installed，核 ORIGIN/LICENSE 和两个模块/console 入口，再跑四 Run native Toy/Stub 与三 Run SpecMTP tiny 的 make/launch/process/status/logs/report、重复 launch 保全。它不验证从零安装全部依赖或真实模型质量。正式结果见 smoke 的当前设备报告；真实模型资源边界见 input_mask_baseline。
+
+## 固定窗口状态／舍入因素（2026-10-15）
+
+本轮测试清单：test_state_rounding_factors.py覆盖Phi全native/full64端点及输入不变、RMS阶段形状与native数学、真实cache根选择、单坐标同步与另一坐标/proxy保全、异常清理、等计数但不同路径、非加性交互。保留test_phi_rms、test_q178_numerics、test_cross_task_hypotheses的旧门，不用合成fixture替代真实GPU结论。
+
+GPU实际检查另见[状态因素报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)与[算术因素报告](../studies/output_space_extension/docs/STUDY_REPORT.md)：六生成AR／native全张量／单坐标门和80直接算术格原值门通过。原生16输出与旧8格不重跑；本轮算术格不声称新的下游接受路径验收。
+
+本轮收尾核验：37项针对性测试及Ruff通过，5个Study的科学source/RPipe冻结门通过，80格保存向量的标量差重新计算一致，18个精确字节路径的暂存blob与本机文件一致。完整原生矩阵、安装包、更多seed/层未重跑；科学源码/default/旧helper/成功Run无改动。

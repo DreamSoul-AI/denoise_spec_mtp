@@ -65,3 +65,30 @@ q178本轮[入口Phi与RMSNorm对照](../../output_space_extension/docs/STUDY_RE
 收尾核验：30项针对性测试通过，Ruff通过，mypy检查56个源码文件无错误；5个相关Study的科学source与RPipe provenance冻结门通过，20诊断及Phi/RMS、canonical张量离线复核与旧正式结果逐项一致。新测量工具／协议保留原始字节；旧operator_analyzer快照的Git blob恢复为本机已测量的CRLF字节，仅修复存档换行，不改分析逻辑或历史测量文件。10个精确字节路径的暂存blob与本机文件一致。
 
 未推远程、未开／合PR、未改科学src/default、未删数据。
+
+## q241结构化归因与状态因素反例（2026-10-15）
+
+按新冻结[STATE_FACTOR_PLAN](STATE_FACTOR_PLAN.md)，执行[选择性回填工具](../../../tools/diagnose_q241_state_factors.py)与[结构化分析](../analyze_state_factors.py)。复用q241/seed123/entry716及已有792-position teacher状态，六次生成共600新token、525forward、零teacher／warmup，全部独立AR一致。两个native审计控制重现旧完整语义路径、stats和全部captured张量；四新格在每个真实KV root>716只回填一个坐标，核对另一坐标和incoming proxies未在patch修改，后续自然变化保留。旧成功原生Run和canonical格不重跑、不重签。
+
+| committed同步因素 | 自值accepted | 一阶←零阶accepted | 移植相对自值 |
+| --- | ---: | ---: | ---: |
+| native（旧格+本轮审计） | 11 | 12 | +1 |
+| 仅anchor（本轮） | 13 | 13 | 0 |
+| 仅velocity（本轮） | 13 | 13 | 0 |
+| anchor+velocity（旧canonical格） | 14 | 14 | 0 |
+
+[完整新生成证据](state_factor_diagnosis_v1.json)与[结构化结果](state_factor_analysis_v1.json)保存正式scalar、全部语义trace、各回填幅度和未访问根。相对native，同步anchor或velocity的自值均+2、移植均+1；双同步自值+3、移植+2。预声明H5“两个状态因素计数效应可加”在自值上被反例收紧：14-13-13+11=-1，而移植为14-13-13+12=0。这个不同交互项再次阻止把原+1消失解释成单一、线性、可按百分比分配的committed舍入贡献。两种选择性同步都使计数差不保持，是q241固定单位的额外反例验证，不是假装新的随机跨任务样本。
+
+### canonical自值／移植为何同数不同路径
+
+双同步两格的第一语义分叉是root720，真实source719/owner0相同。该位置captured anchor和velocity逐元素相同，proxies最大差5.195926666259766；正确第一AR候选264的margin由自值-2.7185325622558594变为移植+1.2852745056152344，命中恢复。随后共同根增益720/731/734/774与损失741/750/780/785各四个相抵；两侧各四个独有root也完整记录，不能按共同根之外假造对齐。**14／14保留了历史代理输入导致的不同候选路径；root720当前committed state差异不是该局部差异的必要条件。** 这并不排除上游历史曾受到committed数值路径影响；本轮未固定整个KV/cache或上游数值路径，不能将proxy差视作唯一中介。两个只同步一项的13／13格也从root720分叉，H6“等接受总数意味着等语义路径”在这三个配对上均有反例。
+
+### 自值控制与committed回填的贡献边界
+
+native自值对双同步自值的首个接受分叉发生在root756，共同根756/783/785新增三个接受，原路径的757/784/786因实际进度而消失。root756 anchor差3.4332275390625e-5、velocity差3.516674041748047e-6，但其代理已累计分化，proxies差22.688066482543945，第一AR候选margin由-.6922931671142578变为+1.2724342346191406。移植控制与双同步移植首分叉在751，第一margin+1.1363706588745117变为-1.1761016845703125：先失去一个，再在756/758/783新增三个，净+2。这里的间接代理传播与排序跨界不可被单个state微差幅度替代。
+
+因此可量化的是这些具体同步干预的接受数效应及路径交互，不能据此认定某一原始committed微差唯一必要／充分。原+1对比消失包含自值基线的+3变化，并非移植影响消失。下一项有价值的局部实验是冻结首个分叉的上游输入，区分即时state改动与累积proxy传播；若实施须新协议，不能把本轮全程同步结果冒充该直接效应。
+
+本轮生成wall35.397秒、.5s采样RSS5132173312 bytes、GPU全局6172MiB、最低可用主存11330322432，含背景且非allocator峰。raw485128429 bytes，SHA914b8331d633f299a089364de5e8556866dc7a5be1637af26c9ae6cc81d5b65b，本机.tmp保留；只有正式scalar/trace证据入Git。现有cross-task四prompt范围未扩大，H5/H6是对已见q241的解释性新假设，不作为独立泛化证据。科学src/default与原PLAN/helpers保持，不推送、不开PR、不删数据。
+
+本轮收尾核验：37项针对性测试及Ruff通过，5个Study的科学source/RPipe冻结门通过，80格保存向量的标量差重新计算一致，18个精确字节路径的暂存blob与本机文件一致。完整原生矩阵、安装包、更多seed/层未重跑；科学源码/default/旧helper/成功Run无改动。

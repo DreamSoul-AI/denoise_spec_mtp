@@ -1,6 +1,6 @@
 # 异机交接
 
-最新状态见本文末尾“真实cross-task与入口Phi／RMS推进”：真实批次和独立canonical跟进已完成。下列历史交接中的未运行状态保留为当时记录，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
+最新状态见本文末尾“q178算术因素／q241选择性state归因”：算子分解、结构化轨迹对比和选择性状态反例已执行。下列历史交接中的未运行状态保留为当时记录，以[当前报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)为准。
 
 ## q178算子对照与下一Study草案（2026-10-14）
 
@@ -107,3 +107,7 @@ v0.3.1 源码升级与完整回归；当前重构安装包/Windows selfcheck；�
 ## 真实cross-task与入口Phi／RMS推进（2026-10-14）
 
 新cross-task fourRuns/16outputs、20窗口诊断全部独立AR一致，input/zero/one85/58/45；四条及八移植方向都有语义/计数变化，混合正负而无一阶优势。q178 entryPhi64两向量1.49e-8有效差、RMS64 row4有效差，8格路径保持8/9；singleton RMSbit相同单列。首个阳性q241另冻canonical合同，native11/12→canonical14/14，自值也变且两canonical路径仍不同，是接受计数差不保持的反例，不是移植全失效／committed唯一因果。完整[实际报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)及[精度报告](../studies/output_space_extension/docs/STUDY_REPORT.md)给来源、图、窗口坏点、资源和哈希。旧草案/批次hypotheses状态保留，真实执行与H2跟进分别增补，不重签成功Run。源码/default/旧工具不改，weights/cache/raw/profiler不入Git，不远程/PR/删数据。
+
+## q178算术因素／q241选择性state归因（2026-10-15）
+
+最新[状态报告](../studies/output_space_cross_task/docs/STUDY_REPORT.md)与[算子报告](../studies/output_space_extension/docs/STUDY_REPORT.md)：六生成AR一致、两native全张量重现，单坐标回填scope/真实KV根门通过；80direct算术格零forward。单因素精度均无最终差，联合中间精度才恢复旧FP64端点，不能锁定单kernel。q24113／13新格收紧“+1保持”，自值同步非加性；双canonical14／14在root720 state相同但proxy不同，四增四减抵消。解释性固定单位，不是新增随机样本。待验证是首个分叉上游冻结后的即时state与历史proxy分离，未执行、不假装完成。raw/cache/weights/profiler仅本机，不远程／PR／删数据。

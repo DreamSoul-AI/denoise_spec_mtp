@@ -88,3 +88,9 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 为固定q241–244写EXECUTION_PLAN并更换version，新make四Run。首格43秒Flow/资源/AR门通过后，只launch其余3格，全部成功；process/report/checker export后冻结Root716/658/600/905，20诊断1950tokens/1704forwards全AR一致。原生input/zero/one85/58/45、移植双向有得失。其后q178 Phi64+post-attention RMS8格288tokens/220forwards：Phi/RMS64有效微差、singleton等价，路径仍8/9。按原准则单独冻结第一阳性q241 canonical4格400tokens/349生成forward+792-position teacher，native11→12、canonical14→14且路径不同，限制H2数量差保持及自值干预解释；源/default/合同不改，不推/PR/删。详见正式报告。
 
 收尾核验：30项针对性测试、Ruff、mypy56源码与5Study冻结门通过；10个测量工具/协议/快照Git blob逐字节一致，修复旧operator_analyzer快照CRLF存档差异，源码/default不变。
+
+## q178舍入因素与q241状态因素（2026-10-15）
+
+按c4cb011证据另冻两个协议，完成80直接算术格与六生成／600new／525forward。Phi/RMS所有单因素最终都等于native，多阶段FP64保留才非零；q241 anchor-only/velocity-only13／13，旧native11／12、双同步14／14，自值交互-1反驳局部可加性。canonical同位root720 state相同、proxy不同且第一margin翻转，四收益四损失相抵；自值首变756三收益。正式报告保留唯一归因边界和未执行局部直接效应；未改科学src/default/旧helpers/成功Run，未远程／PR／删除。
+
+本轮收尾核验：37项针对性测试及Ruff通过，5个Study的科学source/RPipe冻结门通过，80格保存向量的标量差重新计算一致，18个精确字节路径的暂存blob与本机文件一致。完整原生矩阵、安装包、更多seed/层未重跑；科学源码/default/旧helper/成功Run无改动。

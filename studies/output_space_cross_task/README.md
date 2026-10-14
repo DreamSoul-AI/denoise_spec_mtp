@@ -9,3 +9,5 @@ The local q178 operator results are in [the extension report](../output_space_ex
 [证伪脚本](check_hypotheses.py)与[检查协议](docs/CHECKER_PROTOCOL.md)已提供可跑export/check/mre流程，现已完成真实批次和独立canonical跟进。[状态报告](docs/STUDY_REPORT.md)保存实际Run、正负结果与范围。固定q_proj协议已通过[执行增补](docs/KERNEL_EXECUTION_PLAN.md)在旧q178上完成，不混作新任务证据。
 
 真实输入／零／一汇总85/58/45；q241 native11→12，canonical14→14且路径仍不同。完整事实与图见[STUDY_REPORT](docs/STUDY_REPORT.md)，计数对比不代替语义轨迹或纯因果证明。
+
+2026-10-15：新冻结STATE_FACTOR_PLAN完成六生成与H5/H6反例，anchor-only/velocity-only13／13，双canonical等数但路径不同的root720归因见[最新报告](docs/STUDY_REPORT.md)。

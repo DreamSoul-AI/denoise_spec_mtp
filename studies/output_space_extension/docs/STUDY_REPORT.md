@@ -160,3 +160,26 @@ norm实际wall27.943秒、RSS5438509056 bytes、全局GPU5654MiB；q_proj wall26
 本轮288newtokens/220forwards、无teacher/辅助模型forward，wall26.844秒、RSS5133893632 bytes、GPU全局5679MiB、最低可用主存10140618752。.5s采样含背景/漏短峰，不作速度比较。raw183227469 bytes仅本机.tmp/q178-phi-rms-20261014-v1，SHAb8318d3fef010c8bfbac60be52078cc27c6e8781923d24e0498bf1bf56673140，完整tensor/profiler/权重/cache不入Git。
 
 与此同时[真实cross-task报告](../../output_space_cross_task/docs/STUDY_REPORT.md)已完成q241–244原生四格和20诊断。首个阳性q241另冻canonical合同，原11→12变为14→14，自值也变化且两canonical完整路径仍不同，是“计数收益不保持”的局部反例，不能称移植全无效或committed微差唯一因果。q178的稳定不得外推到新prompt。科学source/default/旧成功Run与测量工具保持，不远程、不PR、不删数据。
+
+## q178算子级舍入分解（2026-10-15）
+
+按[ROUNDING_FACTOR_PLAN](ROUNDING_FACTOR_PLAN.md)执行[可复现工具](../../../tools/diagnose_q178_rounding_factors.py)，没有新模型forward或token。复用上一轮FP32槽、scale、两种native RMS输入；只读取缓存中第0层gamma，权重文件SHA和installed Qwen3 norm实现前后相同，原始数学/native返回门通过。完整[80格标量记录](rounding_factor_diagnosis_v1.json)保留正负结果、CUDA profile、来源和中间标量，未将任一格改称新接受率实验。
+
+Phi三位编码依次是norm、scale*slot、division的64位开关，0保留对应FP32输入/运算，1用FP64，最后转回FP32。两个donor的000精确复现原值，111精确复现上一轮CPU64替换。
+
+| Phi编码 | 零阶改变坐标数 | 一阶改变坐标数 | 最大绝对差 |
+| --- | ---: | ---: | ---: |
+| 000 / 001 / 010 / 100 / 110 | 0 | 0 | 0 |
+| 011 | 275 | 252 | 1.4901161193847656e-8 |
+| 101 | 301 | 267 | 1.4901161193847656e-8 |
+| 111 | 359 | 328 | 1.4901161193847656e-8 |
+
+native norm为109.30936431884766／116.98698425292969，CPU64 norm为109.30936172307013／116.98698673712825；64值舍回32都等于native norm。**这组非零Phi差需要跨阶段保留精度：三个单因素格都为零，norm与division或乘积与division联合才改变最终向量；仅111完全恢复上一轮CPU64结果。** 不能将它写成“norm CUDA kernel单独造成1.49e-8”，也不能把norm标量的非零差直接当最终有效替换。
+
+RMS五位编码依次是square、mean+epsilon、rsqrt、input*inverse、gamma product。每一低精度阶段先将输入舍回FP32，每一高精度阶段保留FP64，gamma与epsilon本身固定为native FP32表示。native00000与原packed row4输出bit一致。两种输入下五个单因素格10000/01000/00100/00010/00001都无变化；64组合中各有12个有效非零格，例如00011和00110，说明中间结果跨相邻阶段保留精度会改变最终舍入。full11111自值改变307坐标、最大1.1920928955078125e-7，移植改变275坐标、最大2.384185791015625e-7，都与上一轮CPU64替换bit一致。自值01111也完全匹配CPU64，移植只有11111匹配；同一最终差不要求所有中间精度因素都唯一必要。
+
+实际profile关联Phi的NormTwoOps reduce_kernel及FP32/FP64 mul/div，RMS的MeanOps reduce_kernel、pow/rsqrt/mul。它确认执行了相应算子路径，尚未独立识别某条硬件指令、编译参数或GPU架构的唯一贡献。FP64组合同时改变精度与实现，CPU/GPU full64端点在本组输出上bit相同也不构成全后端等价证明。
+
+本轮direct arithmetic wall8.709秒、采样RSS1222430720 bytes、GPU全局3251MiB，零模型forward；raw factor_tensors352653 bytes、SHA c748beae4a7e4ce1983a5537b7b8d1b092f2ce72ee163dc83eb50c889e7da8d8，仅本机.tmp。先前8／9接受路径稳定只适用于已生成的Phi64/RMS64格，不把本轮80个算术格都当作经过生成验证。未搜索更多层、未改默认或科学src、未远程／PR／删除。
+
+本轮收尾核验：37项针对性测试及Ruff通过，5个Study的科学source/RPipe冻结门通过，80格保存向量的标量差重新计算一致，18个精确字节路径的暂存blob与本机文件一致。完整原生矩阵、安装包、更多seed/层未重跑；科学源码/default/旧helper/成功Run无改动。

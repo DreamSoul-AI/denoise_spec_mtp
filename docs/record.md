@@ -64,3 +64,5 @@ C-007使用新Toy/Stub make及三条status命令复现，原生config/jobs为eva
 2026-10-14 接续三prompt矩阵，先写WINDOW_PLAN并对q173 root83/94/97只读重放：三case token/语义轨迹复现，正确seed时序/teacher/isolatedprefix门通过。再固定2×2实测方向/范数4查询，root83输出方向换成输入范数仍错，输入方向扩大范数仍对，未据此调配方。事后离线源状态重构说明slot1无当前velocity直接项；各类测量与有限机制解释正式归档，raw selected张量仅本机。新增工具6项针对性通过，一次unused import的Ruff问题已去除并复验，科学src/原Run保持。
 
 2026-10-14 接续77fe411，先固定q173 root83 owner0第二槽的零/一阶互换与一阶原值回填三case，无搜索/新增默认。实测99token全部与独立AR一致、单槽scope与实际接受owner门通过；一阶←零阶accepted3→1且两后期seed/logits等于零阶，反向零阶←一阶accepted1→2仅恢复root94。离线核验两段代理传播，前一方向五固定根committed anchor/v仍与一阶原值完全相同，后一方向v仍0，收紧历史/当前速度解释但保留单窗口边界。源码/旧Run/权重不改，资源与失败边界入库，新3项针对性通过；不推送、合并或删数据。
+
+2026-10-14 接续6a953bc跨prompt验证，按预声明首个共同hit前根固定q171/172/174 root63/42/41。旧两tool完整保留，新runner复用函数，15次AR逐token与原轨迹/单槽/实际owner/state门通过，accepted仍10/1/1。q171/172代理和first seed/margin受影响但不跨排序边界；q174 EOS边界仅下一proxy改变。全部null与有限解释入STUDY_REPORT，资源/raw SHA/离线复算正式归档，新2项针对性检查不一致状态也保留。未改科学源码/默认，未重签旧Run，不推送合并或删数据。

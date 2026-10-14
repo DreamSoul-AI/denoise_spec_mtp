@@ -1,5 +1,9 @@
 # 异机交接
 
+## q171/q172/q174固定跨prompt复现（2026-10-14）
+
+按CROSS_PROMPT_PLAN首个共同命中前根规则选择63/42/41，复用未修改的observe/transfer工具，完成6原轨迹观测+6双向移植+3原值回填。15次输出与独立AR相同、全部验证/提交/KV轨迹不变，六移植94同位窗口anchor/v与recipient原值逐元素相同。q171/q172 first seed分别每方向34/7根变化但margin未跨top1边界；q174 terminal proxy变化后EOS停止。未复现q173命中转移，不能概括代理传播必导致收益；也未证伪所有其他窗口。正式合同、完整scalar/轨迹与离线核验见[Study报告](../studies/output_space_small_matrix/docs/STUDY_REPORT.md)。src/default/原Run不改，本地保存，不推送/合并/删数据。
+
 ## q173单槽历史代理移植（2026-10-14）
 
 按预声明TRANSFER_PLAN完成三次单槽重放，均33token与独立AR一致、前缀/原值回填/单槽范围/实际owner门通过。一阶root83第二槽换零阶后，root94/97均失去命中，五固定根committed anchor/velocity与原一阶逐元素不变；反向零阶在velocity为零时恢复root94而未恢复root97。离线张量逐元素确认83→84(owner0)→86(owner1)代理传播边。只证明单qid/seed/入口的局部历史影响，不能宣称全局EMA机制或双向完全转移。正式合同、scalar结果、可复现工具与raw SHA见[Study报告](../studies/output_space_small_matrix/docs/STUDY_REPORT.md)；科学src670c744e0535dcad/default/旧Run与NUMBERS保留，未推送、合并或删数据。

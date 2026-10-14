@@ -144,3 +144,45 @@ root83实际输入/输出seed范数=.1912895/.9250697，原观察同时改变方
 实测wall15.710秒，0.5秒采样进程树RSS峰5568364544 bytes、线程13、GPU全局峰5557MiB、系统可用内存最低12413997056 bytes；包含背景占用并可能漏短峰，不作性能/allocator结论。实际模型forward32/31/30（合计93）等于三case各1+实际decode_calls，新增token99，辅助forward0，低于预声明300-token预算。源码670c744e0535dcad、模型digest/runtime、原Run inputs/config/raw、11文件snapshot及PLAN/tool在前后核验一致。
 
 复跑工具 [diagnose_proxy_transfer.py](../../../tools/diagnose_proxy_transfer.py) 用同一ModelScope缓存和保存窗口证据，out必须新目录；失败保留且停止。离线重核 [analyze_transfers.py](../analyze_transfers.py) 的命令见docstring，既存正式JSON不一致则拒绝覆盖。干预张量19588880 bytes，仅本机.tmp/output-transfer-20261014-v1，SHA473a7f470fc8158a0627e9b5e3f80216a75a73fd04f7fe112d78021fd1089b33，不随Git。3项新小模型测试覆盖单槽范围/实际owner/逐token一致/原值回填/异常清理；文档和静态检查另存日志。没有改旧NUMBERS、重签原Run、推送、合并或删数据。
+
+## 跨prompt固定干预复现：q171、q172、q174（2026-10-14）
+
+按新 [CROSS_PROMPT_PLAN](CROSS_PROMPT_PLAN.md) 在测量前固定三个已有prompt/seed，未按新hidden或logits挑位置。选择规则为两输出方法第一次共同命中的前一个共同访问且均拒绝的根：q171/seed123/root63（原命中64）、q172/seed123/root42（命中43）、q174/seed125/root41（命中42）。q171来自先前prerequisite；q172/174来自本矩阵。三条原零/一阶接受轨迹相同，属于既有一阶优势未出现或输入/输出命中位置不同的样本；T0下这些seed不是随机重复实验。
+
+复用既有observe()/transfer()且不改两份工具，先每prompt观察原零/一阶，再作一阶←零阶、零阶←一阶及一阶原值回填。每次仍只交换指定根owner0第二槽[0,1]，同位第一槽和其他mask保持逐元素不变。观察窗口为从固定根到终止的原两方法访问根并集，本次共36/9/2根。新runner只连接已保存输入与既有工具，不增加decoder、sampler、cache或调度实现；源670c744e0535dcad和原config/Run/默认配方保留。
+
+[完整复现证据](cross_prompt_diagnosis_v1.json)保留15次重放的绑定、完整实际验证/提交/KV语义轨迹、同位state/margin与负结果；[离线路径核验](cross_prompt_path_v1.json)从本机张量复算，不新增model forward。
+
+| qid / seed | 固定介入根 | 原零/一阶accepted | 一阶←零阶 | 零阶←一阶 | 一阶原值回填 | 各case decode calls |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 171 / 123 | 63 | 10 / 10 | 10 | 10 | 10 | 36 |
+| 172 / 123 | 42 | 1 / 1 | 1 | 1 | 1 | 12 |
+| 174 / 125 | 41 | 1 / 1 | 1 | 1 | 1 | 11 |
+
+不是只有汇总不变：全部双向移植和原值回填的完整验证/提交/KV语义轨迹均与对应recipient原轨迹一致，接受位置/深度无变化，没有额外或跳过的根。全部15次输出与各自保存的独立AR逐token一致，没有context缩短；prefill和实际forward计数门通过。原值回填的代理和first seed也完全不变。六次真实移植中未出现q173的命中消失或恢复，不能把已有q173局部接受转移视为已经跨prompt复现。
+
+### 代理变化没有自动成为接受变化
+
+三条第二槽原/ donor向量均非相同，双向L2差分别.097857796/.058794610/.063472696，因而这些null并非没有实际介入。一阶recipient的committed anchor/velocity在全部固定同位根与原一阶逐元素相同；零阶recipient的velocity保持0，anchor/velocity与原零阶也逐元素相同。状态相同核对覆盖六次真实移植的94个同位窗口，另有三次原值回填的47个。
+
+| qid | 每方向incoming proxy pair变化根数 | 每方向first seed变化根数 | 最大正确target margin绝对变化 | margin符号跨越 |
+| --- | ---: | ---: | ---: | ---: |
+| 171 | 35 / 36 | 34 / 36 | 0.427294 | 0 |
+| 172 | 8 / 9 | 7 / 9 | 0.597637 | 0 |
+| 174 | 1 / 2 | 0 / 2 | 0 | 0 |
+
+变化计数按张量逐元素不同，浮点末位变化也计入，不是独立显著性观测。q171/q172的实际hidden→下一块incoming proxies与实际mask→下一块seed，分别在63→64(owner0)→66(owner1)与42→43(owner0)→45(owner1)两段逐元素核验。它们确实发生历史代理传播，却没有正确target从最高其他候选之下变到其上或反向跨越，接受/KV仍不变。例：q172一阶←零阶的root50正确margin从-.880749变为-1.478386；反向从-1.478386变为-.880749，两者仍错，不能将较小负误差记为命中恢复。
+
+q174只有41→42(owner0)这一段：终止块root42的incoming proxy pair改变，但first seed保持不变，并提交句号和bonus EOS停止。没有下一次继续解码可让owner1代理被利用，所以它检验的是终止边界，不应与q171/q172的持续传播null混成三个等价的机制反例，也不表述为所有历史路径无效。
+
+### 对q173解释的收紧与边界
+
+这三次固定prompt窗口没有复现q173的接受转移。q171/q172排除了“只要第二槽历史扰动传播到后续first seed，就必然导致命中消失/恢复”在本组窗口中的说法；代理内容变化本身不足以产生贪心接受变化。q173原局部介入仍成立：其两个后期margin跨越了top1边界，而本组没有跨越。它们共同支持更有限的解释：特定历史入口可影响候选方向和margin，但是否成为接受收益依赖具体prefix和候选排序边界，不能仅由committed速度状态、代理变化存在或其范数判断。
+
+不把null推广成所有窗口/输出空间方法失效，也不声明稳定收益或统计泛化。样本是三个已探索translation prompt及单固定入口，原两输出方法均无接受差异；没有覆盖另一条自然一阶胜零阶的prompt，也没有随机seed重复或其他任务/模型。本轮按预声明规则保留证伪结果，不追加根搜索、改默认参数或升到完整矩阵。后续若再验证命中转移，应先找出并冻结另一个自然差异prompt，再用同样双向/原值回填与完整AR门独立检验。
+
+### 资源、复现与验收
+
+本轮15次生成共370 new tokens，实际310 model forwards均等于各自1+decode_calls，辅助forward0，低于预声明1500-token预算。串行wall25.349秒；.5秒采样RSS峰5079793664 bytes、线程10、GPU全局5775MiB、可用主存最低11891093504 bytes。包含背景且可能漏短峰，instrumentation计时不作方法性能排名。两个Study model/snapshot、11文件hash、源digest、实际runtime、原config/inputs/raw及PLAN/tool/helper在前后核验一致。
+
+[diagnose_cross_prompt.py](../../../tools/diagnose_cross_prompt.py)直接复用先前两个已绑定工具；out必须新目录，失败保留并停止。[analyze_cross_prompt.py](../analyze_cross_prompt.py)复核传播、state和null，既存JSON不一致则拒绝覆盖。selected张量305797221 bytes仅保留于本机.tmp/output-cross-prompt-20261014-v1，SHAd1e5b9f03da0d705e7a2032ccd4718790fccb07a1e913e5501ed5c2f650e9fbe，不随Git。新增2项针对性测试检查按实际root交集选择和保留不一致状态/负margin；原单槽测试与文档/静态检查继续验证。科学源码、旧Run/NUMBERS和失败数据保留，未推送、合并或删数据。

@@ -57,3 +57,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/diagnose_q178_numerics.py` uses process-only deterministic FP32 flags and an explicitly scoped provider-state synchronization to canonical AR-prefix hiddens. Actual root is read from the unchanged mutable KV cache and checked at forward; proxies/decoder/cache code remain intact. Its controls/teacher/repeat budget is frozen in output_space_extension/docs/NUMERICAL_PLAN.md.
 
 `tools/diagnose_study_windows.py` is the manifest-bound four-prompt coordinator for output_space_followup. Existing choose_window/observe/transfer/compare/slots implementations are imported unchanged and individually hash-bound. It records both slot rankings and validity with actual/noncommon paths. New-study native phases stay thin imports; raw tensors/weights remain local.
+
+`tools/diagnose_q178_operators.py`提供固定q178后续provider槽精度／norm归约后端对照。测量v1源码原文在`studies/output_space_extension/docs/operator_tool_v1.py.txt`，当前CLI只补运行示例；分析核对除模块docstring外AST一致，原报告tool哈希不重签。

@@ -99,3 +99,5 @@ RPipe 要求报告附图：解码使用真实接受数或轨迹图及来源图�
 | [output_space_small_matrix](output_space_small_matrix/README.md) | q172–q174小矩阵/匹配前缀诊断通过；混合小样本观察 | [PLAN](output_space_small_matrix/docs/PLAN.md)、[报告](output_space_small_matrix/docs/STUDY_REPORT.md) |
 
 新增 [input_mask_baseline](input_mask_baseline/README.md) 使用真实 Qwen3-0.6B / SpecBench q171，四个固定 case 是宏观方案 §5.11 / E1–E2 的前置门；计划与结果分别见其 docs。通用四阶段从 src/spec_mtp/flow 同名包导入，研究包内的默认 prepare/execute/make 不填空实现。
+
+[output_space_cross_task](output_space_cross_task/README.md)是q241–244 summarization证伪草案，只有输入分词预检，未make/launch，不存在新测量结果。q178后续provider算子对照见[extension报告](output_space_extension/docs/STUDY_REPORT.md)。

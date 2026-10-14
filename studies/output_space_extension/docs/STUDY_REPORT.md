@@ -88,3 +88,28 @@ ModelScope缓存通过同目录junction复用11文件，未重新下载、改环
 11次输出均与原独立AR36token相同，396new tokens，302生成forward+1teacher=303；实际采样wall24.883秒、RSS4901736448 bytes、线程13、GPU全局5659MiB、可用主存最低13485785088 bytes。采样.5s含背景/漏短峰，不用于速度排名。teacher与观察exact hidden cosine>=.99999，source/model/snapshot/PLAN/tool/oldraw绑定前后通过。selected244790261 bytes仅本机.tmp/q178-numerical-20261014-v1，SHA2f71c78210b1609a889b0d3cfec223fd818dd74c625d6eed32540d91008d86a0。首次离线脚本导入路径失败在加载数据/模型前，改同目录import后复算通过，说明保留；测量tool/data没改。3项新针对性覆盖prefix末位、实际cache根与异常恢复，完整本轮验收另有日志，不更新旧全量计数。
 
 新q179–q182的独立原生与双向结果见[后续报告](../../output_space_followup/docs/STUDY_REPORT.md)。完整权重/缓存/selected张量不入Git，未改默认、科学src、推送、合并或删数据。
+
+## q178 provider算子隔离（2026-10-14）
+
+本轮先冻结[OPERATOR_PLAN](OPERATOR_PLAN.md)，在已有规范前缀anchor/v和root85单槽移植上，分别改变**root85之后**的代理映射计算。S64把模拟EMA/slot计算放到CPU FP64，再将slot转回FP32并保留原GPU norm；N64/N32保留原GPU FP32 slot，只把norm标量分别换为CPU FP64归约后转FP32／CPU FP32归约，scale乘除仍在GPU。每次调用使用当时真实proxies，映射本身不改anchor/v/proxies；后续模型输出和proxy历史可以变化。
+
+| 映射方式 | self accepted / calls | 一阶←零阶 accepted / calls | 相对对应native的完整语义轨迹 |
+| --- | ---: | ---: | --- |
+| native规范状态控制 | 8 / 27 | 9 / 26 | 原规范控制张量与轨迹精确重放 |
+| S64 slot计算精度 | 8 / 27 | 9 / 26 | 相同 |
+| N64 norm计算精度 | 8 / 27 | 9 / 26 | 相同 |
+| N32 norm计算后端 | 8 / 27 | 9 / 26 | 相同 |
+
+root86/89/108的六组冻结状态输入逐组重算：native生成的全部mask与旧保存值逐元素相同，三变体有效改变mask，最大max_abs5.960464477539063e-8；后续同位seed logits出现小幅数值变化，所检查窗口最大约8.36e-4，但合法双槽margin和实际接受路径保持。[离线分析](operator_analysis_v1.json)记录root86/91/108的两槽margin和第一槽路径合法性，不从无效第二槽推断接受。工具和既有规范/移植helpers的来源绑定前后相同。
+
+CPU/CUDA profiler捕获一次规范self root86 provider mapping，共84个CUDA launch、3个aten::linalg_vector_norm调用；External id将norm关联到实际符号`_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIfNS0_10NormTwoOpsIfffLb1EEEjfLi4ELi4EEEEEvT1_`。这定位的是provider中的norm归约。N32在相同FP32输入下替换该算子后端，N64改变归约精度，均没有改变本固定对照的完整路径。不能据此把旧pos88 transformer hidden微差归因给这个kernel，也没有隔离其内部指令／归约树。
+
+解释范围是：root85之后这些provider运算的舍入／归约实现不是维持本次移植路径和8→9差异的必要条件。root85原donor/self向量保持native，root86初次排序因此不受本次变体直接干预；**入口向量映射的舍入、transformer生成proxy hidden的舍入、算子交互、反向零阶对照均未独立排除**。后者已写成新Study的[固定行q_proj协议草案](../../output_space_cross_task/docs/KERNEL_PLAN.md)，尚未执行。规范状态同步也不是精确实数模型。
+
+8次完整输出均与独立AR一致，288new tokens/220 model forwards，辅助模型forward0；实际采样wall26.896秒、RSS5150023680 bytes、线程13、GPU全局6267MiB、最低可用主存11469459456 bytes。资源采样.5s含背景且可能漏短峰，不是allocator峰或速度比较。selected182573933 bytes只在本机.tmp/q178-operators-20261014-v1，SHA0a6cc44cf424e83d1ecc2d34a433e6cca8255b1c60581edf54649f2ba19c1538；Chrome trace也只在本机，其SHA与真实kernel名已保留[正式证据](operator_diagnosis_v1.json)。profiler的单cycle事件提示已保留日志，没有丢弃失败数据或安装依赖。
+
+[PLAN结果评审](OPERATOR_PLAN_REVIEW.md)保留边界；[跨任务Study](../../output_space_cross_task/README.md)仅草案和分词预检，q241–244未make/launch。[最小提交清单与PR草稿](../../../docs/research/publication-plan.md)仅本地准备。科学src670c744e0535dcad、默认、原PLAN／旧helper／成功Run保持不变；未推送、合并或删除，完整weights/cache/raw tensors不入Git。
+
+工具导航验收发现新CLI缺少docstring运行示例，补齐示例和layout导航；测量时原文以[源码快照](operator_tool_v1.py.txt)保留并核对旧tool SHA，执行AST除模块docstring外一致，旧报告未重签。初次分析原JSON保留，[后续离线复核](operator_analysis_v2.json)绑定当前分析器。草案description冒号未加引号被配置展开拒绝，已就地修复，失败发生在make／模型运行前并保留记录。
+
+本轮累计26项相关测试／展开／文档检查通过，Ruff与mypy56通过；四旧Study的来源／PLAN锁及16份原始证据门复核通过。首次草案YAML与工具导航检查失败已保留，修复后仅重验受影响项。两份测量源码快照用局部.gitattributes保留原字节，暂存Git blob与旧证据SHA一致；未改旧测量JSON或重签合同。

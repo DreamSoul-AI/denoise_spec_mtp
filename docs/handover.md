@@ -1,5 +1,10 @@
 # 异机交接
 
+## q178算子对照与下一Study草案（2026-10-14）
+
+root85之后provider槽计算S64、norm精度N64、norm后端N32各self/一阶←零阶，共8次AR一致；所有完整语义路径保持self8/27、移植9/26。profiler真实关联provider的NormTwoOps reduce_kernel；这只收紧后续provider运算的必要性，入口85和transformer内部舍入仍未独立隔离。正式[报告](../studies/output_space_extension/docs/STUDY_REPORT.md)保留完整边界、scalar和资源。新[跨任务Study](../studies/output_space_cross_task/README.md)固定summarization q241–244并已分词，仅草案、未make/launch；固定行q_proj kernel隔离协议未执行。[最小提交候选](research/publication-plan.md)为依赖PR6树的437f201，33文件逐blob哈希与PR草稿本地保存，后续研究暂缓。源码/default/旧合同与工具不改，未推送/合并/删除，用户workspace保留。
+
+
 ## q178数值隔离与q179–q182（2026-10-14）
 
 严格FP32 q178重复全selected张量/语义路径相同，microdelta首个共同根89来自pos88的块/row计算路径不同；规范前缀anchor/v同步两self为8、两移植为9，轨迹与strict移植相同，排除committed微差作为这次收益必要条件，不排除proxy内舍入或锁定具体CUDA kernel。新4Run/16outputs/20诊断AR一致，q179原8/9→双10、q182原4/3→双4，q180/181null；q182 root47合法second hit恢复且source45/root47 state相同。累计12prompt表和所有坏点见[后续报告](../studies/output_space_followup/docs/STUDY_REPORT.md)，原PLAN保持冻结，结果单独PLAN_REVIEW。科学src/default/旧helper/Run不改，不推送合并删除，fullweights/cache不入Git。

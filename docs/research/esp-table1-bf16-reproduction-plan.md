@@ -74,3 +74,11 @@ FP32收尾：PR #7 已经CI通过并合dev，merge8677376，main未操作。BF16
 
 
 修订预检已完成：BC60/1主配置pooledτ=1.636982（Δ1.74=-0.103018、exact3/13）；BC60/2对照τ=1.579408（Δ=-0.160592、exact5/13）。两种都列出，未择优，失配τ仅诊断。新的esp_table1_bf16_full已冻结四格480条并启动串行launch，等待真实全量证据；不修改旧PLAN，不进入4B阶段。
+
+## 2026-10-15 最新执行合同：τ主线
+
+停止compact attention、单行RMSNorm、逐层算子追踪；此前reduction/shape报告、测试及4B FP32标注已按主题提交推送（03e3a50/dc2aaa8）。上文数值机理扩展及AR失配阻止τ复现的要求已被本次用户指令替代。
+
+唯一当前GPU任务为[esp_table1_bf16_full_argmax](../../studies/esp_table1_bf16_full_argmax/README.md)：BF16/T0/默认归约、λ=.1 updating mean、dynamic+pruning、完整480，10/1、30/1、60/1主配置与60/2附加对照。三种τ聚合与目标差值都报告。AR一致率及每条首分叉单列，不作为阻止τ执行的门。每个提交token（包括prefill首token）必须等于产生它的验证前向argmax，覆盖数必须等于全部输出token数；观察器不增加模型前向、不改采样/树/精度。原生AR门失败生命周期保持原样，不能把自检通过写成独立AR全一致。
+
+v1全量在新增自检要求到来前启动，其日志没有argmax，不能补造证据。保留其Run与日志，新版本重新完整记录。其他研究、4B五方法继续暂停至Table1四格结果落地。

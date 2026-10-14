@@ -17,6 +17,8 @@ ModelScope Qwen3-0.6B同一11文件snapshot，实际模型digest与输入基线�
 
 零/一阶各accepted10、depth2为0，均低于输入均值链的17（depth1=11/depth2=6）；本prompt未显示一阶外推增益。它不证明所有输出空间方法无效，也不支持方法优越性；固定beta=.9、beta_prime=.99、gamma/rho=1未由本数据选择，不搜索更好超参。没有实现自适应Kalman、非tied映射或一般分支树。
 
+[既有证据离线诊断](offline_diagnosis.json)：零阶与一阶各36次decode的root位置、接受节点、提交token、停止状态和KV保留轨迹逐项相同；36步的last-owner/root mask差异统计全部不同。因此一阶路径确实产生不同mask统计，但该固定prompt没有改变贪心验证结果。这里只比较保存的范数统计与验证轨迹，未保存或重建完整mask向量，也未新增模型前向；不能据此归因于代理hidden误差或宣称一阶机制无效。
+
 ![匹配两槽链接受计数](figures/acceptance_v1.png)
 
 图源execution_v1.json，三个case各同prompt/seed的n=1；仅画真实all-depth接受计数，无速度排名。复画：`python studies/output_space_prerequisite/plot_results.py`，不执行Run。

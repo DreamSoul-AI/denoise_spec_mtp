@@ -6,3 +6,6 @@
 [PLAN](docs/PLAN.md), same original two input sets; two new EMA-only native Runs. Previously measured output0/output1/AR reused, no timing or tuning.
 
 [正式结果](docs/STUDY_REPORT.md)：first26零/一相对固定输入EMA仍增，新4条零阶持平、一阶增加但都不胜冻结均值；仅新增EMA两Run，旧output/AR复用。
+
+
+FP32 收尾状态：[PR #7](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/7) 经 CI 已合 dev，merge8677376；main未操作。

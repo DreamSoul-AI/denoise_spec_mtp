@@ -6,3 +6,6 @@
 [PLAN](docs/PLAN.md) and [historical inventory](docs/history_inventory.json). Fixed26 prompts, matched input/output0/output1 plusAR; timing disabled. No new result before launch. Native source/defaults unchanged.
 
 Archived failed activation: df8ee598dbef53b4 completed execute26/AR but failed collect entry export. Do not launch remaining v1 jobs or re-sign locks. Continue [v2](../output_space_4b_recheck_v2/README.md); old raw/source/config preserved.
+
+
+FP32 收尾状态：[PR #7](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/7) 经 CI 已合 dev，merge8677376；main未操作。

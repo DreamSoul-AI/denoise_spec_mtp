@@ -129,3 +129,12 @@ eval.warmup=false，Study局部仅关闭decoder clock，兼容时长字段是0�
 
 
 2026-10-15 最新执行顺序：已有 Qwen3-4B 结果全部为 **FP32**，本轮先按主题提交、工作分支 PR 经 CI 合入 dev。其他研究暂停；最高优先复现 ESP Table 1（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=0.1）。8B 仅用于该复现；随后 Qwen3-4B/BF16 五方法加 AR 配对。新增实验不用 FP32、不测速。不得强推、合 main、删分支或数据。
+
+
+2026-10-15 FP32 收尾已核实：工具/测试 bdb3f6c、证据 8a0969c；[PR #7](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/7) 的 Branch flow 与两个 cpu-checks 均 SUCCESS，已于 2026-10-14T19:17:08Z 合入 dev，merge 8677376e1ac878a159a3095711eac43420d97bde。未合 main、未强推、未删除分支/数据。8B/BF16 仅按 [Table 1 计划](research/esp-table1-bf16-reproduction-plan.md) 继续；其他研究暂停。
+
+
+2026-10-15 ESP v2 G.2协议修订：Qwen3 BC60主配置改为单mask/29 draft，双mask/19 draft固定作对照；旧冻结PLAN哈希不变。新修订预检单maskτ=1.636982、Δ1.74=-0.103018、exact3/13；双mask复用τ=1.579408、Δ=-0.160592、exact5/13，均为失配诊断值，不称成功。详见[修订报告](../studies/esp_table1_bf16_qwen_protocol/docs/STUDY_REPORT.md)。全480四格已冻结并串行启动，BF16/T0/256/seed123、Eq5 λ=.1 updating mean保持；4B frozen mean是后续不同基线，其他研究暂停。完整Run/权重/缓存留本机；没有测速、强推、合main或删除数据。
+
+
+2026-10-15 最新τ主线：[全480 argmax审计](../studies/esp_table1_bf16_full_argmax/README.md)替代无argmax记录的v1。BF16/T0/默认归约/λ=.1 updating mean/动态树剪枝完全保留，BC60单mask为主、双mask仅对照。AR一致率及逐条首分叉独立报告，不作为τ执行门；全部提交token必须等于对应验证forward的argmax。v1部分日志/旧冻结合同保留；v2四Run在模型加载前缓存接入失败，保留失败后补接同一ModelScope本地snapshot，以v3新四Run串行运行。当前第一格BC10 Run dfe1b9c8d5d12e92已开始真实BF16解码，未完成全480。停止compact attention、单行RMSNorm与逐层数值机理；4B五方法仍等待Table1结果。新增观察器无额外forward，首token、截断尾部、错误argmax与恢复回归通过；上一push的CI两项launcher文档遗漏已用378c6a9修复，尚待新远端CI。

@@ -31,7 +31,9 @@ Table 1 Qwen3-8B 的 ESP τ 目标：BC30=1.63，BC60=1.74。BC10 是额外协�
 | implementation | native naive 动态树 attention/cache，保留原始模型与验证语义 |
 | seed / outputs | seed123，max_new_tokens256，EOS 提前停止，warmup=false |
 | input set | 全部 480 首轮，chat template enable_thinking=false；max_prompt_len40960，实际预检不丢任何条目 |
-| audits | 每个 ESP 输出与该 BF16 模型独立 AR 逐 token 核验；报告所有不一致 |
+| correctness gate | 每个提交 token 等于产生它的验证前向 logits 的 argmax，全部 token 覆盖且必须全过；包括 prefill 首 token |
+| AR diagnostic | 独立 AR 一致率及每条首分叉位置仅作报告指标，不阻塞 τ 执行或本次正确性验收 |
+| numerical settings | BF16、默认归约及默认算子；不运行归约开关、单行 linear/RMSNorm、compact attention 或逐层追踪 |
 | clocks | Study 局部禁用 decoding clock；零 timing 是原生字段占位，不是测量 |
 
 BC=(k+1)(1+draft_nodes)，本次实际 draft budget=4/14/29，另保留60/2的19节点对照；检查每步真实 BC 不超过预算并记录树宽。论文 Algorithm 1 的 B 与正文 Eq7 表述存在歧义；遵循 Eq7 与当前 Top-1 实现并报告映射，不暗改预算来追目标。
@@ -42,43 +44,30 @@ BC=(k+1)(1+draft_nodes)，本次实际 draft budget=4/14/29，另保留60/2的19
 
 1. 复用 native RPipe Study prepare→execute→collect→summarize→write→process；新 Study/version/Run，原失败和成功 Run 不重签。权重逐文件哈希、官方 ModelScope 文件名/尺寸与实际 BF16参数核验；离线缓存 immutable revision 未确认则明确记录。
 2. 先新建小样本协议检查 Study（每类首条，BC10/1、BC30/1、BC60/1主配置与BC60/2对照）。检查 BF16装载、动态树、256上限、精度及原生门；这只是预检，不能代替 480 条 Table 1。
-3. 按本次四格协议冻结全480 Study，预检后串行执行主配置与双mask对照。预检失配不隐藏，也不替代全量：全量仍保留native exact_match_rate=1门，失败格τ仅标为诊断值并列差值，不宣称成功。若实际数据/模型来源或协议校验失败、OOM则先修复来源/容量，再用新Run；不得改FP32、teacher强制纠正、丢反例或放宽门。
+3. 按本次四格协议冻结全480 Study，串行执行BC10/1、BC30/1、BC60/1主配置及BC60/2附加对照。正确性门是数学无损自检：每个提交 token 都等于该次验证前向 logits 的 argmax，覆盖所有实际输出 token，并且必须全过；可记录 logits 差值，但不要求额外算子分析。与独立 AR 的一致率及逐条首分叉只作为报告指标，不阻塞 τ 执行或正确性验收。BF16树验证与逐token AR的前向形状不同，AR不一致本身不判定方法错误。数据、模型来源、BF16装载、树预算及自检覆盖仍须核验；来源/协议不符或OOM先修复，再用新Run，不切FP32、不用teacher纠正、不筛除反例。
 4. OOM/其他任务占显存时保留失败、等资源或用新 Run 可逆验证，不停其他任务。单卡只启动一条实验调度链，不并发加载模型。
-5. 全量完成后报告配置覆盖、精度、每任务/每 prompt计数、三种 τ聚合、对目标差值与失败边界。数值不符也输出可复核负结果，再按首个可证伪差异推进，不宣称强行成功。
+5. 全量完成后报告配置覆盖、精度、每任务/每 prompt计数、三种 τ聚合、BC30相对1.63与BC60相对1.74的差值、argmax自检覆盖/通过率、独立AR一致率及逐条首分叉。数值不符也保留可复核负结果；仅核对数据、配置和统计口径，不转入算子级数值排查，不按结果挑聚合或mask数。
 
 四任务共用 24GB GPU。记录启动前空闲显存及运行容量采样（含其他进程，非精确 allocator peak）；不使用受干扰的墙钟或 timing 占位做性能比较。四格预检约 13×4×2×256=26624（其中旧三格已执行，新补单格上限6656） 生成 token 上界；全量四格含独立 AR 审计约 480×4×2×256=983040 上界。串行，没有额外 teacher/warmup。容量不足先暂停该 GPU 启动，继续证据/实现核对。
 
-## 4. 后续 4B BF16 配对（ESP 复现之后）
+## 4. 4B BF16 配对设计（本轮暂停）
 
 同批 prompt、同树/预算/长度/随机种子，比较 ESP frozen mean、输入零阶 updating mean λ=0.1、输入一阶 mean+gamma、输出零阶 final-normalized hidden 范数映射、输出一阶 final hidden+EMA velocity，另跑独立 AR。逐 prompt 列 accepted/model calls、每个对照的赢平输及 token exact。不得用此前 FP32 数字代替。
 
-这里的 ESP frozen mean 是用户指定的后续基线，区别于 Table 1 updating mean。tied 权重直接用输出 hidden 的尺度映射，不做逆映射。当前 output provider 只支持 unpruned static chain；后续若统一采用 dynamic/pruned，必须先最小扩展并验证 owner/proxy 对齐，不能让方法使用不同树再配对。4B 子实验开始前单独冻结 PLAN、beta/gamma、精度内部计算与实际 tied-storage 检查。本阶段仅排队，不先跑 4B。
+这里的 ESP frozen mean 是用户指定的后续基线，区别于 Table 1 updating mean。tied 权重直接用输出 hidden 的尺度映射，不做逆映射。当前 output provider 只支持 unpruned static chain；后续若统一采用 dynamic/pruned，必须先最小扩展并验证 owner/proxy 对齐，不能让方法使用不同树再配对。4B 子实验开始前单独冻结 PLAN、beta/gamma、精度内部计算与实际 tied-storage 检查。本轮不运行4B，不自动在本矩阵结束后启动；以下设计保留供后续另行安排。
 
-## 5. 实际进度（2026-10-15，进行中）
+## 5. 当前执行与归档（2026-10-15）
 
-FP32收尾：PR #7 已经CI通过并合dev，merge8677376，main未操作。BF16预检已串行执行BC10与BC30，各13条，仅6条与独立AR完全一致，原生summarize门均失败；BC60仍在执行。不得把失败格子的τ称为可用复现结论，也不进入4B五方法。首个writing/q81在生成第10个token分叉（零基index9），是后续最小控制入口。
+FP32收尾：PR #7 已经CI通过并合dev，merge8677376；main未操作。此前4B FP32及0.6B局部研究原位保留，本轮不扩展。
 
-已冻结新Study esp_table1_bf16_numerics v2：q81、BC10、32-token上限，2×2 BF16归约/确定性设置，保持ESP树与mask公式。8项后台设置成功/异常恢复测试通过，待当前launch退出后执行。v1仅make未执行GPU，CPU测试暴露属性mock恢复问题，v2用显式try/finally恢复、新version/Run；旧目录保留。
+当前唯一GPU调度链为[全480 argmax审计](../../studies/esp_table1_bf16_full_argmax/README.md)，正式结果见[STUDY_REPORT](../../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)。四格固定顺序为10/1、30/1、60/1、60/2；保持Qwen3-8B/BF16/T0/默认归约、λ=.1 updating mean、动态树+剪枝、256/EOS/seed123及全部480条。60/1为主，60/2仅附加对照，两者均报告相对1.74差值，不择优。
 
+当前首格BC10 Run `dfe1b9c8d5d12e92`正在执行；随后BC30 `b9b54923b1b9ea9f`、BC60/1 `3f3d0f9a84341c0b`、BC60/2 `555ff70d57ce05b0`串行排队。尚无完整480条τ结果，不用预检或部分日志替代。
 
-03:36 后续：三预算原设置均失配（6/13、6/13、5/13）。q81四格token exact为no/yes/no/yes；仅reduction=False、deterministic=False原生全链通过，deterministic=True组合格因阶段恢复引起runtime终验失败，未冒称成功。已启动新Study esp_table1_bf16_reduction_check 原13条/三BC/256上限扩大验证，仍不启动4B。
+Study局部观察器绑定每个选择行到对应验证forward的logits，记录argmax/选择值及forward/行号；覆盖prefill首token和全部实际提交token，EOS/预算裁剪后的未提交尾部不混入覆盖数。不增加模型前向，不改精度、算子、采样或树。argmax自检失败立即阻止该Run的execute完成；独立AR运行不安装此观察器。
 
+原有native AR严格门可能使summarize标为失败，其生命周期如实保留，不伪称native成功。该状态不阻止下一τ格执行；本次研究报告按全480覆盖、协议核验及数学argmax自检验收，AR一致率独立列示。关闭自动失败重试，避免因AR诊断重复运行。旧冻结Run/PLAN不回写、不重签。
 
-03:47 扩大验证完成：reduction=False的BC10/30/60 exact为4/13、3/13、5/13，三格全失败；部分AR自身也随归约模式变化，局部q81前32token修复不能推广。已串行启动esp_table1_bf16_shape_check，q81/96token仅控制线性投影单行几何，BF16/ESP其他设置不变。16项控制/形状回归通过；仍不跑4B或全480，不把失配τ认作Table1成功。
+无argmax记录的全量v1部分日志保留。新argmax Study v2首次四Run在模型加载前因ModelScope缓存接入失败，未执行解码；失败Run保留。补接此前同一已校验本地snapshot后以v3新Run执行，未改模型或实验设置。
 
-
-03:50 线性形状对照两格均失败，native q81首分叉index74，253个linear单行对照index9；权重digest相同/BF16不变。只固定linear行数不是充分修复。下一项协议：每query仅按attention mask保留有效KV，再比较compact attention单独、compact+单行linear、compact+单行linear+单行RMSNorm（三格q81/96token，BF16、同ESP）；所有数学/权重与接受语义保持，明确这是数值约定控制不是作者已公开实现。先验证可见KV集合/因果位置/patch恢复，再串行执行；若仍失配，按首分叉同prefix逐层BF16算子追踪，禁止切FP32/放宽exact门。目标仍进行中，不将当前负结果标记Table1复现完成。
-
-
-协议修订：2026-10-15核对G.2后，BC60/1、29 draft节点固定为Qwen3主配置，BC60/2、19节点固定为对照。修订预检与全量均预先声明双方，不事后选胜者。Table1 mean mask仍按Eq5 λ=.1更新；后续4B用户定义的ESP frozen mean不更新。此前03:50以前记录中的BC60均指双mask旧格，修订不回写其冻结来源。
-
-
-修订预检已完成：BC60/1主配置pooledτ=1.636982（Δ1.74=-0.103018、exact3/13）；BC60/2对照τ=1.579408（Δ=-0.160592、exact5/13）。两种都列出，未择优，失配τ仅诊断。新的esp_table1_bf16_full已冻结四格480条并启动串行launch，等待真实全量证据；不修改旧PLAN，不进入4B阶段。
-
-## 2026-10-15 最新执行合同：τ主线
-
-停止compact attention、单行RMSNorm、逐层算子追踪；此前reduction/shape报告、测试及4B FP32标注已按主题提交推送（03e3a50/dc2aaa8）。上文数值机理扩展及AR失配阻止τ复现的要求已被本次用户指令替代。
-
-唯一当前GPU任务为[esp_table1_bf16_full_argmax](../../studies/esp_table1_bf16_full_argmax/README.md)：BF16/T0/默认归约、λ=.1 updating mean、dynamic+pruning、完整480，10/1、30/1、60/1主配置与60/2附加对照。三种τ聚合与目标差值都报告。AR一致率及每条首分叉单列，不作为阻止τ执行的门。每个提交token（包括prefill首token）必须等于产生它的验证前向argmax，覆盖数必须等于全部输出token数；观察器不增加模型前向、不改采样/树/精度。原生AR门失败生命周期保持原样，不能把自检通过写成独立AR全一致。
-
-v1全量在新增自检要求到来前启动，其日志没有argmax，不能补造证据。保留其Run与日志，新版本重新完整记录。其他研究、4B五方法继续暂停至Table1四格结果落地。
+全部算子级数值排查已停止。既有[reduction报告](../../studies/esp_table1_bf16_reduction_check/docs/STUDY_REPORT.md)、[shape报告](../../studies/esp_table1_bf16_shape_check/docs/STUDY_REPORT.md)和测试已按主题提交推送，仅作历史归档；不再启动归约开关、单行linear/RMSNorm、compact attention或逐层BF16算子追踪。权重、缓存和完整Run留本机；本轮不测速、不跑4B。

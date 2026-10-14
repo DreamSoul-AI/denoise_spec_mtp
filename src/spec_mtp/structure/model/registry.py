@@ -29,7 +29,8 @@ def _materialize_hub(model_cfg, assets_dir: Path):
     import torch  # noqa: F401  load before ModelScope on Windows so BLAS DLLs agree
     from modelscope import snapshot_download
 
-    local = snapshot_download(str(model_cfg['name_or_path']), cache_dir=str(assets_dir / 'modelscope'))
+    local = snapshot_download(str(model_cfg['name_or_path']), cache_dir=str(assets_dir / 'modelscope'),
+                              local_files_only=bool(model_cfg.get('local_files_only', False)))
     resolved['name_or_path'] = local
     resolved['local_files_only'] = True
     return resolved

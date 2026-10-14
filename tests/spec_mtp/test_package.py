@@ -18,7 +18,7 @@ PYPROJECT = tomllib.loads((ROOT / 'pyproject.toml').read_text(encoding='utf-8'))
 
 
 def _vendored_commit():
-    text = (ROOT / 'src' / 'rpipe' / 'ORIGIN').read_text(encoding='utf-8').strip()
+    text = (ROOT / 'src' / 'rpipe' / 'ORIGIN').read_text(encoding='utf-8').splitlines()[0]
     match = re.match(r'[0-9a-f]{40}$', text)
     if not match:
         raise AssertionError('src/rpipe/ORIGIN must be the full upstream commit')
@@ -49,7 +49,8 @@ def test_console_scripts_expose_vendored_rpipe_and_spec_mtp():
 
 def test_manifest_covers_package_sources():
     body = sources.manifest()
-    assert {'spec_mtp/recipe.py', 'spec_mtp/flow/checks.py',
+    assert {'spec_mtp/recipe.py', 'spec_mtp/flow/collect/run.py',
+            'spec_mtp/structure/artifact/validation.py',
             'spec_mtp/structure/algorithm/decoding.py'} <= set(body['files'])
     assert not any(name.startswith('rpipe/') for name in body['files'])
     assert body['digest'] == sources.files_digest(body['files'])
@@ -99,3 +100,15 @@ def test_load_lock_rejects_corrupt_and_non_object(tmp_path):
         sources.load_lock(tmp_path)
     path.write_text('{"digest": "abc"}\n', encoding='utf-8')
     assert sources.load_lock(tmp_path) == {'digest': 'abc'}
+
+
+def test_package_initializers_do_not_define_business_functions():
+    import ast
+
+    package = ROOT / 'src/spec_mtp'
+    violations = []
+    for path in package.rglob('__init__.py'):
+        body = ast.parse(path.read_text(encoding='utf-8'))
+        if any(isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) for node in body.body):
+            violations.append(path.relative_to(package).as_posix())
+    assert not violations, violations

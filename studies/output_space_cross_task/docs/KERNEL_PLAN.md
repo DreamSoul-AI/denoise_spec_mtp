@@ -1,0 +1,23 @@
+# Transformer proxy-rounding / CUDA packing protocol draft
+
+Unexecuted protocol; separate from the completed provider NormTwoOps controls. Those controls replace provider math on identical inputs, and do not observe all operations that create transformer proxy hiddens. Do not attribute pos88/root89 committed delta to the profiled provider kernel.
+
+## Question and fixed unit
+
+Q178, original root85 owner0 second-slot graft, strict FP32 canonical anchor/v controls, same ModelScope snapshot/source/seed126/AR112. Capture source blocks85 and86 for self and one<-zero, including both owner0 mask rows and exact/draft rows. Self/graft source inputs differ semantically, so their hidden delta is not an estimate of rounding error. Numerical counterfactuals instead compare each source block with itself using exactly the same inputs, cache and model weights.
+
+Predeclare operator target: layer0 q_proj linear output, selected owner0 mask slot1 row of block85. This fixed choice tests a narrow GEMM/packing hypothesis and avoids searching for a kernel with a favorable outcome. A null at this target leaves later layers, RMSNorm, attention and hidden store rounding unresolved.
+
+## Capture, identical-input replay and attribution
+
+1. Read-only hooks retain inputs_embeds, positions, complete4D attention and every pre-forward KV layer tensor; clone before mutable cache pruning, verify storage independence. Persist shapes/dtypes/strides, hashes and exact layer0 q_proj input row/weight/bias/output. No hooks edit science src. Retain source row/true owner from the decoder and remove hooks in finally. Two complete strict canonical generations reproduce old self8/27 and graft9/26, independent AR and old selected windows. If capture alters them, stop.
+2. Restore a fresh cloned pre-forward cache for each auxiliary replay. Native exact block replay must reproduce all selected logits/hiddens bit-for-bit. Profile the original q_proj on its actual packed input, and the identical selected row via singleton FP32 linear; associate CPU operator external IDs, dimensions and concrete CUDA launch names. A name can remain equal across shapes: record it, do not invent a different kernel variant.
+3. Replay only that same row with CPU FP64 linear from exactly represented FP32 input/weight/bias, round output to FP32. Compare native packed FP32, singleton GPU FP32 and CPU FP64-rounded output. The GPU packing comparison fixes dtype and arithmetic operator; the FP64 comparison changes arithmetic rounding. CPU FP64 is a local reference, not exact full-model truth. Other rows/layers are unchanged.
+4. Two interventions during complete canonical decoding: replace only the predeclared row of the predeclared source-block q_proj output with singleton FP32 output, or CPU FP64-rounded output. Run each with self and graft; retain a native original-value self/graft pair from capture. At every patch assert all other output rows bit-equal, same inputs/weights/state, actual block/row, and no candidate/owner forcing. Immediate proxy hidden/mask/logit differences and later traces are outcomes, not fixed to old values.
+5. If captured native packed versus singleton differs and the scoped replacement changes the self/graft contrast, this demonstrates sensitivity to the q_proj operation's packing/backend realization at that input. It does not isolate an internal CUDA instruction or explain every path-dependent hidden delta. If FP64 replacement alone changes the contrast, it shows local arithmetic-rounding sensitivity. If neither changes it, reject necessity of that layer0/source-row operation for this fixed contrast; preserve all other open operations.
+
+## Budget and gates
+
+Six generations (capture native self/graft+four interventions)x100=600 tokens, at most4 auxiliary exact block model forwards (2 sources per path); direct linear replays2 sources x3 modes with reused weights, no new full model or FP64 model. One GPU process, OMP/MKL1, strict runtime recorded, .5s resources and fresh output directory. Extra capture cache increases memory: calibrate first self capture serially; stop/preserve on pressure or cloning failure. Hash source/model/11 snapshot files/input/native/previous raw/tool/this protocol before/after. AR equality, native/capture/replay gates, legal depth2 flags and patch cleanup required. CUPTI unavailability preserves the kernel-name gap, no installation or guessed attribution.
+
+No code for this protocol has been run or added as a scientific method. No new default, push, merge or deletion. Draft choices are intentionally narrow and falsifiable; a later operator change requires a new version before measurement.

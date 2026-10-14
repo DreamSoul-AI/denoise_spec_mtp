@@ -164,7 +164,10 @@ def test_ar_baseline_runs_the_same_stage_chain(study_copy):
 def test_raw_mismatch_fails_before_success_is_written(study_copy):
     study = study_copy(name='raw_mismatch')
     hook = study / 'flow/collect/run.py'
-    hook.write_text(hook.read_text() + """
+    hook.write_text("""from spec_mtp.flow.collect import run as collect
+
+def run(ctx):
+    collect(ctx)
     import json
     from pathlib import Path
     path = Path(ctx.layout.assets_dir) / 'decode_observations.json'
@@ -197,3 +200,54 @@ def test_source_preflight_preserves_existing_result(study_copy):
         proc = cli(command, study, *([run_id] if command == 'run-one' else []))
         assert proc.returncode != 0 and 'sources changed' in proc.stderr
         assert result.read_bytes() == original
+
+
+def test_nested_config_axis_validates_effective_factors_and_rejects_subsets(study_copy):
+    def patch(study):
+        study['axes'] = {'algorithm.config': [
+            {'task': 'esp_mtp', 'mask': 'frozen_mean'},
+            {'task': 'esp_mtp', 'mask': 'gamma_last'},
+        ]}
+    study = study_copy(patch, name='nested_config_axis')
+    cli('make', study, '--num-gpus', '0', check=True)
+    cli('launch', study, '--num-gpus', '0', '--console', 'shared', check=True)
+    cli('report', study, check=True)
+    process = json.loads((study / 'process.json').read_text())
+    assert process['complete'] and process['spec_mtp']['expected_factors_match']
+    index = json.loads((study / 'index.json').read_text())
+    assert all('eval' in exp['factors']['algorithm.config'] for exp in index['experiments'])
+    previous = (study / 'docs/NUMBERS.md').read_bytes()
+    index['experiments'] = index['experiments'][:1]
+    (study / 'index.json').write_text(json.dumps(index))
+    result = cli('process', study)
+    assert result.returncode != 0 and 'incomplete' in result.stdout + result.stderr
+    result = cli('report', study)
+    assert result.returncode != 0 and (study / 'docs/NUMBERS.md').read_bytes() == previous
+
+
+def test_output_hidden_real_cli_and_tampered_owner_evidence(study_copy):
+    import yaml
+    from spec_mtp.structure.artifact.validation import verify_evidence, SpecMtpGateError
+    import pytest
+
+    def patch(study):
+        study['fixed']['model']['config']['tiny']['tie_word_embeddings'] = True
+        study['axes'] = {'algorithm.config.spec': [{
+            'method': 'output_hidden', 'num_masks': 2, 'impl': 'efficient',
+            'tree': {'mode': 'static', 'branches': [1, 1], 'pruning': False},
+            'output': {'order': 1, 'beta': .9, 'beta_prime': .99},
+        }]}
+    study = study_copy(patch, name='output_hidden_cli')
+    cli('make', study, '--num-gpus', '0', check=True)
+    cli('launch', study, '--num-gpus', '0', '--console', 'shared', check=True)
+    cli('report', study, check=True)
+    process = json.loads((study / 'process.json').read_text())
+    assert process['complete'] and process['spec_mtp']['passed']
+    run_id = json.loads((study / 'index.json').read_text())['experiments'][0]['runs'][0]['id']
+    run = study / 'runs' / run_id
+    raw_path = run / 'assets/decode_observations.json'
+    raw = json.loads(raw_path.read_text())
+    raw['out']['evidence'][0]['stats']['trace'][0]['output_hidden']['owner_count'] = 1
+    raw_path.write_text(json.dumps(raw))
+    with pytest.raises(SpecMtpGateError, match='owner/observation'):
+        verify_evidence(yaml.safe_load((run / 'config.yaml').read_text()), run / 'assets')

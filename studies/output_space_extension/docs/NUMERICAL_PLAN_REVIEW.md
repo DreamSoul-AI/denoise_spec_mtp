@@ -1,0 +1,9 @@
+# q178 numerical PLAN review
+
+Results review2026-10-14; original NUMERICAL_PLAN.md and native PLAN.md are retained byte-identical, not re-signed. Evidence: numerical_diagnosis_v1.json and numerical_analysis_v1.json.
+
+Q1 locally supported: strict FP32 repeats produce bit-identical selected logits/hiddens/masks/state and full semantic paths, while altered-versus-baseline path microdeltas persist. First observed common divergence is root89: anchor for exact position88 comes from accepted row2 of block86 in the original path, versus row0 of block88 in the altered path (the latter verified by tensor). This locates a deterministic block/KV/owner packing difference; no individual CUDA kernel is identified.
+
+Q2 locally supported: canonical self/no-graft controls remain8/27; canonical grafts remain9/26 and match strict graft full semantic paths. At same actual AR-prefix root>85, canonical anchor/v are bit-equal across same-order control and graft; incoming proxies are left intact. Thus those committed-state microdeltas are not necessary for this effect under the declared canonical intervention. Teacher/canonical packing itself differs; self controls constrain interpretation, and numeric differences carried in proxy hiddens remain unisolated.
+
+Immediate root86 second-slot rank crossing and subsequent owner1/2 history are different stages, not mutually exclusive causes. No forced-owner or fixed-candidate counterfactual was run. A future causal refinement could hold a specified proxy/owner-output vector under canonical states at one declared root, with self-value and AR gates; this is a proposal, not an executed result or changed default. Current newprompt generality evidence belongs to output_space_followup. No need to change precision/default/source from these diagnostic outcomes.

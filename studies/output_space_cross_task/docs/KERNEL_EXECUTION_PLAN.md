@@ -1,0 +1,11 @@
+# Fixed q_proj protocol execution addendum
+
+2026-10-14 after a50f9e0, before measurements. KERNEL_PLAN.md remains the original draft byte-identical. Current authorization permits the reversible local experiment described there, independently of provider norm controls.
+
+Execute exactly the six planned canonical q178 generations: native self/graft read-only captures of source blocks85/86, plus source85 owner0 slot1 row4 q_proj singleton-FP32 or CPU-FP64-rounded output substitutions, each self/graft. Reuse previous canonical states/donors; no teacher forward. Four cloned-cache exact block replay forwards only. All selected logits/final hiddens in those replays must reproduce captured values bit-for-bit; restore a fresh cloned cache, never original live cache. Pre-forward cache snapshots hold independent storage and their KV tensors remain unchanged after replay.
+
+Profile layer0 q_proj packed[1,9,d] and selected singleton[1,1,d] for each source85 path; correlate aten::mm/addmm CPU IDs to actual CUDA kernels, retain shapes and names even if equal. Direct numerical comparisons additionally cover captured block86. High-precision CPU linear uses exactly represented FP32 activations/weights/bias, casts output only back toFP32. It changes one operation, not model precision. No operator/root/layer search.
+
+Native capture cells must match prior canonical full semantic traces/selected samples and independent AR. At patch assert actual source85, row4, untouched other rows, finite replacement, one application and removable hooks. Complete variant AR/scope/state gates remain mandatory; native paths need not hold after substitutions. Budget600 new tokens plus4 exact block auxiliary forwards; source/plan/model/11-file snapshot/tool/helpers/oldraw/native config/inputs bound before/after, strict deterministic process settings, serialGPU/.5s resources. Preserve failures and no source/default/remote/data deletion.
+
+Separately q241–244 receives a runnable evidence-export/verdict script and deterministic synthetic minimal reproductions. This turn does not launch its real-model batch. H1/H3 real results remain unmeasured; H2 needs a later frozen canonical follow-up. This explicitly limits the next-step claims.

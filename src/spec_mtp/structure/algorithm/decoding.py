@@ -79,6 +79,14 @@ class SpecDecoder:
                              'use spec.impl=naive with dynamic trees')
         if self.impl not in ('naive', 'efficient'):
             raise ValueError(f'Unsupported spec.impl: {self.impl}')
+        self.output_hidden = str(spec_cfg.get('method', '')).lower() == 'output_hidden'
+        if self.output_hidden:
+            widths = list(spec_cfg.get('tree', {}).get('branches', []))
+            if tree_mode != 'static' or widths != [1] * self.num_masks or spec_cfg.tree.get('pruning', True):
+                raise ValueError('output_hidden requires an unpruned static chain with one node per mask')
+            head = model.hf.get_output_embeddings().weight
+            if head.data_ptr() != model.embedding_table.data_ptr():
+                raise ValueError('output_hidden prerequisite requires actually tied input/output weights')
         self._attn_cache: Any = TreeAttentionCache() if self.impl == 'efficient' else None
         # Dynamic trees: memoised, vectorised build of the same naive mask (perf only).
         # Static + naive keeps the literal builder for the Table 4 timing ablation.
@@ -129,18 +137,24 @@ class SpecDecoder:
         position_ids = torch.arange(t + k, device=device).unsqueeze(0)
         cache = kv_cache.new_cache()
         out = model(prefill_embeds, position_ids, attention_mask_4d=None,
-                    past_key_values=cache)
+                    past_key_values=cache, **({'last_hidden_only': True} if self.output_hidden else {}))
         cache = out.past_key_values
         logits = out.logits[0]                                        # [t+k, V]
 
         root_token = select_token(logits[t - 1], self.temperature, self.generator)
+        if self.output_hidden:
+            provider.init_hidden(out.last_hidden_state[0, :t])
+            proxy_hiddens = out.last_hidden_state[0, t:t + k].clone()
+            stats['output_hidden_prefill'] = {'observed_positions': t, 'scale': float(provider.scale),
+                                              'state_dtype': 'float32', 'final_normalized': True}
         mask_logits = logits[t:t + k].clone()                         # [k, V]
         kv_cache.crop(cache, t)                                       # evict masks
 
         committed = [root_token]
         prev_token_embed = prompt_embeds[-1]
         root_embed = model.embed(torch.tensor([[root_token]], device=device))[0, 0]
-        provider.on_token_committed(root_embed, prev_token_embed)
+        if not self.output_hidden:
+            provider.on_token_committed(root_embed, prev_token_embed)
         prev_token_embed = root_embed
         stats['prefill_time'] = time.perf_counter() - start
 
@@ -163,11 +177,15 @@ class SpecDecoder:
             node_ids = torch.tensor([tree.tokens], dtype=torch.long, device=device)
             node_embeds = model.embed(node_ids)[0] if num_nodes else \
                 torch.empty(0, prompt_embeds.size(-1), device=device, dtype=dtype)
-            masks = provider.masks().to(dtype)
+            if self.output_hidden:
+                owner_masks = provider.masks_per_owner(proxy_hiddens).to(dtype)
+            else:
+                masks = provider.masks().to(dtype)
+                owner_masks = masks.unsqueeze(0).expand(1 + num_nodes, k, -1)
             block_embeds = torch.cat([
                 prev_token_embed.unsqueeze(0),         # root = last committed token
                 node_embeds,
-                masks.unsqueeze(0).expand(1 + num_nodes, k, -1).reshape(-1, masks.size(-1)),
+                owner_masks.reshape(-1, prompt_embeds.size(-1)),
             ], dim=0).unsqueeze(0)
 
             if self.impl == 'efficient':
@@ -181,7 +199,7 @@ class SpecDecoder:
                     tree, k, cache_len, root_position, dtype, device, min_value)
 
             out = model(block_embeds, position_ids, attention_mask_4d=attn,
-                        past_key_values=cache)
+                        past_key_values=cache, **({'last_hidden_only': True} if self.output_hidden else {}))
             cache = out.past_key_values
             logits = out.logits[0]                                    # [block, V]
             stats['decode_calls'] += 1
@@ -224,7 +242,8 @@ class SpecDecoder:
 
             for token in committed_now:
                 new_embed = model.embed(torch.tensor([[token]], device=device))[0, 0]
-                provider.on_token_committed(new_embed, prev_token_embed)
+                if not self.output_hidden:
+                    provider.on_token_committed(new_embed, prev_token_embed)
                 prev_token_embed = new_embed
             committed.extend(committed_now)
             stats['committed'] += len(committed_now)
@@ -234,6 +253,18 @@ class SpecDecoder:
                 'accepted_nodes': list(accepted_nodes), 'committed_tokens': list(committed_now),
                 'stopped': stop, 'cache_after': None,
             })
+            if self.output_hidden:
+                observed = [] if stop else [0] + accepted_nodes
+                for block_row in observed:
+                    provider.observe_committed(out.last_hidden_state[0, block_row])
+                stats['trace'][-1]['output_hidden'] = {
+                    'observed_block_rows': observed,
+                    'owner_count': int(owner_masks.shape[0]),
+                    'slot_count': int(owner_masks.shape[1]),
+                    'mask_norm_min': float(owner_masks.float().norm(dim=-1).min()),
+                    'mask_norm_max': float(owner_masks.float().norm(dim=-1).max()),
+                    'last_owner_diff_from_root': float((owner_masks[-1] - owner_masks[0]).float().norm()),
+                }
             if stop:
                 break
 
@@ -245,6 +276,8 @@ class SpecDecoder:
             n_star = accepted_nodes[-1] if accepted_nodes else 0
             mask_rows = mask_indices_of(tree, k, n_star)
             mask_logits = logits[mask_rows].clone()
+            if self.output_hidden:
+                proxy_hiddens = out.last_hidden_state[0, mask_rows].clone()
 
         stats['decode_time'] = time.perf_counter() - decode_start
         stats['new_tokens'] = len(committed)

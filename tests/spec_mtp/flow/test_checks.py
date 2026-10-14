@@ -94,6 +94,7 @@ def _study(tmp_path, runs, axes=None, seeds=(123,)):
 
     study = tmp_path / 'study'
     (study / 'runs').mkdir(parents=True)
+    (study / 'experiment_config.yaml').write_text(yaml.safe_dump(_config()))
     (study / 'study.yaml').write_text(yaml.safe_dump(
         {'study': 'x', 'axes': axes or {'algorithm.config.variant': ['a', 'b']}, 'seeds': list(seeds)}))
     experiments = []
@@ -306,3 +307,30 @@ def test_study_quality_failure_marks_generic_envelope_incomplete(tmp_path):
         checks.study_gate(ctx)
     envelope = json.loads((ctx.study_dir / 'process.json').read_text())
     assert not envelope['complete'] and not envelope['spec_mtp']['passed']
+
+
+def test_declared_factors_follow_mapping_axis_override_contract():
+    base = {'algorithm': {'mode': 'eval', 'config': {
+        'version': 'base-v1', 'eval': {'max_new_tokens': 100}, 'mask': 'frozen_mean'}}}
+    study = {'fixed': {'algorithm': {'config': {'version': 'fixed-v2'}}},
+             'axes': {'algorithm.config': [
+                 {'task': 'esp_mtp', 'mask': 'gamma_last'}, {'task': 'ar_baseline'}]},
+             'seeds': [123, 456]}
+    expected = [
+        {'algorithm.config': {'version': 'base-v1', 'eval': {'max_new_tokens': 100},
+                              'mask': 'gamma_last', 'task': 'esp_mtp'}},
+        {'algorithm.config': {'version': 'base-v1', 'eval': {'max_new_tokens': 100},
+                              'mask': 'frozen_mean', 'task': 'ar_baseline'}},
+    ]
+    # A whole algorithm.config axis replaces that fixed subtree, then merges
+    # into the base. Keep the official make semantics, rather than inventing
+    # recursive base/fixed/axis composition here.
+    assert checks.declared_factors(study, base) == expected
+
+
+def test_declared_factors_bind_inherited_conditions():
+    # Same declared patch, different frozen base: effective factors must differ.
+    study = {'axes': {'algorithm.config': [{'task': 'ar_baseline'}]}, 'seeds': [123]}
+    first = {'algorithm': {'config': {'eval': {'max_new_tokens': 100}}}}
+    second = {'algorithm': {'config': {'eval': {'max_new_tokens': 50}}}}
+    assert checks.declared_factors(study, first) != checks.declared_factors(study, second)

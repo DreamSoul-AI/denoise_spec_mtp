@@ -1,21 +1,21 @@
 # layout
 
-`src/rpipe/` 是上游 RPipe `main` 的文件拷贝，提交 `804b3823ab6d2af46cbda1a65688ca8b76c60b22`（`src/rpipe/ORIGIN`，v0.3.0）。`src/spec_mtp/` 只放 SpecMTP，经 Study recipe 注册。不要把 SpecMTP 写进 `rpipe` 的默认 source。
+`src/rpipe/` 是上游 RPipe `main` 的文件拷贝，提交 `7a15c46b75c5eb951cccd60ed7b9fc3463db90f5`（`src/rpipe/ORIGIN`，v0.3.1）。`src/spec_mtp/` 只放 SpecMTP，经 Study recipe 注册。不要把 SpecMTP 写进 `rpipe` 的默认 source。
 
 ```text
 src/
   rpipe/                   vendored RPipe；Windows 上 __init__.py 先 import torch
   spec_mtp/
-    recipe.py              register_sources + register(ctx)
-    cli.py                 薄入口：make 写源码锁，其余转给 rpipe
-    flow/checks.py         summarize/write 证据门、Study scope 门
+    recipe.py              compatibility exports for structure/api/recipe.py
+    flow/cli.py            薄入口；根 cli.py 保留 console script 兼容导出
+    flow/{collect,summarize,write,process}/   专项阶段；checks.py 兼容导出
     structure/artifact/evidence.py   实际权重/输入/runtime 证据
     structure/             algorithm / data / model / system / control / artifact
 datasets/spec_bench/       SpecBench 源文件；Run prepare 拷进 shared/data
 studies/                   见 studies/README.md
 configs/hf/                论文格子的旧 YAML；不是入口
 tools/                     ci_local.py, windows_selfcheck.py, profile_cpu.py,
-                           decode_fingerprint.py
+                           decode_fingerprint.py, package_selfcheck.py
 tests/spec_mtp/            跟着 src/spec_mtp
 docs/                      architecture, layout, testing, windows, brainstorm,
                            history-extrapolation；research/；papers/
@@ -41,3 +41,37 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 ## Study 合同（2026-10-13）
 
 目录入口统一 README.md，docs/PLAN.md 与 docs/STUDY_REPORT.md 分别保存计划和人类结论；NUMBERS 保留 report 数字。两份 YAML 仍按基底 → fixed → axes/seed 合并，不搬动已有研究配置。smoke 的原交付 version 和正式 JSON 保留，新实测采用隔离目录与新 version。阶段仅保留 collect/summarize/write/process 的专项扩展，默认 prepare/execute 通过 recipe、builder 与 Algorithm 执行。training-free 报告用真实解码结果图适配上游学习曲线要求，不增加训练或恢复承诺。完整合同见 [Study 指南](../studies/README.md)。
+
+当前结构迁移详见 [rpipe-migration.md](rpipe-migration.md)：data 的业务从 __init__ 移至 datasets，跨层输入与注册由 structure/api 组装，纯证据核验在 structure/artifact/validation。make、prepare 与 execute 无专项编排时直接复用库；不补空壳。
+
+`tools/diagnose_output_windows.py` follows the existing direct-decoder profiling utilities. It observes fixed q173 windows, binds tool/PLAN/native raw/source hashes and refuses mismatching replay. Full selected tensors stay in a new .tmp directory; scalar diagnosis belongs to the Study. Scientific src, original Run and source locks are retained.
+
+`tools/diagnose_mask_scale.py` uses the saved window tensors to cross the two observed directions/norms at one predeclared position, with four isolated causal forwards. It reuses the existing model wrapper and scalar helpers; it does not alter decoder/provider/config or choose a new default.
+
+`tools/diagnose_proxy_transfer.py` scopes one predeclared provider-return vector replacement to a diagnostic replay. It infers seed ownership from actual root progress and verifies the returned trace, keeping post-intervention paths rather than forcing baseline acceptance. Its PLAN/results and offline `analyze_transfers.py` live in output_space_small_matrix; no scientific source/default/Run changes.
+
+`tools/diagnose_cross_prompt.py` runs the predeclared q171/q172/q174 selection with the unchanged observation/transfer helpers. It binds both original Studies and compares same-position committed anchor/velocity rather than assuming they are equal. Selection and failure/termination controls live in output_space_small_matrix/docs/CROSS_PROMPT_PLAN.md; full local tensors remain ignored.
+
+`tools/diagnose_extension.py` consumes output_space_extension's predeclared native matrix and frozen semantic-only window_selection_v1.json. It reuses existing observe/transfer/compare helpers; samples follow actual paths and noncommon roots remain explicit. First/second-slot offline inspection lives in that Study's analyze_results.py, with second-slot scalar expansion marked post hoc. Scientific src/defaults and earlier measurement tools remain unchanged.
+
+`tools/diagnose_q178_numerics.py` uses process-only deterministic FP32 flags and an explicitly scoped provider-state synchronization to canonical AR-prefix hiddens. Actual root is read from the unchanged mutable KV cache and checked at forward; proxies/decoder/cache code remain intact. Its controls/teacher/repeat budget is frozen in output_space_extension/docs/NUMERICAL_PLAN.md.
+
+`tools/diagnose_study_windows.py` is the manifest-bound four-prompt coordinator for output_space_followup. Existing choose_window/observe/transfer/compare/slots implementations are imported unchanged and individually hash-bound. It records both slot rankings and validity with actual/noncommon paths. New-study native phases stay thin imports; raw tensors/weights remain local.
+
+`tools/diagnose_q178_operators.py`提供固定q178后续provider槽精度／norm归约后端对照。测量v1源码原文在`studies/output_space_extension/docs/operator_tool_v1.py.txt`，当前CLI只补运行示例；分析核对除模块docstring外AST一致，原报告tool哈希不重签。
+
+`tools/diagnose_q178_norm_kernel.py`比较固定入口／后续CUDA norm实现图，区分返回值等价与有效干预；`tools/diagnose_q178_qproj.py`执行固定layer0行的FP32 packing／FP64-rounded对照及独立cache块重放。两者共享Study局部`kernel_common.py`来源加载门，不改科学模型或默认配方。
+
+`tools/diagnose_q178_phi_rms.py`固定入口Phi完整高精度映射与layer0 post-attention RMSNorm row4对照；`tools/diagnose_q241_canonical.py`按首个cross-task阳性准则执行q241原值／移植canonical状态跟进。复用旧canonical/transfer helpers，raw mmap只读、真KV root门不变。
+
+工具诊断：`tools/diagnose_q178_rounding_factors.py`只做已存输入的算术分解；`tools/diagnose_q241_state_factors.py`只在固定真实KV根选择性回填anchor/velocity，沿用原decoder与transfer。
+
+`tools/diagnose_q241_local_factors.py`固定source719/current720 cache/tree并交换state/proxy；`tools/diagnose_state_extension.py`执行预声明q242/q243两seed状态因素矩阵，不改正式解码器。
+
+`tools/diagnose_sampling_paths.py`做真实非T0 AR耦合路径及旧source719条件抽样；`tools/diagnose_q241_owner1.py`固定实际source717／owner1映射，只核对应rows5/6的seed。
+
+`tools/diagnose_sampling_expansion.py`补固定四prompt三seed全采样路径；`tools/diagnose_rare_events.py`按旧owner1上下文做native抽样及稳定Bernoulli检测能力计算，零模型forward。
+
+`tools/diagnose_sampling_continuation.py`固定六新prompt/seed诊断；`tools/diagnose_rare_stress.py`分开原温度零观测与T=2条件压力测试，不改变默认采样器/配置。Study局部analyze_continuation与analyze_sampled_depth复用旧计数/观察器，只保存统计和语义轨迹，完整draw/tensors仍在.tmp。
+
+4B Study局部untimed_4b.py仅关闭decoder模块计时并以相同权重directCUDA materialize；注册范围是该原生Run进程，科学src/default不变。四phase导出沿用from .run import run；v1失败源保留，v2/native holdout/control为有效入口。两个analyze_results与write_report复核原生计数/AR/来源，selectedEMA复用已测输出，权重/全Run/shared仍不入Git。

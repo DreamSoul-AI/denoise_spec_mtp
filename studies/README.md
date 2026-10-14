@@ -32,7 +32,7 @@ studies/<name>/
     figures/                    真实结果图和图注
 ```
 
-从 [_template](_template/README.md) 复制，改目录和 `study` 名称，再写计划。只有已有的 `smoke` 与模板；研究草案不是可执行 Study，历史接受数见 [history-extrapolation.md](../docs/history-extrapolation.md)。一次性环境排错放 `.tmp/diagnostics/`，必要结论并入关联报告。
+从 [_template](_template/README.md) 复制，改目录和 `study` 名称，再写计划。现有 `smoke`、`input_mask_baseline` 与模板；只有提取并写明 PLAN 的部分进入执行，其余研究草案不是可执行 Study，历史接受数见 [history-extrapolation.md](../docs/history-extrapolation.md)。一次性环境排错放 `.tmp/diagnostics/`，必要结论并入关联报告。
 
 SpecMTP 声明使用 `recipe: recipe.py` 和 `source: spec_mtp`。Study recipe 的 import 调用 `register_sources()`，Run prepare 的 `register(ctx)` 检查构造合同；注册不读取 prompt、下载权重或执行大模型。库默认 source 保持原状。复用的 ESP/EMA/AR/alignment、mask、tree、KV cache 和数据/模型适配在 `src/spec_mtp/`，只有本轮独有实现才放 Study `structure/`。
 
@@ -95,3 +95,16 @@ RPipe 要求报告附图：解码使用真实接受数或轨迹图及来源图�
 | --- | --- | --- |
 | [smoke](smoke/README.md) | 随机 tiny 三 variant 的可复用门；历史 CPU/CUDA 串行验收已完成 | [PLAN](smoke/docs/PLAN.md)、[报告](smoke/docs/STUDY_REPORT.md)、[NUMBERS](smoke/docs/NUMBERS.md) |
 | [_template](_template/README.md) | 新研究起点，不能直接运行，不代表真实模型已通过 | [计划模板](_template/docs/PLAN.md)、[报告模板](_template/docs/STUDY_REPORT.md) |
+| [output_space_prerequisite](output_space_prerequisite/README.md) | tied输出hidden零/一阶两槽链式四格已通过；接受数17/10/10，单prompt负结果 | [PLAN](output_space_prerequisite/docs/PLAN.md) |
+| [output_space_small_matrix](output_space_small_matrix/README.md) | q172–q174小矩阵/匹配前缀诊断通过；混合小样本观察 | [PLAN](output_space_small_matrix/docs/PLAN.md)、[报告](output_space_small_matrix/docs/STUDY_REPORT.md) |
+
+新增 [input_mask_baseline](input_mask_baseline/README.md) 使用真实 Qwen3-0.6B / SpecBench q171，四个固定 case 是宏观方案 §5.11 / E1–E2 的前置门；计划与结果分别见其 docs。通用四阶段从 src/spec_mtp/flow 同名包导入，研究包内的默认 prepare/execute/make 不填空实现。
+
+[output_space_cross_task](output_space_cross_task/README.md)是q241–244 summarization证伪草案，只有输入分词预检，未make/launch，不存在新测量结果。q178后续provider算子对照见[extension报告](output_space_extension/docs/STUDY_REPORT.md)。
+
+[output_space_cross_task](output_space_cross_task/README.md)已按独立EXECUTION_PLAN完成q241–244真实四格和20固定移植，全部AR一致但正负混合；第一阳性q241另冻canonical跟进出现11/12→14/14反例（路径仍不同）。此前“草案未执行”是历史状态，以[当前报告](output_space_cross_task/docs/STUDY_REPORT.md)为准，未改旧PLAN或重签Run。
+
+[4B同链复验](output_space_4b_recheck_v2/README.md)及[固定新4条](output_space_4b_holdout/README.md)真实四Run/Study门通过；[固定输入EMA](output_space_4b_input_control/README.md)两新Run复用其输出/AR。当前只比较接受/主calls/AR，不测速。output_space_4b_recheck是失败v1原位归档，勿继续其pending或重签锁。
+
+
+2026-10-15 最新执行顺序：已有 Qwen3-4B 结果全部为 **FP32**，本轮先按主题提交、工作分支 PR 经 CI 合入 dev。其他研究暂停；最高优先复现 ESP Table 1（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=0.1）。8B 仅用于该复现；随后 Qwen3-4B/BF16 五方法加 AR 配对。新增实验不用 FP32、不测速。不得强推、合 main、删分支或数据。

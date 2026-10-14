@@ -2,7 +2,7 @@
 
 - ``spec_mtp.structure`` — SpecMTP-only Data / Model / Algorithm and helpers
 - ``spec_mtp.recipe`` — ``register(ctx)`` used by Study recipes
-- ``spec_mtp.flow.checks`` — Run / Study gates used by Study flow phases
+- ``spec_mtp.flow.<phase>`` — collect, success and Study gates; checks is a compatibility facade
 - ``python -m spec_mtp`` — thin entry over ``python -m rpipe``
 
 Importing this package registers nothing; registration happens in a Study

@@ -1,0 +1,26 @@
+study: input_mask_baseline
+description: Real pretrained input-mask baseline prerequisite; not output-space validation
+experiment:
+  name: input_mask_baseline
+recipe: recipe.py
+freeze: true
+provenance:
+  include:
+  - docs/PLAN.md
+  - docs/modelscope_snapshot.json
+  - docs/resource_load_calibration.json
+flow:
+  study_phases: true
+  prepare_shared: false
+axes:
+  algorithm.config:
+  - task: esp_mtp
+    mask: frozen_mean
+  - task: esp_mtp
+    mask: gamma_last
+  - task: ar_baseline
+  - task: alignment_probe
+    mask: frozen_mean
+seeds:
+- 123
+run_description: '{experiment} seed={seed}'

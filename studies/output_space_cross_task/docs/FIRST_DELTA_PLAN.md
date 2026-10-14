@@ -1,0 +1,9 @@
+# First local acceptance change versus final full-path direction
+
+Frozen after the completed expansion and its STUDY_REPORT update, before inspecting/scoring first differences,2026-10-15. This is an explanatory test on already observed final outcomes, not a new held-out stochastic sample. No new model forwards/draws/inputs/window selection.
+
+H7: the sign of the first chronological semantic self/graft difference's accepted-node-count delta predicts the sign of the final accepted-count delta. Use all10 new completed sampled units plus2 old development rows separately; do not choose a helpful root or omit cancellation/nulls. Compare TRACE_KEYS only, because mask norm/hidden diagnostic metadata can differ before any accepted-path effect. Shared prefixes imply the first divergent trace record has the same actualroot; require this, do not force later alignment.
+
+Verify per-cell accepted equals sum of trace accepted_nodes before final budget/EOS clipping. Preserve actual common roots and each side's unique roots. Reconstruct final delta exactly as common-root node-count difference + graft-only accepts - self-only accepts; this is a trace accounting identity, not tensor causal mediation or a forced baseline path. Report firstgain→finalloss, firstloss→finalgain and firsteffect→netzero counterexamples. Identical traces must imply zero delta; missing/truncated/duplicate-root records fail, never default to zero.
+
+Complete script with tests for sign reversal, cancellation, preserved-direction controls, first-record prefix mismatch and damaged counts. Bind original sampled reports, expansion analysis, tool/plan/source before/after; formal structured comparisons only. Then update report with actual H7 verdict and new/old scope. No source/default/old evidence edit, remote/PR/merge/delete.

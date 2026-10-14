@@ -1,0 +1,112 @@
+# Preserve measured source snapshots as exact bytes for provenance checks.
+/studies/output_space_extension/docs/operator_tool_v1.py.txt -text whitespace=cr-at-eol
+/studies/output_space_extension/docs/operator_analyzer_v1.py.txt -text whitespace=cr-at-eol
+# Keep new measured tools and frozen protocols byte-identical on checkout.
+/tools/diagnose_q178_phi_rms.py -text whitespace=cr-at-eol
+/tools/diagnose_q241_canonical.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_canonical.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_results.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/plot_results.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/CANONICAL_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/EXECUTION_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_extension/docs/PHI_RMS_PLAN.md -text whitespace=cr-at-eol
+
+# Preserve state/arithmetic factor measurement and analysis bytes.
+/tools/diagnose_q241_state_factors.py -text whitespace=cr-at-eol
+/tools/diagnose_q178_rounding_factors.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_state_factors.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/STATE_FACTOR_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_extension/docs/ROUNDING_FACTOR_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/state_factor_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/state_factor_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_extension/docs/rounding_factor_diagnosis_v1.json -text whitespace=cr-at-eol
+
+# Preserve fixed-frame and state-extension evidence bytes.
+/tools/diagnose_q241_local_factors.py -text whitespace=cr-at-eol
+/tools/diagnose_state_extension.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_local_extension.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/LOCAL_FACTOR_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/STATE_EXTENSION_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/local_extension_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/local_factor_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/state_extension_diagnosis_v1.json -text whitespace=cr-at-eol
+
+# Preserve sampling and owner1 measured tools/protocol/evidence bytes.
+/tools/diagnose_sampling_paths.py -text whitespace=cr-at-eol
+/tools/diagnose_q241_owner1.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_sampling_owner.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/SAMPLING_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/OWNER_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_owner_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/owner1_diagnosis_v1.json -text whitespace=cr-at-eol
+
+# Preserve sampled expansion, rare-event and H7 evidence bytes.
+/tools/diagnose_sampling_expansion.py -text whitespace=cr-at-eol
+/tools/diagnose_rare_events.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_sampling_expansion.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_first_delta.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/SAMPLING_EXPANSION_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/RARE_EVENT_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/FIRST_DELTA_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_expansion_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_expansion_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/rare_event_diagnosis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/first_delta_analysis_v1.json -text whitespace=cr-at-eol
+
+# Preserve new sampled continuation and rare stress protocol bytes.
+/tools/diagnose_sampling_continuation.py -text whitespace=cr-at-eol
+/tools/diagnose_rare_stress.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/SAMPLING_CONTINUATION_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_continuation_inputs_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_continuation.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampling_continuation_analysis_v1.json -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/SAMPLED_DEPTH_PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_cross_task/analyze_sampled_depth.py -text whitespace=cr-at-eol
+/studies/output_space_cross_task/docs/sampled_depth_analysis_v1.json -text whitespace=cr-at-eol
+
+# Preserve 4B recheck adapters, declarations and explicit input/weight protocols.
+/studies/output_space_4b_recheck/untimed_4b.py -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck/recipe.py -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck/experiment_config.yaml -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck/study.yaml -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck/docs/PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck/docs/history_inventory.json -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck/docs/prompts_manifest.json -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck/docs/execution_v1.json -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck/analyze_results.py -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/untimed_4b.py -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/recipe.py -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/experiment_config.yaml -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/study.yaml -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/docs/PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/docs/history_inventory.json -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/docs/prompts_manifest.json -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/docs/execution_v1.json -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/analyze_results.py -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/untimed_4b.py -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/recipe.py -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/experiment_config.yaml -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/study.yaml -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/docs/PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/docs/history_inventory.json -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/docs/prompts_manifest.json -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/docs/first_run_failure.json -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/docs/execution_v1.json -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/analyze_results.py -text whitespace=cr-at-eol
+/studies/output_space_4b_recheck_v2/write_report.py -text whitespace=cr-at-eol
+/studies/output_space_4b_holdout/write_report.py -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/recipe.py -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/untimed_4b.py -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/experiment_config.yaml -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/study.yaml -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/docs/PLAN.md -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/docs/history_inventory.json -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/docs/prompts_manifest.json -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/docs/preceding_results.json -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/docs/execution_v1.json -text whitespace=cr-at-eol
+/studies/output_space_4b_input_control/analyze_results.py -text whitespace=cr-at-eol

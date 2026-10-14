@@ -52,7 +52,7 @@ line-length = 120
 select = ["F", "E9"]
 
 [tool.ruff.lint.per-file-ignores]
-# RPipe v0.3.0 public facades intentionally reexport these imports; keep upstream bytes.
+# RPipe v0.3.1 public facades intentionally reexport these imports; keep upstream bytes.
 "src/rpipe/structure/api/algorithm_api.py" = ["F401"]
 "src/rpipe/structure/api/data_api.py" = ["F401"]
 "src/rpipe/structure/api/model_api.py" = ["F401"]
@@ -78,7 +78,9 @@ warn_redundant_casts = true
 # Strict tier: new modules written for the RPipe dependency.
 module = [
   "spec_mtp.recipe",
+  "spec_mtp.structure.api.recipe",
   "spec_mtp.cli",
+  "spec_mtp.flow.cli",
   "spec_mtp.flow.checks",
   "spec_mtp.structure.artifact.sources",
   "spec_mtp.structure.algorithm.config_bridge",

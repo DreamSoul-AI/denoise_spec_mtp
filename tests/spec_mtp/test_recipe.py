@@ -119,7 +119,7 @@ def test_freeze_detects_changed_rpipe_commit(study_copy):
         recipe.register(_ctx(study_dir, _config(variant='esp_static')))
 
 
-@pytest.mark.parametrize('study', ['_template', 'smoke'])
+@pytest.mark.parametrize('study', ['_template', 'smoke', 'input_mask_baseline', 'output_space_prerequisite', 'output_space_small_matrix', 'output_space_extension', 'output_space_followup', 'output_space_cross_task', 'output_space_4b_recheck_v2', 'output_space_4b_holdout', 'output_space_4b_input_control'])
 def test_repository_studies_expand_and_validate(tmp_path, study):
     """make-level expansion through RPipe, then the recipe checks on every Run config (no weights)."""
     import shutil
@@ -130,7 +130,8 @@ def test_repository_studies_expand_and_validate(tmp_path, study):
     src = Path(__file__).resolve().parents[2] / 'studies' / study
     dest = tmp_path / study
     shutil.copytree(src, dest, ignore=shutil.ignore_patterns(
-        'runs', 'shared', 'scripts', '*.json', 'docs', '__pycache__'))
+        'runs', 'shared', 'scripts', 'index.json', 'process.json', 'provenance.json',
+        'activity.json', 'spec_mtp_sources.json', 'spec_mtp_study_check.json', '__pycache__'))
     declared = load_study_yaml(dest)
     assert declared['recipe'] == 'recipe.py'
     assert declared.get('flow', {}).get('study_phases') is True

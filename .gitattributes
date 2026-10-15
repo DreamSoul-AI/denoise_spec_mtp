@@ -286,3 +286,9 @@
 /tools/audit_esp_third_party.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/docs/THIRD_PARTY_PLAN.md -text whitespace=cr-at-eol
 /docs/research/esp-third-party-audit-2026-10-15.json -text whitespace=cr-at-eol
+
+# Preserve imported research standards and translations as upstream bytes.
+"docs/research/standards/研究计划规范 Research Plan Standard.md" -text whitespace=cr-at-eol
+"docs/research/standards/研究计划模板 Research Plan Template.md" -text whitespace=cr-at-eol
+"docs/research/standards/research_plan_standard_en.md" -text whitespace=cr-at-eol
+"docs/research/standards/research_plan_template_en.md" -text whitespace=cr-at-eol

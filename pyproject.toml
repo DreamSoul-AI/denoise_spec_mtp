@@ -19,7 +19,7 @@ dependencies = [
   "scipy",
   "torch",
   "torchvision",
-  "transformers>=4.45",
+  "transformers==5.12.1",
 ]
 
 [project.scripts]

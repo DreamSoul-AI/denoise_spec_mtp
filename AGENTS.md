@@ -20,7 +20,8 @@
 | 测试与 CI | [testing.md](docs/testing.md) |
 | Windows | [windows.md](docs/windows.md) |
 | 还没拍板的下一步 | [brainstorm.md](docs/brainstorm.md) |
-| 研究计划草案（非 Study 合同） | [research/readme.md](docs/research/readme.md) |
+| 当前研究计划（非冻结Study合同） | [中文](docs/research-plan.md) / [English](docs/research-plan.en.md) |
+| 研究证据、历史草稿与规范入口 | [research/readme.md](docs/research/readme.md) |
 | 论文 PDF | [papers/index.md](docs/papers/index.md)。PDF 不进 git |
 | 问题与兼容性 | [bugs.md](docs/bugs.md) |
 | 开发记录 | [record.md](docs/record.md) |

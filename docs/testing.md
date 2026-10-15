@@ -85,3 +85,5 @@ test_4b_untimed验证三method tiny token/全部语义/calls保持、全局时�
 ## 4B 固定窗口与CPU状态分析（2026-10-15）
 
 `test_4b_mask_windows.py`覆盖槽差径向/切向、同prompt相邻转移、原生shadow纯推演、同前缀输入控制、局部BF16控制续接及argmax/bonus目标对齐、准入父PID链、条件选择拒绝、树预算/父节点/重复剪枝、并列排名区间和固定模板差分代数近似。真实局部干预和CPU分析见[阶段报告](research/4b-mask-window-2026-10-15.md)。候选覆盖界不当作GPU实际接受数，条件样本不估计总体τ。
+
+模板对照新增纯速度替换保留更新mean、零速度等价updating ESP（区别frozen mean）、四格tiny BF16原生窗口的控制续接/argmax/bonus门；该文件共10项通过。扩展CPU读出时对旧24行及5组比较作真实数据回归，全部保持。真实4B新增两批24格、100次forward及75次局部选择自检见报告第八节，完整logits仅留本机。

@@ -1,5 +1,7 @@
 # SD 阶段报告：8B ESP 复现与 4B BF16 方法比较
 
+全480方向对照新增完整格：同范数随机0 τ=1.495188134，81,425个提交token全argmax通过；相对zero的accepted胜/平/负为363/29/88、逐promptτ为360/27/93，template对应τ仍为1.507777653。来源：[三格有效结果快照](../../studies/qwen3_4b_bf16_directions/docs/direction_partial_v2.json)与[方向报告](../../studies/qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)。本批收益并非仅e2−e1方向出现；其余随机种子与content仍待完整，不能推断任意方向有效或全矩阵排名。队列已自动进入随机1，不改数据/配置。
+
 2026-10-16追加指示：四窗口不足以回答方向唯一性；现已冻结[BC30全480方向对照计划](../../studies/qwen3_4b_bf16_directions/docs/PLAN.md)，新增严格固定e2−e1、三个同范数随机方向和内容初始化五格，零偏置复用旧输入零阶。执行与结果另见[新Study报告](../../studies/qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)，未完成格子不填数字，BC60待本轮完成后再决定。目标模式继续active。
 
 首格已完整验收：严格固定e2−e1全480的pooled τ=1.507777653（80,932个提交token自检全过），原生输入一阶含EMA更新的旧值为1.511957584，二者不能混称同一方法。出处：[完整首格/旧零阶证据快照](../../studies/qwen3_4b_bf16_directions/docs/direction_partial_v1.json)；随机三种子及内容初始化仍在单队列执行，整个方向Study未完成，暂不判唯一方向或全量排名。

@@ -1,10 +1,10 @@
 # BC30固定480方向对照阶段报告
 
-当前步骤：原队列已自然结束，template全480成功；独立补齐Study单队列运行，random0已完成前66/480条。
-实测自检：template的80,932个提交token全过，pooled τ=1.507777653；完整矩阵仍未完成。
-出处：[首格有效结果快照](direction_partial_v1.json)，完整token/trace及Run均留本机；零偏置单列旧结果复用来源。
+当前步骤：template与random0均全480成功，zero复用旧全480；补齐队列已进入random1，random2/content待接续。
+最新发现：random0 τ=1.495188134，低于template的1.507777653，高于zero的1.422420206；81,425个提交token自检全过。
+出处：[三格有效结果快照](direction_partial_v2.json)，完整token/trace及Run均留本机；尚不能推断三个随机种子或全部方向排名。
 下一步：按[补齐执行PLAN](../../qwen3_4b_bf16_directions_recovery/docs/PLAN.md)继续同一队列完整补四格；后续模板以附加文档对齐，不改运行中冻结计划。
-阻塞：当前无阻塞；四格仍待完整结果，不能提前报告τ或方向排名。BC60未声明，不测速。
+阻塞：当前无阻塞；random1/random2/content仍待完整结果，不提前报告其τ或全矩阵排名。BC60未声明，不测速。
 
 2026-10-16新指令已冻结[PLAN](PLAN.md)。四窗口不能回答总体唯一方向问题，本轮不以其结果代替全量。`tools/analyze_4b_full_directions.py`复用原五方法native读出，pending只记进度，不补零或平局。最终取原template成功格、补齐Study四个预定成功格及旧zero；补齐Study process必须通过，原Study资源失败终验原样保留。六格均完整并通过来源与数学门核对后才发布正式JSON；方向与旧五方法的关系按PLAN单列。
 
@@ -25,7 +25,23 @@ CPU集成记录：PR22首轮远端CI为497 passed/3 failed（run 38768912287）�
 
 原生输入一阶仍是旧方法结果，含β0.9999的真实EMA更新：pooled τ=1.511957584（旧正式证据），不能称为严格固定方向。新固定e2−e1相对原生输入一阶的accepted胜/平/负为104/236/140，calls为110/234/136，逐prompt τ为105/229/146；总accepted少144、主calls多170、输出多34。由完整480数据确认二者接近但不等价，不回写主方法排名。AR一致率只诊断，输出长度不同，不把调用数差当等输出测速。
 
-剩余三个随机种子及内容初始化尚无完整结果，不能据此判断收益是否只来自原方向。category聚合按原数据实际category等权，非已确认论文任务权重；τ不含prefill首token，主calls含prefill，accepted为裁剪前计数，沿用原报告口径。
+首格快照时三个随机种子及内容初始化尚无完整结果；后续完整格另列如下，不回写该快照。category聚合按原数据实际category等权，非已确认论文任务权重；τ不含prefill首token，主calls含prefill，accepted为裁剪前计数，沿用原报告口径。
+
+## 随机0完整结果（矩阵仍未完成）
+
+补齐Run `2c3e7547a4f931a7`原生succeeded，全480经原生来源/输入/合同/argmax复核通过。来源：[direction_partial_v2.json](direction_partial_v2.json)的`cells.random0`、`vs_template`及`vs_existing_five`；`complete=false`，原资源失败与新Run替换关系均保留，未改旧首格快照。
+
+| 组 | pooled τ | prompt mean τ | category pooled等权mean τ | accepted | 主calls | 新输出/argmax全过token | AR exact |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 同范数随机0 | 1.495188134 | 1.537621631 | 1.508771530 | 26,938 | 54,617 | 81,425 | 179/480 |
+
+| 第二组相对第一组 | accepted胜/平/负 | calls胜/平/负 | τ胜/平/负 | Δaccepted | Δ主calls | Δ新输出 |
+| --- | --- | --- | --- | --- | --- | --- |
+| template → random0 | 201/53/226 | 186/51/243 | 195/46/239 | -289 | +779 | +493 |
+| zero → random0 | 363/29/88 | 333/28/119 | 360/27/93 | +3,012 | -2,321 | +638 |
+| 原生input_first → random0 | 191/54/235 | 184/49/247 | 183/47/250 | -433 | +949 | +527 |
+
+该固定随机种子的范数比在480条均为0.999963522，cosine_to_template均为0.030544994，完整prompt mean全保留；这些是BF16方向初值的实际标量，不用理想范数1替代。固定模板首差分在这批输入相同，因此同一随机种子也给出同一固定偏置。随机0相对zero的总量及多数逐promptτ均改善，说明本批收益并非只在e2−e1方向出现；但template略优于该随机0，且仍有88条accepted和93条τ输给zero。两个其他随机种子与content未完整，不据单种子推断任意方向普遍有效或方向不重要。输出长度相差638，calls差不能解释为同输出加速；AR一致率仅诊断。
 
 ## GPU准入中断与补齐
 

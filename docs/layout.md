@@ -79,3 +79,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/launch_once.py`调用原生SpecMTP/RPipe CLI，仅关闭可选失败重试，避免AR诊断失败格重复执行：`python tools/launch_once.py launch studies/<name> --round 1 --console shared`。退出恢复调度器，不修改vendored RPipe。
 
 `tools/revalidate_run.py` uses a separately loaded verifier-argmax gate with the unchanged execution package. It finalises existing raw evidence without prepare/execute, retains the previous failed result by SHA256, and supports native Study process after all declared cells are revalidated.
+
+`tools/analyze_4b_geometry.py` reads existing full480 traces for position/depth/trim/norm audits without model forwards. `tools/capture_4b_geometry.py` adds read-only hooks to the unchanged 4B decoder after observational non-preemptive admission, binds targets to the actual accepted path, and keeps raw vectors local; see the Study's `docs/GEOMETRY_PLAN.md`.

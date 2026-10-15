@@ -28,3 +28,5 @@ Mean mask按Eq5 λ=.1更新，与后续4B用户指定的ESP frozen mean不同。
 ![Full480 tau and accepted draft counts](figures/tau_acceptance.png)
 
 图：同一四格480条，三种τ聚合及真实accepted draft总数（EOS/预算裁剪前）；黑菱形为论文目标。来源[protocol_evidence_v1.json](protocol_evidence_v1.json)，AR一致率另列，不含测速。
+
+[原生Experiment/Run数字表](NUMBERS.md)保留单Run的mean/std/min/max/n及原生指标，绑定已验收process与formatter SHA；日志仅本机保留，公开副本去掉其超链接。未重新执行或改动本轮数值与结论。

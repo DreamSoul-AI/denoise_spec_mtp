@@ -10,6 +10,8 @@
 
 四格均完成全480条，verifier argmax全过，原生summarize/process成功。BC10/1、BC30/1、BC60/1、BC60/2的pooled τ分别为1.399047、1.563378、1.647301、1.603729；BC30与BC60未达到论文目标1.63/1.74。AR一致率与逐条首分叉仅作诊断，三种τ聚合、目标差值及正式证据见[报告](docs/STUDY_REPORT.md)。
 
+[原生数字表](docs/NUMBERS.md)从已验收process只读生成，绑定process与原生formatter SHA；保留Experiment/Run数字，去掉仅本机存在的日志超链接。每格一个Run，std=0不代表稳定性；未新增模型执行或测速。
+
 上列命令为本轮原执行入口；已有Run不重跑或重新冻结。后续复现实验使用新Study版本，保留本轮原始来源锁。原始Run、逐prompt argmax JSONL、完整tokens、权重与缓存只保留本机。
 
 首次v2四Run均在模型加载前报ModelScope CacheNotFound，未执行解码；失败Run保留。补接shared/model/modelscope/Qwen/Qwen3-8B到此前同一已校验本地snapshot后，以v3新Run执行，不覆盖/重签v2。只修本地缓存接入，配置设置及源代码不变。

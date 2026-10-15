@@ -6,6 +6,8 @@
 
 Enmao 最新指示的独立诊断：[4B BF16 输出 mask 差距诊断](4b-mask-geometry-2026-10-15.md)、[全 480 条 CPU 证据](4b-mask-geometry-cpu-2026-10-15.json)、[固定预算观测协议](../../studies/qwen3_4b_bf16_five_methods/docs/GEOMETRY_PLAN.md)。只分析既有结果及小规模 4B 几何，不恢复其他研究或 8B 算子数值链。
 
+后续[候选质量与固定窗口阶段报告](4b-mask-window-2026-10-15.md)推进到同前缀真实干预：输入一阶四窗口首目标排名更好，输出局部改法未增加接受；补充固定模板差分混杂、径向分解和树预算/Top-1父节点限制。追加2个条件窗口也已完成，未发现输出接受增益，正负结果分表保留；共享GPU释放后按准入执行，无遗留等待任务。
+
 原作者官方代码复现仍有来源缺口：[ESP 官方代码复现报告与来源核查](esp-official-code-reproduction-2026-10-15.md)、[请求状态/commit/SHA 审计](esp-official-source-audit-2026-10-15.json)。尚未核验到可运行的作者实现，OpenReview 补充材料访问不完整；该次来源核查未启动 GPU。此前 8B 数字为自实现参考，不满足原作者代码要求。
 
 | **文件** | **性质** |

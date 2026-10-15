@@ -24,7 +24,7 @@ set PYTHONUTF8=1
 python -m pytest tests/spec_mtp
 ```
 
-For a fresh [smoke](studies/smoke/README.md), copy `studies/smoke` to an isolated directory and set a new Study name and `algorithm.config.version` before `python -m spec_mtp make <copy>` and `launch <copy>`. Every Run must have `exact_match_rate=1` and complete raw evidence. Source/input changes require explicit make/remake; do not rerun historical Run IDs. See the [acceptance report](studies/smoke/docs/STUDY_REPORT.md).
+For a fresh [smoke](studies/smoke/README.md), copy `studies/smoke` to an isolated directory and set a new Study name and `algorithm.config.version` before `python -m spec_mtp make <copy>` and `launch <copy>`. New T0 speculative Runs require a complete verifier-argmax audit: every committed token must equal its verification forward's argmax. Independent AR exactness is diagnostic; all Runs still require complete raw and source evidence. Source/input changes require explicit make/remake; do not rerun historical Run IDs. See the [acceptance report](studies/smoke/docs/STUDY_REPORT.md).
 
 GPU cells are new Studies under `studies/`. Copy `_template/`. SpecBench lives in `datasets/spec_bench/` and is copied into that Study's `shared/data` on the first Run. ModelScope / HF weights land in `shared/model`. Do not start from `src/main.py`.
 

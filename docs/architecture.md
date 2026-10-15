@@ -100,7 +100,7 @@ history-extrapolation 和论文设置（长上下文、100/256 new tokens）碰�
 
 `spec_metrics.csv` 每 prompt 一行：`prompt`、`category`、`new_tokens`、`committed`、`decode_calls`、`accepted`、`tau`、`spec_time`、`hit_context_limit`。开了 AR 基线还有 `ar_time`、`ar_calls`、`exact_match`。`hit_context_limit = 1` 时 AR 按方案 A 截断。
 
-`accepted` 是留下的 draft。`committed = accepted + decode_calls`（预算或 EOS 截断的最后一拍除外）。`tau = committed / decode_calls`。`summary.csv` 的 `tau` 是 `sum(committed) / sum(decode_calls)`。`exact_match_rate` 必须是 1。`tau` 在 naive / efficient 之间不变，墙钟会变。
+`accepted` 是留下的 draft。`committed = accepted + decode_calls`（预算或 EOS 截断的最后一拍除外）。`tau = committed / decode_calls`。`summary.csv` 的 `tau` 是 `sum(committed) / sum(decode_calls)`。独立AR的`exact_match_rate`与逐prompt首分叉仅诊断；T0硬门是全部提交token等于对应验证前向logits的argmax，详见上方Run gates。`tau` 在 naive / efficient 之间不变，墙钟会变。
 
 `ar_baseline` 只写 AR 列。alignment probe 写 `alignment_metrics.csv`，不写投机 CSV。
 

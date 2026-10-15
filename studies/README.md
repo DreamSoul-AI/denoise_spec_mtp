@@ -51,7 +51,7 @@ SpecMTP 声明使用 `recipe: recipe.py` 和 `source: spec_mtp`。Study recipe �
 
 write 先执行 Study hook 再由库定稿，其他阶段先库后 Study；prepare 需要构造前职责时才使用 `before(ctx)`。默认阶段不能复制成第二套 runner。Study scope 没有单 Run layout，不得在每个 Run 重跑矩阵。子集不完整、混合来源或专项门失败时，通用 `complete` 与专项质量不能报告完整通过。
 
-指标口径见 [architecture.md](../docs/architecture.md)：`exact_match_rate == 1` 是硬门；accepted 为所有深度接受的 draft 数，沿用预算/EOS 截断前统计；`accept_d1` 等是深度诊断。new_tokens 包含 prefill 首 token，committed 是 decode pass 提交量，τ 为总 committed / 总 decode_calls。速度单列条件和单位，不代替正确性与研究结论；γ 不叫 slope。training-free 不意味着去掉 mask 更新的 autograd；不改变权重、mask/EMA、树/cache、位置/attention、接受、EOS 或预算语义来获得通过。
+指标口径见 [architecture.md](../docs/architecture.md)：当前T0硬门是全部提交token等于对应验证前向logits的argmax，独立AR一致率及逐prompt首分叉仅诊断，不阻塞summarize/write/process；历史冻结协议与Run不重签。accepted 为所有深度接受的 draft 数，沿用预算/EOS 截断前统计；`accept_d1` 等是深度诊断。new_tokens 包含 prefill 首 token，committed 是 decode pass 提交量，τ 为总 committed / 总 decode_calls。速度单列条件和单位，不代替正确性与研究结论；γ 不叫 slope。training-free 不意味着去掉 mask 更新的 autograd；不改变权重、mask/EMA、树/cache、位置/attention、接受、EOS 或预算语义来获得通过。
 
 ## 4. 来源冻结与复跑
 

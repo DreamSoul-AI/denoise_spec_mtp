@@ -35,4 +35,6 @@
 
 实际队列停止检查首次因子进程仍在而拒绝，后续新旧队列短暂重叠，目录存在门阻止重复尝试；已取消重复队列，原队列因目录保护退出，全部0-forward，记录不删除。后续只单次串行准入。第16次的PID 34924/63696是量化CPU校准数据准备：已读两个脚本，只有tokenizer/datasets采样及CPU tensor保存，没有模型/CUDA前向；`watch_calibration.py` SHA `dc3f6db96ca5698f19feba0a7e6a23c2f5bd7602bbf29b38cb78c03c8b29e845`，`prepare_official_calibration.py` SHA `669a03a0e26231c9e7fbb0bd1d261c892dbe2f57da1164abd06123f94c324baf`。仅识别已核验CPU作业，不操作该作业。
 
+第17次新增PID 44856/55352对应RPipe `watch-publication-main.py`，已读源码，仍是同一只读CI查询器，SHA `336458e7229ec727348604c9142ec1a63283d2a77f00c81f235f34b24cdb3350`。这只是外部CPU资源识别，不授权或执行外部仓库的main合并。
+
 全部提交token必须等于对应验证前向argmax，当前owner argmax不变，输出零阶控制续接旧Run。独立AR仅旧诊断，不新增AR前向。任一数学门、来源、有限值、预算或控制失败即保存停止；不跑8B、不测速、不删数据、不改默认配方、不钻算子机理。按长期授权正常提交/推工作分支/PR合dev，保留分支，不合main。

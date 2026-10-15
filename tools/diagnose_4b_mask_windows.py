@@ -31,6 +31,8 @@ def admission(initial=True):
         processes = [processes]
     processes = [p for p in processes if p['ProcessId'] != os.getpid()]
     inspected = {
+        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-publication-main.py':
+            '336458e7229ec727348604c9142ec1a63283d2a77f00c81f235f34b24cdb3350',
         'D:/GitHub/DreamSoul/quantization/.tmp/paroquant-reference/watch_calibration.py':
             'dc3f6db96ca5698f19feba0a7e6a23c2f5bd7602bbf29b38cb78c03c8b29e845',
         'D:/GitHub/DreamSoul/quantization/.tmp/paroquant-reference/prepare_official_calibration.py':

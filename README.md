@@ -2,7 +2,7 @@
 
 ESP reproduction + EMA-velocity masks.
 
-当前研究计划：[中文](docs/research-plan.md) / [English](docs/research-plan.en.md)。按新版规范组织文献、数据、模型、算法、指标与实验；旧v6为历史草稿。正在运行的全480方向Study继续执行，结果另见[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)，不改其冻结PLAN。
+当前研究计划：[中文](docs/research-plan.md) / [English](docs/research-plan.en.md)。按新版规范组织文献、数据、模型、算法、指标与实验；旧v6为历史草稿。全480方向Study已完成并由[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)合dev，冻结PLAN及历史证据保留。当前不启动SD GPU实验，算力优先留给量化同协议对照；新实验等Enmao指定方向。
 
 Training-free multi-token prediction:
 

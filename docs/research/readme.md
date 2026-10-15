@@ -2,6 +2,8 @@
 
 人写的研究计划，不是 Study 执行合同。Study 的 `PLAN.md` / `STUDY_REPORT.md` 仍在 `studies/<name>/docs/`。已记下的接受数在 [history-extrapolation.md](../history-extrapolation.md)。
 
+当前结果速读：[SD 阶段报告：8B ESP 复现与 4B BF16 方法比较](sd-stage-report-2026-10-15.md)。集中列出已有结果的 τ、论文差值、全部逐 prompt 胜平负、正确性门、排名与局限，并逐表链接原始结果文件；下一步建议尚未执行。
+
 | **文件** | **性质** |
 | --- | --- |
 | [research-plan-v6.md](research-plan-v6.md) | denoising speculative decoding 草案。主方法和卡尔曼变体均【待测】；附录 C 的输入空间 / 树形格子才是【实测】 |

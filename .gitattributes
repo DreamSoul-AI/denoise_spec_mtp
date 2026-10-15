@@ -266,3 +266,9 @@
 /docs/research/4b-mask-active-observations-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-mask-active-readout-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-mask-active-admission-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-mask-template-unconditional-observations-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-mask-template-unconditional-readout-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-mask-template-conditioned-observations-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-mask-template-conditioned-readout-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-mask-template-admission-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-mask-template-opportunities-2026-10-15.json -text whitespace=cr-at-eol

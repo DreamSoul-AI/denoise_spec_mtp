@@ -1,14 +1,12 @@
 # Qwen3-4B BF16 paired report
 
-完整验收：False；已完成 0/11。
+完整验收：False；已完成 1/11。
 
-2026-10-15执行状态：原生make/source/Study冻结检查通过，source digest 538e52c929a542a8（56文件），代码8047281。11格顺序已核对为AR、BC30五方法、BC60五方法；round1/单GPU。独立AR 0e25348a3a60d601于12:09 +08:00进入execute，首forward前已实测BF16/cuda、tied-storage、embedding shape [151936,2560]与全部冻结模型/480输入匹配。尚无完成Run，不外推收益；该运行状态不改冻结PLAN。
-
-工程支持[PR #11](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/11)已于2026-10-15T04:17:30Z经两项CPU CI及Branch flow全部SUCCESS后合dev（73eaad87d7edc10ae8a24eff974afa0f066c2c1e）。之前CI未完时的合并命令曾被自动审批拒绝，未执行；准确命令和拒绝理由及后续解决记录见[交接](../../../docs/handover.md)。源码、冻结PLAN、输入及正在运行的执行链未因合并而更改。
+运行检查点：独立AR 0e25348a3a60d601全480条原生succeeded，阅读器再次通过verify_evidence、来源/Study冻结门及480输入/14模型文件SHA核对，共81,880新token和81,880主model calls。source digest 538e52c929a542a8，实际BF16 model digest 535de659a78af3855c5eafe361e9244ec4d793fc2abd2e95e24a71debe64605f。BC30 frozen mean 30d0bfa0924c4478已自动接续；首forward前已实测与AR的model digest、runtime、seed和全部prompt相同，双mask/BC30/动态剪枝/λ=0/update=false符合冻结配置。方法格尚无终态，不能据此推断收益；完整paired证据仍待11格与native process全部通过。
 
 | Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact | argmax checked |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AR | pending | pending | pending | pending | pending | pending | pending | pending |
+| AR | succeeded | n/a | 81880 | 81880 | n/a | n/a | n/a | n/a |
 | 30/frozen_mean | pending | pending | pending | pending | pending | pending | pending | pending |
 | 30/input_zero | pending | pending | pending | pending | pending | pending | pending | pending |
 | 30/input_first | pending | pending | pending | pending | pending | pending | pending | pending |
@@ -19,6 +17,11 @@
 | 60/input_first | pending | pending | pending | pending | pending | pending | pending | pending |
 | 60/output_zero | pending | pending | pending | pending | pending | pending | pending | pending |
 | 60/output_first | pending | pending | pending | pending | pending | pending | pending | pending |
+
+相对独立AR的逐prompt调用数比较；calls越低越好。AR没有draft接受数，该指标不适用。输出长度及AR首分叉单列，不能将不同长度的调用数直接解释为等长加速。
+
+| Cell | calls vs AR W/T/L | Δcalls vs AR |
+| --- | --- | --- |
 
 以下胜负指第二方法相对第一方法；accepted越高越好，calls越低越好，两个指标分别判定。
 

@@ -17,57 +17,26 @@ import torch
 
 VARIANTS = ('zero', 'input_first', 'first', 'shifted', 'radial', 'both')
 TEMPLATE_VARIANTS = ('zero', 'input_first', 'input_template', 'input_mean')
+EARLY_ROOTS = {121: 1, 401: 0, 241: 1, 161: 2}
 
 
 def admission(initial=True):
-    from analyze_4b_geometry import sha
-    gpu = subprocess.check_output(['nvidia-smi', '--query-gpu=memory.free,memory.used',
+    import csv
+    gpu = subprocess.check_output(['nvidia-smi', '--id=0', '--query-gpu=memory.free,memory.used',
                                    '--format=csv,noheader,nounits'], text=True).strip().split(', ')
-    command = ("Get-CimInstance Win32_Process | Where-Object {$_.Name -eq 'python.exe'} | "
-               'Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress')
-    raw = subprocess.check_output(['powershell', '-NoProfile', '-Command', command], text=True)
-    processes = json.loads(raw) if raw.strip() else []
-    if isinstance(processes, dict):
-        processes = [processes]
-    processes = [p for p in processes if p['ProcessId'] != os.getpid()]
-    inspected = {
-        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-publication-main.py':
-            '336458e7229ec727348604c9142ec1a63283d2a77f00c81f235f34b24cdb3350',
-        'D:/GitHub/DreamSoul/quantization/.tmp/paroquant-reference/watch_calibration.py':
-            'dc3f6db96ca5698f19feba0a7e6a23c2f5bd7602bbf29b38cb78c03c8b29e845',
-        'D:/GitHub/DreamSoul/quantization/.tmp/paroquant-reference/prepare_official_calibration.py':
-            '669a03a0e26231c9e7fbb0bd1d261c892dbe2f57da1164abd06123f94c324baf',
-        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-publication.py':
-            '4f9b8c486aff8b93cc18116100e9013290e469fe8ed362639b4ebf790bf2dece',
-        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-version-dev.py':
-            'b69fd1fe0c67a405afee52be9599cd79cb06459b5abc23b17860ea9014d2ce92',
-        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-version-final.py':
-            'f33abb9086f09bbf917118b20a5fc10cd3c13cca8ec0690b6d0178ef4a399763',
-        'D:/GitHub/diaoenmao/RPipe/.tmp/systematic-contracts-20261015/watch-first-dev.py':
-            'fdba7ab0c68e17d47af938df1997c25560f0276213c0b3960d183061283bf7e7',
-        'D:/GitHub/diaoenmao/RPipe/.tmp/systematic-contracts-20261015/watch-first.py':
-            '08bd5e0fb31e1d7d453827879e5c82e6b84f708794bda8e2135357a75558ebce',
-        'D:/GitHub/diaoenmao/RPipe/.tmp/systematic-contracts-20261015/watch-second.py':
-            'c10313215b37de40ec62d6dd96ed6d4d5ef868a9f87cf21f6c6df9898d57516a',
-        'D:/GitHub/DreamSoul/quantization/.tmp/paroquant-reference/build_official_container_v3.py':
-            'bc206af76763f1364fe2565be1be8cf2294342aaa414f3b263cbf115dafcceec'}
-    known = []
-    for p in processes:
-        cmd = p['CommandLine'] or ''
-        if ('release-ci.py' in cmd or ('RPipe' in cmd and 'and not gpu and not slow' in cmd)
-                or any(Path(name).name in cmd and Path(name).is_file() and sha(name) == digest
-                       for name, digest in inspected.items())):
-            known.append(p['ProcessId'])
-    for _ in processes:
-        children = [p['ProcessId'] for p in processes if p['ProcessId'] not in known and p.get('ParentProcessId') in known]
-        if not children:
-            break
-        known.extend(children)
-    unknown = [p['ProcessId'] for p in processes if p['ProcessId'] not in known]
-    return {'passed': not unknown and (not initial or int(gpu[0]) >= 18 * 1024),
-            'free_mib': int(gpu[0]), 'used_mib': int(gpu[1]), 'foreign_python_count': len(processes),
-            'verified_cpu_count': len(known), 'unknown_python_count': len(unknown),
-            'unknown_python_pids': unknown, 'initial': initial}
+    raw = subprocess.check_output(['nvidia-smi', '--id=0', '--query-compute-apps=pid,process_name',
+                                   '--format=csv,noheader,nounits'], text=True)
+    foreign = []
+    for row in csv.reader(raw.splitlines()):
+        if not row:
+            continue
+        pid, name = row
+        if int(pid) != os.getpid() and Path(name.strip().replace('\\', '/')).name.lower().startswith('python'):
+            foreign.append(int(pid))
+    required = 14 * 1024
+    return {'passed': not foreign and (not initial or int(gpu[0]) >= required),
+            'free_mib': int(gpu[0]), 'used_mib': int(gpu[1]), 'required_free_mib': required,
+            'foreign_gpu_python_pids': foreign, 'gpu_index': 0, 'initial': initial}
 
 
 def intervention_masks(shadow, proxies, zero):
@@ -280,9 +249,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--study', required=True, type=Path)
     parser.add_argument('--out', required=True, type=Path)
-    parser.add_argument('--active-depth', action='store_true', help='Separate conditioned q121/q401 protocol; not a random-sample extension')
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument('--active-depth', action='store_true', help='Separate conditioned q121/q401 protocol; not a random-sample extension')
+    selection.add_argument('--early-template', action='store_true', help='Fixed earlier output-control roots before selected input-path differences')
     parser.add_argument('--template-control', action='store_true', help='Frozen template velocity and zero velocity at the same native input mean')
     args = parser.parse_args()
+    assert not args.early_template or args.template_control
     assert not args.out.exists()
     args.out.mkdir(parents=True)
     qids, limit = ((121, 401), 64) if args.active_depth else ((121, 401, 241, 161), 128)
@@ -291,10 +263,12 @@ def main():
     if args.template_control:
         plan = 'MASK_TEMPLATE_PLAN.md'
         limit = 48 if args.active_depth else 96
+    if args.early_template:
+        plan, limit = 'MASK_EARLY_TEMPLATE_PLAN.md', 64
     report = {'status': 'preflight', 'quality_passed': False, 'admission': [], 'rows': [], 'model_calls': 0,
               'forward_limit': limit, 'no_timing': True, 'no_8b': True, 'tool_sha256': sha(__file__),
               'variants': variants, 'template_control': args.template_control,
-              'sample_mode': 'conditioned_top1_only' if args.active_depth else 'unconditioned_first_root_ge8',
+              'sample_mode': 'selected_early_predecessors' if args.early_template else 'conditioned_top1_only' if args.active_depth else 'unconditioned_first_root_ge8',
               'plan_sha256': sha(args.study / ('docs/' + plan))}
     def save():
         (args.out / 'windows.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
@@ -352,9 +326,13 @@ def main():
                 apply_runtime(seed, SystemConfig.from_mapping({'config': {'deterministic': False}}))
                 ids = torch.tensor([p['input_ids']], device=model.device)
                 minimum = active_predecessor(raw[index]['stats']['trace'], len(p['input_ids'])) if args.active_depth else 8
+                if args.early_template:
+                    minimum = EARLY_ROOTS[qid]
                 if args.active_depth:
                     assert minimum == {121: 3, 401: 19}[qid]
                 packet = capture_window(model, ids, cell['actual_settings']['spec'], cell['actual_settings']['eval'], prompts['eos_token_ids'], seed, minimum=minimum)
+                if args.early_template:
+                    assert packet['root_index'] == minimum
                 packet['masks']['input_first'] = input_control(model, ids,
                     raw[index]['output_ids'][len(p['input_ids']):len(p['input_ids']) + packet['root_index'] + 1],
                     paired['cells']['30/input_first']['actual_settings']['spec'])

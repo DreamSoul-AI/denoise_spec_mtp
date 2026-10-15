@@ -116,16 +116,22 @@ def test_template_and_zero_controls_keep_same_updated_mean(monkeypatch):
     assert torch.equal(mean[0], esp.masks())
 
 
-def test_window_admission_rejects_unrelated_work_and_tracks_cpu_children(monkeypatch):
-    import json
+def test_window_admission_uses_only_gpu_residency_and_capacity(monkeypatch):
     m = tool('diagnose_4b_mask_windows', monkeypatch)
-    processes = [{'ProcessId': -1, 'ParentProcessId': 0, 'CommandLine': 'python release-ci.py'},
-                 {'ProcessId': -2, 'ParentProcessId': -1, 'CommandLine': None}]
-    monkeypatch.setattr(m.subprocess, 'check_output', lambda args, **kw:
-                        '19000, 2000' if args[0] == 'nvidia-smi' else json.dumps(processes))
-    assert m.admission()['passed'] and m.admission()['verified_cpu_count'] == 2
-    processes.append({'ProcessId': -3, 'ParentProcessId': 0, 'CommandLine': 'python unknown_model.py'})
-    assert not m.admission()['passed']
+    free = 19000
+    processes = f'1, C:\\Windows\\dwm.exe\n{m.os.getpid()}, D:\\python.exe\n'
+    def query(args, **kwargs):
+        assert args[0] == 'nvidia-smi' and '--id=0' in args
+        return f'{free}, 2000' if '--query-gpu=memory.free,memory.used' in args else processes
+    monkeypatch.setattr(m.subprocess, 'check_output', query)
+    assert m.admission()['passed']
+    processes += '999999, D:\\unknown\\Python3.13.exe\n'
+    assert not m.admission()['passed'] and m.admission()['foreign_gpu_python_pids'] == [999999]
+    processes = ''
+    free = 14000
+    assert not m.admission()['passed'] and m.admission(initial=False)['passed']
+    free = 19000
+    assert m.admission()['passed']
 
 
 def test_coverage_separates_budget_and_correct_parent_from_real_acceptance(monkeypatch):

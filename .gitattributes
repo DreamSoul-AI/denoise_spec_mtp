@@ -258,3 +258,5 @@
 /tools/analyze_4b_velocity.py -text whitespace=cr-at-eol
 /tools/diagnose_4b_mask_windows.py -text whitespace=cr-at-eol
 /studies/qwen3_4b_bf16_five_methods/docs/MASK_WINDOW_PLAN.md -text whitespace=cr-at-eol
+/tools/analyze_4b_window_results.py -text whitespace=cr-at-eol
+/studies/qwen3_4b_bf16_five_methods/docs/MASK_ACTIVE_PLAN.md -text whitespace=cr-at-eol

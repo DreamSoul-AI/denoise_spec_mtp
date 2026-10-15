@@ -92,3 +92,24 @@ def test_window_admission_rejects_unrelated_work_and_tracks_cpu_children(monkeyp
     assert m.admission()['passed'] and m.admission()['verified_cpu_count'] == 2
     processes.append({'ProcessId': -3, 'ParentProcessId': 0, 'CommandLine': 'python unknown_model.py'})
     assert not m.admission()['passed']
+
+
+def test_coverage_separates_budget_and_correct_parent_from_real_acceptance(monkeypatch):
+    m = tool('analyze_4b_window_results', monkeypatch)
+    logits = torch.tensor([[5., 4.9, 1., 0.], [0., 0., 6., 0.]])
+    tree, r = m.coverage(logits, root=3, truth=[1, 2], budget=3)
+    assert r['reference_d1_in_tree'] and not r['reference_d1_is_expanded_top1']
+    assert not r['reference_d2_in_actual_tree'] and r['oracle_parent_d2_definite_coverage_only']
+    assert r['all_budget_to_d1_definite_coverage_only']
+    _, repeated = m.coverage(logits, root=1, truth=[1, 2], budget=3)
+    assert repeated['repeat_pruning_bans_d1'] and not repeated['all_budget_to_d1_possible_coverage_only']
+    assert m.rank_interval(torch.tensor([2., 2., 0.]), 0, 2) == (1, 2)
+
+
+def test_active_selection_uses_first_predecessor_and_rejects_no_opportunity(monkeypatch):
+    m = tool('diagnose_4b_mask_windows', monkeypatch)
+    trace = [{'root_position': 5, 'accepted_nodes': []}, {'root_position': 6, 'accepted_nodes': [1, 2]},
+             {'root_position': 9, 'accepted_nodes': [1]}, {'root_position': 11, 'accepted_nodes': [1]}]
+    assert m.active_predecessor(trace, 5) == 1
+    with pytest.raises(ValueError, match='No predefined'):
+        m.active_predecessor(trace[:2], 5)

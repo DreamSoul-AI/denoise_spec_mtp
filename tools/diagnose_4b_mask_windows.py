@@ -93,6 +93,13 @@ def walk(tree, logits):
         owner = child
 
 
+def active_predecessor(trace, prompt_length):
+    for previous, current in zip(trace, trace[1:]):
+        if current['accepted_nodes'] == [1]:
+            return previous['root_position'] - prompt_length
+    raise ValueError('No predefined top1-only control opportunity; do not replace the prompt')
+
+
 @torch.no_grad()
 def input_control(model, prompt, generated_prefix, spec):
     from spec_mtp.structure.algorithm.mask_providers import build_mask_provider
@@ -249,12 +256,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--study', required=True, type=Path)
     parser.add_argument('--out', required=True, type=Path)
+    parser.add_argument('--active-depth', action='store_true', help='Separate conditioned q121/q401 protocol; not a random-sample extension')
     args = parser.parse_args()
     assert not args.out.exists()
     args.out.mkdir(parents=True)
+    qids, limit = ((121, 401), 64) if args.active_depth else ((121, 401, 241, 161), 128)
+    plan = 'MASK_ACTIVE_PLAN.md' if args.active_depth else 'MASK_WINDOW_PLAN.md'
     report = {'status': 'preflight', 'quality_passed': False, 'admission': [], 'rows': [], 'model_calls': 0,
-              'forward_limit': 128, 'no_timing': True, 'no_8b': True, 'tool_sha256': sha(__file__),
-              'plan_sha256': sha(args.study / 'docs/MASK_WINDOW_PLAN.md')}
+              'forward_limit': limit, 'no_timing': True, 'no_8b': True, 'tool_sha256': sha(__file__),
+              'sample_mode': 'conditioned_top1_only' if args.active_depth else 'unconditioned_first_root_ge8',
+              'plan_sha256': sha(args.study / ('docs/' + plan))}
     def save():
         (args.out / 'windows.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     local = {}
@@ -297,10 +308,10 @@ def main():
                       reference_run=cell['run_id'], reference_raw_sha256=sha(raw_path))
         def count(_module, _args):
             report['model_calls'] += 1
-            assert report['model_calls'] <= 128
+            assert report['model_calls'] <= limit
         handle = model.register_forward_pre_hook(count)
         try:
-            for qid in (121, 401, 241, 161):
+            for qid in qids:
                 check = admission(initial=False)
                 report['admission'].append(check)
                 assert check['passed'], 'New foreign work; stop this diagnostic'
@@ -310,11 +321,19 @@ def main():
                 seed = cell['rows'][index]['generator_seed']
                 apply_runtime(seed, SystemConfig.from_mapping({'config': {'deterministic': False}}))
                 ids = torch.tensor([p['input_ids']], device=model.device)
-                packet = capture_window(model, ids, cell['actual_settings']['spec'], cell['actual_settings']['eval'], prompts['eos_token_ids'], seed)
+                minimum = active_predecessor(raw[index]['stats']['trace'], len(p['input_ids'])) if args.active_depth else 8
+                if args.active_depth:
+                    assert minimum == {121: 3, 401: 19}[qid]
+                packet = capture_window(model, ids, cell['actual_settings']['spec'], cell['actual_settings']['eval'], prompts['eos_token_ids'], seed, minimum=minimum)
                 packet['masks']['input_first'] = input_control(model, ids,
                     raw[index]['output_ids'][len(p['input_ids']):len(p['input_ids']) + packet['root_index'] + 1],
                     paired['cells']['30/input_first']['actual_settings']['spec'])
                 rows, tensors = probe_window(model, packet, cell['actual_settings']['spec'], raw[index]['output_ids'][len(p['input_ids']):])
+                if args.active_depth:
+                    control = tensors['zero']
+                    assert packet['root_index'] == minimum and rows[0]['next_accept_depth'] == 1
+                    assert len(rows[0]['next_tree_widths']) == 2 and rows[0]['next_tree_widths'][1] > 0
+                    assert control['next_tree']['tokens'][0] == control['next_chosen'][0]
                 for row in rows:
                     row['question_id'] = qid
                 report['rows'].extend(rows)
@@ -324,7 +343,7 @@ def main():
                 del packet
         finally:
             handle.remove()
-        assert len(report['rows']) == 24 and manifest()['digest'] == report['source_digest']
+        assert len(report['rows']) == len(qids) * 6 and manifest()['digest'] == report['source_digest']
         torch.save(local, args.out / 'private_logits.pt')
         report.update(status='complete', quality_passed=True, private_logits_sha256=sha(args.out / 'private_logits.pt'))
     except Exception as error:
@@ -332,7 +351,7 @@ def main():
         save()
         raise
     save()
-    print('Complete: 24 local interventions; no full generation or timing', flush=True)
+    print('Complete:', len(report['rows']), 'local interventions; no full generation or timing', flush=True)
 
 
 if __name__ == '__main__':

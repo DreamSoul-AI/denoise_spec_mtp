@@ -7,3 +7,5 @@
 配置和来源预检已完成：11格在原生RPipe展开检查中通过；4B 14文件与魔搭直接SHA256/历史检查点一致，480条4B tokenizer输入与前置Table1逐token一致。离线魔搭缓存已接入，缓存master revision身份无法确认的原始警告如实保留，内容SHA已核验。详见[模型来源](docs/modelscope-content-verification-v1.json)、[输入清单](docs/prompts_manifest.json)。无计时adapter在每Run首forward前核对冻结模型/输入，检查实际tied-storage；协议/恢复/CUDA loader及四phase导出回归通过。
 
 配对阅读器`analyze_results.py`保留五方法全部两两对照、逐prompt接受/calls赢平输及AR首分叉，另显式列出每个方法相对同一独立AR的调用数赢平输、Δcalls和两侧输出长度。AR无draft接受数，该项不适用。复用native证据/source/Study冻结门，仅全11格与process通过后生成正式证据；未完成格保持pending。运行和结论见[当前报告](docs/STUDY_REPORT.md)，CPU tiny/合成回归不代替真实4B。
+
+全部11格验收后，阅读器同时生成`docs/figures/paired_outcomes.png`：两个预算各展示接受数和调用数的完整五方法胜负矩阵，格内W/T/L、颜色W−L，固定范围±480，保留全部输局；正式JSON记录绘图器SHA。未完成、失败、缺失或重复配对不生成图。布局回归使用明确标注的合成计数，真实图只来自完整正式证据；图不表示测速或总体显著性。

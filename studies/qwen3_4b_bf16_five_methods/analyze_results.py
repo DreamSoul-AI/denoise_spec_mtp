@@ -182,6 +182,8 @@ def main():
     body = {'complete': ready, 'scope': '480 prompts; BF16/T0; two-mask dynamic pruned BC30/60; one seed',
             'argmax_is_gate_AR_is_diagnostic': True, 'timing_disabled': True,
             'analyzer_sha256': file_hash(Path(__file__)), 'cells': cells, 'pairs': pairs}
+    if ready:
+        body['plotter_sha256'] = file_hash(study/'plot_results.py')
     name = 'paired_evidence_v1.json' if ready else 'paired_pending.json'
     target = study/'docs'/name
     text = json.dumps(body, indent=2, allow_nan=False)+'\n'
@@ -189,6 +191,10 @@ def main():
         assert target.read_text(encoding='utf-8') == text
     else:
         assert ready or not (study/'docs/paired_evidence_v1.json').exists()
+    if ready:
+        from plot_results import write_plot
+        write_plot(body, study/'docs/figures/paired_outcomes.png')
+    if not ready or not target.exists():
         target.write_text(text, encoding='utf-8')
     lines = ['# Qwen3-4B BF16 paired report', '', f"完整验收：{ready}；已完成 {sum('rows' in c for c in cells.values())}/11。",
              '', '| Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact/n (rate) | argmax checked |',
@@ -216,6 +222,9 @@ def main():
     lines += ['', 'accepted为EOS/预算裁剪前候选接受数；committed及τ包含bonus、按裁剪后实际解码提交数计算，不含prefill首token。argmax审计含首token且必须全过；独立AR首分叉和输出长度全部保留，不作为失败门。AR参考不冒充Spec验证argmax审计。', '',
               '模型、forward及最终mask为BF16；输出EMA/范数沿用原生FP32内部状态。不同方法β等沿用预先定义配方，不声称差异仅由输入/输出空间造成。单seed、固定480条，不推断总体优越或测速收益；零计时字段为占位。', '',
               f'逐prompt计数、两两赢平输及AR首分叉见[{name}]({name})。' if ready else '尚无完整实测结论；本机pending文件不作为公开证据。', '', '[冻结计划](PLAN.md)；原始tokens、完整Run和权重仅本机保留。']
+    if ready:
+        lines += ['', '![Full480 paired wins ties losses](figures/paired_outcomes.png)', '',
+                  '图：行方法相对列方法，格内为W/T/L，颜色为净赢数W−L，固定范围±480；接受数越高越好，调用数越低越好。两个预算的全部方法对照和输局均保留，对角不作比较。独立AR调用数、一致率、首分叉与输出长度另列于表格及正式证据；本图不表示测速或总体显著性。']
     (study/'docs/STUDY_REPORT.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')
     print(json.dumps({'complete': ready, 'observed': sum('rows' in c for c in cells.values()), 'pairs': len(pairs)}))
 

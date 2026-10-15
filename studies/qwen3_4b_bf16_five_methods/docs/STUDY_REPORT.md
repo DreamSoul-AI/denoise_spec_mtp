@@ -2,8 +2,6 @@
 
 完整验收：False；已完成 5/11。
 
-运行检查点：输出零阶fb6416c3a8a77ec3全480原生succeeded，80,877提交token的argmax全过；真实owner、观测路径、prefill及实际BF16 mask范数证据再次通过原生复核，未放宽提交token的argmax条件。相对输入零阶，accepted总数+456、主calls−361，逐prompt接受数W/T/L=231/38/211、调用数236/34/210，输出总长+90；相对输入一阶为accepted−2,989、calls+2,909，接受数106/40/334、调用数116/42/322，输出总长−21。相对frozen mean的+1,194/−1,248及全部反例亦保留。独立AR一致177/480（36.88%）仅诊断，不能据此宣称同输出加速或五方法普遍优势。输出一阶2593e53990f8b097已自动接续，实际模型digest/runtime/seed/480输入及tied-storage契约一致，order1/β=.9/β′=.99符合冻结配置。source538e52c929a542a8及冻结PLAN/配置保持；输出一阶和BC60仍待完整验收。
-
 | Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact/n (rate) | argmax checked |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | AR | succeeded | n/a | 81880 | 81880 | n/a | n/a | n/a | n/a |

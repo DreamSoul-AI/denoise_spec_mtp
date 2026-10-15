@@ -31,6 +31,8 @@ def admission(initial=True):
         processes = [processes]
     processes = [p for p in processes if p['ProcessId'] != os.getpid()]
     inspected = {
+        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-publication.py':
+            '4f9b8c486aff8b93cc18116100e9013290e469fe8ed362639b4ebf790bf2dece',
         'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-version-dev.py':
             'b69fd1fe0c67a405afee52be9599cd79cb06459b5abc23b17860ea9014d2ce92',
         'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-version-final.py':

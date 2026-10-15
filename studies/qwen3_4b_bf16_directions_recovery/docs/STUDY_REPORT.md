@@ -2,7 +2,7 @@
 
 已先登记[PLAN](PLAN.md)，四因素random0/1/2/content各完整480；原template全480成功和旧zero复用，不重跑。只有原资源assert改成同进程准入等待，方向control原文保持，CPU15项针对回归和Ruff通过。
 
-random0/1均已全480并原生succeeded：τ分别1.495188134/1.464349086，81,425/81,356个提交token全argmax通过；完整来源与配对见[direction_partial_v3.json](../../qwen3_4b_bf16_directions/docs/direction_partial_v3.json)和[主报告](../../qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)。random1完整后已组间让卡；量化限时窗口到期未启动，random2已恢复执行，content待接续。原队列自然结束和资源失败全部保留；本Study native process及四格均通过后才称补齐完成，整个目标保持active。
+random0/1/2均已全480并原生succeeded：τ分别1.495188134/1.464349086/1.523884714，81,425/81,356/80,583个提交token全argmax通过；完整来源与配对见[direction_partial_v4.json](../../qwen3_4b_bf16_directions/docs/direction_partial_v4.json)和[主报告](../../qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)。量化第二窗口单Run已终态并释放GPU，原SD队列已接content。原队列自然结束和资源失败全部保留；本Study native process及四格均通过后才称补齐完成，整个目标保持active。
 
 运行快照：random0新Run `2c3e7547a4f931a7`已完成220/480条，来源为本机`runs/2c3e7547a4f931a7/assets/direction_progress.json`。同一GPU进程PID61936在190条附近检测到外部GPU Python PID63780，准入输出`waiting`后自动`resumed`，Run没有失败或重启；随后继续超过220条。恢复状态来源为本机`.tmp/full-direction-resource-wait.json`，其中`status=admitted`、外部GPU Python列表为空、`initial=false`。加载后的准入排除自身模型占用，不将14GiB初始加载余量重复扣减。这是执行恢复证据，不是完整格或τ结果。
 
@@ -21,3 +21,11 @@ random1完整结束后先让量化现有Q-only v3插跑一次，其原optimizer�
 ## CI安装版本漂移
 
 后续[CI run38786263761](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38786263761)实为75 failed/427 passed，而非先前502通过：`transformers>=4.45`解析为5.20.0，其缓存crop接口拒绝现有正数keep_len。结果文件`runtime.transformers`及本机实际安装均为5.12.1；本次把`pyproject.toml`安装版本固定到该已验收版本，不改`src/spec_mtp`、缓存算法、冻结Study、GPU依赖或任何Run。两Study科学source与RPipe冻结门复核通过，方向9项CPU回归通过；新完整CI待当前提交验证，不将旧失败标绿，也不宣称5.20兼容。该修复仅安装可复现性，不开展数值算子机理研究，random2继续原进程执行。
+
+固定版本提交`626930b`后，两项[CPU CI](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38787712253)及Branch flow均已通过，证明当前验收版本的回归恢复；不等于新接口已适配。
+
+## 第二窗口与content接续
+
+random2于03:04:32完整480并原生succeeded，80,583个提交token全argmax通过、τ=1.523884714，见[五格快照](../../qwen3_4b_bf16_directions/docs/direction_partial_v4.json)。第二窗口核对时旧量化排队PID59720已不存在；实际由量化侧新队列28040/原生子进程56752执行同一Run `ec12ed2e4d0633cc`，其03:04:51原生启动、03:09:45 succeeded。容器`59f05ad5...`已退出且exit0，队列也已终态；原结果文件位于`D:/GitHub/DreamSoul/quantization/studies/paroquant_training_reproduction/runs/ec12ed2e4d0633cc/result.json`，队列日志为该仓`.tmp/paroquant-reference/qonly-v3-fastgap.stdout.log`。这里只确认这次资源交接及单Run终态，不替量化主表或完整训练质量背书。
+
+核对原调度器65876创建时间后于03:10:28 resume同一session23573，content Run `bf2985a87c29fb29`子进程17400已开始且prepare通过。没有第二SD队列、没有Run重签、没有改prompt或中止组；也没有遗留由本任务故意挂起的进程。content全480及本Study process尚未完成，整个方向目标仍active。

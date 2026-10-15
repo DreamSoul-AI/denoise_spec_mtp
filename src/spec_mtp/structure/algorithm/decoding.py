@@ -84,12 +84,9 @@ class SpecDecoder:
             raise ValueError(f'Unsupported spec.impl: {self.impl}')
         self.output_hidden = str(spec_cfg.get('method', '')).lower() == 'output_hidden'
         if self.output_hidden:
-            widths = list(spec_cfg.get('tree', {}).get('branches', []))
-            if tree_mode != 'static' or widths != [1] * self.num_masks or spec_cfg.tree.get('pruning', True):
-                raise ValueError('output_hidden requires an unpruned static chain with one node per mask')
             head = model.hf.get_output_embeddings().weight
             if head.data_ptr() != model.embedding_table.data_ptr():
-                raise ValueError('output_hidden prerequisite requires actually tied input/output weights')
+                raise ValueError('output_hidden requires actually tied input/output weights')
         self._attn_cache: Any = TreeAttentionCache() if self.impl == 'efficient' else None
         # Dynamic trees: memoised, vectorised build of the same naive mask (perf only).
         # Static + naive keeps the literal builder for the Table 4 timing ablation.
@@ -188,7 +185,8 @@ class SpecDecoder:
             node_embeds = model.embed(node_ids)[0] if num_nodes else \
                 torch.empty(0, prompt_embeds.size(-1), device=device, dtype=dtype)
             if self.output_hidden:
-                owner_masks = provider.masks_per_owner(proxy_hiddens).to(dtype)
+                depth_masks = provider.masks_per_owner(proxy_hiddens).to(dtype)
+                owner_masks = depth_masks[[0] + tree.depths]
             else:
                 masks = provider.masks().to(dtype)
                 owner_masks = masks.unsqueeze(0).expand(1 + num_nodes, k, -1)

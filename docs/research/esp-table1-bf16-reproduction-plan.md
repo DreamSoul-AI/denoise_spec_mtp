@@ -56,7 +56,7 @@ BC=(k+1)(1+draft_nodes)，本次实际 draft budget=4/14/29，另保留60/2的19
 
 同批 prompt、同树/预算/长度/随机种子，比较 ESP frozen mean、输入零阶 updating mean λ=0.1、输入一阶 mean+gamma、输出零阶 final-normalized hidden 范数映射、输出一阶 final hidden+EMA velocity，另跑独立 AR。逐 prompt 列 accepted/model calls、每个对照的赢平输及 token exact。不得用此前 FP32 数字代替。
 
-这里的 ESP frozen mean 是用户指定的后续基线，区别于 Table 1 updating mean。tied 权重直接用输出 hidden 的尺度映射，不做逆映射。当前 output provider 只支持 unpruned static chain；后续若统一采用 dynamic/pruned，必须先最小扩展并验证 owner/proxy 对齐，不能让方法使用不同树再配对。4B 子实验开始前单独冻结 PLAN、beta/gamma、精度内部计算与实际 tied-storage 检查。按最新最终指示，先完成8B四格全480并写回三种τ、目标差值、AR一致率及verifier argmax自检，再启动4B BF16五方法加AR的同prompt配对；不因BF16相对独立AR的数值失配转入算子机理。不得提前与8B矩阵并发启动4B。
+这里的 ESP frozen mean 是用户指定的后续基线，区别于 Table 1 updating mean。tied 权重直接用输出 hidden 的尺度映射，不做逆映射。4B工作分支已补齐按深度映射到branching/dynamic/pruned树owner的支持，单链默认行为保留；多兄弟、多深度、非首兄弟路径和BF16原生CLI均通过CPU回归，尚无真实4B BF16新结果。不能让方法使用不同树再配对，实际开跑合同见[4B PLAN](../../studies/qwen3_4b_bf16_five_methods/docs/PLAN.md)。4B 子实验开始前单独冻结 PLAN、beta/gamma、精度内部计算与实际 tied-storage 检查。按最新最终指示，先完成8B四格全480并写回三种τ、目标差值、AR一致率及verifier argmax自检，再启动4B BF16五方法加AR的同prompt配对；不因BF16相对独立AR的数值失配转入算子机理。不得提前与8B矩阵并发启动4B。
 
 ## 5. 当前执行与归档（2026-10-15）
 

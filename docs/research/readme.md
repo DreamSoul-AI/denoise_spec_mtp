@@ -11,4 +11,4 @@
 
 [跨任务证伪Study草案](../../studies/output_space_cross_task/README.md)固定另一任务四输入但未运行，含未执行的transformer固定行kernel隔离协议。[最小推送候选与清单](publication-plan.md)、[逐blob manifest](publication-manifest.json)和[PR说明草稿](pr-draft.md)只供本地评审，未推送／新建PR。
 
-当前执行优先级（2026-10-15）：[ESP Table 1 BF16 复现计划](esp-table1-bf16-reproduction-plan.md)。其他研究暂停，0.6B 诊断与 4B FP32 结果保留归档；历史草案的“未执行”表述仅代表写入当时，不代表当前状态。
+当前执行优先级（2026-10-15）：[ESP Table1全480](../../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)已完成且数学门/原生process通过，τ目标未复现；PR #10经CI合dev。现推进[4B BF16五方法配对计划](../../studies/qwen3_4b_bf16_five_methods/docs/PLAN.md)，尚未冻结或运行。其他研究暂停，0.6B与4B FP32保留归档；历史状态不能当当前结论。

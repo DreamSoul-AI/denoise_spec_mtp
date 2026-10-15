@@ -71,4 +71,8 @@ test_sampling_continuation.py新增12项：首命中使用真实seed、零/全�
 
 ## 4B模型接续与禁用计时（2026-10-15）
 
+`test_4b_pairing_contract.py`核对11格BF16配置、480条同输入、来源/输入不符在forward前拒绝、时钟与capture异常恢复、CUDA loader保持BF16；`test_output_hidden.py`覆盖BF16多深度/兄弟树与非首兄弟真实hidden/cache路径，`test_smoke_study.py`新增tiny HF BF16五方法+独立AR六Run原生CLI及owner/范数篡改拒绝。均为CPU tiny/Stub回归，不代表真实4B结果；实际运行与赢平输见[4B PLAN](../studies/qwen3_4b_bf16_five_methods/docs/PLAN.md)。
+
+`test_4b_bf16_readout.py`覆盖接受数/calls各自赢平输、调用数反向判赢、缺失/错位/重复拒绝、AR长度分叉、11格pending不补零，以及native验收后480条合成读出格式。该测试的mock仅验证读出与保留反例，不冒充真实模型或独立native验收。
+
 test_4b_untimed验证三method tiny token/全部语义/calls保持、全局时钟不改及异常恢复、CUDA loader dtype/kwargs/恢复。test_4b_phases验证四phase的函数导出；test_4b_pairs保留正负零及拒绝缺配对。test_4b_input_control验证历史EMA字段/同链/原26与4输入manifest复用。原native配置展开新增4B Study，仍不加载真实权重。实际模型硬门来自10个成功4B native Runs，而非tiny fixture：first26/new4四格+EMA两格，所有输出和两类AR逐token一致。

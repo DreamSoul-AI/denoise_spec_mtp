@@ -4,7 +4,8 @@ import pytest
 from test_window_observer import ROOT
 
 
-@pytest.mark.parametrize('study',['output_space_4b_recheck_v2','output_space_4b_holdout','output_space_4b_input_control'])
+@pytest.mark.parametrize('study',['output_space_4b_recheck_v2','output_space_4b_holdout','output_space_4b_input_control',
+                                'qwen3_4b_bf16_five_methods'])
 @pytest.mark.parametrize('phase',['collect','summarize','write','process'])
 def test_4b_native_phase_entry_is_function_not_module(study,phase):
     directory=ROOT/'studies'/study/'flow'/phase

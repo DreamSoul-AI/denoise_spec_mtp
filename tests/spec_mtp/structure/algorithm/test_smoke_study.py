@@ -254,3 +254,65 @@ def test_output_hidden_real_cli_and_tampered_owner_evidence(study_copy):
     raw_path.write_text(json.dumps(raw))
     with pytest.raises(SpecMtpGateError, match='owner/observation'):
         verify_evidence(yaml.safe_load((run / 'config.yaml').read_text()), run / 'assets')
+
+
+def test_bf16_five_methods_and_independent_ar_native_cli(study_copy, tmp_path):
+    from copy import deepcopy
+    import pytest
+    import torch
+    import yaml
+    from spec_mtp.structure.model.hf_causal import HFCausalLM
+    from spec_mtp.structure.artifact.validation import verify_evidence, SpecMtpGateError
+
+    saved = tmp_path / 'bf16_local_hf'
+    torch.manual_seed(7)
+    model = HFCausalLM(tiny_config={'vocab_size': 256, 'hidden_size': 32, 'intermediate_size': 64,
+        'num_layers': 1, 'num_heads': 2, 'num_kv_heads': 1, 'max_position_embeddings': 256,
+        'tie_word_embeddings': True})
+    model.hf.to(torch.bfloat16).save_pretrained(saved)
+    common = {'num_masks': 2, 'impl': 'naive', 'block_complexity': 30,
+              'tree': {'mode': 'dynamic', 'pruning': True}}
+    variants = [
+        {**common, 'method': 'esp', 'mask': {'init': 'mean_prompt', 'update': False}},
+        {**common, 'method': 'esp', 'mask': {'init': 'mean_prompt', 'lam': .1, 'update': True}},
+        {**common, 'method': 'ema_velocity', 'ema': {'level': 'order0', 'beta': .9999,
+            'lam': .1, 'step_scale': 1., 'normalize': False, 'extrapolate_ema': False}},
+        *[{**common, 'method': 'output_hidden', 'output': {'order': order, 'beta': .9, 'beta_prime': .99}}
+          for order in (0, 1)],
+    ]
+    def patch(study):
+        study['fixed']['model'] = {'name': 'hf_causal', 'source': 'spec_mtp', 'config': {
+            'name_or_path': str(saved), 'local_files_only': True,
+            'torch_dtype': 'bfloat16', 'attn_implementation': 'eager'}}
+        base = deepcopy(study['fixed']['algorithm']['config'])
+        base['eval'].update(run_ar_baseline=False, warmup=False, max_new_tokens=12)
+        study['axes'] = {'algorithm.config': [dict(deepcopy(base), spec=v) for v in variants]
+                        + [dict(deepcopy(base), task='ar_baseline')]}
+    study = study_copy(patch, name='bf16_five_methods_cli')
+    cli('make', study, '--num-gpus', '0', check=True)
+    cli('launch', study, '--num-gpus', '0', '--console', 'shared', check=True)
+    check = json.loads((study / 'spec_mtp_study_check.json').read_text())
+    assert check['complete'] and check['passed'] and len(check['runs']) == 6
+    output_run = None
+    for entry in json.loads((study / 'index.json').read_text())['experiments']:
+        run = study / 'runs' / entry['runs'][0]['id']
+        result = json.loads((run / 'result.json').read_text())
+        inputs = json.loads((run / 'assets/decode_inputs.json').read_text())
+        assert inputs['dtype'] == 'torch.bfloat16' and result['status'] == 'succeeded'
+        if result['spec_mtp']['task'] == 'esp_mtp':
+            assert result['spec_mtp']['argmax_all_passed']
+            assert all(d['exact'] is None for d in result['spec_mtp']['AR_diagnostics'])
+            if inputs['settings']['spec']['method'] == 'output_hidden':
+                output_run = run
+    assert output_run is not None
+    raw_path = output_run / 'assets/decode_observations.json'
+    original = raw_path.read_bytes()
+    config = yaml.safe_load((output_run / 'config.yaml').read_text())
+    for key, value, error in [('owner_count', 1, 'owner/observation'),
+                              ('mask_norm_min', 0., 'mapping norm')]:
+        raw = json.loads(original)
+        raw['out']['evidence'][0]['stats']['trace'][0]['output_hidden'][key] = value
+        raw_path.write_text(json.dumps(raw))
+        with pytest.raises(SpecMtpGateError, match=error):
+            verify_evidence(config, output_run / 'assets')
+    raw_path.write_bytes(original)

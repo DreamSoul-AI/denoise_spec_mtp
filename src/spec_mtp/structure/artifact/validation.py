@@ -206,10 +206,16 @@ def verify_evidence(config: dict[str, Any], assets: Path) -> None:
                     raise SpecMtpGateError('cache eviction mismatch')
             if settings['spec'].get('method') == 'output_hidden':
                 import math
+                import torch
 
                 prefill = stats.get('output_hidden_prefill') or {}
                 scale = prefill.get('scale', 0)
                 k = int(settings['spec']['num_masks'])
+                tree = settings['spec'].get('tree', {})
+                expected_owners = (1 + sum(tree['branches']) if tree.get('mode', 'dynamic') == 'static'
+                                   else int(settings['spec']['block_complexity']) // (k + 1))
+                # Actual masks are cast to model dtype after FP32 normalization.
+                mapping_tol = max(1e-5, torch.finfo(getattr(torch, inputs['dtype'].split('.')[-1])).eps)
                 if (prefill.get('observed_positions') != len(item['input_ids'])
                         or prefill.get('state_dtype') != 'float32' or prefill.get('final_normalized') is not True
                         or not math.isfinite(scale) or scale <= 0):
@@ -218,11 +224,11 @@ def verify_evidence(config: dict[str, Any], assets: Path) -> None:
                     observation = trace.get('output_hidden') or {}
                     expected_rows = [] if trace['stopped'] else [0] + trace['accepted_nodes']
                     if (observation.get('observed_block_rows') != expected_rows
-                            or observation.get('owner_count') != k + 1 or observation.get('slot_count') != k):
+                            or observation.get('owner_count') != expected_owners or observation.get('slot_count') != k):
                         raise SpecMtpGateError('output hidden owner/observation evidence invalid')
                     for key in ('mask_norm_min', 'mask_norm_max'):
                         value = observation.get(key, float('nan'))
-                        if not math.isfinite(value) or not math.isclose(value, scale, rel_tol=1e-5):
+                        if not math.isfinite(value) or not math.isclose(value, scale, rel_tol=mapping_tol):
                             raise SpecMtpGateError('output hidden mapping norm evidence invalid')
             for key in ('accepted', 'committed', 'decode_calls', 'new_tokens'):
                 if row[key] != stats[key]:

@@ -1,10 +1,10 @@
 # BC30固定480方向对照阶段报告
 
-当前步骤：template、random0/1均全480成功，zero复用旧全480；按最新指示已在组间释放GPU给量化v3，random2/content待接续。
+当前步骤：template、random0/1均全480成功，zero复用旧全480；量化限时窗口到期未启动，已恢复原队列运行random2。
 最新发现：random1 τ=1.464349086，低于template的1.507777653，高于zero的1.422420206；81,356个提交token自检全过。
 出处：[四格有效结果快照](direction_partial_v3.json)，完整token/trace及Run均留本机；尚不能推断全部随机种子或全部方向排名。
-下一步：量化v3一次任务终态并释放GPU后，resume原调度父进程65876接random2/content，不新开队列；模板用附加文档对齐。
-阻塞：量化既有准入暂缺18GiB可用主存，SD显存已释放；不放宽其门。两格未完整、BC60未声明，不测速。
+下一步：random2完整结束后，在content前再试量化v3组间窗口；仍用原session23573，不新开队列，模板用附加文档对齐。
+阻塞：SD当前无阻塞，random2子进程47012运行；量化自身18GiB主存门仍未满足。本矩阵两格未完整、BC60未声明，不测速。
 
 2026-10-16新指令已冻结[PLAN](PLAN.md)。四窗口不能回答总体唯一方向问题，本轮不以其结果代替全量。`tools/analyze_4b_full_directions.py`复用原五方法native读出，pending只记进度，不补零或平局。最终取原template成功格、补齐Study四个预定成功格及旧zero；补齐Study process必须通过，原Study资源失败终验原样保留。六格均完整并通过来源与数学门核对后才发布正式JSON；方向与旧五方法的关系按PLAN单列。
 

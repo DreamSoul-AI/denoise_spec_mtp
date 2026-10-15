@@ -227,3 +227,5 @@ PR #10全480报告已于2026-10-15T02:28:28Z合dev，merge fafed6145ba75bc68e521
 4B动态树支持已完成代码与CPU检查：输出深度预测按[0]+tree.depths映射到实际owner，同深度兄弟共享代理，已验证状态仍仅观察实际root/accepted路径；未改默认配方、输入provider、树算法、KV或forward数量。验收owner数按配置树预算，mask实际BF16范数仅允许dtype舍入误差，argmax门未放宽。原19项输出回归及两项原生CLI回归通过，后者含本地tiny HF BF16五方法+独立AR六Run与owner/范数篡改拒绝；全套tests/spec_mtp、Ruff、mypy56文件通过，另加的六项混合深度/兄弟BF16用例通过。均为CPU tiny验证，未执行真实4B、未新增FP32研究或算子机理。缓存4B14文件已与魔搭直接SHA256及历史FP32检查点逐字节匹配，后续冻结实际模型/输入来源。
 
 4B Study配置与来源预检落地（尚未make/冻结/运行）：11格为独立AR一次、BC30/60各五方法，共用两mask动态剪枝树。4B14文件共8,060,927,256字节与魔搭直接Sha256和历史FP32检查点全匹配；离线缓存接通，revision master身份未确认警告保留，不混同内容验证。真实4B tokenizer全部480条ID/顺序与Table1一致，最大1500token。Study adapter在首forward前校验模型维度、实际tied-storage、BF16/default policy和冻结输入/文件SHA，不增forward、不改全局时钟；九项协议/异常恢复/CUDA loader回归及16项phase导出回归通过。下一步补配对阅读器与回归，再冻结启动；尚无真实4B BF16生成结论。
+
+4B配对阅读器已补齐：保留BC30/60五方法20组逐prompt接受/calls赢平输、长度与AR首分叉；仅11格native成功且process/source/Study/模型输入全部核验后输出不可覆盖的正式证据。未完成格明确pending，原始tokens不入Git。新增8项读出回归与9项adapter/配置回归通过（17项），全仓Ruff通过；全套CPU回归正在运行，PR #11保持草稿至检查完毕。当前没有真实4B BF16新结果，后续make状态写入该Study报告，不回写冻结PLAN；长期授权按工作分支PR合dev，无需再次询问。

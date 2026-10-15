@@ -55,7 +55,8 @@ def test_pairing_adapter_checks_before_decode_and_restores_globals(tmp_path, mon
     saved = {'dtype': 'torch.bfloat16', 'backend': 'eager', 'eos_ids': [2],
         'prompts': [{'category': 'a', 'input_ids': [1,2]}],
         'files': {'/cache/config.json': 'weights', '/data/question.jsonl': 'data'},
-        'settings': {'eval': {'temperature': 0., 'max_new_tokens': 256, 'warmup': False}}}
+        'settings': {'eval': {'temperature': 0., 'max_new_tokens': 256, 'warmup': False,
+                              'stop_on_eos': True, 'run_ar_baseline': False}}}
     if failure == 'dtype': saved['dtype'] = 'torch.float32'
     if failure == 'prompt': saved['prompts'][0]['input_ids'] = [3]
     if failure == 'weights': saved['files']['/cache/config.json'] = 'wrong'

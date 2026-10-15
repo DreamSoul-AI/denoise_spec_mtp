@@ -1,6 +1,6 @@
 # Qwen3-4B BF16 five-method paired comparison
 
-状态：计划已写，owner映射/BF16范数验收及CPU回归已完成；尚未冻结、make或运行真实4B。前置ESP Table1四格全480、argmax与原生process已完成；PR #10经CI合dev（fafed614）。论文τ目标未达到，完整负结果保留。本Study不再使用8B，不恢复算子机理。
+状态：执行协议与配对阅读器就绪，owner映射/BF16范数验收及CPU回归已完成；本PLAN作为首次make的冻结候选。实际make/运行状态另记STUDY_REPORT，冻结后不回写本PLAN。前置ESP Table1四格全480、argmax与原生process已完成；PR #10经CI合dev（fafed614）。论文τ目标未达到，完整负结果保留。本Study不再使用8B，不恢复算子机理。
 
 ## 问题与固定范围
 
@@ -44,8 +44,8 @@ Qwen/Qwen3-4B，优先复用ModelScope既有检查点；冻结实际文件SHA、
 
 报告需包含每个Run真实状态、实际dtype/参数/输入与来源SHA、完整逐prompt赢平输和AR差异、argmax覆盖及失败边界；原始tokens/Run/权重/cache留本机。正常工作分支提交/推送、PR和合dev按长期授权执行，不合main、不强推、不删除数据/分支、不花钱。
 
-## 预检状态（尚未冻结）
+## 首次make前预检
 
 模型内容14文件共8,060,927,256字节，全部匹配魔搭直接SHA256及此前4B FP32检查点；内容已核验，不称历史下载来源或immutable revision已确认。离线snapshot_download成功，缓存revision身份警告保留。4B tokenizer实际生成全部480条，qid/category/顺序及token IDs与Table1输入一致，最长1500，不截断。模型配置声明qwen3/2560 hidden/36层/151936 vocab/tied=true；实际GPU存储共享仍由每Run首forward前的adapter检查，不能拿配置声明代替实测。
 
-已完成CPU原生六Run tiny BF16检查、全套CPU兼容性与mypy56文件，以及新Study九项协议/恢复/loader和phase导出回归。11格配置已用原生expander核对；无真实4B生成或新FP32实验。配对阅读器和其回归完成后才make冻结并串行开跑。
+已完成CPU原生六Run tiny BF16检查、全套CPU兼容性与mypy56文件，以及新Study九项协议/恢复/loader和phase导出回归。11格配置已用原生expander核对；此处不宣称真实4B结果。配对阅读器复用原生verify_evidence、source/Study冻结门及输入manifest检查，每Run核对实际tied-storage、dtype、model digest和runtime；逐prompt保留全部20组两两对照的接受/calls赢平输、输出长度和AR首分叉。仅11格与native process全部完成才生成不可覆盖的正式paired_evidence_v1.json，未完成格不补零，不以pending冒充结果。新增回归覆盖正负平、调用数反向判赢、缺失/错位拒绝、AR长度分叉、pending完整性及已验收证据的读出格式。

@@ -23,6 +23,7 @@ def verify_inputs(saved, manifest, snapshot):
     assert all(landed[f['path']] == f['sha256'] for f in snapshot['files'])
     cfg = saved['settings']['eval']
     assert cfg['temperature'] == 0 and cfg['max_new_tokens'] == 256 and cfg['warmup'] is False
+    assert cfg['stop_on_eos'] is True and cfg['run_ar_baseline'] is False
 
 
 class PairedUntimedEval(SpecMtpEvalAlgorithm):

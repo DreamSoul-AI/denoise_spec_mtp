@@ -8,10 +8,10 @@
 
 `python studies/esp_table1_bf16_full_argmax/analyze_results.py`
 
-原始Run、逐prompt argmax JSONL与完整tokens只保留本机。原生AR严格门状态如实保留，正式τ验收另列。
+四格均完成全480条，verifier argmax全过，原生summarize/process成功。BC10/1、BC30/1、BC60/1、BC60/2的pooled τ分别为1.399047、1.563378、1.647301、1.603729；BC30与BC60未达到论文目标1.63/1.74。AR一致率与逐条首分叉仅作诊断，三种τ聚合、目标差值及正式证据见[报告](docs/STUDY_REPORT.md)。
+
+上列命令为本轮原执行入口；已有Run不重跑或重新冻结。后续复现实验使用新Study版本，保留本轮原始来源锁。原始Run、逐prompt argmax JSONL、完整tokens、权重与缓存只保留本机。
 
 首次v2四Run均在模型加载前报ModelScope CacheNotFound，未执行解码；失败Run保留。补接shared/model/modelscope/Qwen/Qwen3-8B到此前同一已校验本地snapshot后，以v3新Run执行，不覆盖/重签v2。只修本地缓存接入，配置设置及源代码不变。
 
-BC10 Run dfe1b9c8d5d12e92已完成全480：τ/argmax结果有效（79,757个提交token全过），AR188/480仅作报告指标。原生AR严格门failed状态保留，不因该失配重跑BC10。串行入口显式retry_failed=False，BC30、BC60/1与60/2继续执行；未完成格仅标pending。不要在正在运行的冻结Study里修改gate或重签已有Run；本报告的τ/argmax验收不依赖原生AR门成功。
-
-2026-10-15原生门修订：按用户新指示改validation.evaluate_run/verify_evidence与原生T0审计记录。正在执行的v3使用原执行源码，不切换工作目录、不杀BC30。新validator在隔离工作树测试；旧AR门失败格用tools/revalidate_run.py仅重新验收/写结果，保留原失败result备份与新validator SHA，raw和来源锁不修改。全格重新验收后原生process也使用该门。此节覆盖此前“不改gate”的阶段安排，不覆盖原科学配置或重新执行。
+按用户最终指示，四格旧AR门失败结果均只重做summarize gate与write，execute_rerun=false；旧失败result按SHA保留，raw、输入、argmax JSONL和执行来源锁字节不变，新validator SHA另列。原队列退出后用同一门运行原生process，来源、配置与seed检查全过，旧process也已归档。[重新验收记录](docs/native-process-revalidation-v1.json)不替代原始执行来源。串行入口显式retry_failed=False，未因AR失配重跑任何已完成格；此后进入4B BF16配对，不恢复算子机理或测速。

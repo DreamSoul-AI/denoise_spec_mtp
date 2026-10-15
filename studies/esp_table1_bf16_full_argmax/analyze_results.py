@@ -135,7 +135,10 @@ def main():
     if formal_ready and body['quality_passed']:
         from plot_results import write_plot
         write_plot(body,study/'docs/figures/tau_acceptance.png')
-        lines+=['','![Full480 tau and accepted draft counts](figures/tau_acceptance.png)',
+        matched=all(round(c['pooled_tau'],2)==c['target'] for c in cells if c['role']=='primary' and c['target'] is not None)
+        lines+=['',f"结论：主配置pooled τ按两位小数与论文目标{'一致' if matched else '不一致'}。数学自检与原生生命周期通过不等于论文τ数值复现成功；三种聚合和双mask对照全部保留，不事后择优。",
+                '', '[原生process验收证据](native-process-revalidation-v1.json)记录四格成功状态及旧process归档哈希。',
+                '', '![Full480 tau and accepted draft counts](figures/tau_acceptance.png)',
                 '',f'图：同一四格480条，三种τ聚合及真实accepted draft总数（EOS/预算裁剪前）；黑菱形为论文目标。来源[{filename}]({filename})，AR一致率另列，不含测速。']
     (study/'docs/STUDY_REPORT.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
     print(json.dumps({'n':len(prompts),'observed':body['all_cells_observed'],'quality_passed':body['quality_passed'],

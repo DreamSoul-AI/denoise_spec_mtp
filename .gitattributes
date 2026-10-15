@@ -249,3 +249,9 @@
 
 # Keep the paired 4B protocol and evidence byte-identical across checkouts.
 /studies/qwen3_4b_bf16_five_methods/** -text whitespace=cr-at-eol
+# Preserve the bounded 4B geometry protocol, tools and scalar evidence bytes.
+/tools/analyze_4b_geometry.py -text whitespace=cr-at-eol
+/tools/capture_4b_geometry.py -text whitespace=cr-at-eol
+/studies/qwen3_4b_bf16_five_methods/docs/GEOMETRY_PLAN.md -text whitespace=cr-at-eol
+/docs/research/4b-mask-geometry-cpu-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-mask-geometry-observations-2026-10-15.json -text whitespace=cr-at-eol

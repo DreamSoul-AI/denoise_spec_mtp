@@ -4,7 +4,9 @@
 
 当前结果速读：[SD 阶段报告：8B ESP 复现与 4B BF16 方法比较](sd-stage-report-2026-10-15.md)。集中列出已有结果的 τ、论文差值、全部逐 prompt 胜平负、正确性门、排名与局限，并逐表链接原始结果文件；下一步建议尚未执行。
 
-当前最高优先级为原作者官方代码复现：[ESP 官方代码复现报告与来源核查](esp-official-code-reproduction-2026-10-15.md)、[请求状态/commit/SHA 审计](esp-official-source-audit-2026-10-15.json)。尚未核验到可运行的作者实现，OpenReview 补充材料访问不完整；本轮未启动 GPU。此前 8B 数字为自实现参考，不满足本轮原作者代码要求。
+Enmao 最新指示的独立诊断：[4B BF16 输出 mask 差距诊断](4b-mask-geometry-2026-10-15.md)、[全 480 条 CPU 证据](4b-mask-geometry-cpu-2026-10-15.json)、[固定预算观测协议](../../studies/qwen3_4b_bf16_five_methods/docs/GEOMETRY_PLAN.md)。只分析既有结果及小规模 4B 几何，不恢复其他研究或 8B 算子数值链。
+
+原作者官方代码复现仍有来源缺口：[ESP 官方代码复现报告与来源核查](esp-official-code-reproduction-2026-10-15.md)、[请求状态/commit/SHA 审计](esp-official-source-audit-2026-10-15.json)。尚未核验到可运行的作者实现，OpenReview 补充材料访问不完整；该次来源核查未启动 GPU。此前 8B 数字为自实现参考，不满足原作者代码要求。
 
 | **文件** | **性质** |
 | --- | --- |

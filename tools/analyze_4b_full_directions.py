@@ -1,5 +1,9 @@
-"""Read native full480 direction Runs and reuse the original five-method readout."""
+"""Read native full480 direction Runs and reuse the original five-method readout.
+
+    python tools/analyze_4b_full_directions.py
+"""
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -11,7 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / 'studies/qwen3_4b_bf16_five_methods'
 STUDY = ROOT / 'studies/qwen3_4b_bf16_directions'
 sys.path.insert(0, str(BASE))
-from analyze_results import load_cell, compare_rows  # noqa: E402
+_spec = importlib.util.spec_from_file_location('original_five_method_readout', BASE / 'analyze_results.py')
+_original = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_original)
+load_cell, compare_rows = _original.load_cell, _original.compare_rows
 
 NAMES = ('template', 'random0', 'random1', 'random2', 'zero', 'content')
 
@@ -25,7 +32,7 @@ def sha(path):
 
 
 def category_mean(rows):
-    categories = {r['category'] for r in rows}
+    categories = sorted({r['category'] for r in rows})
     return sum(sum(r['committed'] for r in rows if r['category'] == c) /
                max(sum(r['decode_calls'] for r in rows if r['category'] == c), 1)
                for c in categories) / len(categories)
@@ -38,6 +45,36 @@ def compare(first, second):
         r['tau'] = 'win' if diff > 0 else 'loss' if diff < 0 else 'tie'
     result['tau'] = {s: sum(r['tau'] == s for r in result['rows']) for s in ('win', 'tie', 'loss')}
     return result
+
+
+def plot(body, path):
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    assert body['complete']
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5), layout='constrained')
+    try:
+        values = [body['cells'][n]['totals']['pooled_tau'] for n in NAMES]
+        axes[0].barh(NAMES, values)
+        for i, value in enumerate(values):
+            axes[0].text(value, i, f' {value:.6f}', va='center')
+        axes[0].set_xlim(0, max(values) * 1.16)
+        axes[0].set_xlabel('Pooled decode committed / decode calls')
+        axes[0].set_title('BC30, 480 original prompts')
+        names = [p['second'] for p in body['vs_template']]
+        left = [0] * len(names)
+        for key, color in [('win', '#3b8c6e'), ('tie', '#bbbbbb'), ('loss', '#c16b64')]:
+            count = [p['accepted'][key] for p in body['vs_template']]
+            axes[1].barh(names, count, left=left, label=key, color=color)
+            left = [a + b for a, b in zip(left, count)]
+        assert left == [480] * len(names)
+        axes[1].set_xlabel('Prompts: accepted W/T/L versus fixed e2-e1')
+        axes[1].legend()
+        fig.supxlabel('Fixed data, BF16/T0. Different output paths/lengths; counts are not timing or significance.')
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(path, dpi=160)
+    finally:
+        plt.close(fig)
 
 
 def main():
@@ -96,7 +133,10 @@ def main():
         if 'rows' in cell:
             for method in ('frozen_mean', 'input_zero', 'input_first', 'output_zero', 'output_first'):
                 old = original['cells']['30/' + method]
-                existing.append(dict(first='30/' + method, second=name, **compare(old['rows'], cell['rows'])))
+                pair = compare(old['rows'], cell['rows'])
+                # Canonical per-prompt counts in cells and the old evidence reconstruct these pairs.
+                pair.pop('rows')
+                existing.append(dict(first='30/' + method, second=name, **pair))
     ready = all('rows' in cell for cell in cells.values())
     if ready:
         native, process = read(STUDY / 'spec_mtp_study_check.json'), read(STUDY / 'process.json')
@@ -112,6 +152,8 @@ def main():
         assert target.read_text(encoding='utf-8') == text
     else:
         target.write_text(text, encoding='utf-8')
+    if ready:
+        plot(body, STUDY / 'docs/figures/bc30_directions.png')
     print(json.dumps({'complete': ready, 'full_cells': sum('rows' in c for c in cells.values()),
         'progress': {n: c.get('completed_prompt_rows', 480 if 'rows' in c else 0) for n, c in cells.items()}}))
 

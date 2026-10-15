@@ -75,9 +75,11 @@ def test_native_tiny_bf16_direction_controls_remain_argmax_safe(monkeypatch):
 
 def test_tau_pairs_use_ratios_and_category_pooling(monkeypatch):
     monkeypatch.setattr(sys, 'path', sys.path.copy())
+    existing_readout = sys.modules.get('analyze_results')
     spec = importlib.util.spec_from_file_location('full_direction_analysis', ROOT / 'tools/analyze_4b_full_directions.py')
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
+    assert sys.modules.get('analyze_results') is existing_readout
     def row(qid, category, committed, decode_calls):
         return {'question_id': qid, 'category': category, 'accepted': committed // 2,
                 'model_calls': decode_calls + 1, 'new_tokens': committed + 1,

@@ -62,13 +62,13 @@ BC=(k+1)(1+draft_nodes)，本次实际 draft budget=4/14/29，另保留60/2的19
 
 FP32收尾：PR #7 已经CI通过并合dev，merge8677376；main未操作。此前4B FP32及0.6B局部研究原位保留，本轮不扩展。
 
-当前唯一GPU调度链为[全480 argmax审计](../../studies/esp_table1_bf16_full_argmax/README.md)，正式结果见[STUDY_REPORT](../../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)。四格固定顺序为10/1、30/1、60/1、60/2；保持Qwen3-8B/BF16/T0/默认归约、λ=.1 updating mean、动态树+剪枝、256/EOS/seed123及全部480条。60/1为主，60/2仅附加对照，两者均报告相对1.74差值，不择优。
+已完成的全480GPU执行链为[全480 argmax审计](../../studies/esp_table1_bf16_full_argmax/README.md)，正式结果见[STUDY_REPORT](../../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)。四格固定顺序为10/1、30/1、60/1、60/2；保持Qwen3-8B/BF16/T0/默认归约、λ=.1 updating mean、动态树+剪枝、256/EOS/seed123及全部480条。60/1为主，60/2仅附加对照，两者均报告相对1.74差值，不择优。
 
-当前首格BC10 Run `dfe1b9c8d5d12e92`正在执行；随后BC30 `b9b54923b1b9ea9f`、BC60/1 `3f3d0f9a84341c0b`、BC60/2 `555ff70d57ce05b0`串行排队。尚无完整480条τ结果，不用预检或部分日志替代。
+四格均完成全480并经新门重验为succeeded，原生process的来源、配置、seed及证据检查全过。pooled τ依次为1.399047、1.563378、1.647301、1.603729；BC30主配置距1.63为−0.066622，BC60单mask主配置距1.74为−0.092699，双mask对照为−0.136271。三种聚合均保留，按两位小数未复现论文目标，不以正确性门通过冒充数值复现成功。AR一致率依次为188/480、175/480、185/480、187/480，仅诊断。
 
 Study局部观察器绑定每个选择行到对应验证forward的logits，记录argmax/选择值及forward/行号；覆盖prefill首token和全部实际提交token，EOS/预算裁剪后的未提交尾部不混入覆盖数。不增加模型前向，不改精度、算子、采样或树。argmax自检失败立即阻止该Run的execute完成；独立AR运行不安装此观察器。
 
-原有native生命周期可能含旧AR严格门产生的失败状态，原记录如实保留，不重签；该历史状态不得作为本次研究的失败门或阻塞下一τ格。本次研究报告只按全480覆盖、协议核验及数学argmax自检验收，AR一致率独立列示。关闭自动失败重试，避免因AR诊断重复运行。旧冻结Run/PLAN不回写、不重签。
+四格旧AR门失败result均按SHA保留；按用户新授权仅重做summarize gate/write，execute_rerun=false，四项原始证据和执行来源锁字节未变，新validator SHA另列。队列退出后用同一门重做原生process，旧process结果也已归档。没有因AR失配重跑execute，没有改冻结科学配置、Run输入或来源锁。[原生process重验记录](../../studies/esp_table1_bf16_full_argmax/docs/native-process-revalidation-v1.json)。下一阶段按第4节推进4B BF16五方法加AR；不再开8B算子机理链，也不以调参追目标数值。
 
 无argmax记录的全量v1部分日志保留。新argmax Study v2首次四Run在模型加载前因ModelScope缓存接入失败，未执行解码；失败Run保留。补接此前同一已校验本地snapshot后以v3新Run执行，未改模型或实验设置。
 

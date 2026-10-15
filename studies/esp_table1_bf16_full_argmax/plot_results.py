@@ -18,7 +18,7 @@ def write_plot(body, path):
             axes[0].bar([x+(offset-1)*.24 for x in positions],[c[key] for c in cells],width=.24,label=label)
         axes[0].scatter([1,2,3],[1.63,1.74,1.74],marker='D',color='black',label='Paper target',zorder=5)
         axes[0].set_ylabel('Committed tokens / decode call (tau)')
-        axes[0].legend(fontsize=8)
+        axes[0].legend(loc='upper left',bbox_to_anchor=(1.02,1),fontsize=8)
         axes[1].bar(positions,[c['accepted'] for c in cells],color='#6854a3')
         axes[1].set_ylabel('Accepted draft tokens\n(before EOS/budget trimming)')
         for axis in axes:

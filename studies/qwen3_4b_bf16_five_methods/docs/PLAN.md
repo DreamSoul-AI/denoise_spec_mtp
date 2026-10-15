@@ -43,3 +43,9 @@ Qwen/Qwen3-4B，优先复用ModelScope既有检查点；冻结实际文件SHA、
 共用单张24GB GPU，一次只开一条round1/num-gpus1调度链，先独立AR，再BC30五方法、BC60五方法，组间确认进程退出。开跑前核对其他GPU任务，不能杀其他任务；无预热、无decode计时、无latency/throughput结论，原生计时字段仅零占位。
 
 报告需包含每个Run真实状态、实际dtype/参数/输入与来源SHA、完整逐prompt赢平输和AR差异、argmax覆盖及失败边界；原始tokens/Run/权重/cache留本机。正常工作分支提交/推送、PR和合dev按长期授权执行，不合main、不强推、不删除数据/分支、不花钱。
+
+## 预检状态（尚未冻结）
+
+模型内容14文件共8,060,927,256字节，全部匹配魔搭直接SHA256及此前4B FP32检查点；内容已核验，不称历史下载来源或immutable revision已确认。离线snapshot_download成功，缓存revision身份警告保留。4B tokenizer实际生成全部480条，qid/category/顺序及token IDs与Table1输入一致，最长1500，不截断。模型配置声明qwen3/2560 hidden/36层/151936 vocab/tied=true；实际GPU存储共享仍由每Run首forward前的adapter检查，不能拿配置声明代替实测。
+
+已完成CPU原生六Run tiny BF16检查、全套CPU兼容性与mypy56文件，以及新Study九项协议/恢复/loader和phase导出回归。11格配置已用原生expander核对；无真实4B生成或新FP32实验。配对阅读器和其回归完成后才make冻结并串行开跑。

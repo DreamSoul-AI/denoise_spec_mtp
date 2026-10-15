@@ -246,3 +246,6 @@
 /studies/esp_table1_bf16_full_argmax/recipe.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/study.yaml -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/untimed_bf16.py -text whitespace=cr-at-eol
+
+# Keep the paired 4B protocol and evidence byte-identical across checkouts.
+/studies/qwen3_4b_bf16_five_methods/** -text whitespace=cr-at-eol

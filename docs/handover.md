@@ -225,3 +225,5 @@ BC60单mask全480及原生重新验收完成：3f3d0f9a84341c0b为succeeded，79
 PR #10全480报告已于2026-10-15T02:28:28Z合dev，merge fafed6145ba75bc68e5210b2c7e04d0cd44d9052；CPU CI 38670591102/38670655139及Branch flow 38670655128均SUCCESS。当前研究转入4B BF16五方法，PLAN已写但尚未冻结/make/运行。为保留8B原执行来源及旧validator物理路径SHA，新建feature/4b-bf16-five-methods工作树，原执行与验收工作树不改源码。当前需要补输出owner深度映射和BF16范数量化验收，保留既有方法与参数，不开展精度机理；源代码/实际模型数据校验与回归后才冻结开跑。
 
 4B动态树支持已完成代码与CPU检查：输出深度预测按[0]+tree.depths映射到实际owner，同深度兄弟共享代理，已验证状态仍仅观察实际root/accepted路径；未改默认配方、输入provider、树算法、KV或forward数量。验收owner数按配置树预算，mask实际BF16范数仅允许dtype舍入误差，argmax门未放宽。原19项输出回归及两项原生CLI回归通过，后者含本地tiny HF BF16五方法+独立AR六Run与owner/范数篡改拒绝；全套tests/spec_mtp、Ruff、mypy56文件通过，另加的六项混合深度/兄弟BF16用例通过。均为CPU tiny验证，未执行真实4B、未新增FP32研究或算子机理。缓存4B14文件已与魔搭直接SHA256及历史FP32检查点逐字节匹配，后续冻结实际模型/输入来源。
+
+4B Study配置与来源预检落地（尚未make/冻结/运行）：11格为独立AR一次、BC30/60各五方法，共用两mask动态剪枝树。4B14文件共8,060,927,256字节与魔搭直接Sha256和历史FP32检查点全匹配；离线缓存接通，revision master身份未确认警告保留，不混同内容验证。真实4B tokenizer全部480条ID/顺序与Table1一致，最大1500token。Study adapter在首forward前校验模型维度、实际tied-storage、BF16/default policy和冻结输入/文件SHA，不增forward、不改全局时钟；九项协议/异常恢复/CUDA loader回归及16项phase导出回归通过。下一步补配对阅读器与回归，再冻结启动；尚无真实4B BF16生成结论。

@@ -1,0 +1,160 @@
+study: qwen3_4b_bf16_five_methods
+description: Full480 paired BF16 five methods at BC30/60 with one independent AR reference
+experiment:
+  name: qwen3_4b_bf16_five_methods
+recipe: recipe.py
+freeze: true
+provenance:
+  include:
+  - docs/PLAN.md
+  - docs/modelscope_snapshot.json
+  - docs/modelscope-content-verification-v1.json
+  - docs/prompts_manifest.json
+  - docs/specbench-source.json
+  - untimed_pairing.py
+flow:
+  study_phases: true
+  prepare_shared: false
+axes:
+  algorithm.config:
+  - task: ar_baseline
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 30
+      method: esp
+      mask:
+        init: mean_prompt
+        lam: 0.0
+        update: false
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 30
+      method: esp
+      mask:
+        init: mean_prompt
+        lam: 0.1
+        update: true
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 30
+      method: ema_velocity
+      ema:
+        level: order0
+        beta: 0.9999
+        lam: 0.1
+        step_scale: 1.0
+        normalize: false
+        extrapolate_ema: false
+        update: true
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 30
+      method: output_hidden
+      output:
+        order: 0
+        beta: 0.9
+        beta_prime: 0.99
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 30
+      method: output_hidden
+      output:
+        order: 1
+        beta: 0.9
+        beta_prime: 0.99
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 60
+      method: esp
+      mask:
+        init: mean_prompt
+        lam: 0.0
+        update: false
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 60
+      method: esp
+      mask:
+        init: mean_prompt
+        lam: 0.1
+        update: true
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 60
+      method: ema_velocity
+      ema:
+        level: order0
+        beta: 0.9999
+        lam: 0.1
+        step_scale: 1.0
+        normalize: false
+        extrapolate_ema: false
+        update: true
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 60
+      method: output_hidden
+      output:
+        order: 0
+        beta: 0.9
+        beta_prime: 0.99
+  - task: esp_mtp
+    spec:
+      num_masks: 2
+      impl: naive
+      tree:
+        mode: dynamic
+        pruning: true
+      block_complexity: 60
+      method: output_hidden
+      output:
+        order: 1
+        beta: 0.9
+        beta_prime: 0.99
+seeds:
+- 123

@@ -281,3 +281,4 @@
 /docs/research/4b-reciprocal-prefix-audit-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-direction-controls-observations-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-direction-controls-readout-2026-10-15.json -text whitespace=cr-at-eol
+/src/spec_mtp/structure/algorithm/reference/esp_reproduction_artifacts/** -text whitespace=cr-at-eol

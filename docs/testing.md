@@ -91,3 +91,7 @@ test_4b_untimed验证三method tiny token/全部语义/calls保持、全局时�
 最新准入回归只允许调用nvidia-smi，覆盖WDDM桌面与本PID放行、GPU驻留外部Python拒绝、显存不足拒绝/已加载后不重复扣容量、空计算进程列表放行；不再检查CPU进程或SHA。早期同前缀16格、44次forward及54次局部选择自检见报告第九节。
 
 追加原输入一阶轨迹的反向capture回归，核验native mask逐元素相同、当前owner不变、原输入后续mask恢复及旧Run续接；随机偏置同范数、独立种子可重复与内容初始化保留完整mean均覆盖。窗口11项加文档3项共14项通过，全仓Ruff通过。真实双向24格72次forward/72次局部选择检查、方向32格76次forward/99次检查见报告第十/十一节，不能把重复控制当独立样本。
+
+## 非官方ESP原码验收
+
+`test_esp_third_party.py`核对8个原字节文件SHA、三个Python文件可编译、prefix父行/剩余输出上限，以及直接调用原第三方验证器的self-match假阳性反例。三项CPU回归通过，不代表真实8B测量。原码排除Ruff/mypy自动规范约束，保留原有语法警告；外部审计工具与新增测试仍执行检查，真实BF16预检另落结果文件。

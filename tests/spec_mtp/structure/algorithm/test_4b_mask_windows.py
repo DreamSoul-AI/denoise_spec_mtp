@@ -56,7 +56,8 @@ def test_local_factorial_keeps_native_first_and_shifts_only_declared_formula(mon
     assert torch.equal(shadow.anchor, before[0]) and torch.equal(shadow.velocity, before[1])
 
 
-def test_fixed_window_uses_native_control_and_predicts_after_bonus(monkeypatch):
+@pytest.mark.parametrize('template', [False, True])
+def test_fixed_window_uses_native_control_and_predicts_after_bonus(monkeypatch, template):
     from spec_mtp.structure.model.hf_causal import HFCausalLM
     from spec_mtp.structure.algorithm.decoding import SpecDecoder
     from spec_mtp.structure.control.named import _convert
@@ -74,12 +75,40 @@ def test_fixed_window_uses_native_control_and_predicts_after_bonus(monkeypatch):
     packet = m.capture_window(model, ids, spec, cfg, [], 123, minimum=2)
     input_spec = {'method': 'ema_velocity', 'num_masks': 2, 'ema': {'level': 'order0', 'beta': .9999, 'lam': .1}}
     packet['masks']['input_first'] = m.input_control(model, ids, reference[0, 3:3 + packet['root_index'] + 1].tolist(), input_spec)
+    variants = m.TEMPLATE_VARIANTS if template else m.VARIANTS
+    if template:
+        for variant, mode in (('input_template', 'template'), ('input_mean', 'zero')):
+            packet['masks'][variant] = m.input_control(model, ids,
+                reference[0, 3:3 + packet['root_index'] + 1].tolist(), input_spec, velocity_mode=mode)
     assert not model._forward_hooks and not model._forward_pre_hooks
-    rows, private = m.probe_window(model, packet, spec, reference[0, 3:].tolist())
-    assert [r['variant'] for r in rows] == list(m.VARIANTS) and len(private) == 6
+    rows, private = m.probe_window(model, packet, spec, reference[0, 3:].tolist(), variants)
+    assert [r['variant'] for r in rows] == list(variants) and len(private) == len(variants)
     assert all(r['current_owner_argmax_unchanged'] and r['argmax_passed'] for r in rows)
     assert all(r['next_root_index'] == packet['root_index'] + len(packet['chosen']) for r in rows)
     assert rows[0]['next_verified_chain_equals_reference']
+
+
+def test_template_and_zero_controls_keep_same_updated_mean(monkeypatch):
+    from types import SimpleNamespace
+    from spec_mtp.structure.algorithm.mask_providers import EMAVelocityMaskProvider
+    m = tool('diagnose_4b_mask_windows', monkeypatch)
+    table = torch.tensor([[1., 0.], [0., 1.], [2., 3.], [3., -2.], [1., 2.]], dtype=torch.bfloat16)
+    model = SimpleNamespace(embedding_table=table, dtype=table.dtype, embed=lambda ids: table[ids])
+    ids = torch.tensor([[0, 1, 2]])
+    cfg = {'method': 'ema_velocity', 'num_masks': 2, 'ema': {'level': 'order0', 'beta': .5, 'lam': .1}}
+    provider = EMAVelocityMaskProvider(2, table, beta=.5, level='order0', lam=.1)
+    provider.init_from_prompt(table[ids[0]])
+    provider.on_token_committed(table[3], table[2])
+    provider.on_token_committed(table[4], table[3])
+    native = m.input_control(model, ids, [3, 4], cfg)
+    frozen = m.input_control(model, ids, [3, 4], cfg, velocity_mode='template')
+    mean = m.input_control(model, ids, [3, 4], cfg, velocity_mode='zero')
+    steps = torch.arange(1, 3, dtype=table.dtype)[:, None]
+    assert torch.equal(native[0], provider.masks())
+    assert torch.equal(frozen[0], provider._level + steps * (table[1] - table[0]))
+    assert torch.equal(mean[0], provider._level.expand(2, -1))
+    assert not torch.equal(mean[0, 0], table[ids[0]].mean(0))
+    assert not torch.equal(frozen, native) and not torch.equal(frozen, mean)
 
 
 def test_window_admission_rejects_unrelated_work_and_tracks_cpu_children(monkeypatch):

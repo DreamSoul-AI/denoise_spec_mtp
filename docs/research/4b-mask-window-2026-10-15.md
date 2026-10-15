@@ -1,8 +1,8 @@
-现状：CPU分析和36格固定窗口已完成，共124次forward；[PR #18](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/18)的完整CPU检查已通过，正在收尾。<br>
+现状：[PR #18](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/18)已通过CI合dev（adc17a9）；模板/零速度对照协议已冻结，10项相关回归通过。<br>
 发现：138个输入速度状态接近固定模板差分，最大相对误差0.095%（[CPU证据](4b-mask-velocity-cpu-2026-10-15.json)，`template_control`）。<br>
 发现：输出局部改法未增加接受数：无条件0胜4平、条件0胜2平（[无条件读出](4b-mask-window-readout-2026-10-15.json)、[条件读出](4b-mask-active-readout-2026-10-15.json)）。<br>
-下一步：核对报告与CI后合dev；后续优先固定模板偏置与相同初始化对照，目前尚未执行。<br>
-阻塞：无资源阻塞，GPU和等待队列已释放；补充文档提交后核对最终检查状态。
+下一步：按[模板对照协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_TEMPLATE_PLAN.md)补同mean四格，直接核对候选与接受；尚无新增GPU结果。<br>
+阻塞：共享GPU现有量化作业约占11.7GB，等待非抢占准入；继续做CPU核对，无需Enmao操作。
 
 # 4B 输出侧候选质量与固定窗口阶段报告
 

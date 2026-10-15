@@ -229,3 +229,5 @@ PR #10全480报告已于2026-10-15T02:28:28Z合dev，merge fafed6145ba75bc68e521
 4B Study配置与来源预检落地（尚未make/冻结/运行）：11格为独立AR一次、BC30/60各五方法，共用两mask动态剪枝树。4B14文件共8,060,927,256字节与魔搭直接Sha256和历史FP32检查点全匹配；离线缓存接通，revision master身份未确认警告保留，不混同内容验证。真实4B tokenizer全部480条ID/顺序与Table1一致，最大1500token。Study adapter在首forward前校验模型维度、实际tied-storage、BF16/default policy和冻结输入/文件SHA，不增forward、不改全局时钟；九项协议/异常恢复/CUDA loader回归及16项phase导出回归通过。下一步补配对阅读器与回归，再冻结启动；尚无真实4B BF16生成结论。
 
 4B配对阅读器已补齐：保留BC30/60五方法20组逐prompt接受/calls赢平输、长度与AR首分叉；仅11格native成功且process/source/Study/模型输入全部核验后输出不可覆盖的正式证据。未完成格明确pending，原始tokens不入Git。新增8项读出回归与9项adapter/配置回归通过（17项），全仓Ruff通过；全套CPU回归正在运行，PR #11保持草稿至检查完毕。当前没有真实4B BF16新结果，后续make状态写入该Study报告，不回写冻结PLAN；长期授权按工作分支PR合dev，无需再次询问。
+
+4B BF16已首次make并串行开跑，执行代码8047281/source538e52c929a542a8；11格顺序/seed123/round1/单GPU及两套冻结门全部核对。12:09 +08:00 AR 0e25348a3a60d601已进入execute，首forward前实际BF16/tied-storage/[151936,2560]、480输入与14文件SHA检查通过；此时尚无完成Run。全套CPU458项中457通过，唯一文档链接检查因沙箱Git ownership拒绝git ls-files失败；已原样在正常权限环境单独重跑通过，无全局safe.directory更改。Ruff与mypy56文件通过，不把此环境错误写成代码失败或远端CI成功。普通提交/PR合dev依据Enmao长期授权；冻结PLAN、源码和输入在运行中保持。

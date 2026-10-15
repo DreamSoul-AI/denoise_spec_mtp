@@ -1,8 +1,8 @@
-现状：[PR #18](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/18)已合dev；又完成24格模板/零速度对照、100次forward，数学门全过，见第八节。<br>
-发现：固定模板及零速度mean对原生速度的接受数均持平（无条件0胜4平、条件0胜2平）；模板logits在6处均不同，见[无条件](4b-mask-template-unconditional-readout-2026-10-15.json)/[条件](4b-mask-template-conditioned-readout-2026-10-15.json)读出。<br>
-发现：旧480条有459条的首个同前缀接受差异在root&lt;8，晚窗口不足以解释全量优势，见[CPU定位](4b-mask-template-opportunities-2026-10-15.json) `counts`。<br>
-下一步：提交新证据、PR合dev；后续优先prefill/早期差异块的固定模板与零速度对照，尚未执行。<br>
-阻塞：当前无资源阻塞，GPU与等待队列已释放；完整CPU检查待最终提交验证，无需Enmao操作。
+现状：固定数据下[五方法加AR](../../studies/qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)完整11/11已验收；追加早期/双向/方向72格、192次forward，数学门全过。<br>
+发现：原e2−e1对零偏置3胜1负；随机0也在q241提升，否定本批“只有原方向有效”，见[方向读出](4b-direction-controls-readout-2026-10-15.json) `comparisons`。<br>
+发现：q121/q241双向替换接受数0↔1；其余保留反例，见[输出轨迹](4b-reciprocal-output-readout-2026-10-15.json)/[输入轨迹](4b-reciprocal-input-readout-2026-10-15.json)。<br>
+下一步：本批结果PR合dev；第三方HF实现仅作非官方复现验收，不改变主实验或自行新增方法。<br>
+阻塞：本批无资源阻塞、GPU已释放；已合远程分支[清理完成](remote-branch-cleanup-2026-10-15.md)，当前工作分支保留，第三方配置兼容性仍待验收。
 
 # 4B 输出侧候选质量与固定窗口阶段报告
 
@@ -238,3 +238,117 @@ CPU读出直接读取保存的GPU实际树。另计算两种**候选覆盖上界
 [全部19份准入/执行记录](4b-mask-template-admission-2026-10-15.json)保留了此前17份0-forward记录与最终两批成功记录。两次加载后停止是新未知Python进程触发保守门，没有模型forward；早期记录缺PID，不能把原因唯一归于同期CPU回归。后来核验多个外部CI查询、CPU校准准备脚本的字节，仅识别已读CPU工作，没有操作外部进程。自己的队列切换发生短暂重叠，目录保护拒绝重复调用，没有覆盖目录或执行模型；重复队列已结束。最终两批串行通过准入，100次forward全部来自成功批次，GPU和所有自己的等待队列已释放。所有延期、失败目录和完整logits均保留本机。
 
 相关10项回归通过，包含纯速度替换保留同一已更新mean、零速度等价updating ESP、原生tiny BF16两组局部控制及argmax门。CPU读出扩展到template/input_first/input_mean配对后，旧24行和5组比较逐项不变。最终PR的完整CPU检查另按实际平台状态记录；不把本轮有限窗口持平外推为全480速度无用。
+
+## 九、实际GPU准入与早期模板因果对照
+
+### 准入修正
+
+按Enmao最新指令，当前窗口工具不再枚举Windows Python、不读外部CPU脚本或登记SHA。只查询GPU0的nvidia-smi实际计算进程与显存：排除本PID，没有其他GPU驻留Python且初始free≥14GiB即放行；Windows桌面进程只通过实际free影响容量，不当作Python实验。14GiB覆盖4B BF16约8GB权重及临时KV/树余量，加载后不再次为自己的模型扣除初始容量。只用单个串行执行命令，没有后台或重叠等待队列。这是观测准入，仍不是全局原子锁。
+
+前面各节保留旧准入历史，不能把那些CPU误延期解释为真实GPU忙。新回归仅允许调用nvidia-smi，覆盖桌面和本PID、外部GPU Python、低显存及空进程列表；CPU进程不再进入判定。旧几何工具/历史证据没有重签，本次只运行修正后的窗口工具。
+
+### 固定早期16格
+
+按[早期协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_EARLY_TEMPLATE_PLAN.md)预先固定q121/R1→2、q401/R0→1、q241/R1→3、q161/R2→4。在原输出零阶的同一真实前缀/cache/tree上，只改变当前块的mask构造。q161的原输入两路径差异在R3，但输出零阶跳过R3，因此这里是邻近负对照，不声称精确复现R3。
+
+新门一次放行，实际初始free=21,537MiB，所有准入记录的foreign_gpu_python_pids为空。16格全部完成，44次总forward（上限64），54次局部argmax选择检查全过，16格当前owner argmax及下一短链保持，4个零阶控制续接旧Run。没有AR新增前向、测速或8B。
+
+来源：[原始标量及准入](4b-mask-template-early-observations-2026-10-15.json) `admission/model_calls/rows`、[CPU读出](4b-mask-template-early-readout-2026-10-15.json) `rows/comparisons`。测量工具为Git `3601c7f` 原字节，模型/source/协议/private logits SHA均绑定；完整logits留本机 `.tmp/4b-mask-template-early-v1/private_logits.pt`。
+
+各格为“首/次目标排名；实际接受draft数”，不把排名直接当作接受。
+
+| 当前→下一窗口 | 输出零阶 | 输入原生速度 | 输入固定模板 | 输入零速度mean |
+| --- | --- | --- | --- | --- |
+| q121/R1→R2 | 16/53；0 | 4/134；1 | 4/127；1 | 86/41；0 |
+| q401/R0→R1 | 1/2；2 | 6/56；1 | 6/53；1 | 83/2159；0 |
+| q241/R1→R3 | 4823/5；0 | 3/12；1 | 2/13；1 | 41/3；0 |
+| q161/R2→R4 | 1/4；2 | 1/43；1 | 1/47；1 | 1/5；2 |
+
+输入原生速度和固定模板各自相对零速度mean均为3胜0平1负，相对输出零阶均为2胜0平2负；固定模板对原生速度仍为0胜4平0负，见读出 `comparisons`。完整seed logits在4处均不同，q241首目标排名也从3变为2，不能宣称数值相同。
+
+**这些早期窗口直接显示固定偏置的局部因果作用，且保留反例。** 在相同mean/真实历史/cache/tree上，仅添加固定模板速度，q121/q401/q241从0接受变1，q161反而从2变1。原生速度的这些接受行为可由固定方向复现，不需要其继续依赖内容更新；但mean仍依赖内容，也没有证明固定方向在全量轨迹必要或充分。
+
+q161的零速度第二目标排名5、d2宽8，原生速度变43、d2宽7，实际从2降1；q401即使输入速度胜过零速度mean，仍低于输出零阶的2接受。这些正负结果不支持“输入一阶在每个早期上下文都胜过输出”。本轮没有干预prefill本体，R0 decode也不冒称prefill替换；双向构造互换另见下一节。
+
+## 十、原输入与输出轨迹上的双向构造互换
+
+按[双向协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_RECIPROCAL_PLAN.md)，分别重建原输出零阶、原输入一阶的4个早期窗口。同一origin内，只换当前块mask构造为输出零阶、输入一阶或输出一阶；当前prefix/cache/tree/位置/注意力固定，下一验证块mask回到该origin原规则。输入origin只读观察原生final hidden，按真实已提交历史维护两种输出shadow，不改变原输入provider或生成历史。
+
+| origin | 原始观测 | 读出 | forward | 局部argmax选择检查 |
+| --- | --- | --- | --- | --- |
+| 输出零阶 | [标量及SHA](4b-reciprocal-output-observations-2026-10-15.json) | [对照](4b-reciprocal-output-readout-2026-10-15.json) | 36 | 42，全过 |
+| 输入一阶 | [标量及SHA](4b-reciprocal-input-observations-2026-10-15.json) | [对照](4b-reciprocal-input-readout-2026-10-15.json) | 36 | 30，全过 |
+
+每批12格、上限64前向。所有24格当前owner argmax及下一短链保持；8个native控制的实际mask逐元素等于重建块mask，并续接各自旧Run。全部准入通过，无延期或重叠队列。工具为Git `f363dda`，来源/协议/model/private logits SHA在原始观测；完整logits留本机 `.tmp/4b-reciprocal-output-v1/`、`.tmp/4b-reciprocal-input-v1/`。
+
+### 实际接受数
+
+| 输出origin窗口 | 输出零阶（native） | 换输入一阶 | 换输出一阶 |
+| --- | --- | --- | --- |
+| q121/R1→R2 | 0 | 1 | 0 |
+| q401/R0→R1 | 2 | 1 | 2 |
+| q241/R1→R3 | 0 | 1 | 0 |
+| q161/R2→R4 | 2 | 1 | 2 |
+
+| 输入origin窗口 | 输入一阶（native） | 换输出零阶 | 换输出一阶 |
+| --- | --- | --- | --- |
+| q121/R1→R2 | 1 | 0 | 0 |
+| q401/R0→R1 | 1 | 0 | 0 |
+| q241/R1→R3 | 1 | 0 | 0 |
+| q161/R2→R3 | 0 | 0 | 0 |
+
+来源：两份读出 `rows[].next_accept_depth`。输出origin输入替换相对native为2胜0平2负；输入origin两种输出替换相对native均0胜1平3负。后者见读出 `zero-input_first/first-input_first`，不误用默认zero比较列。输出一阶对零阶在两个origin均为0胜4平0负。
+
+**q121/q241出现了局部可逆翻转：输出轨迹0→1，输入轨迹换回输出后1→0。** 在同一origin固定状态内，mask构造选择足以改变下一树及真实接受，支持局部因果作用。q401却在原输出轨迹以输出构造最好、原输入轨迹以输入构造最好；q161反向未恢复命中，不能推广成普遍可逆。
+
+四对当前root以前的实际token前缀逐项相同，见[已执行窗口前缀核验](4b-reciprocal-prefix-audit-2026-10-15.json)；这是执行后核验，不是新一轮CPU筛选。两origin的当前树、代理hidden和历史缓存分块仍可能不同，不能把跨origin差值当作只换表示的同状态实验。q161的下一root分别4/3尤其不能拼成同一个位置。没有进入算子数值排查。
+
+## 十一、Enmao指定的四类方向对照
+
+按[方向协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_DIRECTION_PLAN.md)，只在相同4处输出origin早期窗口追加分析格。数据SHA和原480条manifest不变，模型实际input_ids始终取原manifest。对照不是新主方法，不进入五方法排名或改写其完整Run。
+
+四类为原固定e2−e1、同范数随机方向（固定种子0/1/2，不选最优）、零偏置updating mean、内容初始化速度；另保留原生输入速度与输出零阶控制。所有输入格的完整prompt mean和后续λ更新相同。正文起始从原SpecBench第一turn及原tokenizer offset核验，四处均index3；仅把速度初始化移到正文首差分，继续原prompt后缀和committed历史EMA，不重写prompt或模板。
+
+**32格完成，76次总forward（上限96），99次局部argmax选择检查全过。** 全部当前owner argmax、下一短链及零阶旧Run控制通过；原模板/native/零偏置的已测控制保持。来源：[方向原始观测](4b-direction-controls-observations-2026-10-15.json) `admission/model_calls/data_sha256/prompts_manifest_sha256/content_start_indices/rows`、[方向读出](4b-direction-controls-readout-2026-10-15.json) `rows/comparisons`。测量工具Git `de58a84`，完整logits留本机 `.tmp/4b-direction-controls-v1/`。
+
+### 接受数与配对比较
+
+| 窗口 | 原生输入v | 固定e2−e1 | 随机0 | 随机1 | 随机2 | 零偏置 | 内容初始化 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| q121/R1→R2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 |
+| q401/R0→R1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 |
+| q241/R1→R3 | 1 | 1 | 1 | 0 | 0 | 0 | 0 |
+| q161/R2→R4 | 1 | 1 | 1 | 1 | 1 | 2 | 1 |
+
+来源：方向读出 `rows[].next_accept_depth`。以下按该列计胜平负，随机种子分别保留。
+
+| 分析格 | 相对零偏置胜/平/负 | 相对固定e2−e1胜/平/负 |
+| --- | --- | --- |
+| 原生输入v | 3/0/1 | 0/4/0 |
+| 固定e2−e1 | 3/0/1 | 自比较不适用 |
+| 随机0 | 1/2/1 | 0/2/2 |
+| 随机1 | 0/3/1 | 0/1/3 |
+| 随机2 | 0/3/1 | 0/1/3 |
+| 内容初始化 | 0/3/1 | 0/1/3 |
+
+来源：方向读出 `comparisons[variant-input_mean/variant-input_template]`。固定模板与原生输入v仍在这4处接受数相同，不能声称完整logits相同。
+
+### 范数与方向核验
+
+| 随机种子 | 实际速度范数/原e2−e1范数 | 与原方向余弦 |
+| --- | --- | --- |
+| 0 | 0.9999635 | 0.0305450 |
+| 1 | 1.0000664 | 0.0146537 |
+| 2 | 1.0000499 | −0.0469948 |
+
+来源：原始观测 `rows[].direction_state`，同种子在4处使用同一方向；最大范数误差约0.00664%，通过预设<1%门。方向由独立CPU Generator采样并缩放，实际model/mask为BF16，未运行FP32模型。内容初始化范数比为1.3687–1.4582，没有范数匹配，因而其方向与幅度效应不能分开；报告未新增未授权的归一化内容方法。
+
+**本批否定“只有e2−e1方向才能产生提升”的强版本：随机0在q241也从0接受变1。** 但原方向在q121/q401/q241三处都提升，三个随机方向只在其中一处命中，内容初始化本批未提升；原方向在这4个条件选择窗口更稳定。3个随机种子不是方向空间穷举，4处不是独立随机prompt样本；不能证明全量提升唯一来自模板方向，也不能把内容控制的负结果外推为内容信息无价值。
+
+## 十二、主实验范围与集成
+
+完整五方法加AR仍以原[Study报告](../../studies/qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)、[正式配对证据](../../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json)及[原生process核验](../../studies/qwen3_4b_bf16_five_methods/docs/native-process-evidence-v1.json)为准：11/11完成，五方法在BC30/60各480条、独立AR一次480条；10个Spec Run共809,118个提交token的argmax自检通过。新增方向/构造控制只作分析，不改主数据和prompt，不重跑或重新命名主方法，不宣称新全量τ。
+
+本轮早期模板16格、双向24格、方向32格合计192次forward及225次局部选择检查，窗口和控制有重复，不能当72个独立样本。prefill本体、不同数据或模板未改动或测试；新idea等待Enmao，不自动开启新Study。14项窗口/文档回归与全仓Ruff通过，GPU已释放，自己的等待队列为零。
+
+[远程分支清理清单](remote-branch-cleanup-2026-10-15.md)记录已删除合dev的`feature/output-space-prerequisite`，当前`feature/sd-stage-report`因仍在使用而保留。正常按主题commit/push/PR合dev，不合main、不强推、不删实验数据。第三方HF ESP已核验到dataset仓库commit `ad76f8da29f3bfc7faa20488193c6aa83a9f708c`，属非作者官方，后续单独记录配置兼容和数学门验收，不把第三方已有数字当本机Table1复现。

@@ -1,5 +1,7 @@
 # Research notes
 
+[最新作者官方路径与PMLR出版版重查](esp-official-recheck-2026-10-16.md)：仍无已核验可执行入口，目标未改；任务标签10/8与本地13的纳入/权重缺口明确列出。本轮仅CPU，不开GPU重复矩阵。
+
 当前优先：[Table1差距分析与无GPU计划](esp-table1-gap-analysis-2026-10-16.md)、[可复算CPU账本](esp-table1-gap-analysis-2026-10-16.json)。聚焦8B主复现缺口、统计/合同边界与已有效工作的来源；4B方向作为背景，bias/random/Kalman后置，不开新GPU组。
 
 最新完整交付：[4B BC30固定480方向最终报告](4b-full-direction-controls-2026-10-16.md)。六格均完整、485,860 token全数学门通过；content已完成。三随机方向均高于zero，不支持e2−e1唯一性；BC60方向本轮未追加，工作量与理由单列。以下历史阶段表述以各报告快照时点为准。

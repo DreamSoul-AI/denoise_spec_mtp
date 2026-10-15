@@ -152,6 +152,8 @@ E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.46
 
 本轮不追加BC60方向矩阵：新增五个有效格已有2,400次prompt执行、405,073 token/276,523模型调用，三随机种子已否定本批e2−e1唯一性；BC60回答跨预算泛化，不能消除content范数混杂。失败完整partial另记20,977 token/13,854 calls，不拼接有效样本，细节见最终报告。CPU回归及PR22/dev闭环已完成。当前无GPU主线是已有8B与4B证据的差距账本及作者合同对照，P0/P1/P2产物和停止条件见上述差距报告；不筛prompt、不重选聚合、不改预算追目标。GPU留给量化，不启动新实验。旧0.6B罕见事件、算子归因、Kalman和新方法继续归档；开放问题不自行升级为额外实验。
 
+最新CPU来源刷新见[官方路径重查](research/esp-official-recheck-2026-10-16.md)：出版版Table1目标1.63/1.74未变；Figure8十类与采样表八类标签不构成Table1样本/权重合同。本地固定480/13类不改；作者入口未核验且OpenReview访问不完整，当前无可启动官方GPU项，不因空闲重跑自实现或失败第三方。
+
 ## 十、GitHub使用与计划变更
 
 本文件是当前宏观计划入口，英文版逐章对应；Study级`docs/PLAN.md`是先于make冻结的执行合同，数字/图在其`STUDY_REPORT.md`和evidence中。原始tokens/trace、完整Run、模型和cache不进Git。每次正式运行沿用原生记录的commit、source/input/model摘要、配置、实际环境、seed、命令、RunID、失败和结果路径，不重建同名Run或重签历史成功记录。

@@ -1,5 +1,7 @@
 # Research notes
 
+当前执行主线：[4B BC30全480方向对照](../../studies/qwen3_4b_bf16_directions/README.md)。按10月16日追加指示扩大全量，五格新完整路径加复用旧零偏置；原四窗口仅保留局部证据。计划已冻结，正式状态以该Study报告为准；不修改数据或prompt、不新增方法。
+
 人写的研究计划，不是 Study 执行合同。Study 的 `PLAN.md` / `STUDY_REPORT.md` 仍在 `studies/<name>/docs/`。已记下的接受数在 [history-extrapolation.md](../history-extrapolation.md)。
 
 当前结果速读：[SD 阶段报告：8B ESP 复现与 4B BF16 方法比较](sd-stage-report-2026-10-15.md)。集中列出已有结果的τ、论文差值、全部逐prompt胜平负、正确性门、排名与局限，并逐表链接原始结果文件；最新目标交付及未复现边界另在顶部说明。

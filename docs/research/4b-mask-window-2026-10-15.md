@@ -1,8 +1,8 @@
 现状：固定数据下[五方法加AR](../../studies/qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)完整11/11已验收；追加早期/双向/方向72格、192次forward，数学门全过。<br>
 发现：原e2−e1对零偏置3胜1负；随机0也在q241提升，否定本批“只有原方向有效”，见[方向读出](4b-direction-controls-readout-2026-10-15.json) `comparisons`。<br>
 发现：q121/q241双向替换接受数0↔1；其余保留反例，见[输出轨迹](4b-reciprocal-output-readout-2026-10-15.json)/[输入轨迹](4b-reciprocal-input-readout-2026-10-15.json)。<br>
-下一步：本批结果PR20已合dev并删除远程工作分支；[第三方HF验收](esp-third-party-reproduction-2026-10-15.md)及证据继续按PR合dev，不改变主实验或新增方法。<br>
-阻塞：4B目标无阻塞、GPU已释放；第三方8B三预算均首token数学门失败，未跑其全480、无有效τ，失败证据已保留，不改源码调结果。
+下一步：按10月16日追加指示执行[BC30全480方向对照](../../studies/qwen3_4b_bf16_directions/docs/PLAN.md)，四窗口不能替代全量结论；新Study独立留证，不改变prompt。<br>
+阻塞：主实验及局部方向控制已通过PR20交付；第三方失败证据已通过PR21交付，无有效τ。新全量Study尚未得出结果，pending不补零，目标模式继续active。
 
 # 4B 输出侧候选质量与固定窗口阶段报告
 

@@ -1,0 +1,23 @@
+study: qwen3_4b_bf16_directions
+description: Full480 fixed-input BC30 requested direction controls
+experiment:
+  name: qwen3_4b_bf16_directions
+recipe: recipe.py
+freeze: true
+provenance:
+  include:
+  - docs/PLAN.md
+  - docs/source_refs.json
+  - direction_control.py
+flow:
+  study_phases: true
+  prepare_shared: false
+axes:
+  algorithm.config.direction:
+  - template
+  - random0
+  - random1
+  - random2
+  - content
+seeds:
+- 123

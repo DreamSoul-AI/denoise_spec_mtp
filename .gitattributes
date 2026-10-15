@@ -286,3 +286,4 @@
 /tools/audit_esp_third_party.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/docs/THIRD_PARTY_PLAN.md -text whitespace=cr-at-eol
 /docs/research/esp-third-party-audit-2026-10-15.json -text whitespace=cr-at-eol
+/studies/qwen3_4b_bf16_directions/** -text whitespace=cr-at-eol

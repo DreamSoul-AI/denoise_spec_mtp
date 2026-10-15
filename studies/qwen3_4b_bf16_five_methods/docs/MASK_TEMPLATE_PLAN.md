@@ -29,4 +29,6 @@
 
 新出现的RPipe `watch-version-final.py`已读源码核验，仅调用已检查的CPU远端CI查询脚本；准入按脚本SHA `f33abb9086f09bbf917118b20a5fc10cd3c13cca8ec0690b6d0178ef4a399763`识别及其子进程。未知进程仍拒绝。排队最多20次、每次间隔30秒，只重试0-forward的deferred，任何执行失败不自动重跑。
 
+零forward资源停止记录保留后补充核验`watch-version-dev.py`，同样只读远端CI，SHA `b69fd1fe0c67a405afee52be9599cd79cb06459b5abc23b17860ea9014d2ce92`。新版本额外记录未知PID，控制公式、窗口和预算不变；人工确认0-forward后可新目录重新准入，不重用失败目录或自动重试执行失败。
+
 全部提交token必须等于对应验证前向argmax，当前owner argmax不变，输出零阶控制续接旧Run。独立AR仅旧诊断，不新增AR前向。任一数学门、来源、有限值、预算或控制失败即保存停止；不跑8B、不测速、不删数据、不改默认配方、不钻算子机理。按长期授权正常提交/推工作分支/PR合dev，保留分支，不合main。

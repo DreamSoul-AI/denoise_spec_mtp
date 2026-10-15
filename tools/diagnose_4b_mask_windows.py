@@ -31,6 +31,8 @@ def admission(initial=True):
         processes = [processes]
     processes = [p for p in processes if p['ProcessId'] != os.getpid()]
     inspected = {
+        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-version-dev.py':
+            'b69fd1fe0c67a405afee52be9599cd79cb06459b5abc23b17860ea9014d2ce92',
         'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-version-final.py':
             'f33abb9086f09bbf917118b20a5fc10cd3c13cca8ec0690b6d0178ef4a399763',
         'D:/GitHub/diaoenmao/RPipe/.tmp/systematic-contracts-20261015/watch-first-dev.py':
@@ -56,7 +58,8 @@ def admission(initial=True):
     unknown = [p['ProcessId'] for p in processes if p['ProcessId'] not in known]
     return {'passed': not unknown and (not initial or int(gpu[0]) >= 18 * 1024),
             'free_mib': int(gpu[0]), 'used_mib': int(gpu[1]), 'foreign_python_count': len(processes),
-            'verified_cpu_count': len(known), 'unknown_python_count': len(unknown), 'initial': initial}
+            'verified_cpu_count': len(known), 'unknown_python_count': len(unknown),
+            'unknown_python_pids': unknown, 'initial': initial}
 
 
 def intervention_masks(shadow, proxies, zero):

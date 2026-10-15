@@ -90,7 +90,7 @@ def test_fixed_window_uses_native_control_and_predicts_after_bonus(monkeypatch, 
 
 def test_template_and_zero_controls_keep_same_updated_mean(monkeypatch):
     from types import SimpleNamespace
-    from spec_mtp.structure.algorithm.mask_providers import EMAVelocityMaskProvider
+    from spec_mtp.structure.algorithm.mask_providers import EMAVelocityMaskProvider, ESPMaskProvider
     m = tool('diagnose_4b_mask_windows', monkeypatch)
     table = torch.tensor([[1., 0.], [0., 1.], [2., 3.], [3., -2.], [1., 2.]], dtype=torch.bfloat16)
     model = SimpleNamespace(embedding_table=table, dtype=table.dtype, embed=lambda ids: table[ids])
@@ -109,6 +109,11 @@ def test_template_and_zero_controls_keep_same_updated_mean(monkeypatch):
     assert torch.equal(mean[0], provider._level.expand(2, -1))
     assert not torch.equal(mean[0, 0], table[ids[0]].mean(0))
     assert not torch.equal(frozen, native) and not torch.equal(frozen, mean)
+    esp = ESPMaskProvider(2, table, lam=.1, update=True)
+    esp.init_from_prompt(table[ids[0]])
+    esp.on_token_committed(table[3], table[2])
+    esp.on_token_committed(table[4], table[3])
+    assert torch.equal(mean[0], esp.masks())
 
 
 def test_window_admission_rejects_unrelated_work_and_tracks_cpu_children(monkeypatch):

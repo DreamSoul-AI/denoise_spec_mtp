@@ -88,3 +88,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 - `studies/qwen3_4b_bf16_directions/`：固定480条BC30方向对照；Study作用域只控制输入速度方向，复用原生解码/验证/Untimed合同和旧零阶结果，单队列串行，不修改科学包或数据。
 - `tools/analyze_4b_full_directions.py`：复用五方法native读出，新增方向相对template和旧五方法的逐promptτ/accepted/calls配对；pending仅记进度，不补结果或写平局。
 - `studies/qwen3_4b_bf16_directions_recovery/`：原队列终态后仅补未完整因素，原方向control不变，准入拒绝在同Run prompt边界等待而不丢弃进度；新version/Run，保留旧资源失败及已成功格。
+
+`tools/analyze_esp_table1_gap.py`仅用标准库读取既有8B/4B证据，复算Table1差距、尾部/prefill计数与分组/配对账本；不加载模型或GPU，不改变原Run。

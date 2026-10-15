@@ -95,3 +95,20 @@ def test_read_only_observer_preserves_tiny_bf16_output_and_forward_budget(method
     rows, _ = module.point_rows(frames, actual[3:], model.embedding_table, method, 121, 7)
     assert rows and all(row['target_index'] >= row['root_index'] + row['depth'] + 1 for row in rows)
     assert not model._forward_hooks and not model._forward_pre_hooks and not model.hf.model.norm._forward_hooks
+
+
+def test_cpu_downloader_requires_verified_content(monkeypatch):
+    import json
+    from types import SimpleNamespace
+    module = tool('capture_4b_geometry')
+    command = 'D:\\GitHub\\DreamSoul\\quantization\\.tmp\\paroquant-paper-env\\python.exe -u .tmp/paroquant-reference/download_layers.py'
+    monkeypatch.setattr(module.subprocess, 'check_output', lambda args, **kw:
+                        'GPU-test, 19000, 2000' if args[0] == 'nvidia-smi' else
+                        json.dumps([{'ProcessId': -1, 'CommandLine': command}]))
+    monkeypatch.setattr(module.Path, 'is_file', lambda _: True)
+    monkeypatch.setattr(module.Path, 'read_bytes', lambda _: b'inspected downloader')
+    monkeypatch.setattr(module.hashlib, 'sha256', lambda _: SimpleNamespace(hexdigest=lambda:
+                        '10689bac808d0e5fa1958d306508f459d3c4637dc92a51bf5b6c1bb915545026'))
+    assert module.admission()['passed'] and module.admission()['verified_cpu_downloader_count'] == 1
+    monkeypatch.setattr(module.hashlib, 'sha256', lambda _: SimpleNamespace(hexdigest=lambda: 'changed'))
+    assert not module.admission()['passed']

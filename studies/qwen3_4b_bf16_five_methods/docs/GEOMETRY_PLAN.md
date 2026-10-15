@@ -15,6 +15,8 @@
 
 启动前两次检查共享 GPU 显存与 Python 作业；没有其它 GPU/未知模型作业且可用显存至少 18 GiB 才加载。已有其它作业则不加载、记录 deferred；不抢占、不终止其它进程。每个短诊断前再核查新作业。桌面图形进程与已确认的 CPU CI 单列；这些检查是观测准入，不冒称跨进程的原子全局预约。
 
+首次准入因发现未知 Python 作业延期，未加载模型。随后核验量化任务 `download_layers.py`：只调用下载和文件哈希，不加载模型；仅路径与 SHA256 `10689bac808d0e5fa1958d306508f459d3c4637dc92a51bf5b6c1bb915545026` 同时匹配时按已核验 CPU 下载作业放行，变化或其他未知作业仍延期。保留首次延期证据。
+
 使用未修改的 SpecDecoder/HFCausalLM/真实 provider，只增加只读 hook，记录实际输入 mask、原生 final-normalized hidden、provider 的原始 state/proxy。只处理 root 与实际接受路径上的 owner；拒绝分支没有真实延续，不混入目标统计。槽 j 的目标为该 owner 之后第 j+1 个实际生成 token 的 embedding，末尾无目标者跳过并计数。另比较真实 owner hidden 与其预测的下一 token embedding，区分原始 hidden、范数缩放后的实际 BF16 mask、真实 embedding。
 
 验证全部提交 token 的原生 verifier-argmax 审计、输出为原完整 Run 的前缀、hook 未增加 forward。独立 AR 前缀一致率只从已有共享 AR 读出，不作为失败门。完整向量/原始 token 仅本机保存，公开逐点几何标量、分位数、计数及 SHA。几何分析在 CPU 完成；不改变算子/归约开关，不分析 BF16 算子数值分叉。

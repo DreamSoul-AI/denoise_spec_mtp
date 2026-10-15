@@ -1,6 +1,6 @@
 # Qwen3-4B BF16 paired report
 
-完整验收：False；已完成 9/11。
+完整验收：False；已完成 10/11。
 
 | Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact/n (rate) | argmax checked |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -13,7 +13,7 @@
 | 60/frozen_mean | succeeded | 26913 | 54197 | 81006 | 1.4990785040117653 | 1.5710319322666075 | 165/480 (34.38%) | 81006 |
 | 60/input_zero | succeeded | 27523 | 53309 | 80733 | 1.519108822805656 | 1.5789239399696458 | 167/480 (34.79%) | 80733 |
 | 60/input_first | succeeded | 31611 | 49875 | 81307 | 1.6363397104970139 | 1.6658595242934762 | 162/480 (33.75%) | 81307 |
-| 60/output_zero | pending | pending | pending | pending | pending | pending | pending | pending |
+| 60/output_zero | succeeded | 27828 | 52896 | 80620 | 1.5289224664224663 | 1.5791263993793005 | 172/480 (35.83%) | 80620 |
 | 60/output_first | pending | pending | pending | pending | pending | pending | pending | pending |
 
 相对独立AR的逐prompt调用数比较；calls越低越好。AR没有draft接受数，该指标不适用。输出长度及AR首分叉单列，不能将不同长度的调用数直接解释为等长加速。
@@ -28,6 +28,7 @@
 | 60/frozen_mean | 475/1/4 | -27683 |
 | 60/input_zero | 478/0/2 | -28571 |
 | 60/input_first | 478/0/2 | -32005 |
+| 60/output_zero | 476/0/4 | -28984 |
 
 以下胜负指第二方法相对第一方法；accepted越高越好，calls越低越好，两个指标分别判定。
 
@@ -45,7 +46,10 @@
 | 30/output_zero → 30/output_first | 209/72/199 | 201/64/215 | 191 | 139 | 332 |
 | 60/frozen_mean → 60/input_zero | 225/29/226 | 232/35/213 | 610 | -888 | -273 |
 | 60/frozen_mean → 60/input_first | 317/41/122 | 300/33/147 | 4698 | -4322 | 301 |
+| 60/frozen_mean → 60/output_zero | 246/23/211 | 245/27/208 | 915 | -1301 | -386 |
 | 60/input_zero → 60/input_first | 374/36/70 | 354/28/98 | 4088 | -3434 | 574 |
+| 60/input_zero → 60/output_zero | 216/48/216 | 229/39/212 | 305 | -413 | -113 |
+| 60/input_first → 60/output_zero | 90/28/362 | 114/40/326 | -3783 | 3021 | -687 |
 
 accepted为EOS/预算裁剪前候选接受数；committed及τ包含bonus、按裁剪后实际解码提交数计算，不含prefill首token。argmax审计含首token且必须全过；独立AR首分叉和输出长度全部保留，不作为失败门。AR参考不冒充Spec验证argmax审计。
 

@@ -15,7 +15,7 @@
 
 启动前两次检查共享 GPU 显存与 Python 作业；没有其它 GPU/未知模型作业且可用显存至少 18 GiB 才加载。已有其它作业则不加载、记录 deferred；不抢占、不终止其它进程。每个短诊断前再核查新作业。桌面图形进程与已确认的 CPU CI 单列；这些检查是观测准入，不冒称跨进程的原子全局预约。
 
-首次准入因发现未知 Python 作业延期，未加载模型。随后核验量化任务 `download_layers.py`：只调用下载和文件哈希，不加载模型；仅路径与 SHA256 `10689bac808d0e5fa1958d306508f459d3c4637dc92a51bf5b6c1bb915545026` 同时匹配时按已核验 CPU 下载作业放行，变化或其他未知作业仍延期。保留首次延期证据。
+前两次准入因发现未知 Python 作业延期，未加载模型。随后核验量化任务 `download_layers.py`：只调用下载和文件哈希，不加载模型；SHA256 `10689bac808d0e5fa1958d306508f459d3c4637dc92a51bf5b6c1bb915545026`。另核验 `build_official_container_v2.py`：仅准备容器、编译扩展，Docker create 没有 GPU/device 参数；SHA256 `b22cbe9814bcfcf85e9e6caade2a60a2258d2bb83f5e1d856124753bf8976e44`。仅路径与 SHA 同时匹配时按已核验 CPU 准备作业放行，变化或其他未知作业仍延期。保留前两次延期证据。
 
 使用未修改的 SpecDecoder/HFCausalLM/真实 provider，只增加只读 hook，记录实际输入 mask、原生 final-normalized hidden、provider 的原始 state/proxy。只处理 root 与实际接受路径上的 owner；拒绝分支没有真实延续，不混入目标统计。槽 j 的目标为该 owner 之后第 j+1 个实际生成 token 的 embedding，末尾无目标者跳过并计数。另比较真实 owner hidden 与其预测的下一 token embedding，区分原始 hidden、范数缩放后的实际 BF16 mask、真实 embedding。
 

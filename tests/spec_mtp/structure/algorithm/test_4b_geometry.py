@@ -109,6 +109,6 @@ def test_cpu_downloader_requires_verified_content(monkeypatch):
     monkeypatch.setattr(module.Path, 'read_bytes', lambda _: b'inspected downloader')
     monkeypatch.setattr(module.hashlib, 'sha256', lambda _: SimpleNamespace(hexdigest=lambda:
                         '10689bac808d0e5fa1958d306508f459d3c4637dc92a51bf5b6c1bb915545026'))
-    assert module.admission()['passed'] and module.admission()['verified_cpu_downloader_count'] == 1
+    assert module.admission()['passed'] and module.admission()['verified_cpu_preparation_count'] == 1
     monkeypatch.setattr(module.hashlib, 'sha256', lambda _: SimpleNamespace(hexdigest=lambda: 'changed'))
     assert not module.admission()['passed']

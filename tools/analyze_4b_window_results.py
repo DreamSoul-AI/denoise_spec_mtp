@@ -89,6 +89,8 @@ def main():
     prompts = json.loads((args.study / 'docs/prompts_manifest.json').read_text())['rendered_prompts']
     report = {'no_model_forward': True, 'analyzer_sha256': sha(__file__), 'windows_sha256': sha(args.windows),
               'sample_mode': windows.get('sample_mode', 'unconditioned_first_root_ge8'),
+              'reference_method': windows.get('reference_method', 'output_zero'),
+              'native_control_variant': 'input_first' if windows.get('reference_method') == 'input_first' else 'zero',
               'private_logits_sha256': sha(args.logits), 'rows': [], 'comparisons': {}}
     for row in windows['rows']:
         qid, variant = row['question_id'], row['variant']
@@ -103,10 +105,12 @@ def main():
         report['rows'].append(dict(row, **{k: v for k, v in metrics.items() if k not in row}))
     methods = sorted({r['variant'] for r in report['rows']} - {'zero'})
     baselines = ('zero', 'input_first', 'input_mean') if 'input_template' in methods else ('zero',)
+    if windows.get('reference_method') == 'input_first':
+        baselines = ('zero', 'input_first')
+    if any(m.startswith('input_random_') for m in methods):
+        baselines += ('input_template',)
     for baseline in baselines:
-        for method in methods:
-            if method == baseline:
-                continue
+        for method in sorted({r['variant'] for r in report['rows']} - {baseline}):
             counts = Counter()
             for row in report['rows']:
                 if row['variant'] == method:

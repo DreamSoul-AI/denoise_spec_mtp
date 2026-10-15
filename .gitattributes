@@ -282,3 +282,6 @@
 /docs/research/4b-direction-controls-observations-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-direction-controls-readout-2026-10-15.json -text whitespace=cr-at-eol
 /src/spec_mtp/structure/algorithm/reference/esp_reproduction_artifacts/** -text whitespace=cr-at-eol
+/src/spec_mtp/structure/algorithm/reference/esp_reproduction_artifacts/upstream/** whitespace=-blank-at-eol,cr-at-eol
+/tools/audit_esp_third_party.py -text whitespace=cr-at-eol
+/studies/esp_table1_bf16_full_argmax/docs/THIRD_PARTY_PLAN.md -text whitespace=cr-at-eol

@@ -29,3 +29,13 @@ PR [#20](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/20)
 | feature/sd-research-plan-template | cd0a2fae3569bc15eb57c2abb79e276942538963 | 核dev包含head、远程tip未变，主仓切回dev并fast-forward后，`git push origin --delete feature/sd-research-plan-template`成功；ls-remote确认不存在 |
 
 删除后远程仅剩dev（上述merge）、main（`b636f90e54c7641be6914fbccec13f64bd9cc04c`，未变）及仍在运行的`feature/4b-full-direction-controls`（本次核验tip `b9e45d6352a37e11860b81634a6da19cddc9bc7f`）。本地计划分支、Run、worktree和数据保留；content全480原进程继续，不把计划PR完成记作整个方向目标完成。合并及删除的闭环同时记录在PR23说明和主仓本机`.tmp/research-plan-template-20261016/closure.json`。
+
+## PR22全量方向结果合并后的清理（2026-10-16）
+
+[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)两项CPU CI及Branch flow全部通过，普通merge进入dev：`d792ca57872b1138e09302ec51bebcdf8e61da2e`。
+
+| 远程分支 | 删除前tip | 实际结果 |
+| --- | --- | --- |
+| feature/4b-full-direction-controls | 0aad4d16b6016f002681e411616bedcc06906204 | 确认dev包含head且远程tip未变后删除；ls-remote确认不存在 |
+
+删除后仅余dev（上述merge）与main（`b636f90e54c7641be6914fbccec13f64bd9cc04c`，未变）。本地主仓dev已同步且干净；本地分支、worktree、Run及数据保留。此为该次清理快照，后续文档分支按相同PR流程维护，其自身删除闭环记录在对应PR说明，避免为记载自身删除重复开PR。

@@ -10,7 +10,7 @@
 
 当前状态：五方法加AR及BC30方向六格各480均完整验收；新增405,073个token、连同复用zero共485,860个token全数学门通过。8B自实现未达到论文目标，作者官方入口未确认，非官方第三方预检数学门失败。计划经PR23合dev；[六格最终报告](research/4b-full-direction-controls-2026-10-16.md)与正式证据由[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)交付，本轮不追加方向BC60。
 
-本次由本会话执行文档与既有实验收尾，路线和资源边界按Enmao当前指示。优先完成本次计划及PR流程，不停止现有GPU任务。共享一张24GB GPU，单队列、非抢占；不测速、不改prompt、不另起研究方法。后续新增研究的负责人、期限与预算待另定。旧[研究计划v6](research/research-plan-v6.md)保留为历史设想，Kalman、高阶和非tied映射不属于当前执行范围。
+本轮实验与PR22/23已完成，当前只维护文档与分支卫生。按Enmao最新排班，GPU优先留给量化Identity/Haar/L4/PQI同协议对照，其准入为实测峰值显存加2GB余量；本仓不启动新SD GPU组，新实验等Enmao指定方向。共享一张24GB GPU，非抢占；不测速、不改prompt、不另起研究方法。后续新增研究的负责人、期限与预算待另定。旧[研究计划v6](research/research-plan-v6.md)保留为历史设想，Kalman、高阶和非tied映射不属于当前执行范围。
 
 ## 二、文献调研
 
@@ -121,7 +121,7 @@ E3是对既有输入速度解释的指定控制，不是新增方法主表。随
 
 ### （三）执行安排与优化方法
 
-原GPU单队列已自然exit0，content完成；CPU正式读出、来源/argmax/原生process核对通过。计划PR23已合dev，PR22收尾结果交付，不更改E3冻结PLAN。正常提交、push、PR合dev及合后远程工作分支清理按用户授权执行；不合main、不force push、不删本地分支、Run或数据。归档旧PR/issues只在状态和关联已核实后做，不因旧日期直接关闭。
+原GPU单队列已自然exit0，content完成；CPU正式读出、来源/argmax/原生process核对通过。计划PR23及结果PR22均已合dev，对应远程工作分支已删，不更改E3冻结PLAN。正常提交、push、PR合dev及合后远程工作分支清理按用户授权执行；不合main、不force push、不删本地分支、Run或数据。归档旧PR/issues只在状态和关联已核实后做，不因旧日期直接关闭。
 
 GPU准入只看nvidia-smi实际占用与足够空闲显存，不把未识别CPU进程当GPU作业。每组完整结束后再让卡，共享GPU的量化插跑窗口已完成一次实际交接，不能中止当前组。资源短暂冲突在prompt边界等待同一Run，来源/argmax/OOM等失败仍如实终止该格并保留，不用改prompt修结果。既有成功template和zero不重跑。
 
@@ -148,7 +148,7 @@ GPU准入只看nvidia-smi实际占用与足够空闲显存，不把未识别CPU�
 
 E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.464349086、随机2为1.523884714、zero1.422420206、content1.364829262，均来自上述正式六格证据。随机2相对template逐promptτ267胜/47平/166负；三个随机种子均高于zero，故不支持本批收益只由e2−e1方向造成的解释。仍有逐prompt反例，content范数未匹配且输出长度不同；这不是推荐最佳随机种子作新方法，也不证明任意方向有效。零偏置复用和失败资源工作量单列，不能把补齐成功包装成原失败Study通过。
 
-本轮不追加BC60方向矩阵：新增五个有效格已有2,400次prompt执行、405,073 token/276,523模型调用，三随机种子已否定本批e2−e1唯一性；BC60回答跨预算泛化，不能消除content范数混杂。失败完整partial另记20,977 token/13,854 calls，不拼接有效样本，细节见最终报告。下一步仅为CPU回归及PR22/dev闭环。旧0.6B罕见事件、算子归因、Kalman和新方法继续归档；开放问题不自行升级为额外实验。
+本轮不追加BC60方向矩阵：新增五个有效格已有2,400次prompt执行、405,073 token/276,523模型调用，三随机种子已否定本批e2−e1唯一性；BC60回答跨预算泛化，不能消除content范数混杂。失败完整partial另记20,977 token/13,854 calls，不拼接有效样本，细节见最终报告。CPU回归及PR22/dev闭环已完成，当前仅维护文档与分支卫生；GPU留给量化，不启动新实验。旧0.6B罕见事件、算子归因、Kalman和新方法继续归档；开放问题不自行升级为额外实验。
 
 ## 十、GitHub使用与计划变更
 
@@ -160,4 +160,4 @@ E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.46
 | 2026-10-16 | 记录作者/自实现/第三方差异、正确性门与AR诊断、三随机方向及资源补齐状态 | 收紧结论，不扩大GPU预算或改prompt |
 | 2026-10-16 | 安装依赖固定Transformers5.12.1，避免5.20缓存API漂移导致CPU CI失败 | 只固定已验证安装版本，不改科学缓存算法、不替换现有GPU环境 |
 
-计划PR关联现有[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)及各结果报告，合dev后删除本次已合远程计划分支；运行中的方向工作分支保留到其结果PR合入为止。规范正本、译本、来源与SHA见[standards README](research/standards/README.md)。旧v6更广的60篇参考文献仅为历史线索，不能当本次已全部审阅的证据。本文献表各作者原文、官方数据入口和实际使用的本仓报告即本次参考资料，关键事实已就近定位。
+计划PR23与结果[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)均已合dev，对应远程分支均已删除，详见[清理记录](research/remote-branch-cleanup-2026-10-15.md)。规范正本、译本、来源与SHA见[standards README](research/standards/README.md)。旧v6更广的60篇参考文献仅为历史线索，不能当本次已全部审阅的证据。本文献表各作者原文、官方数据入口和实际使用的本仓报告即本次参考资料，关键事实已就近定位。

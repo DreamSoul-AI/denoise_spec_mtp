@@ -81,3 +81,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/revalidate_run.py` uses a separately loaded verifier-argmax gate with the unchanged execution package. It finalises existing raw evidence without prepare/execute, retains the previous failed result by SHA256, and supports native Study process after all declared cells are revalidated.
 
 `tools/analyze_4b_geometry.py` reads existing full480 traces for position/depth/trim/norm audits without model forwards. `tools/capture_4b_geometry.py` adds read-only hooks to the unchanged 4B decoder after observational non-preemptive admission, binds targets to the actual accepted path, and keeps raw vectors local; see the Study's `docs/GEOMETRY_PLAN.md`.
+- `tools/analyze_4b_velocity.py`：已保存向量的径向/切向分解与全量 seed 深度转移，零模型 forward。
+- `tools/diagnose_4b_mask_windows.py`：4B 固定 cache/树的 mask 槽位×范数映射对照，只跑冻结的小窗口预算。

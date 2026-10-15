@@ -255,3 +255,6 @@
 /studies/qwen3_4b_bf16_five_methods/docs/GEOMETRY_PLAN.md -text whitespace=cr-at-eol
 /docs/research/4b-mask-geometry-cpu-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-mask-geometry-observations-2026-10-15.json -text whitespace=cr-at-eol
+/tools/analyze_4b_velocity.py -text whitespace=cr-at-eol
+/tools/diagnose_4b_mask_windows.py -text whitespace=cr-at-eol
+/studies/qwen3_4b_bf16_five_methods/docs/MASK_WINDOW_PLAN.md -text whitespace=cr-at-eol

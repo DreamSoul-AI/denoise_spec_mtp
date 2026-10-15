@@ -217,3 +217,5 @@ BC10原生重新验收已执行：dfe1b9c8d5d12e92为succeeded，新门480条/79
 原生门修复PR #9已于2026-10-14T22:55:18Z合dev，merge712d61646e451725e7071656c2f8049f466acf36。两个cpu-checks（38649881410、38650062847）及Branch flow（38650062745）均SUCCESS；合并依据Enmao长期授权。当前执行目录保持旧冻结科学来源，仅新门验收独立加载，不切换/杀BC30，不改配方或权重。
 
 BC30全480及原生重新验收完成：b9b54923b1b9ea9f为succeeded，79,762提交token自检全过，AR175/480=0.364583仅诊断。pooledτ=1.563378、Δ1.63=-0.066622；prompt mean=1.593232、category mean=1.563387。未达目标如实保留，不以AR失配重跑；只summarize gate/write，原始四证据SHA不变，旧失败result归档。[验收证据](../studies/esp_table1_bf16_full_argmax/docs/bc30-native-revalidation-v1.json)。BC60/1已由原串行队列接续，仍不改科学源码/冻结配置、不测速；全四格后再process、正式冻结与4B。
+
+BC60单mask全480及原生重新验收完成：3f3d0f9a84341c0b为succeeded，79,618提交token自检全过，AR185/480=0.385417仅诊断。pooledτ=1.647301、Δ1.74=-0.092699；prompt mean=1.669498、Δ=-0.070502；category mean=1.649693、Δ=-0.090307。未达论文目标如实保留；只重做summarize gate/write，execute_rerun=false，四项原始证据SHA未变，旧失败result按SHA归档。[验收证据](../studies/esp_table1_bf16_full_argmax/docs/bc60-m1-native-revalidation-v1.json)。原worker已退出，原串行队列接续BC60双mask对照555ff70d57ce05b0；三格主配置全部完成，四格总体验收仍pending。未改变冻结源码/配置，未测速、未开展算子机理，4B继续等待全四格。

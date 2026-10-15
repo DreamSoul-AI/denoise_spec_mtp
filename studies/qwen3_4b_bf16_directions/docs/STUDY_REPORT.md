@@ -1,10 +1,10 @@
 # BC30固定480方向对照阶段报告
 
-当前步骤：template全480及原生Run终验成功，单队列已自动进入random0；其余新格继续排队。
+当前步骤：template全480及原生Run终验成功；random0完成46条后遇外部GPU进程停止，原队列已进入random1。
 实测自检：template的80,932个提交token全过，pooled τ=1.507777653；完整矩阵仍未完成。
 出处：[首格有效结果快照](direction_partial_v1.json)，完整token/trace及Run均留本机；零偏置单列旧结果复用来源。
-下一步：队列继续random0→random1→random2→content；完整后再判方向总体差异，不因首格结果改对照。
-阻塞：暂无GPU/数学门阻塞；BC60尚未声明，本轮完成后按forward/token工作量决定，不测速。
+下一步：原队列继续random1→random2→content；队列退出后按[补齐协议](RECOVERY_PLAN.md)用新version/Run完整补跑缺失因素，不重跑成功格。
+阻塞：random0资源中断待补齐，并非数学门失败；整个方向目标仍未完成，BC60未声明，不测速。
 
 2026-10-16新指令已冻结[PLAN](PLAN.md)。四窗口不能回答总体唯一方向问题，本轮不以其结果代替全量。CPU控制/读出七项及文档四项通过；`tools/analyze_4b_full_directions.py`复用原五方法native读出，pending只记进度，不补零或平局。原生5格全部成功、Study process通过才发布正式JSON；方向与旧五方法的关系按PLAN单列。
 
@@ -26,3 +26,9 @@ CPU集成记录：PR22首轮远端CI为497 passed/3 failed（run 38768912287）�
 原生输入一阶仍是旧方法结果，含β0.9999的真实EMA更新：pooled τ=1.511957584（旧正式证据），不能称为严格固定方向。新固定e2−e1相对原生输入一阶的accepted胜/平/负为104/236/140，calls为110/234/136，逐prompt τ为105/229/146；总accepted少144、主calls多170、输出多34。由完整480数据确认二者接近但不等价，不回写主方法排名。AR一致率只诊断，输出长度不同，不把调用数差当等输出测速。
 
 剩余三个随机种子及内容初始化尚无完整结果，不能据此判断收益是否只来自原方向。category聚合按原数据实际category等权，非已确认论文任务权重；τ不含prefill首token，主calls含prefill，accepted为裁剪前计数，沿用原报告口径。
+
+## GPU准入中断与补齐
+
+random0原Run `be910fe1fa042b28`在北京时间00:57:07的下一prompt准入时观察到真实GPU Python PID65348，按冻结规则抛出`Foreign GPU work appeared`，原生状态failed。此前完整46条共9,028个提交token经原生`_check_argmax`对token/hash/owner链复核通过，实际5,923次模型调用。该格不是方法正确性失败或OOM，也没有有效全480τ。
+
+证据：[resource_interruption_v1.json](resource_interruption_v1.json)，绑定原failed result、完整私有partial JSONL和progress SHA；完整失败Run保留，不把46条拼接成全量或重签成成功。外部PID随后已不在实际GPU列表，原串行队列自动进入random1；不杀外部作业，不重启当前有效进程、不另开队列。原队列结束后仅为缺失因素建立新版本完整480补齐，具体门与唯一有效格选择见[RECOVERY_PLAN](RECOVERY_PLAN.md)。原Study可能保留失败终验，最终如需跨Study组合，会逐项披露，不宣称原失败Study通过。

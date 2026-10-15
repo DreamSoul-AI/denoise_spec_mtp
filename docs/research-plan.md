@@ -10,7 +10,7 @@
 
 当前状态：五方法加AR及BC30方向六格各480均完整验收；新增405,073个token、连同复用zero共485,860个token全数学门通过。8B自实现未达到论文目标，作者官方入口未确认，非官方第三方预检数学门失败。计划经PR23合dev；[六格最终报告](research/4b-full-direction-controls-2026-10-16.md)与正式证据由[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)交付，本轮不追加方向BC60。
 
-本轮GPU实验与PR22/23已完成，当前仅做已有证据CPU对账、文档与分支卫生。按Enmao最新排班，GPU优先留给量化Identity/Haar/L4/PQI同协议对照，其准入为实测峰值显存加2GB余量；本仓不启动新SD GPU组，新实验等Enmao指定方向。共享一张24GB GPU，非抢占；不测速、不改prompt、不另起研究方法。后续新增研究的负责人、期限与预算待另定。旧[研究计划v6](research/research-plan-v6.md)保留为历史设想，Kalman、高阶和非tied映射不属于当前执行范围。
+本轮GPU实验与PR22/23已完成，当前仅做已有证据CPU对账、文档与分支卫生。按Enmao最新排班，SD官方Table1/8B步骤获得GPU优先授权，取得可核验官方入口并满足实际非抢占准入后立即串行推进；当前入口仍缺失，GPU最新实测已空闲，详见[启动就绪清单](research/esp-official-launch-readiness-2026-10-16.md)。不因优先授权改用自实现或已失败第三方充当官方，不启动其他新SD实验。共享一张24GB GPU，非抢占；不测速、不改prompt、不另起研究方法。后续新增研究的负责人、期限与预算待另定。旧[研究计划v6](research/research-plan-v6.md)保留为历史设想，Kalman、高阶和非tied映射不属于当前执行范围。
 
 ## 二、文献调研
 

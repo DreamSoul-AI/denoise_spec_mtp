@@ -1,0 +1,32 @@
+{
+  "checked_at_utc": "2026-10-15T23:54:54.960767+00:00",
+  "authorization": "SD official Table1 GPU work prioritized; fixed prompts; no new idea; no preemption",
+  "official_entrypoint": null,
+  "official_repository": null,
+  "official_commit": null,
+  "last_full_source_audit": "docs/research/esp-official-recheck-2026-10-16.json",
+  "current_bounded_check": [
+    "author ESP homepage entry",
+    "PMLR publication page",
+    "local docs/handover and launch-status records",
+    "web searches for paper identifier and official ESP implementation"
+  ],
+  "new_verified_official_implementation_found": false,
+  "gpu_observation": "NVIDIA GeForce RTX 5090 D v2, 2035 MiB, 22001 MiB, 0 %",
+  "actual_gpu_compute_processes_filtered": [
+    "47796, C:\\Program Files\\Docker\\Docker\\frontend\\Docker Desktop.exe, [N/A]"
+  ],
+  "execution": {
+    "gpu_run_started": false,
+    "model_loaded": false,
+    "existing_gpu_job_interrupted": false,
+    "prompt_changed": false,
+    "timing_performed": false
+  },
+  "unresolved": [
+    "No authenticated author repository/commit/native entrypoint is available locally.",
+    "OpenReview supplementary access remains incomplete in last full audit."
+  ],
+  "actual_experiment_python_processes": [],
+  "gpu_observation_interpretation": "GPU released by latest snapshot:0% utilization,22001MiB free; Docker Desktop UI is not classified as an experiment Python."
+}

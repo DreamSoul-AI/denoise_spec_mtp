@@ -84,6 +84,10 @@ test_4b_untimed验证三method tiny token/全部语义/calls保持、全局时�
 `test_4b_geometry.py` 覆盖 trace/root 位置与总计数、未来目标槽位及尾端跳过、共同前缀和重复点拒绝、固定 state/proxy 首槽无直接速度项、原生 tiny BF16 三方法只读观测器的输出/forward/argmax/hook 恢复，以及准入容量、未知作业、已核验 CPU 脚本字节和父 PID 链。几何汇总回归保留 raw 槽范数比与映射后范数比的区别。tiny 回归不替代真实模型证据；真实 12 格及全 480 条 CPU 复核见[诊断报告](research/4b-mask-geometry-2026-10-15.md)。
 ## 4B 固定窗口与CPU状态分析（2026-10-15）
 
-`test_4b_mask_windows.py`覆盖槽差径向/切向、同prompt相邻转移、原生shadow纯推演、同前缀输入控制、局部BF16控制续接及argmax/bonus目标对齐、准入父PID链、条件选择拒绝、树预算/父节点/重复剪枝、并列排名区间和固定模板差分代数近似。真实局部干预和CPU分析见[阶段报告](research/4b-mask-window-2026-10-15.md)。候选覆盖界不当作GPU实际接受数，条件样本不估计总体τ。
+`test_4b_mask_windows.py`覆盖槽差径向/切向、同prompt相邻转移、原生shadow纯推演、同前缀输入控制、局部BF16控制续接及argmax/bonus目标对齐、GPU准入、条件选择拒绝、树预算/父节点/重复剪枝、并列排名区间和固定模板差分代数近似。真实局部干预和CPU分析见[阶段报告](research/4b-mask-window-2026-10-15.md)。候选覆盖界不当作GPU实际接受数，条件样本不估计总体τ。
 
 模板对照新增纯速度替换保留更新mean、零速度等价updating ESP（区别frozen mean）、四格tiny BF16原生窗口的控制续接/argmax/bonus门；该文件共10项通过。扩展CPU读出时对旧24行及5组比较作真实数据回归，全部保持。真实4B新增两批24格、100次forward及75次局部选择自检见报告第八节，完整logits仅留本机。
+
+最新准入回归只允许调用nvidia-smi，覆盖WDDM桌面与本PID放行、GPU驻留外部Python拒绝、显存不足拒绝/已加载后不重复扣容量、空计算进程列表放行；不再检查CPU进程或SHA。早期同前缀16格、44次forward及54次局部选择自检见报告第九节。
+
+追加原输入一阶轨迹的反向capture回归，核验native mask逐元素相同、当前owner不变、原输入后续mask恢复及旧Run续接；随机偏置同范数、独立种子可重复与内容初始化保留完整mean均覆盖。窗口11项加文档3项共14项通过，全仓Ruff通过。真实双向24格72次forward/72次局部选择检查、方向32格76次forward/99次检查见报告第十/十一节，不能把重复控制当独立样本。

@@ -1,4 +1,6 @@
 import importlib.util
+import hashlib
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -21,6 +23,20 @@ def test_original_files_hash_and_compile(monkeypatch):
     assert len(origin['files']) == 8
     for path in (m.VENDOR / 'upstream/code').glob('*.py'):
         compile(path.read_bytes(), str(path), 'exec')
+
+
+def test_recorded_preflight_cannot_be_reported_as_valid_tau():
+    report = json.loads((ROOT / 'docs/research/esp-third-party-audit-2026-10-15.json').read_text(encoding='utf-8'))
+    assert not report['author_official'] and not report['quality_passed'] and not report['full_480_executed']
+    assert [r['bc'] for r in report['rows']] == [10, 30, 60]
+    assert sum(r['completed_model_calls'] for r in report['rows']) == 6
+    for row in report['rows']:
+        assert row['status'] == 'verifier_argmax_failed' and row['valid_tau'] is None
+        assert row['stopped_before_bad_commit'] and row['first_rejection']['output_index'] == 0
+        assert row['first_rejection']['argmax_minus_chosen_logit'] > 0
+    for path, key in [('tools/audit_esp_third_party.py', 'tool_sha256'),
+                      ('studies/esp_table1_bf16_full_argmax/docs/THIRD_PARTY_PLAN.md', 'plan_sha256')]:
+        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == report[key]
 
 
 def test_audit_uses_prefix_parent_and_limits_remaining(monkeypatch):

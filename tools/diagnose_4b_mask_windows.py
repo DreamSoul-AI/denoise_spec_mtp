@@ -30,6 +30,8 @@ def admission(initial=True):
         processes = [processes]
     processes = [p for p in processes if p['ProcessId'] != os.getpid()]
     inspected = {
+        'D:/GitHub/diaoenmao/RPipe/.tmp/systematic-contracts-20261015/watch-first-dev.py':
+            'fdba7ab0c68e17d47af938df1997c25560f0276213c0b3960d183061283bf7e7',
         'D:/GitHub/diaoenmao/RPipe/.tmp/systematic-contracts-20261015/watch-first.py':
             '08bd5e0fb31e1d7d453827879e5c82e6b84f708794bda8e2135357a75558ebce',
         'D:/GitHub/diaoenmao/RPipe/.tmp/systematic-contracts-20261015/watch-second.py':

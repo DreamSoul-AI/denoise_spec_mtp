@@ -8,6 +8,8 @@
 
 2026-10-16新指令已冻结[PLAN](PLAN.md)。四窗口不能回答总体唯一方向问题，本轮不以其结果代替全量。`tools/analyze_4b_full_directions.py`复用原五方法native读出，pending只记进度，不补零或平局。最终取原template成功格、补齐Study四个预定成功格及旧zero；补齐Study process必须通过，原Study资源失败终验原样保留。六格均完整并通过来源与数学门核对后才发布正式JSON；方向与旧五方法的关系按PLAN单列。
 
+新版研究计划已按模板十章重写并纳入文献表：[中文正本](https://github.com/DreamSoul-AI/denoising-speculative-decoding/blob/b00ecc0a188bb1a2845f061e958fdac37da7bcce/docs/research-plan.md)、[英文译本](https://github.com/DreamSoul-AI/denoising-speculative-decoding/blob/b00ecc0a188bb1a2845f061e958fdac37da7bcce/docs/research-plan.en.md)，由PR23经CI合dev。两个中文规范/模板逐字节沿用RPipe固定版本；英文规范/模板仅各一处导航适配，来源和SHA在其standards README。本次是对现有研究的组织补全，不是事后预注册；本Study及补齐Study的冻结PLAN/科学源码原字节保持，content原进程未被打断。计划远程分支已清理，当前方向工作分支保留，见[清理记录](../../../docs/research/remote-branch-cleanup-2026-10-15.md)。
+
 主实验五方法加AR11/11和HF第三方失败预检均已通过PR20/21交付；PR21已合dev，相关远程分支已删。当前目标继续扩大到方向全480，目标模式仍active。本报告只填实际结果，不为pending格补τ或胜平负。
 
 CPU集成记录：PR22首轮远端CI为497 passed/3 failed（run 38768912287），失败来自CPU工具通用模块名`analyze_results`污染旧测试，以及新工具docstring缺少使用命令。读出改用唯一模块名加载，保留原生测量代码不变；新增无污染断言后，方向/旧配对/文档13项针对回归通过。修订提交继续跑远端CI，不把旧失败记为通过，不中断GPU队列。

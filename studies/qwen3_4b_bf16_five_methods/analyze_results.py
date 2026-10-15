@@ -191,12 +191,14 @@ def main():
         assert ready or not (study/'docs/paired_evidence_v1.json').exists()
         target.write_text(text, encoding='utf-8')
     lines = ['# Qwen3-4B BF16 paired report', '', f"完整验收：{ready}；已完成 {sum('rows' in c for c in cells.values())}/11。",
-             '', '| Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact | argmax checked |',
+             '', '| Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact/n (rate) | argmax checked |',
              '| --- | --- | --- | --- | --- | --- | --- | --- | --- |']
     for case, cell in cells.items():
         t = cell.get('totals', {})
         values = [str(t.get(k, 'pending' if not t else 'n/a')) for k in
                   ('accepted', 'model_calls', 'new_tokens', 'pooled_tau', 'prompt_mean_tau', 'AR_exact_count', 'argmax_checked_tokens')]
+        if 'AR_exact_count' in t:
+            values[5] = f"{t['AR_exact_count']}/{len(cell['rows'])} ({t['AR_exact_rate']:.2%})"
         lines.append(f"| {case} | {cell['native_status']} | "+' | '.join(values)+' |')
     lines += ['', '相对独立AR的逐prompt调用数比较；calls越低越好。AR没有draft接受数，该指标不适用。输出长度及AR首分叉单列，不能将不同长度的调用数直接解释为等长加速。', '',
               '| Cell | calls vs AR W/T/L | Δcalls vs AR |', '| --- | --- | --- |']

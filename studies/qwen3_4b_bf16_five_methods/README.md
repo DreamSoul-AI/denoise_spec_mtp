@@ -1,6 +1,6 @@
 # Qwen3-4B BF16五方法配对
 
-[计划](docs/PLAN.md)已首次make冻结，11格串行链运行中；独立AR已完成480条并通过原生验收，BC30 frozen mean已自动接续，尚无全矩阵结论。前置[8B Table1全480报告](../esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)与原生process已完成，PR #10已经CI通过合dev；τ目标未复现，负结果保留。
+[计划](docs/PLAN.md)已首次make冻结，11格串行链运行中；独立AR与BC30 frozen mean各480条均已原生成功（后者80,929提交token argmax全过），输入零阶已自动接续。frozen mean pooled τ=1.402895，独立AR一致184/480（38.33%）单列诊断，不阻止验收；尚无五方法完整配对结论。前置[8B Table1全480报告](../esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)与原生process已完成，PR #10已经CI通过合dev；τ目标未复现，负结果保留。
 
 在同一480条SpecBench上运行五方法×BC30/60加独立AR（共11 Run），统一双mask动态剪枝树/BF16/T0/256。owner映射、BF16原生验收回归及模型/输入来源核验已完成。原生source digest为538e52c929a542a8（56文件），代码8047281；2026-10-15 12:09 +08:00独立AR 0e25348a3a60d601进入execute，实际cuda BF16/tied-storage与480输入、权重SHA的首forward前检查全过。队列round1/单GPU，不使用旧FP32结果替代，不测速、不恢复算子机理。
 

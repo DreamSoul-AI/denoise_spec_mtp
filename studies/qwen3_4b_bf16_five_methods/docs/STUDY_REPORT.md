@@ -1,13 +1,13 @@
 # Qwen3-4B BF16 paired report
 
-完整验收：False；已完成 1/11。
+完整验收：False；已完成 2/11。
 
-运行检查点：独立AR 0e25348a3a60d601全480条原生succeeded，阅读器再次通过verify_evidence、来源/Study冻结门及480输入/14模型文件SHA核对，共81,880新token和81,880主model calls。source digest 538e52c929a542a8，实际BF16 model digest 535de659a78af3855c5eafe361e9244ec4d793fc2abd2e95e24a71debe64605f。BC30 frozen mean 30d0bfa0924c4478已自动接续；首forward前已实测与AR的model digest、runtime、seed和全部prompt相同，双mask/BC30/动态剪枝/λ=0/update=false符合冻结配置。方法格尚无终态，不能据此推断收益；完整paired证据仍待11格与native process全部通过。
+运行检查点：AR与BC30 frozen mean（30d0bfa0924c4478）均为全480原生succeeded，读出再次通过原始证据、全部输入/权重SHA及两套冻结门；source digest 538e52c929a542a8、模型digest保持535de659a78af3855c5eafe361e9244ec4d793fc2abd2e95e24a71debe64605f。frozen mean全部80,929提交token的argmax审计通过；相对AR输出总数少951，独立AR一致184/480，不将调用数差解释为同输出的测速结果。输入零阶e2fc2b6401860435已自动接续，实际模型/runtime/seed/480输入与AR一致，mean mask λ=.1/update=true符合冻结配置。其他方法与完整Study验收仍待完成。
 
-| Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact | argmax checked |
+| Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact/n (rate) | argmax checked |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | AR | succeeded | n/a | 81880 | 81880 | n/a | n/a | n/a | n/a |
-| 30/frozen_mean | pending | pending | pending | pending | pending | pending | pending | pending |
+| 30/frozen_mean | succeeded | 23188 | 57825 | 80929 | 1.4028947597872525 | 1.4759377696433031 | 184/480 (38.33%) | 80929 |
 | 30/input_zero | pending | pending | pending | pending | pending | pending | pending | pending |
 | 30/input_first | pending | pending | pending | pending | pending | pending | pending | pending |
 | 30/output_zero | pending | pending | pending | pending | pending | pending | pending | pending |
@@ -22,6 +22,7 @@
 
 | Cell | calls vs AR W/T/L | Δcalls vs AR |
 | --- | --- | --- |
+| 30/frozen_mean | 469/1/10 | -24055 |
 
 以下胜负指第二方法相对第一方法；accepted越高越好，calls越低越好，两个指标分别判定。
 

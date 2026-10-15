@@ -1,10 +1,10 @@
 # BC30固定480方向对照阶段报告
 
-当前步骤：template、random0/1/2均全480成功，zero复用旧全480；量化v3已完成一次，原队列已接content。
-最新发现：random2 τ=1.523884714，高于template的1.507777653；80,583个提交token自检全过。三随机种子均高于zero。
-出处：[五格有效结果快照](direction_partial_v4.json)，完整token/trace及Run均留本机；content未完整，不提前列其排名。
-下一步：同一session23573完整跑content并核Study process，再生成六格正式证据/图/报告，PR合dev并清理远程工作分支。
-阻塞：当前无阻塞，content子进程17400运行；量化容器已exit0且队列终态，无遗留挂起队列。BC60待本轮决策，不测速。
+当前步骤：BC30全部六格各480完成；补齐Study process通过，原GPU队列自然exit0。
+最新发现：content τ=1.364829262低于zero1.422420206；三预定随机方向均高于zero，random2也高于template。
+出处：[正式证据](direction_evidence_v1.json)及[最终报告](../../../docs/research/4b-full-direction-controls-2026-10-16.md)；485,860审计token全argmax通过。
+下一步：CPU回归、PR22合dev、清理对应远程分支；本轮BC60方向不追加，理由见最终报告。
+阻塞：无；以下为保留的历史阶段快照，未完成表述仅指各自快照时点，不代表当前状态。
 
 2026-10-16新指令已冻结[PLAN](PLAN.md)。四窗口不能回答总体唯一方向问题，本轮不以其结果代替全量。`tools/analyze_4b_full_directions.py`复用原五方法native读出，pending只记进度，不补零或平局。最终取原template成功格、补齐Study四个预定成功格及旧zero；补齐Study process必须通过，原Study资源失败终验原样保留。六格均完整并通过来源与数学门核对后才发布正式JSON；方向与旧五方法的关系按PLAN单列。
 

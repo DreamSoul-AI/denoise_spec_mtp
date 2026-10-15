@@ -114,6 +114,17 @@ def test_template_and_zero_controls_keep_same_updated_mean(monkeypatch):
     esp.on_token_committed(table[3], table[2])
     esp.on_token_committed(table[4], table[3])
     assert torch.equal(mean[0], esp.masks())
+    info = {}
+    random = m.input_control(model, ids, [3, 4], cfg, velocity_mode='random', random_seed=0, state_report=info)
+    assert abs(info['template_norm_ratio'] - 1) < .01
+    assert torch.equal(random, m.input_control(model, ids, [3, 4], cfg, velocity_mode='random', random_seed=0))
+    assert not torch.equal(random, m.input_control(model, ids, [3, 4], cfg, velocity_mode='random', random_seed=1))
+    content_info = {}
+    content = m.input_control(model, ids, [3, 4], cfg, velocity_mode='content', content_start=1, state_report=content_info)
+    assert content_info['level_norm'] == float(esp.masks()[0].float().norm())
+    v = .5 * (table[2] - table[1]) + .5 * (table[3] - table[2])
+    v = .5 * v + .5 * (table[4] - table[3])
+    assert torch.equal(content[0], esp.masks() + steps * v)
 
 
 def test_reverse_swap_replays_actual_input_path_and_preserves_native_control(monkeypatch):

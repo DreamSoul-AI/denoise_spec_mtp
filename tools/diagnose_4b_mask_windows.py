@@ -18,6 +18,8 @@ import torch
 VARIANTS = ('zero', 'input_first', 'first', 'shifted', 'radial', 'both')
 TEMPLATE_VARIANTS = ('zero', 'input_first', 'input_template', 'input_mean')
 RECIPROCAL_VARIANTS = ('zero', 'input_first', 'first')
+DIRECTION_VARIANTS = ('zero', 'input_first', 'input_template', 'input_mean',
+                      'input_random_0', 'input_random_1', 'input_random_2', 'input_content')
 EARLY_ROOTS = {121: 1, 401: 0, 241: 1, 161: 2}
 
 
@@ -87,12 +89,18 @@ def active_predecessor(trace, prompt_length):
 
 
 @torch.no_grad()
-def input_control(model, prompt, generated_prefix, spec, velocity_mode='native'):
+def input_control(model, prompt, generated_prefix, spec, velocity_mode='native', random_seed=None,
+                  content_start=None, state_report=None):
     from spec_mtp.structure.algorithm.mask_providers import build_mask_provider
     from spec_mtp.structure.control.named import _convert
     provider = build_mask_provider(_convert(spec), model.embedding_table)
     embeds = model.embed(prompt)[0]
     provider.init_from_prompt(embeds)
+    if velocity_mode == 'content':
+        assert content_start is not None and 0 <= content_start < len(embeds) - 1
+        level = provider._level
+        provider.init_from_prompt(embeds[content_start:])
+        provider._level = level
     previous = embeds[-1]
     for token in generated_prefix:
         current = model.embedding_table[token]
@@ -102,9 +110,33 @@ def input_control(model, prompt, generated_prefix, spec, velocity_mode='native')
         provider._velocity = (embeds[1] - embeds[0]).clone()
     elif velocity_mode == 'zero':
         provider._velocity = torch.zeros_like(provider._velocity)
+    elif velocity_mode == 'random':
+        assert random_seed is not None
+        direction = torch.randn(embeds.shape[-1], generator=torch.Generator().manual_seed(random_seed), dtype=torch.float32)
+        direction *= (embeds[1] - embeds[0]).float().norm().cpu() / direction.norm()
+        provider._velocity = direction.to(device=embeds.device, dtype=embeds.dtype)
+        assert abs(float(provider._velocity.float().norm() / (embeds[1] - embeds[0]).float().norm()) - 1) < .01
     else:
-        assert velocity_mode == 'native'
+        assert velocity_mode in ('native', 'content')
+    if state_report is not None:
+        v, fixed = provider._velocity.float(), (embeds[1] - embeds[0]).float()
+        state_report.update(random_seed=random_seed, content_start=content_start,
+            velocity_norm=float(v.norm()), template_norm=float(fixed.norm()),
+            template_norm_ratio=float(v.norm() / fixed.norm()),
+            level_norm=float(provider._level.float().norm()),
+            template_cosine=float(torch.nn.functional.cosine_similarity(v, fixed, dim=0)))
     return provider.masks().to(model.dtype)[None].expand(3, -1, -1).clone()
+
+
+def content_start_of(tokenizer, body, expected_ids):
+    rendered = tokenizer.apply_chat_template([{'role': 'user', 'content': body}], tokenize=False,
+        add_generation_prompt=True, enable_thinking=False)
+    encoded = tokenizer(rendered, add_special_tokens=False, return_offsets_mapping=True)
+    assert encoded['input_ids'] == expected_ids and rendered.count(body) == 1
+    start, end = rendered.index(body), rendered.index(body) + len(body)
+    indices = [i for i, (a, b) in enumerate(encoded['offset_mapping']) if start <= a < b <= end]
+    assert len(indices) >= 2 and indices[1] == indices[0] + 1
+    return indices[0]
 
 
 class WindowCaptured(Exception):
@@ -294,6 +326,8 @@ def probe_window(model, packet, spec, reference, variants=VARIANTS, control='zer
                'next_verified_chain_equals_reference': next_chosen == reference[next_index + 1:next_index + 1 + len(next_chosen)],
                'argmax_passed': True, 'argmax_checked_tokens': len(chosen) + len(next_chosen)}
         rows.append(row)
+        if name in packet.get('direction_states', {}):
+            row['direction_state'] = packet['direction_states'][name]
         local[name] = {'seed_logits': logits.detach().cpu(), 'next_tree': vars(next_tree), 'next_chosen': next_chosen}
     for row in rows:
         row['d1_seed_logits_equal_zero'] = torch.equal(local[row['variant']]['seed_logits'][0], local['zero']['seed_logits'][0])
@@ -320,10 +354,12 @@ def main():
     parser.add_argument('--template-control', action='store_true', help='Frozen template velocity and zero velocity at the same native input mean')
     parser.add_argument('--reciprocal', action='store_true', help='Swap input first and output zero/first at the fixed early roots')
     parser.add_argument('--input-origin', action='store_true', help='Reconstruct the original input-first path for the reverse swap')
+    parser.add_argument('--direction-controls', action='store_true', help='Fixed template, three norm-matched random seeds, zero and content initialization')
     args = parser.parse_args()
     assert not args.early_template or args.template_control
     assert not args.reciprocal or args.early_template
     assert not args.input_origin or args.reciprocal
+    assert not args.direction_controls or (args.early_template and not args.reciprocal)
     assert not args.out.exists()
     args.out.mkdir(parents=True)
     qids, limit = ((121, 401), 64) if args.active_depth else ((121, 401, 241, 161), 128)
@@ -336,6 +372,8 @@ def main():
         plan, limit = 'MASK_EARLY_TEMPLATE_PLAN.md', 64
     if args.reciprocal:
         plan, variants = 'MASK_RECIPROCAL_PLAN.md', RECIPROCAL_VARIANTS
+    if args.direction_controls:
+        plan, variants, limit = 'MASK_DIRECTION_PLAN.md', DIRECTION_VARIANTS, 96
     report = {'status': 'preflight', 'quality_passed': False, 'admission': [], 'rows': [], 'model_calls': 0,
               'forward_limit': limit, 'no_timing': True, 'no_8b': True, 'tool_sha256': sha(__file__),
               'variants': variants, 'template_control': args.template_control,
@@ -344,6 +382,8 @@ def main():
               'plan_sha256': sha(args.study / ('docs/' + plan))}
     if args.reciprocal:
         report['sample_mode'] = 'reciprocal_input_origin' if args.input_origin else 'reciprocal_output_origin'
+    if args.direction_controls:
+        report['sample_mode'] = 'selected_early_direction_controls'
     def save():
         (args.out / 'windows.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     local = {}
@@ -367,6 +407,18 @@ def main():
         cache = study / 'shared/model/modelscope/Qwen/Qwen3-4B'
         for f in snapshot['files']:
             assert sha(cache / f['path']) == f['sha256']
+        content_starts = {}
+        if args.direction_controls:
+            from transformers import AutoTokenizer
+            data_path = study / 'shared/data/specbench/question.jsonl'
+            assert sha(data_path) == prompts['data_sha256']
+            records = {x['question_id']: x for x in map(json.loads, data_path.read_text(encoding='utf-8').splitlines())}
+            tokenizer = AutoTokenizer.from_pretrained(cache, local_files_only=True)
+            for p in prompts['rendered_prompts']:
+                if p['question_id'] in qids:
+                    content_starts[p['question_id']] = content_start_of(tokenizer, records[p['question_id']]['turns'][0], p['input_ids'])
+            report.update(data_sha256=sha(data_path), prompts_manifest_sha256=sha(study / 'docs/prompts_manifest.json'),
+                          content_start_indices=content_starts, random_direction_seeds=[0, 1, 2])
         check = admission()
         report['admission'].append(check)
         if not check['passed']:
@@ -418,6 +470,18 @@ def main():
                         packet['masks'][variant] = input_control(model, ids,
                             raw[index]['output_ids'][len(p['input_ids']):len(p['input_ids']) + packet['root_index'] + 1],
                             paired['cells']['30/input_first']['actual_settings']['spec'], velocity_mode=mode)
+                if args.direction_controls:
+                    packet['direction_states'] = {}
+                    modes = [('input_first', 'native', None), ('input_template', 'template', None), ('input_mean', 'zero', None)]
+                    modes += [(f'input_random_{seed}', 'random', seed) for seed in (0, 1, 2)]
+                    modes += [('input_content', 'content', None)]
+                    for variant, mode, direction_seed in modes:
+                        info = {}
+                        packet['masks'][variant] = input_control(model, ids,
+                            raw[index]['output_ids'][len(p['input_ids']):len(p['input_ids']) + packet['root_index'] + 1],
+                            paired['cells']['30/input_first']['actual_settings']['spec'], velocity_mode=mode,
+                            random_seed=direction_seed, content_start=content_starts[qid] if mode == 'content' else None, state_report=info)
+                        packet['direction_states'][variant] = info
                 rows, tensors = probe_window(model, packet, cell['actual_settings']['spec'], raw[index]['output_ids'][len(p['input_ids']):], variants,
                     control='input_first' if args.input_origin else 'zero')
                 if args.active_depth:

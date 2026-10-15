@@ -11,4 +11,4 @@
 
 [跨任务证伪Study草案](../../studies/output_space_cross_task/README.md)固定另一任务四输入但未运行，含未执行的transformer固定行kernel隔离协议。[最小推送候选与清单](publication-plan.md)、[逐blob manifest](publication-manifest.json)和[PR说明草稿](pr-draft.md)只供本地评审，未推送／新建PR。
 
-当前执行优先级（2026-10-15）：[ESP Table1全480](../../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)已完成且数学门/原生process通过，τ目标未复现；PR #10经CI合dev。现推进[4B BF16五方法配对计划](../../studies/qwen3_4b_bf16_five_methods/docs/PLAN.md)，尚未冻结或运行。其他研究暂停，0.6B与4B FP32保留归档；历史状态不能当当前结论。
+当前阶段结果（2026-10-15）：[ESP Table1全480](../../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)数学门/原生process通过，τ目标未复现；PR #10经CI合dev。[4B BF16五方法配对](../../studies/qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)已完成11/11及原生process，809,118个Spec提交token自检全过，全部20组逐prompt对照及AR首分叉已保留。输入一阶本次总accepted最高、calls最少；两输出方法对mean基线有小幅总量改善，速度项相对输出零阶无稳定联合收益。[正式证据](../../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json)与真实图重复读出字节一致；[集成与CI](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12)。[冻结计划](../../studies/qwen3_4b_bf16_five_methods/docs/PLAN.md)不回写执行状态。其他研究暂停，0.6B与4B FP32保留归档；未恢复算子机理或测速，8B仅限该Table1复现。

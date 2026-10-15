@@ -61,7 +61,9 @@ def summarize(rows, is_ar):
         totals.update(pooled_tau=totals['committed']/totals['decode_calls'],
                       prompt_mean_tau=sum(r['committed']/max(r['decode_calls'], 1) for r in rows)/len(rows),
                       AR_exact_count=sum(r['AR_exact'] for r in rows),
-                      AR_exact_rate=sum(r['AR_exact'] for r in rows)/len(rows))
+                      AR_exact_rate=sum(r['AR_exact'] for r in rows)/len(rows),
+                      calls_delta_vs_AR=sum(r['calls_delta_vs_AR'] for r in rows),
+                      calls_vs_AR={s: sum(r['calls_vs_AR'] == s for r in rows) for s in ('win', 'tie', 'loss')})
     return totals
 
 
@@ -98,17 +100,22 @@ def load_cell(study, folder, cfg, prompts, manifest, snapshot, reference):
         if is_ar:
             assert stats['ar_time'] == row['ar_time'] == 0
             common['model_calls'] = stats['ar_calls']
-            outputs.append(output)
+            outputs.append({'question_id': p['question_id'], 'output_ids': output, 'model_calls': stats['ar_calls']})
         else:
             assert stats['prefill_time'] == stats['decode_time'] == row['spec_time'] == 0
             assert item.get('ar_ids') is None and 'ar_time' not in row
             assert stats['verification_argmax_audit']['passed'] is True
             assert stats['prefill_calls'] == 1
+            ar = reference[i]
+            assert ar['question_id'] == p['question_id']
+            delta = stats['decode_calls']+stats['prefill_calls']-ar['model_calls']
             common.update({k: stats[k] for k in ('accepted', 'committed', 'decode_calls')})
             common.update(model_calls=stats['decode_calls']+stats['prefill_calls'],
                           argmax_checked_tokens=stats['verification_argmax_audit']['checked_committed_tokens'],
-                          AR_exact=output == reference[i], AR_new_tokens=len(reference[i]),
-                          first_new_difference_index=first_difference(output, reference[i]))
+                          AR_exact=output == ar['output_ids'], AR_new_tokens=len(ar['output_ids']),
+                          AR_model_calls=ar['model_calls'], calls_delta_vs_AR=delta,
+                          calls_vs_AR='win' if delta < 0 else 'loss' if delta > 0 else 'tie',
+                          first_new_difference_index=first_difference(output, ar['output_ids']))
         rows.append(common)
     files = {str(p.relative_to(folder)).replace('\\', '/'): file_hash(p) for p in
              (folder/'config.yaml', folder/'result.json', assets/'decode_observations.json',
@@ -175,6 +182,8 @@ def main():
     body = {'complete': ready, 'scope': '480 prompts; BF16/T0; two-mask dynamic pruned BC30/60; one seed',
             'argmax_is_gate_AR_is_diagnostic': True, 'timing_disabled': True,
             'analyzer_sha256': file_hash(Path(__file__)), 'cells': cells, 'pairs': pairs}
+    if ready:
+        body['plotter_sha256'] = file_hash(study/'plot_results.py')
     name = 'paired_evidence_v1.json' if ready else 'paired_pending.json'
     target = study/'docs'/name
     text = json.dumps(body, indent=2, allow_nan=False)+'\n'
@@ -182,15 +191,28 @@ def main():
         assert target.read_text(encoding='utf-8') == text
     else:
         assert ready or not (study/'docs/paired_evidence_v1.json').exists()
+    if ready:
+        from plot_results import write_plot
+        write_plot(body, study/'docs/figures/paired_outcomes.png')
+    if not ready or not target.exists():
         target.write_text(text, encoding='utf-8')
     lines = ['# Qwen3-4B BF16 paired report', '', f"完整验收：{ready}；已完成 {sum('rows' in c for c in cells.values())}/11。",
-             '', '| Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact | argmax checked |',
+             '', '| Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact/n (rate) | argmax checked |',
              '| --- | --- | --- | --- | --- | --- | --- | --- | --- |']
     for case, cell in cells.items():
         t = cell.get('totals', {})
         values = [str(t.get(k, 'pending' if not t else 'n/a')) for k in
                   ('accepted', 'model_calls', 'new_tokens', 'pooled_tau', 'prompt_mean_tau', 'AR_exact_count', 'argmax_checked_tokens')]
+        if 'AR_exact_count' in t:
+            values[5] = f"{t['AR_exact_count']}/{len(cell['rows'])} ({t['AR_exact_rate']:.2%})"
         lines.append(f"| {case} | {cell['native_status']} | "+' | '.join(values)+' |')
+    lines += ['', '相对独立AR的逐prompt调用数比较；calls越低越好。AR没有draft接受数，该指标不适用。输出长度及AR首分叉单列，不能将不同长度的调用数直接解释为等长加速。', '',
+              '| Cell | calls vs AR W/T/L | Δcalls vs AR |', '| --- | --- | --- |']
+    for case, cell in cells.items():
+        totals = cell.get('totals', {})
+        if 'calls_vs_AR' in totals:
+            wtl = '/'.join(str(totals['calls_vs_AR'][s]) for s in ('win', 'tie', 'loss'))
+            lines.append(f"| {case} | {wtl} | {totals['calls_delta_vs_AR']} |")
     lines += ['', '以下胜负指第二方法相对第一方法；accepted越高越好，calls越低越好，两个指标分别判定。', '',
               '| first → second | accepted W/T/L | calls W/T/L | Δaccepted | Δcalls | Δnew tokens |', '| --- | --- | --- | --- | --- | --- |']
     for pair in pairs:
@@ -200,6 +222,9 @@ def main():
     lines += ['', 'accepted为EOS/预算裁剪前候选接受数；committed及τ包含bonus、按裁剪后实际解码提交数计算，不含prefill首token。argmax审计含首token且必须全过；独立AR首分叉和输出长度全部保留，不作为失败门。AR参考不冒充Spec验证argmax审计。', '',
               '模型、forward及最终mask为BF16；输出EMA/范数沿用原生FP32内部状态。不同方法β等沿用预先定义配方，不声称差异仅由输入/输出空间造成。单seed、固定480条，不推断总体优越或测速收益；零计时字段为占位。', '',
               f'逐prompt计数、两两赢平输及AR首分叉见[{name}]({name})。' if ready else '尚无完整实测结论；本机pending文件不作为公开证据。', '', '[冻结计划](PLAN.md)；原始tokens、完整Run和权重仅本机保留。']
+    if ready:
+        lines += ['', '![Full480 paired wins ties losses](figures/paired_outcomes.png)', '',
+                  '图：行方法相对列方法，格内为W/T/L，颜色为净赢数W−L，固定范围±480；接受数越高越好，调用数越低越好。两个预算的全部方法对照和输局均保留，对角不作比较。独立AR调用数、一致率、首分叉与输出长度另列于表格及正式证据；本图不表示测速或总体显著性。']
     (study/'docs/STUDY_REPORT.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')
     print(json.dumps({'complete': ready, 'observed': sum('rows' in c for c in cells.values()), 'pairs': len(pairs)}))
 

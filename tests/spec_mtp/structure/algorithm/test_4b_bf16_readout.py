@@ -68,10 +68,19 @@ def test_readout_retains_ar_mismatch_and_audit_counts_after_native_validation(re
             'evidence': [dict(input_ids=[10], output_ids=[10,1,2,3], ar_ids=None, stats=stats)]*480}}}
     for name, value in payloads.items():
         (folder/name).write_text(json.dumps(value))
+    reference = [dict(question_id=i, output_ids=[1,9,3][:3-i%3], model_calls=3-i%3) for i in range(480)]
     cell, outputs = reader.load_cell(tmp_path, folder, {'algorithm': {'config': settings}}, prompts, {},
-                                    {'config': dict(vocab_size=20, hidden_size=4)}, [[1,9]]*480)
+                                    {'config': dict(vocab_size=20, hidden_size=4)}, reference)
     assert checked == [True] and not outputs
     assert cell['totals']['argmax_checked_tokens'] == 1440 and cell['totals']['AR_exact_rate'] == 0
     assert cell['totals']['pooled_tau'] == 2 and cell['totals']['model_calls'] == 960
-    assert all(r['first_new_difference_index'] == 1 and r['AR_new_tokens'] == 2 for r in cell['rows'])
+    assert all(r['first_new_difference_index'] == 1 for r in cell['rows'])
+    assert {r['AR_new_tokens'] for r in cell['rows']} == {1,2,3}
+    assert cell['totals']['calls_vs_AR'] == dict(win=160, tie=160, loss=160)
+    assert cell['totals']['calls_delta_vs_AR'] == 0
+    assert [r['calls_vs_AR'] for r in cell['rows'][:3]] == ['win', 'tie', 'loss']
     assert 'output_ids' not in json.dumps(cell) and 'input_ids' not in json.dumps(cell)
+    reference[0]['question_id'] = -1
+    with pytest.raises(AssertionError):
+        reader.load_cell(tmp_path, folder, {'algorithm': {'config': settings}}, prompts, {},
+                         {'config': dict(vocab_size=20, hidden_size=4)}, reference)

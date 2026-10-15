@@ -24,7 +24,7 @@ set PYTHONUTF8=1
 python -m pytest tests/spec_mtp
 ```
 
-For a fresh [smoke](studies/smoke/README.md), copy `studies/smoke` to an isolated directory and set a new Study name and `algorithm.config.version` before `python -m spec_mtp make <copy>` and `launch <copy>`. Every Run must have `exact_match_rate=1` and complete raw evidence. Source/input changes require explicit make/remake; do not rerun historical Run IDs. See the [acceptance report](studies/smoke/docs/STUDY_REPORT.md).
+For a fresh [smoke](studies/smoke/README.md), copy `studies/smoke` to an isolated directory and set a new Study name and `algorithm.config.version` before `python -m spec_mtp make <copy>` and `launch <copy>`. New T0 speculative Runs require a complete verifier-argmax audit: every committed token must equal its verification forward's argmax. Independent AR exactness is diagnostic; all Runs still require complete raw and source evidence. Source/input changes require explicit make/remake; do not rerun historical Run IDs. See the [acceptance report](studies/smoke/docs/STUDY_REPORT.md).
 
 GPU cells are new Studies under `studies/`. Copy `_template/`. SpecBench lives in `datasets/spec_bench/` and is copied into that Study's `shared/data` on the first Run. ModelScope / HF weights land in `shared/model`. Do not start from `src/main.py`.
 
@@ -42,7 +42,7 @@ Next stage: [output-space chain prerequisite](studies/output_space_prerequisite/
 
 Follow-up: [three-prompt small matrix](studies/output_space_small_matrix/README.md) and matched-prefix analysis. All outputs remain AR-identical; q172–q174 acceptance counts for input/order0/order1 are1/1/1,5/1/3,0/1/1. These mixed development observations do not establish stable superiority.
 
-当前主研究模型为Qwen3-4B：[同prompt first26复验](studies/output_space_4b_recheck_v2/docs/STUDY_REPORT.md)两阶总接受均高于输入，[固定4条新输入](studies/output_space_4b_holdout/docs/STUDY_REPORT.md)未保持收益，[历史输入EMA同链控制](studies/output_space_4b_input_control/docs/STUDY_REPORT.md)已执行。三批全AR一致，计时关闭；此前0.6B机理/罕见事件记录作为归档，不再扩大。
+历史Qwen3-4B **FP32**：[同prompt first26复验](studies/output_space_4b_recheck_v2/docs/STUDY_REPORT.md)两阶总接受均高于输入，[固定4条新输入](studies/output_space_4b_holdout/docs/STUDY_REPORT.md)未保持收益，[历史输入EMA同链控制](studies/output_space_4b_input_control/docs/STUDY_REPORT.md)已执行。三批全AR一致，计时关闭；这些结果及此前0.6B机理/罕见事件记录保留归档，不代替当前BF16证据。
 
 
-2026-10-15 最新执行顺序：已有 Qwen3-4B 结果全部为 **FP32**，本轮先按主题提交、工作分支 PR 经 CI 合入 dev。其他研究暂停；最高优先复现 ESP Table 1（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=0.1）。8B 仅用于该复现；随后 Qwen3-4B/BF16 五方法加 AR 配对。新增实验不用 FP32、不测速。不得强推、合 main、删分支或数据。
+2026-10-15 当前结果：历史4B FP32归档经PR #7合dev；[ESP Table1全480 BF16复现](studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)四格和原生process完成，BC30 pooled τ=1.563378、BC60单mask=1.647301，未达到1.63/1.74，负结果保留，PR #10经CI合dev。[4B BF16五方法加AR配对](studies/qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)已完成11/11及原生Study process，同480条、BC30/60、双mask动态剪枝树，809,118个Spec提交token自检全过。输入一阶本次总accepted最高、主calls最少；两输出方法对mean基线有小幅总量改善，输出一阶相对输出零阶未显示稳定联合收益。全部逐prompt负例与AR差异保留，AR一致率不作失败门；[集成与CI记录](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12)。其他研究暂停；8B仅限该Table1复现，未新增FP32模型实验、测速、强推、合main或删除分支和数据。

@@ -1,14 +1,14 @@
 # Qwen3-4B BF16 paired report
 
-完整验收：False；已完成 2/11。
+完整验收：False；已完成 3/11。
 
-运行检查点：AR与BC30 frozen mean（30d0bfa0924c4478）均为全480原生succeeded，读出再次通过原始证据、全部输入/权重SHA及两套冻结门；source digest 538e52c929a542a8、模型digest保持535de659a78af3855c5eafe361e9244ec4d793fc2abd2e95e24a71debe64605f。frozen mean全部80,929提交token的argmax审计通过；相对AR输出总数少951，独立AR一致184/480，不将调用数差解释为同输出的测速结果。输入零阶e2fc2b6401860435已自动接续，实际模型/runtime/seed/480输入与AR一致，mean mask λ=.1/update=true符合冻结配置。其他方法与完整Study验收仍待完成。
+运行检查点：输入零阶e2fc2b6401860435全480原生succeeded，80,787提交token的argmax全过；阅读器再次通过原始证据、全部模型/输入SHA与冻结门。相对frozen mean，pooled τ从1.402895到1.422420、accepted总数+738、主calls−887，逐prompt接受数W/T/L=229/24/227、调用数235/21/224，输出总长−142；总量小幅改善不代表普遍逐prompt优势或同输出测速结论。独立AR一致168/480（35.00%）仅诊断，全部首分叉与正负/平局保留。输入一阶45c0823a28799080已自动接续，实际模型digest/runtime/seed/480输入与AR相同，β=.9999/λ=.1/γ=1等冻结配方已核对。source538e52c929a542a8及冻结PLAN/配置保持；其余方法与完整Study仍待验收。
 
 | Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact/n (rate) | argmax checked |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | AR | succeeded | n/a | 81880 | 81880 | n/a | n/a | n/a | n/a |
 | 30/frozen_mean | succeeded | 23188 | 57825 | 80929 | 1.4028947597872525 | 1.4759377696433031 | 184/480 (38.33%) | 80929 |
-| 30/input_zero | pending | pending | pending | pending | pending | pending | pending | pending |
+| 30/input_zero | succeeded | 23926 | 56938 | 80787 | 1.422420206170959 | 1.4798374864700174 | 168/480 (35.00%) | 80787 |
 | 30/input_first | pending | pending | pending | pending | pending | pending | pending | pending |
 | 30/output_zero | pending | pending | pending | pending | pending | pending | pending | pending |
 | 30/output_first | pending | pending | pending | pending | pending | pending | pending | pending |
@@ -23,11 +23,13 @@
 | Cell | calls vs AR W/T/L | Δcalls vs AR |
 | --- | --- | --- |
 | 30/frozen_mean | 469/1/10 | -24055 |
+| 30/input_zero | 476/0/4 | -24942 |
 
 以下胜负指第二方法相对第一方法；accepted越高越好，calls越低越好，两个指标分别判定。
 
 | first → second | accepted W/T/L | calls W/T/L | Δaccepted | Δcalls | Δnew tokens |
 | --- | --- | --- | --- | --- | --- |
+| 30/frozen_mean → 30/input_zero | 229/24/227 | 235/21/224 | 738 | -887 | -142 |
 
 accepted为EOS/预算裁剪前候选接受数；committed及τ包含bonus、按裁剪后实际解码提交数计算，不含prefill首token。argmax审计含首token且必须全过；独立AR首分叉和输出长度全部保留，不作为失败门。AR参考不冒充Spec验证argmax审计。
 

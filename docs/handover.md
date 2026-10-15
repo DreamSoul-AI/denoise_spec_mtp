@@ -235,3 +235,5 @@ PR #10全480报告已于2026-10-15T02:28:28Z合dev，merge fafed6145ba75bc68e521
 PR #11已转ready，head cccc9bb88c54f13341321c9bf4db0525ca824ea9。正常合dev命令`gh pr merge 11 --merge --match-head-commit cccc9bb88c54f13341321c9bf4db0525ca824ea9`在本工作树被自动审批拒绝，未执行。理由原文：“该命令会将 PR #11 合入 dev，但证据显示两个 CPU CI 仍为 IN_PROGRESS；用户授权明确要求 CI 通过后再合并，因此当前合并时机未获授权。”虽本地等价检查及长期授权已记录，仍保留该实际拒绝；不绕过、不请求弹窗、不改分支保护，等待远端真实CI完成后再按新状态处理。4B串行执行不依赖合并，继续运行；该记录不改冻结PLAN/科学来源。
 
 PR #11的两项cpu-checks（38680154203、38680158358）于04:16:04Z/04:16:44Z实际SUCCESS，两项Branch flow亦SUCCESS。先前拒绝依据已改变后，以相同固定head正常合dev命令成功，2026-10-15T04:17:30Z实际MERGED，merge 73eaad87d7edc10ae8a24eff974afa0f066c2c1e。未绕过CI、强推、合main或删除分支/数据。4B完整矩阵仍运行，尚无收益结论；冻结科学source538e52c929a542a8、PLAN和输入未改。后续普通工作分支提交及结果PR继续按长期授权执行。
+
+4B独立AR执行期间已用真实decode_inputs验证阅读器模型/480输入/原生config digest契约通过；实际BF16模型digest为535de659a78af3855c5eafe361e9244ec4d793fc2abd2e95e24a71debe64605f。日志至少已完成prompt0–98，但尚无终态结果。非冻结阅读器另补显式相对AR的逐prompt calls赢平输/Δcalls/输出长度，AR draft接受数保持不适用；8项读出回归与Ruff通过。该改动不增加forward、不改冻结PLAN/源码/配置/Run；真实方法收益仍待全部11格原生验收。

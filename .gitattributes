@@ -272,3 +272,12 @@
 /docs/research/4b-mask-template-conditioned-readout-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-mask-template-admission-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-mask-template-opportunities-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-mask-template-early-observations-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-mask-template-early-readout-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-reciprocal-output-observations-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-reciprocal-output-readout-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-reciprocal-input-observations-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-reciprocal-input-readout-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-reciprocal-prefix-audit-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-direction-controls-observations-2026-10-15.json -text whitespace=cr-at-eol
+/docs/research/4b-direction-controls-readout-2026-10-15.json -text whitespace=cr-at-eol

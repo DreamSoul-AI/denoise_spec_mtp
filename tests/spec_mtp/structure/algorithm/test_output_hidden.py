@@ -96,10 +96,7 @@ def test_output_chain_lossless_sampling_budget_and_exact_state_positions(model, 
     assert not model.hf.model.norm._forward_hooks
 
 
-def test_output_rejects_untied_nonchain_and_invalid_states(model):
-    bad = spec(); bad.tree.branches = [2, 1]
-    with pytest.raises(ValueError, match='unpruned static chain'):
-        SpecDecoder(model, bad, _convert({}))
+def test_output_rejects_untied_and_invalid_states(model):
     untied = HFCausalLM(tiny_config={'vocab_size': 64, 'hidden_size': 32, 'num_layers': 1})
     with pytest.raises(ValueError, match='actually tied'):
         SpecDecoder(untied, spec(), _convert({}))
@@ -140,3 +137,90 @@ def test_output_sampling_eos_truncation_matches_ar(model):
                          generator=torch.Generator().manual_seed(12)).generate(prompt)
     reference, _ = ar_generate(model, prompt, cfg, eos_ids=[eos], generator=torch.Generator().manual_seed(12))
     assert torch.equal(out, reference) and int(out[0, -1]) == eos
+
+
+@pytest.mark.parametrize('order', [0, 1])
+@pytest.mark.parametrize('mode,budget', [('dynamic',30), ('dynamic',60), ('static',15)])
+def test_bf16_branching_siblings_share_depth_masks_without_mutating_state(model, monkeypatch, order, mode, budget):
+    from copy import deepcopy
+    from spec_mtp.structure.algorithm import decoding
+
+    m = deepcopy(model).to(torch.bfloat16)
+    trees, blocks = [], []
+    build = decoding.build_tree
+    predict = OutputHiddenMaskProvider.masks_per_owner
+    def capture_tree(*args):
+        tree = build(*args)
+        trees.append(tree)
+        return tree
+    def pure_prediction(self, proxies):
+        anchor, velocity = self.anchor.clone(), self.velocity.clone()
+        result = predict(self, proxies)
+        assert torch.equal(self.anchor, anchor) and torch.equal(self.velocity, velocity)
+        return result
+    monkeypatch.setattr(decoding, 'build_tree', capture_tree)
+    monkeypatch.setattr(OutputHiddenMaskProvider, 'masks_per_owner', pure_prediction)
+    handle = m.register_forward_pre_hook(lambda _m, args: blocks.append(args[0][0].clone()))
+    cfg = spec(order, 'naive')
+    cfg.tree = _convert({'mode': mode, 'pruning': True,
+                         **({'branches': [2,2]} if mode == 'static' else {})})
+    cfg.block_complexity = budget
+    try:
+        out, stats = SpecDecoder(m, cfg, _convert({'max_new_tokens': 12, 'temperature': 0.,
+                                                  'stop_on_eos': False})).generate(torch.tensor([[1,2,3,4]]))
+    finally:
+        handle.remove()
+    assert out.shape[1] == 16 and len(blocks) == 1 + stats['decode_calls']
+    assert stats['verification_argmax_audit']['passed']
+    assert stats['verification_argmax_audit']['checked_committed_tokens'] == 12
+    for tree, block, trace in zip(trees, blocks[1:], stats['trace']):
+        assert block.shape[0] == budget and tree.num_nodes == budget // 3 - 1
+        if mode == 'static':
+            assert tree.depths == [1,1,2,2]
+        masks = block[1 + tree.num_nodes:].reshape(1 + tree.num_nodes, 2, -1)
+        for depth in set(tree.depths):
+            siblings = [i+1 for i,d in enumerate(tree.depths) if d == depth]
+            assert all(torch.equal(masks[i], masks[siblings[0]]) for i in siblings)
+        assert trace['output_hidden']['owner_count'] == 1 + tree.num_nodes
+        assert trace['output_hidden']['observed_block_rows'] == ([] if trace['stopped'] else [0]+trace['accepted_nodes'])
+
+
+def test_nonfirst_sibling_updates_actual_hidden_path_and_cache(model, monkeypatch):
+    from spec_mtp.structure.algorithm import decoding
+    from spec_mtp.structure.algorithm.tree import DraftTree
+
+    prompt = torch.tensor([[2,4,6,8]])
+    cfg = _convert({'max_new_tokens': 9, 'temperature': 0., 'stop_on_eos': False})
+    reference, _ = ar_generate(model, prompt, cfg)
+    cursor = prompt.shape[1] + 1
+    def candidates(_cfg, _probs, root):
+        nonlocal cursor
+        expected = int(reference[0, cursor])
+        cursor += 2
+        return DraftTree(root_token=root, tokens=[(expected+1) % model.vocab_size, expected],
+                         depths=[1,1], parents=[0,0], probs=[.6,.4])
+    observed, forwards = [], []
+    observe = OutputHiddenMaskProvider.observe_committed
+    def capture(self, hidden):
+        observed.append(hidden.clone())
+        return observe(self, hidden)
+    monkeypatch.setattr(decoding, 'build_tree', candidates)
+    monkeypatch.setattr(OutputHiddenMaskProvider, 'observe_committed', capture)
+    handle = model.hf.model.norm.register_forward_hook(lambda _m, _a, out: forwards.append(out[0].clone()))
+    tree_cfg = spec(); tree_cfg.tree.branches = [2]
+    try:
+        out, stats = SpecDecoder(model, tree_cfg, cfg).generate(prompt)
+    finally:
+        handle.remove()
+    assert torch.equal(out, reference) and len(forwards) == 1 + stats['decode_calls']
+    assert all(t['accepted_nodes'] == [2] for t in stats['trace'])
+    expected = list(forwards[0][:prompt.shape[1]])
+    for matrix, trace in zip(forwards[1:], stats['trace']):
+        if not trace['stopped']:
+            assert trace['output_hidden']['observed_block_rows'] == [0,2]
+            expected.extend([matrix[0], matrix[2]])
+    assert torch.equal(torch.stack(observed), torch.stack(expected))
+    prefix = out[:, :len(observed)]
+    causal = model(model.embed(prefix), torch.arange(prefix.shape[1]).unsqueeze(0),
+                   last_hidden_only=True).last_hidden_state[0]
+    assert torch.allclose(torch.stack(observed), causal, rtol=1e-5, atol=1e-6)

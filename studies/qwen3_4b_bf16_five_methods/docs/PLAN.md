@@ -1,6 +1,6 @@
 # Qwen3-4B BF16 five-method paired comparison
 
-状态：计划已写，尚未冻结、make或运行。前置ESP Table1四格全480、argmax与原生process已完成；PR #10经CI合dev（fafed614）。论文τ目标未达到，完整负结果保留。本Study不再使用8B，不恢复算子机理。
+状态：计划已写，owner映射/BF16范数验收及CPU回归已完成；尚未冻结、make或运行真实4B。前置ESP Table1四格全480、argmax与原生process已完成；PR #10经CI合dev（fafed614）。论文τ目标未达到，完整负结果保留。本Study不再使用8B，不恢复算子机理。
 
 ## 问题与固定范围
 

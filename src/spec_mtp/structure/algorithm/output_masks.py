@@ -1,4 +1,4 @@
-"""Tied final-hidden masks for the predeclared order0/order1 chain prerequisite."""
+"""Tied final-hidden depth predictions for order0/order1 output masks."""
 
 from typing import Any
 import torch
@@ -36,6 +36,7 @@ class OutputHiddenMaskProvider:
             self.observe_committed(y)
 
     def masks_per_owner(self, proxy_hiddens):
+        """Predict depths 0..k; the decoder shares each depth across tree siblings."""
         # Proxies are at root..penultimate draft positions. The last owner
         # has no observation; simulate only, without mutating committed state.
         if proxy_hiddens.shape != (self.num_masks, self.anchor.numel()):

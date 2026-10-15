@@ -1,10 +1,10 @@
 # BC30固定480方向对照阶段报告
 
-当前步骤：template与random0均全480成功，zero复用旧全480；补齐队列已进入random1，random2/content待接续。
-最新发现：random0 τ=1.495188134，低于template的1.507777653，高于zero的1.422420206；81,425个提交token自检全过。
-出处：[三格有效结果快照](direction_partial_v2.json)，完整token/trace及Run均留本机；尚不能推断三个随机种子或全部方向排名。
-下一步：按[补齐执行PLAN](../../qwen3_4b_bf16_directions_recovery/docs/PLAN.md)继续同一队列完整补四格；后续模板以附加文档对齐，不改运行中冻结计划。
-阻塞：当前无阻塞；random1/random2/content仍待完整结果，不提前报告其τ或全矩阵排名。BC60未声明，不测速。
+当前步骤：template、random0/1均全480成功，zero复用旧全480；按最新指示已在组间释放GPU给量化v3，random2/content待接续。
+最新发现：random1 τ=1.464349086，低于template的1.507777653，高于zero的1.422420206；81,356个提交token自检全过。
+出处：[四格有效结果快照](direction_partial_v3.json)，完整token/trace及Run均留本机；尚不能推断全部随机种子或全部方向排名。
+下一步：量化v3一次任务终态并释放GPU后，resume原调度父进程65876接random2/content，不新开队列；模板用附加文档对齐。
+阻塞：量化既有准入暂缺18GiB可用主存，SD显存已释放；不放宽其门。两格未完整、BC60未声明，不测速。
 
 2026-10-16新指令已冻结[PLAN](PLAN.md)。四窗口不能回答总体唯一方向问题，本轮不以其结果代替全量。`tools/analyze_4b_full_directions.py`复用原五方法native读出，pending只记进度，不补零或平局。最终取原template成功格、补齐Study四个预定成功格及旧zero；补齐Study process必须通过，原Study资源失败终验原样保留。六格均完整并通过来源与数学门核对后才发布正式JSON；方向与旧五方法的关系按PLAN单列。
 
@@ -42,6 +42,18 @@ CPU集成记录：PR22首轮远端CI为497 passed/3 failed（run 38768912287）�
 | 原生input_first → random0 | 191/54/235 | 184/49/247 | 183/47/250 | -433 | +949 | +527 |
 
 该固定随机种子的范数比在480条均为0.999963522，cosine_to_template均为0.030544994，完整prompt mean全保留；这些是BF16方向初值的实际标量，不用理想范数1替代。固定模板首差分在这批输入相同，因此同一随机种子也给出同一固定偏置。随机0相对zero的总量及多数逐promptτ均改善，说明本批收益并非只在e2−e1方向出现；但template略优于该随机0，且仍有88条accepted和93条τ输给zero。两个其他随机种子与content未完整，不据单种子推断任意方向普遍有效或方向不重要。输出长度相差638，calls差不能解释为同输出加速；AR一致率仅诊断。
+
+## 随机1完整结果（矩阵仍未完成）
+
+Run `5fec59e54de877eb`完整480并原生succeeded，来源：[direction_partial_v3.json](direction_partial_v3.json)的`cells.random1`及两类配对。pooled τ=1.464349086、prompt mean τ=1.511211546、category pooled等权mean τ=1.478840563；accepted=25,809、主calls=55,710、decode calls=55,230、decode committed=80,876、实际新输出/argmax全过token=81,356，AR exact=175/480仅诊断。
+
+| 第二组相对第一组 | accepted胜/平/负 | calls胜/平/负 | τ胜/平/负 | Δaccepted | Δ主calls | Δ新输出 |
+| --- | --- | --- | --- | --- | --- | --- |
+| template → random1 | 172/51/257 | 168/47/265 | 164/45/271 | -1,418 | +1,872 | +424 |
+| zero → random1 | 308/25/147 | 292/30/158 | 306/28/146 | +1,883 | -1,228 | +569 |
+| 原生input_first → random1 | 178/41/261 | 170/38/272 | 167/36/277 | -1,562 | +2,042 | +458 |
+
+480条方向初值范数比均为1.000066400，cosine_to_template均为0.014653734，完整prompt mean全保留。两个预定随机种子相对zero均改善，但幅度不同且仍弱于template；不等于任意同范数方向都有效，也未分离方向与长期解码路径差异。random2/content仍待完整，输出长度差及全部输局保留。按用户最新排班指示，random1完整终验后才释放GPU给量化v3，未中途中止。
 
 ## GPU准入中断与补齐
 

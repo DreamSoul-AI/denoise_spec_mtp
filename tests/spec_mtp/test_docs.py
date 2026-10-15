@@ -10,7 +10,7 @@ LINK = re.compile(r'\]\(([^)#\s]+)(#[^)]*)?\)')
 
 
 def test_relative_markdown_links_resolve():
-    files = subprocess.check_output(['git', 'ls-files', '*.md'], cwd=ROOT, text=True).split()
+    files = subprocess.check_output(['git', 'ls-files', '-z', '*.md'], cwd=ROOT, text=True, encoding='utf-8').rstrip('\0').split('\0')
     broken = []
     for name in files:
         text = (ROOT / name).read_text(encoding='utf-8')

@@ -17,6 +17,7 @@ import torch
 
 VARIANTS = ('zero', 'input_first', 'first', 'shifted', 'radial', 'both')
 TEMPLATE_VARIANTS = ('zero', 'input_first', 'input_template', 'input_mean')
+RECIPROCAL_VARIANTS = ('zero', 'input_first', 'first')
 EARLY_ROOTS = {121: 1, 401: 0, 241: 1, 161: 2}
 
 
@@ -179,7 +180,67 @@ def capture_window(model, prompt, spec, eval_cfg, eos, seed, minimum=8):
 
 
 @torch.no_grad()
-def probe_window(model, packet, spec, reference, variants=VARIANTS):
+def capture_input_window(model, prompt, spec, eval_cfg, eos, seed, minimum):
+    from spec_mtp.structure.algorithm import decoding
+    from spec_mtp.structure.algorithm.output_masks import OutputHiddenMaskProvider
+    from spec_mtp.structure.algorithm.tree_attention import mask_indices_of
+    from spec_mtp.structure.control.named import _convert
+    original_tree = decoding.build_tree
+    shadows = [OutputHiddenMaskProvider(2, model.embedding_table, order=i, beta=.9, beta_prime=.99) for i in (0, 1)]
+    active, packet, generated = {}, {}, []
+
+    def tree_builder(*args, **kwargs):
+        tree = original_tree(*args, **kwargs)
+        active['tree'] = tree
+        return tree
+
+    def before(_module, args, kwargs):
+        kwargs['last_hidden_only'] = True
+        active['prefill'] = kwargs.get('attention_mask_4d') is None
+        if not active['prefill'] and int(args[1][0, 0]) - prompt.shape[1] >= minimum:
+            zero = shadows[0].masks_per_owner(active['proxies']).to(model.dtype)
+            packet.update(root_index=int(args[1][0, 0]) - prompt.shape[1], inputs=args[0].clone(),
+                positions=args[1].clone(), tree=deepcopy(active['tree']), zero_provider=shadows[0],
+                kwargs={**kwargs, 'past_key_values': deepcopy(kwargs['past_key_values'])},
+                masks=intervention_masks(shadows[1], active['proxies'], zero))
+        return args, kwargs
+
+    def after(_module, _args, _kwargs, output):
+        if active['prefill']:
+            for shadow in shadows:
+                shadow.init_hidden(output.last_hidden_state[0, :prompt.shape[1]])
+            active['proxies'] = output.last_hidden_state[0, prompt.shape[1]:].clone()
+            generated.append(int(output.logits[0, prompt.shape[1] - 1].argmax()))
+            return
+        accepted, chosen = walk(active['tree'], output.logits[0])
+        generated.extend(chosen)
+        if packet:
+            packet.update(baseline=output, prefix_generated=list(generated), accepted=accepted, chosen=chosen)
+            raise WindowCaptured()
+        for row in [0] + accepted:
+            for shadow in shadows:
+                shadow.observe_committed(output.last_hidden_state[0, row])
+        owner = accepted[-1] if accepted else 0
+        active['proxies'] = output.last_hidden_state[0, mask_indices_of(active['tree'], 2, owner)].clone()
+
+    handles = [model.register_forward_pre_hook(before, with_kwargs=True), model.register_forward_hook(after, with_kwargs=True)]
+    try:
+        with patch.object(decoding, 'build_tree', tree_builder), \
+                patch.object(decoding, 'time', SimpleNamespace(perf_counter=lambda: 0.)):
+            try:
+                decoding.SpecDecoder(model, _convert(spec), _convert(dict(eval_cfg, max_new_tokens=32)), eos,
+                    torch.Generator(device=model.device).manual_seed(seed)).generate(prompt)
+            except WindowCaptured:
+                pass
+    finally:
+        for handle in handles:
+            handle.remove()
+    assert packet and packet['root_index'] < 32
+    return packet
+
+
+@torch.no_grad()
+def probe_window(model, packet, spec, reference, variants=VARIANTS, control='zero'):
     from spec_mtp.structure.algorithm import decoding, kv_cache
     from spec_mtp.structure.algorithm.tree_attention import DynamicTreeAttentionCache, mask_indices_of
     from spec_mtp.structure.control.named import _convert
@@ -188,11 +249,15 @@ def probe_window(model, packet, spec, reference, variants=VARIANTS):
     assert packet['prefix_generated'] == reference[:len(packet['prefix_generated'])]
     owner = accepted[-1] if accepted else 0
     seed_rows = mask_indices_of(tree, 2, owner)
-    next_zero = packet['zero_provider'].masks_per_owner(baseline.last_hidden_state[0, seed_rows]).to(model.dtype)
+    next_zero = packet.get('next_control_masks')
+    if next_zero is None:
+        next_zero = packet['zero_provider'].masks_per_owner(baseline.last_hidden_state[0, seed_rows]).to(model.dtype)
     next_index = packet['root_index'] + len(chosen)
     assert next_index + 2 < len(reference) and chosen[-1] == reference[next_index]
     truth = reference[next_index + 1:next_index + 3]
     rows, local = [], {}
+    expected_masks = packet['masks'][control][[0] + tree.depths].reshape(-1, packet['inputs'].shape[-1])
+    assert torch.equal(packet['inputs'][0, 1 + tree.num_nodes:], expected_masks), 'Native control mask mismatch'
     for name in variants:
         inputs = packet['inputs'].clone()
         inputs[0, 1 + tree.num_nodes:] = packet['masks'][name][[0] + tree.depths].reshape(-1, inputs.shape[-1])
@@ -234,7 +299,7 @@ def probe_window(model, packet, spec, reference, variants=VARIANTS):
         row['d1_seed_logits_equal_zero'] = torch.equal(local[row['variant']]['seed_logits'][0], local['zero']['seed_logits'][0])
         if 'input_template' in variants:
             row['seed_logits_equal_input_first'] = torch.equal(local[row['variant']]['seed_logits'], local['input_first']['seed_logits'])
-    assert rows[0]['next_verified_chain_equals_reference'], 'Zero-control continuation differs from old Run; stop, no numerical study'
+    assert next(r for r in rows if r['variant'] == control)['next_verified_chain_equals_reference'], 'Native control differs from old Run; stop, no numerical study'
     return rows, local
 
 
@@ -253,8 +318,12 @@ def main():
     selection.add_argument('--active-depth', action='store_true', help='Separate conditioned q121/q401 protocol; not a random-sample extension')
     selection.add_argument('--early-template', action='store_true', help='Fixed earlier output-control roots before selected input-path differences')
     parser.add_argument('--template-control', action='store_true', help='Frozen template velocity and zero velocity at the same native input mean')
+    parser.add_argument('--reciprocal', action='store_true', help='Swap input first and output zero/first at the fixed early roots')
+    parser.add_argument('--input-origin', action='store_true', help='Reconstruct the original input-first path for the reverse swap')
     args = parser.parse_args()
     assert not args.early_template or args.template_control
+    assert not args.reciprocal or args.early_template
+    assert not args.input_origin or args.reciprocal
     assert not args.out.exists()
     args.out.mkdir(parents=True)
     qids, limit = ((121, 401), 64) if args.active_depth else ((121, 401, 241, 161), 128)
@@ -265,11 +334,16 @@ def main():
         limit = 48 if args.active_depth else 96
     if args.early_template:
         plan, limit = 'MASK_EARLY_TEMPLATE_PLAN.md', 64
+    if args.reciprocal:
+        plan, variants = 'MASK_RECIPROCAL_PLAN.md', RECIPROCAL_VARIANTS
     report = {'status': 'preflight', 'quality_passed': False, 'admission': [], 'rows': [], 'model_calls': 0,
               'forward_limit': limit, 'no_timing': True, 'no_8b': True, 'tool_sha256': sha(__file__),
               'variants': variants, 'template_control': args.template_control,
+              'reference_method': 'input_first' if args.input_origin else 'output_zero',
               'sample_mode': 'selected_early_predecessors' if args.early_template else 'conditioned_top1_only' if args.active_depth else 'unconditioned_first_root_ge8',
               'plan_sha256': sha(args.study / ('docs/' + plan))}
+    if args.reciprocal:
+        report['sample_mode'] = 'reciprocal_input_origin' if args.input_origin else 'reciprocal_output_origin'
     def save():
         (args.out / 'windows.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     local = {}
@@ -285,7 +359,7 @@ def main():
         study = args.study
         paired = json.loads((study / 'docs/paired_evidence_v1.json').read_text())
         prompts = json.loads((study / 'docs/prompts_manifest.json').read_text())
-        cell = paired['cells']['30/output_zero']
+        cell = paired['cells']['30/' + report['reference_method']]
         raw_path = study / 'runs' / cell['run_id'] / 'assets/decode_observations.json'
         assert sha(raw_path) == cell['files_sha256']['assets/decode_observations.json']
         raw = json.loads(raw_path.read_text())['out']['evidence']
@@ -330,18 +404,22 @@ def main():
                     minimum = EARLY_ROOTS[qid]
                 if args.active_depth:
                     assert minimum == {121: 3, 401: 19}[qid]
-                packet = capture_window(model, ids, cell['actual_settings']['spec'], cell['actual_settings']['eval'], prompts['eos_token_ids'], seed, minimum=minimum)
+                capture = capture_input_window if args.input_origin else capture_window
+                packet = capture(model, ids, cell['actual_settings']['spec'], cell['actual_settings']['eval'], prompts['eos_token_ids'], seed, minimum=minimum)
                 if args.early_template:
                     assert packet['root_index'] == minimum
                 packet['masks']['input_first'] = input_control(model, ids,
                     raw[index]['output_ids'][len(p['input_ids']):len(p['input_ids']) + packet['root_index'] + 1],
                     paired['cells']['30/input_first']['actual_settings']['spec'])
-                if args.template_control:
+                if args.input_origin:
+                    packet['next_control_masks'] = input_control(model, ids, packet['prefix_generated'], cell['actual_settings']['spec'])
+                if args.template_control and not args.reciprocal:
                     for variant, mode in (('input_template', 'template'), ('input_mean', 'zero')):
                         packet['masks'][variant] = input_control(model, ids,
                             raw[index]['output_ids'][len(p['input_ids']):len(p['input_ids']) + packet['root_index'] + 1],
                             paired['cells']['30/input_first']['actual_settings']['spec'], velocity_mode=mode)
-                rows, tensors = probe_window(model, packet, cell['actual_settings']['spec'], raw[index]['output_ids'][len(p['input_ids']):], variants)
+                rows, tensors = probe_window(model, packet, cell['actual_settings']['spec'], raw[index]['output_ids'][len(p['input_ids']):], variants,
+                    control='input_first' if args.input_origin else 'zero')
                 if args.active_depth:
                     control = tensors['zero']
                     assert packet['root_index'] == minimum and rows[0]['next_accept_depth'] == 1

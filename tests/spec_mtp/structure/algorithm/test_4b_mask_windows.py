@@ -116,6 +116,31 @@ def test_template_and_zero_controls_keep_same_updated_mean(monkeypatch):
     assert torch.equal(mean[0], esp.masks())
 
 
+def test_reverse_swap_replays_actual_input_path_and_preserves_native_control(monkeypatch):
+    from spec_mtp.structure.model.hf_causal import HFCausalLM
+    from spec_mtp.structure.algorithm.decoding import SpecDecoder
+    from spec_mtp.structure.control.named import _convert
+    m = tool('diagnose_4b_mask_windows', monkeypatch)
+    torch.manual_seed(42)
+    model = HFCausalLM(tiny_config={'vocab_size': 32, 'hidden_size': 16, 'num_layers': 1,
+                                  'num_heads': 2, 'num_kv_heads': 1, 'max_position_embeddings': 128})
+    model.hf.lm_head.weight = model.hf.model.embed_tokens.weight
+    model.hf.bfloat16()
+    spec = {'method': 'ema_velocity', 'num_masks': 2, 'block_complexity': 30, 'impl': 'naive',
+            'tree': {'mode': 'dynamic', 'pruning': True}, 'ema': {'level': 'order0', 'beta': .9999, 'lam': .1}}
+    cfg = {'temperature': 0., 'max_new_tokens': 32, 'stop_on_eos': False}
+    ids = torch.tensor([[1, 2, 3]])
+    reference, _ = SpecDecoder(model, _convert(spec), _convert(cfg)).generate(ids)
+    packet = m.capture_input_window(model, ids, spec, cfg, [], 123, minimum=1)
+    packet['masks']['input_first'] = m.input_control(model, ids,
+        reference[0, 3:3 + packet['root_index'] + 1].tolist(), spec)
+    packet['next_control_masks'] = m.input_control(model, ids, packet['prefix_generated'], spec)
+    rows, _ = m.probe_window(model, packet, spec, reference[0, 3:].tolist(), m.RECIPROCAL_VARIANTS, control='input_first')
+    assert len(rows) == 3 and all(r['argmax_passed'] and r['current_owner_argmax_unchanged'] for r in rows)
+    assert next(r for r in rows if r['variant'] == 'input_first')['next_verified_chain_equals_reference']
+    assert not model._forward_hooks and not model._forward_pre_hooks
+
+
 def test_window_admission_uses_only_gpu_residency_and_capacity(monkeypatch):
     m = tool('diagnose_4b_mask_windows', monkeypatch)
     free = 19000

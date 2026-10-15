@@ -134,3 +134,23 @@ accepted 为 EOS/预算裁剪前接受的候选数，不能替代 τ 分子；�
 - 4B 全部格子、两两逐 prompt 对照及 AR 诊断：[`studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json`](../../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json)。
 - 4B 正确性门、实际来源与原生产物哈希：[`studies/qwen3_4b_bf16_five_methods/docs/native-process-evidence-v1.json`](../../studies/qwen3_4b_bf16_five_methods/docs/native-process-evidence-v1.json)。
 - 原生 Experiment/Run 数字表：[8B NUMBERS](../../studies/esp_table1_bf16_full_argmax/docs/NUMBERS.md)、[4B NUMBERS](../../studies/qwen3_4b_bf16_five_methods/docs/NUMBERS.md)。完整 Run、原始 token、权重与缓存留在本机，不随报告提交。
+
+## 五、已合并远程分支清理记录
+
+执行时间：2026-10-15 12:05:33 UTC（北京时间 20:05:33）。依据 Enmao 本次明确授权，删除已合入 dev 的远程工作分支；当前工作分支及明确指定保留的分支不删。本次授权仅用于以下远程分支清理，不扩展为删除本地分支、worktree、Run 或数据的授权。
+
+删除前已 fetch 并核对 GitHub 实际分支列表、打开的 PR 和提交祖先关系。核验基准为 `dev@b22e513319803c449060a9771d20ea8ff3f24ebc`；以下三个分支头均通过 `git merge-base --is-ancestor <head> origin/dev`，没有打开的 PR。
+
+| 已删除远程分支 | 删除前 head SHA | 对应已合入 dev 的 PR | 执行结果 |
+| --- | --- | --- | --- |
+| `feature/4b-bf16-five-methods` | `5840ea2d0c877f2571ac57a4e9dc80c02562551e` | [#12](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12) | 已删除，远端复查不存在 |
+| `fix/verifier-argmax-gate` | `c9367661c5c5c84eae797e0040784fcf60768ee1` | [#10](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/10) | 已删除，远端复查不存在 |
+| `refactor/spec-rpipe` | `1219a1d88f10c2faee345b8d9bf6a42fd1e0110e` | [#6](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/6) | 已删除，远端复查不存在 |
+
+实际执行命令（正常远程删除，无强推）：
+
+```text
+git push --atomic origin --delete feature/4b-bf16-five-methods fix/verifier-argmax-gate refactor/spec-rpipe
+```
+
+命令成功后用 `git ls-remote --heads origin` 复查：远程仅剩 `main`、`dev`、`feature/sd-stage-report`、`feature/output-space-prerequisite`。`main`/`dev` 为长期主线；后两个分支按用户明确要求保留，其中 `feature/sd-stage-report` 也是当前报告工作分支。删除未改变 dev 已合并内容，本地分支、worktree、权重、缓存及实验数据均保留。此清单记录清理完成时的远程状态，后续报告提交会正常推进保留的工作分支。

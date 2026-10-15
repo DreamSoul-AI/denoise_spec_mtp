@@ -4,6 +4,8 @@
 
 2026-10-15执行状态：原生make/source/Study冻结检查通过，source digest 538e52c929a542a8（56文件），代码8047281。11格顺序已核对为AR、BC30五方法、BC60五方法；round1/单GPU。独立AR 0e25348a3a60d601于12:09 +08:00进入execute，首forward前已实测BF16/cuda、tied-storage、embedding shape [151936,2560]与全部冻结模型/480输入匹配。尚无完成Run，不外推收益；该运行状态不改冻结PLAN。
 
+工程支持[PR #11](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/11)已于2026-10-15T04:17:30Z经两项CPU CI及Branch flow全部SUCCESS后合dev（73eaad87d7edc10ae8a24eff974afa0f066c2c1e）。之前CI未完时的合并命令曾被自动审批拒绝，未执行；准确命令和拒绝理由及后续解决记录见[交接](../../../docs/handover.md)。源码、冻结PLAN、输入及正在运行的执行链未因合并而更改。
+
 | Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact | argmax checked |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | AR | pending | pending | pending | pending | pending | pending | pending | pending |

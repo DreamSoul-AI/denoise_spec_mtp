@@ -26,7 +26,7 @@ def admission(initial=True):
         processes = [processes]
     foreign = [p for p in processes if p['ProcessId'] != os.getpid()]
     cpu_ci = [p for p in foreign if any(name in (p['CommandLine'] or '') for name in
-                                      ('watch-cleanup.py', 'release-ci.py'))]
+                                      ('watch-cleanup.py', 'watch-third.py', 'release-ci.py'))]
     # Exact inspected scripts only: downloader and container build without --gpus/devices.
     cpu_scripts = {'download_layers.py': '10689bac808d0e5fa1958d306508f459d3c4637dc92a51bf5b6c1bb915545026',
                    'build_official_container_v2.py': 'b22cbe9814bcfcf85e9e6caade2a60a2258d2bb83f5e1d856124753bf8976e44'}

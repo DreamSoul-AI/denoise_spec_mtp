@@ -4,6 +4,8 @@
 
 当前结果速读：[SD 阶段报告：8B ESP 复现与 4B BF16 方法比较](sd-stage-report-2026-10-15.md)。集中列出已有结果的 τ、论文差值、全部逐 prompt 胜平负、正确性门、排名与局限，并逐表链接原始结果文件；下一步建议尚未执行。
 
+当前最高优先级为原作者官方代码复现：[ESP 官方代码复现报告与来源核查](esp-official-code-reproduction-2026-10-15.md)、[请求状态/commit/SHA 审计](esp-official-source-audit-2026-10-15.json)。尚未核验到可运行的作者实现，OpenReview 补充材料访问不完整；本轮未启动 GPU。此前 8B 数字为自实现参考，不满足本轮原作者代码要求。
+
 | **文件** | **性质** |
 | --- | --- |
 | [research-plan-v6.md](research-plan-v6.md) | denoising speculative decoding 草案。主方法和卡尔曼变体均【待测】；附录 C 的输入空间 / 树形格子才是【实测】 |

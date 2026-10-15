@@ -6,7 +6,7 @@
 
 当前结果速读：[SD 阶段报告：8B ESP 复现与 4B BF16 方法比较](sd-stage-report-2026-10-15.md)。集中列出已有结果的τ、论文差值、全部逐prompt胜平负、正确性门、排名与局限，并逐表链接原始结果文件；最新目标交付及未复现边界另在顶部说明。
 
-当前目标交付：[非官方HF第三方ESP原码验收](esp-third-party-reproduction-2026-10-15.md)。源commit/逐文件SHA固定、所有code原字节保留；真实8B BF16固定q121三预算共6次forward均首token数学门失败，未跑其全480、无有效τ，不改算法或prompt修结果。[审计JSON](esp-third-party-audit-2026-10-15.json)保留位置/margin/来源；现有五方法加AR和四组方向控制已完成，PR20已合dev并清理对应远程分支。
+已交付：[非官方HF第三方ESP原码验收](esp-third-party-reproduction-2026-10-15.md)。源commit/逐文件SHA固定、所有code原字节保留；真实8B BF16固定q121三预算共6次forward均首token数学门失败，未跑其全480、无有效τ，不改算法或prompt修结果。[审计JSON](esp-third-party-audit-2026-10-15.json)保留位置/margin/来源；现有五方法加AR和四窗口方向控制已完成，PR20已合dev并清理对应远程分支。追加的全480方向对照尚未完成，不能把四窗口交付视为全量交付。
 
 Enmao 最新指示的独立诊断：[4B BF16 输出 mask 差距诊断](4b-mask-geometry-2026-10-15.md)、[全 480 条 CPU 证据](4b-mask-geometry-cpu-2026-10-15.json)、[固定预算观测协议](../../studies/qwen3_4b_bf16_five_methods/docs/GEOMETRY_PLAN.md)。只分析既有结果及小规模 4B 几何，不恢复其他研究或 8B 算子数值链。
 

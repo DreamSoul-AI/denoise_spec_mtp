@@ -102,14 +102,18 @@ def main():
         assert metrics['reference_d2_in_actual_tree'] == row['reference_d2_under_d1']
         report['rows'].append(dict(row, **{k: v for k, v in metrics.items() if k not in row}))
     methods = sorted({r['variant'] for r in report['rows']} - {'zero'})
-    for method in methods:
-        counts = Counter()
-        for row in report['rows']:
-            if row['variant'] == method:
-                base = next(r for r in report['rows'] if r['variant'] == 'zero' and r['question_id'] == row['question_id'])
-                delta = row['next_accept_depth'] - base['next_accept_depth']
-                counts['win' if delta > 0 else 'loss' if delta < 0 else 'tie'] += 1
-        report['comparisons'][method + '-zero'] = {key: counts[key] for key in ('win', 'tie', 'loss')}
+    baselines = ('zero', 'input_first', 'input_mean') if 'input_template' in methods else ('zero',)
+    for baseline in baselines:
+        for method in methods:
+            if method == baseline:
+                continue
+            counts = Counter()
+            for row in report['rows']:
+                if row['variant'] == method:
+                    base = next(r for r in report['rows'] if r['variant'] == baseline and r['question_id'] == row['question_id'])
+                    delta = row['next_accept_depth'] - base['next_accept_depth']
+                    counts['win' if delta > 0 else 'loss' if delta < 0 else 'tie'] += 1
+            report['comparisons'][method + '-' + baseline] = {key: counts[key] for key in ('win', 'tie', 'loss')}
     if args.figure:
         plot_results(report, args.figure)
         report['figure_sha256'] = sha(args.figure)

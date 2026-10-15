@@ -16,6 +16,7 @@ import torch
 
 
 VARIANTS = ('zero', 'input_first', 'first', 'shifted', 'radial', 'both')
+TEMPLATE_VARIANTS = ('zero', 'input_first', 'input_template', 'input_mean')
 
 
 def admission(initial=True):
@@ -30,6 +31,18 @@ def admission(initial=True):
         processes = [processes]
     processes = [p for p in processes if p['ProcessId'] != os.getpid()]
     inspected = {
+        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-publication-main.py':
+            '336458e7229ec727348604c9142ec1a63283d2a77f00c81f235f34b24cdb3350',
+        'D:/GitHub/DreamSoul/quantization/.tmp/paroquant-reference/watch_calibration.py':
+            'dc3f6db96ca5698f19feba0a7e6a23c2f5bd7602bbf29b38cb78c03c8b29e845',
+        'D:/GitHub/DreamSoul/quantization/.tmp/paroquant-reference/prepare_official_calibration.py':
+            '669a03a0e26231c9e7fbb0bd1d261c892dbe2f57da1164abd06123f94c324baf',
+        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-publication.py':
+            '4f9b8c486aff8b93cc18116100e9013290e469fe8ed362639b4ebf790bf2dece',
+        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-version-dev.py':
+            'b69fd1fe0c67a405afee52be9599cd79cb06459b5abc23b17860ea9014d2ce92',
+        'D:/GitHub/diaoenmao/RPipe/.tmp/v041-draft-20261015/watch-version-final.py':
+            'f33abb9086f09bbf917118b20a5fc10cd3c13cca8ec0690b6d0178ef4a399763',
         'D:/GitHub/diaoenmao/RPipe/.tmp/systematic-contracts-20261015/watch-first-dev.py':
             'fdba7ab0c68e17d47af938df1997c25560f0276213c0b3960d183061283bf7e7',
         'D:/GitHub/diaoenmao/RPipe/.tmp/systematic-contracts-20261015/watch-first.py':
@@ -53,7 +66,8 @@ def admission(initial=True):
     unknown = [p['ProcessId'] for p in processes if p['ProcessId'] not in known]
     return {'passed': not unknown and (not initial or int(gpu[0]) >= 18 * 1024),
             'free_mib': int(gpu[0]), 'used_mib': int(gpu[1]), 'foreign_python_count': len(processes),
-            'verified_cpu_count': len(known), 'unknown_python_count': len(unknown), 'initial': initial}
+            'verified_cpu_count': len(known), 'unknown_python_count': len(unknown),
+            'unknown_python_pids': unknown, 'initial': initial}
 
 
 def intervention_masks(shadow, proxies, zero):
@@ -103,7 +117,7 @@ def active_predecessor(trace, prompt_length):
 
 
 @torch.no_grad()
-def input_control(model, prompt, generated_prefix, spec):
+def input_control(model, prompt, generated_prefix, spec, velocity_mode='native'):
     from spec_mtp.structure.algorithm.mask_providers import build_mask_provider
     from spec_mtp.structure.control.named import _convert
     provider = build_mask_provider(_convert(spec), model.embedding_table)
@@ -114,6 +128,12 @@ def input_control(model, prompt, generated_prefix, spec):
         current = model.embedding_table[token]
         provider.on_token_committed(current, previous)
         previous = current
+    if velocity_mode == 'template':
+        provider._velocity = (embeds[1] - embeds[0]).clone()
+    elif velocity_mode == 'zero':
+        provider._velocity = torch.zeros_like(provider._velocity)
+    else:
+        assert velocity_mode == 'native'
     return provider.masks().to(model.dtype)[None].expand(3, -1, -1).clone()
 
 
@@ -190,7 +210,7 @@ def capture_window(model, prompt, spec, eval_cfg, eos, seed, minimum=8):
 
 
 @torch.no_grad()
-def probe_window(model, packet, spec, reference):
+def probe_window(model, packet, spec, reference, variants=VARIANTS):
     from spec_mtp.structure.algorithm import decoding, kv_cache
     from spec_mtp.structure.algorithm.tree_attention import DynamicTreeAttentionCache, mask_indices_of
     from spec_mtp.structure.control.named import _convert
@@ -204,7 +224,7 @@ def probe_window(model, packet, spec, reference):
     assert next_index + 2 < len(reference) and chosen[-1] == reference[next_index]
     truth = reference[next_index + 1:next_index + 3]
     rows, local = [], {}
-    for name in VARIANTS:
+    for name in variants:
         inputs = packet['inputs'].clone()
         inputs[0, 1 + tree.num_nodes:] = packet['masks'][name][[0] + tree.depths].reshape(-1, inputs.shape[-1])
         kwargs = {**packet['kwargs'], 'past_key_values': deepcopy(packet['kwargs']['past_key_values'])}
@@ -243,6 +263,8 @@ def probe_window(model, packet, spec, reference):
         local[name] = {'seed_logits': logits.detach().cpu(), 'next_tree': vars(next_tree), 'next_chosen': next_chosen}
     for row in rows:
         row['d1_seed_logits_equal_zero'] = torch.equal(local[row['variant']]['seed_logits'][0], local['zero']['seed_logits'][0])
+        if 'input_template' in variants:
+            row['seed_logits_equal_input_first'] = torch.equal(local[row['variant']]['seed_logits'], local['input_first']['seed_logits'])
     assert rows[0]['next_verified_chain_equals_reference'], 'Zero-control continuation differs from old Run; stop, no numerical study'
     return rows, local
 
@@ -259,13 +281,19 @@ def main():
     parser.add_argument('--study', required=True, type=Path)
     parser.add_argument('--out', required=True, type=Path)
     parser.add_argument('--active-depth', action='store_true', help='Separate conditioned q121/q401 protocol; not a random-sample extension')
+    parser.add_argument('--template-control', action='store_true', help='Frozen template velocity and zero velocity at the same native input mean')
     args = parser.parse_args()
     assert not args.out.exists()
     args.out.mkdir(parents=True)
     qids, limit = ((121, 401), 64) if args.active_depth else ((121, 401, 241, 161), 128)
     plan = 'MASK_ACTIVE_PLAN.md' if args.active_depth else 'MASK_WINDOW_PLAN.md'
+    variants = TEMPLATE_VARIANTS if args.template_control else VARIANTS
+    if args.template_control:
+        plan = 'MASK_TEMPLATE_PLAN.md'
+        limit = 48 if args.active_depth else 96
     report = {'status': 'preflight', 'quality_passed': False, 'admission': [], 'rows': [], 'model_calls': 0,
               'forward_limit': limit, 'no_timing': True, 'no_8b': True, 'tool_sha256': sha(__file__),
+              'variants': variants, 'template_control': args.template_control,
               'sample_mode': 'conditioned_top1_only' if args.active_depth else 'unconditioned_first_root_ge8',
               'plan_sha256': sha(args.study / ('docs/' + plan))}
     def save():
@@ -330,7 +358,12 @@ def main():
                 packet['masks']['input_first'] = input_control(model, ids,
                     raw[index]['output_ids'][len(p['input_ids']):len(p['input_ids']) + packet['root_index'] + 1],
                     paired['cells']['30/input_first']['actual_settings']['spec'])
-                rows, tensors = probe_window(model, packet, cell['actual_settings']['spec'], raw[index]['output_ids'][len(p['input_ids']):])
+                if args.template_control:
+                    for variant, mode in (('input_template', 'template'), ('input_mean', 'zero')):
+                        packet['masks'][variant] = input_control(model, ids,
+                            raw[index]['output_ids'][len(p['input_ids']):len(p['input_ids']) + packet['root_index'] + 1],
+                            paired['cells']['30/input_first']['actual_settings']['spec'], velocity_mode=mode)
+                rows, tensors = probe_window(model, packet, cell['actual_settings']['spec'], raw[index]['output_ids'][len(p['input_ids']):], variants)
                 if args.active_depth:
                     control = tensors['zero']
                     assert packet['root_index'] == minimum and rows[0]['next_accept_depth'] == 1
@@ -341,11 +374,11 @@ def main():
                 report['rows'].extend(rows)
                 local[str(qid)] = tensors
                 save()
-                print(qid, 'six fixed-window variants passed', flush=True)
+                print(qid, len(variants), 'fixed-window variants passed', flush=True)
                 del packet
         finally:
             handle.remove()
-        assert len(report['rows']) == len(qids) * 6 and manifest()['digest'] == report['source_digest']
+        assert len(report['rows']) == len(qids) * len(variants) and manifest()['digest'] == report['source_digest']
         torch.save(local, args.out / 'private_logits.pt')
         report.update(status='complete', quality_passed=True, private_logits_sha256=sha(args.out / 'private_logits.pt'))
     except Exception as error:

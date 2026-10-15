@@ -82,3 +82,6 @@ test_4b_untimed验证三method tiny token/全部语义/calls保持、全局时�
 ## 4B mask 几何诊断（2026-10-15）
 
 `test_4b_geometry.py` 覆盖 trace/root 位置与总计数、未来目标槽位及尾端跳过、共同前缀和重复点拒绝、固定 state/proxy 首槽无直接速度项、原生 tiny BF16 三方法只读观测器的输出/forward/argmax/hook 恢复，以及准入容量、未知作业、已核验 CPU 脚本字节和父 PID 链。几何汇总回归保留 raw 槽范数比与映射后范数比的区别。tiny 回归不替代真实模型证据；真实 12 格及全 480 条 CPU 复核见[诊断报告](research/4b-mask-geometry-2026-10-15.md)。
+## 4B 固定窗口与CPU状态分析（2026-10-15）
+
+`test_4b_mask_windows.py`覆盖槽差径向/切向、同prompt相邻转移、原生shadow纯推演、同前缀输入控制、局部BF16控制续接及argmax/bonus目标对齐、准入父PID链、条件选择拒绝、树预算/父节点/重复剪枝、并列排名区间和固定模板差分代数近似。真实局部干预和CPU分析见[阶段报告](research/4b-mask-window-2026-10-15.md)。候选覆盖界不当作GPU实际接受数，条件样本不估计总体τ。

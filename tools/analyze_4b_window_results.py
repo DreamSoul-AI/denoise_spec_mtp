@@ -40,6 +40,33 @@ def coverage(logits, root, truth, budget=9, tree=None):
         'repeat_pruning_bans_d1': truth[0] == root}
 
 
+def plot_results(report, path):
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import LogNorm
+    import numpy as np
+    methods = ('zero', 'input_first', 'first', 'shifted', 'radial', 'both')
+    qids = list(dict.fromkeys(r['question_id'] for r in report['rows']))
+    indexed = {(r['question_id'], r['variant']): r for r in report['rows']}
+    assert len(indexed) == len(qids) * len(methods) == len(report['rows'])
+    ranks = np.array([[indexed[q, m]['mask_logit_target_ranks'][0] for q in qids] for m in methods])
+    accepted = np.array([[indexed[q, m]['next_accept_depth'] for q in qids] for m in methods])
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4.6), constrained_layout=True)
+    for ax, values, title, options in zip(axes, (ranks, accepted),
+            ('Target rank in mask-1 logits', 'Next-block verified draft tokens'),
+            ({'norm': LogNorm(vmin=1, vmax=max(1000, int(ranks.max()))), 'cmap': 'viridis_r'}, {'vmin': 0, 'vmax': 2, 'cmap': 'Blues'})):
+        chart = ax.imshow(values, aspect='auto', **options)
+        ax.set_title(title)
+        ax.set_yticks(range(6), ['O0', 'I1 same history', 'O1 same history', 'O1 shifted', 'O1 radial', 'O1 both'])
+        ax.set_xticks(range(len(qids)), [f'q{q}\nR{indexed[q, "zero"]["root_index"]}' for q in qids])
+        for i, j in np.ndindex(values.shape):
+            ax.text(j, i, str(values[i, j]), ha='center', va='center', color='red', fontsize=11)
+        fig.colorbar(chart, ax=ax, shrink=.8, **({'ticks': [0, 1, 2]} if values is accepted else {}))
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+
+
 def main():
     from analyze_4b_geometry import sha
     from spec_mtp.structure.algorithm.tree import DraftTree
@@ -48,8 +75,10 @@ def main():
     parser.add_argument('--windows', required=True, type=Path)
     parser.add_argument('--logits', required=True, type=Path)
     parser.add_argument('--out', required=True, type=Path)
+    parser.add_argument('--figure', type=Path)
     args = parser.parse_args()
     assert not args.out.exists()
+    assert args.figure is None or not args.figure.exists()
     torch.set_num_threads(1)
     windows = json.loads(args.windows.read_text())
     assert windows['quality_passed'] and windows['private_logits_sha256'] == sha(args.logits)
@@ -59,6 +88,7 @@ def main():
     evidence = json.loads(raw_path.read_text())['out']['evidence']
     prompts = json.loads((args.study / 'docs/prompts_manifest.json').read_text())['rendered_prompts']
     report = {'no_model_forward': True, 'analyzer_sha256': sha(__file__), 'windows_sha256': sha(args.windows),
+              'sample_mode': windows.get('sample_mode', 'unconditioned_first_root_ge8'),
               'private_logits_sha256': sha(args.logits), 'rows': [], 'comparisons': {}}
     for row in windows['rows']:
         qid, variant = row['question_id'], row['variant']
@@ -80,6 +110,9 @@ def main():
                 delta = row['next_accept_depth'] - base['next_accept_depth']
                 counts['win' if delta > 0 else 'loss' if delta < 0 else 'tie'] += 1
         report['comparisons'][method + '-zero'] = {key: counts[key] for key in ('win', 'tie', 'loss')}
+    if args.figure:
+        plot_results(report, args.figure)
+        report['figure_sha256'] = sha(args.figure)
     args.out.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print('PASS: saved GPU native trees verified; tie-aware candidate coverage bounds are not verified acceptance')
 

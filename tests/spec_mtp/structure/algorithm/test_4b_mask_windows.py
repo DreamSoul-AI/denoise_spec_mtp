@@ -113,3 +113,14 @@ def test_active_selection_uses_first_predecessor_and_rejects_no_opportunity(monk
     assert m.active_predecessor(trace, 5) == 1
     with pytest.raises(ValueError, match='No predefined'):
         m.active_predecessor(trace[:2], 5)
+
+
+def test_constant_template_check_is_only_algebraic_not_an_acceptance_claim(monkeypatch):
+    m = tool('analyze_4b_velocity', monkeypatch)
+    level, velocity = torch.tensor([1., 1.]), torch.tensor([1., 0.])
+    masks = torch.stack([level + velocity, level + 2 * velocity])
+    result = m.template_metrics(level, velocity, velocity, masks)
+    assert result['velocity_initial_relative_error'] == result['constant_slot1_relative_error'] == 0
+    assert result['velocity_initial_cos'] == 1
+    changed = m.template_metrics(level, velocity, -velocity, masks)
+    assert changed['velocity_initial_cos'] == -1 and changed['constant_slot0_relative_error'] > 0

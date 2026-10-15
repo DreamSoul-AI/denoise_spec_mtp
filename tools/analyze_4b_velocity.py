@@ -3,6 +3,7 @@
     python tools/analyze_4b_velocity.py --study studies/qwen3_4b_bf16_five_methods --capture docs/research/4b-mask-geometry-observations-2026-10-15.json --vectors .tmp/4b-geometry-capture-v5/vectors.pt --out .tmp/4b-velocity-v1.json
 """
 import argparse
+from collections import Counter
 import json
 from pathlib import Path
 
@@ -39,6 +40,18 @@ def transition_counts(evidence):
     return result
 
 
+def template_metrics(level, velocity, direction, masks):
+    fixed = torch.stack([level + i * direction for i in (1, 2)])
+    cosine = torch.nn.functional.cosine_similarity
+    return {'velocity_initial_cos': float(cosine(velocity.float(), direction.float(), dim=0)),
+            'velocity_initial_norm_ratio': float(velocity.float().norm() / direction.float().norm()),
+            'velocity_initial_relative_error': float((velocity.float() - direction.float()).norm() / direction.float().norm()),
+            'constant_slot0_cos': float(cosine(fixed[0].float(), masks[0].float(), dim=0)),
+            'constant_slot1_cos': float(cosine(fixed[1].float(), masks[1].float(), dim=0)),
+            'constant_slot0_relative_error': float((fixed[0].float() - masks[0].float()).norm() / masks[0].float().norm()),
+            'constant_slot1_relative_error': float((fixed[1].float() - masks[1].float()).norm() / masks[1].float().norm())}
+
+
 def main():
     from analyze_4b_geometry import distribution, sha
     parser = argparse.ArgumentParser(description=__doc__)
@@ -73,6 +86,31 @@ def main():
         report['velocity'][method] = {'points': points, 'distribution': {
             k: distribution([p[k] for p in points]) for k in metrics}}
     paired = json.loads((args.study / 'docs/paired_evidence_v1.json').read_text())
+    prompts = json.loads((args.study / 'docs/prompts_manifest.json').read_text())['rendered_prompts']
+    prefixes = Counter(tuple(p['input_ids'][:2]) for p in prompts)
+    assert len(prefixes) == 1
+    first, second = next(iter(prefixes))
+    cache = args.study / 'shared/model/modelscope/Qwen/Qwen3-4B'
+    snapshot = json.loads((args.study / 'docs/modelscope_snapshot.json').read_text())
+    index = cache / 'model.safetensors.index.json'
+    expected = {f['path']: f['sha256'] for f in snapshot['files']}
+    assert sha(index) == expected[index.name]
+    shard = json.loads(index.read_text())['weight_map']['model.embed_tokens.weight']
+    assert sha(cache / shard) == expected[shard]
+    from safetensors import safe_open
+    with safe_open(cache / shard, framework='pt', device='cpu') as handle:
+        table = handle.get_slice('model.embed_tokens.weight')
+        direction = table[second:second + 1][0] - table[first:first + 1][0]
+    points = []
+    for key, case in vectors.items():
+        if key.endswith('/input_first'):
+            for frame in case['frames']:
+                point = template_metrics(frame['input_level'], frame['input_velocity'], direction, frame['masks'][0])
+                point.update(question_id=int(key.split('/')[0]), root_index=frame['root_index'])
+                points.append(point)
+    report['template_control'] = {'prompt_count': len(prompts), 'unique_first_two_pairs': len(prefixes),
+        'embedding_shard_sha256': expected[shard], 'points': points,
+        'distribution': {k: distribution([p[k] for p in points]) for k in points[0] if k not in ('question_id', 'root_index')}}
     for bc in (30, 60):
         for method in ('input_first', 'output_zero', 'output_first'):
             cell = paired['cells'][f'{bc}/{method}']

@@ -214,7 +214,7 @@ For existing plans, request checks of evidence, six-aspect connections and desig
 
 ## 2. Plans and execution in repositories
 
-Save the filled plan as docs/research-plan.md and link it from README. Existing repositories retain their structure; this table describes responsibilities, not mandatory new directories. RPipe's adaptation in [research.md](../../development/research.md) preserves macro plans and Study PLAN separation.
+Save the filled plan as docs/research-plan.md and link it from README. Existing repositories retain their structure; this table describes responsibilities, not mandatory new directories. RPipe's adaptation in [research.md](https://github.com/DreamSoul-AI/RPipe/blob/e461133218deabf8755b3e8657650e1e4a3cd9f4/docs/development/research.md) preserves macro plans and Study PLAN separation.
 
 | **Contents** | **Suggested location/responsibility** |
 | --- | --- |

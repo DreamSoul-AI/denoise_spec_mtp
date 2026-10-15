@@ -15,7 +15,7 @@ def test_relative_markdown_links_resolve():
     for name in files:
         text = (ROOT / name).read_text(encoding='utf-8')
         for match in LINK.finditer(text):
-            target = match.group(1)
+            target = match.group(1).strip('<>')
             if target.startswith(('http://', 'https://', 'mailto:')):
                 continue
             if not (ROOT / os.path.dirname(name) / target).exists():

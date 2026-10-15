@@ -141,7 +141,7 @@ Use [research-plan](https://github.com/DreamSoul-AI/knowledge/tree/main/skills/r
 
 Example: “Use `$research-plan` to fill this plan from the idea and evidence below. Check the six aspects, controls and budget. Keep unknowns to be confirmed. Planning only.”
 
-The general template suggests docs/research-plan.md linked from README and retains existing code/config layout. RPipe instead retains [macro plans and Study-specific PLAN files](../../development/research.md), not duplicate plans. Exploration issues capture ideas; implementation/experiment issues link questions, hypotheses and validation; PRs link tasks and actual results. Formal runs preserve versions/artifacts and complete adaptive-search trajectories.
+The general template suggests docs/research-plan.md linked from README and retains existing code/config layout. RPipe instead retains [macro plans and Study-specific PLAN files](https://github.com/DreamSoul-AI/RPipe/blob/e461133218deabf8755b3e8657650e1e4a3cd9f4/docs/development/research.md), not duplicate plans. Exploration issues capture ideas; implementation/experiment issues link questions, hypotheses and validation; PRs link tasks and actual results. Formal runs preserve versions/artifacts and complete adaptive-search trajectories.
 
 | **Date** | **Change/reason** | **Affected hypotheses, experiments or results** |
 | --- | --- | --- |

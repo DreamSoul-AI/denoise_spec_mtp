@@ -125,3 +125,29 @@ def test_verified_cpu_ci_descendants_not_unrelated_jobs(monkeypatch):
     assert module.admission()['passed'] and module.admission()['recognized_cpu_ci_count'] == 3
     processes.append({'ProcessId': -4, 'ParentProcessId': 0, 'CommandLine': 'python train.py'})
     assert not module.admission()['passed']
+
+
+def test_geometry_summary_pairs_only_identical_shared_targets():
+    module = tool('analyze_4b_geometry')
+    points = []
+    for method, value in [('input_first', .2), ('output_zero', .1), ('output_first', .11)]:
+        for root in (0, 1):
+            points.append(dict(case=method, question_id=121, root_index=root, depth=0, slot=0,
+                               shared_prefix=root == 0, mask_target_cos=value, target_norm=1.,
+                               raw_norm=1., mask_norm=1.,
+                               mask_target_norm_ratio=1., velocity_anchor_ratio=.1))
+    capture = {'quality_passed': True, 'status': 'complete', 'cases': [], 'points': points}
+    result = module.summarize_geometry(capture)
+    paired = result['matched_shared_prefix']['output_first-output_zero/slot0']['mask_target_cos']
+    assert paired['n'] == 1 and paired['mean'] == pytest.approx(.01)
+    assert result['groups']['all/input_first/depthNone/slot0']['mask_target_cos']['n'] == 2
+    assert result['groups']['all/input_first/depthNone/slot1']['mask_target_cos'] == {'n': 0}
+    for row in list(points):
+        if row['root_index'] == 0:
+            points.append(dict(row, slot=1, raw_norm=2., mask_norm=1.))
+    effects = module.summarize_geometry(capture)['slot_effects']['shared_prefix/output_first']
+    assert effects['raw_norm_slot1_over_slot0']['mean'] == 2
+    assert effects['mask_norm_slot1_over_slot0']['mean'] == 1
+    points.append(points[0])
+    with pytest.raises(AssertionError, match='Duplicate'):
+        module.summarize_geometry(capture)

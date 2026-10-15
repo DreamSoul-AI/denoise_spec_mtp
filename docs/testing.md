@@ -78,3 +78,7 @@ test_sampling_continuation.py新增12项：首命中使用真实seed、零/全�
 `test_4b_bf16_plot.py`覆盖胜负矩阵行/列方向、互换W/L时保留平局、调用数不重复反向、未完成/失败/缺格/缺对/重复/计数不一致拒绝，以及合成计数PNG渲染。图形8项与读出8项回归通过；合成布局已检查，不代表模型结果。真实图仅在11格和native process通过后生成，并记录绘图器SHA。
 
 test_4b_untimed验证三method tiny token/全部语义/calls保持、全局时钟不改及异常恢复、CUDA loader dtype/kwargs/恢复。test_4b_phases验证四phase的函数导出；test_4b_pairs保留正负零及拒绝缺配对。test_4b_input_control验证历史EMA字段/同链/原26与4输入manifest复用。原native配置展开新增4B Study，仍不加载真实权重。实际模型硬门来自10个成功4B native Runs，而非tiny fixture：first26/new4四格+EMA两格，所有输出和两类AR逐token一致。
+
+## 4B mask 几何诊断（2026-10-15）
+
+`test_4b_geometry.py` 覆盖 trace/root 位置与总计数、未来目标槽位及尾端跳过、共同前缀和重复点拒绝、固定 state/proxy 首槽无直接速度项、原生 tiny BF16 三方法只读观测器的输出/forward/argmax/hook 恢复，以及准入容量、未知作业、已核验 CPU 脚本字节和父 PID 链。几何汇总回归保留 raw 槽范数比与映射后范数比的区别。tiny 回归不替代真实模型证据；真实 12 格及全 480 条 CPU 复核见[诊断报告](research/4b-mask-geometry-2026-10-15.md)。

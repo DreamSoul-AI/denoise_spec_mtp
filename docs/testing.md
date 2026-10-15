@@ -15,6 +15,8 @@ python -m pytest tests/spec_mtp
 
 现有 GPU 环境不执行上面的 CPU torch 安装。测试使用独立 --basetemp=.tmp/<new-id>。Ruff 的 vendored facade 例外见 [兼容记录](bugs.md)。tiny 接受数是回归基线；完整链还检查原始 token、来源漂移、证据缺失和 Study 完整性。
 
+Transformers固定为已验证的`5.12.1`，与本轮4B完整结果的`decode_inputs.json.runtime.transformers`一致。2026-10-16，未设上限的安装解析到`5.20.0`后，CI出现75 failed/427 passed，原正数长度`cache.crop(keep_len)`被其新API拒绝（[失败记录](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38786263761)）。本次只固定安装版本，不修改科学缓存源码或正在运行的GPU环境；更高版本兼容性尚未验收。
+
 CPU 剖析：`python tools/profile_cpu.py`。输出身份：`python tools/decode_fingerprint.py`。Windows：`python tools/windows_selfcheck.py`。
 
 分支门：`.github/workflows/branch-flow.yml` 的 `Branch flow` 只核对 PR metadata，不 checkout 或运行 PR 代码。工作分支先进入 dev；main 只接受同仓库 dev。默认分支为 main，两个长期分支均要求现有 cpu-checks 与 Branch flow，保留既有审批、防强推和防删除规则。

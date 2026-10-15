@@ -92,6 +92,13 @@ def test_tau_pairs_use_ratios_and_category_pooling(monkeypatch):
     assert m.compare(second, first)['tau'] == {'win': 1, 'tie': 1, 'loss': 1}
     assert m.category_mean(first) == pytest.approx(13 / 12)
     assert m.category_mean(first) != sum(r['committed'] / r['decode_calls'] for r in first) / 3
+    for error in ('Foreign GPU work appeared: 42', 'Nonpreemptive GPU admission deferred'):
+        m.require_resource_failure({'native_status': 'failed'}, error)
+        for status in ('succeeded', 'running', 'pending'):
+            with pytest.raises(AssertionError, match='Never replace'):
+                m.require_resource_failure({'native_status': status}, error)
+    with pytest.raises(AssertionError, match='argmax mismatch'):
+        m.require_resource_failure({'native_status': 'failed'}, 'argmax mismatch')
 
 
 @pytest.mark.parametrize('initial', [False, True])

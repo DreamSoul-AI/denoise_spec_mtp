@@ -4,6 +4,7 @@
 """
 import hashlib
 import importlib.util
+import ast
 import json
 from pathlib import Path
 import sys
@@ -14,6 +15,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / 'studies/qwen3_4b_bf16_five_methods'
 STUDY = ROOT / 'studies/qwen3_4b_bf16_directions'
+RECOVERY = ROOT / 'studies/qwen3_4b_bf16_directions_recovery'
 sys.path.insert(0, str(BASE))
 _spec = importlib.util.spec_from_file_location('original_five_method_readout', BASE / 'analyze_results.py')
 _original = importlib.util.module_from_spec(_spec)
@@ -45,6 +47,17 @@ def compare(first, second):
         r['tau'] = 'win' if diff > 0 else 'loss' if diff < 0 else 'tie'
     result['tau'] = {s: sum(r['tau'] == s for r in result['rows']) for s in ('win', 'tie', 'loss')}
     return result
+
+
+def require_resource_failure(previous, error):
+    assert previous['native_status'] == 'failed', 'Never replace a completed or running factor'
+    assert any(text in error for text in ('Foreign GPU work appeared', 'Nonpreemptive GPU admission deferred')), error
+
+
+def control_source(path):
+    source = path.read_text(encoding='utf-8')
+    node = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == 'control')
+    return ast.get_source_segment(source, node)
 
 
 def plot(body, path):
@@ -81,9 +94,15 @@ def main():
     from spec_mtp.structure.artifact.sources import check_frozen, manifest as sources
     from rpipe.structure.artifact.provenance import check_frozen as pcheck
     from rpipe.structure.make.expand import load_study_yaml
-    decl = load_study_yaml(STUDY)
-    check_frozen(STUDY, decl, sources())
-    pcheck(STUDY, decl)
+    owners = [STUDY]
+    if (RECOVERY / 'index.json').exists():
+        owners.append(RECOVERY)
+        assert sha(STUDY / 'docs/source_refs.json') == sha(RECOVERY / 'docs/source_refs.json')
+        assert control_source(STUDY / 'direction_control.py') == control_source(RECOVERY / 'direction_control.py')
+    for owner in owners:
+        decl = load_study_yaml(owner)
+        check_frozen(owner, decl, sources())
+        pcheck(owner, decl)
     original = read(BASE / 'docs/paired_evidence_v1.json')
     prompts = read(BASE / 'docs/prompts_manifest.json')
     snapshot = read(BASE / 'docs/modelscope_snapshot.json')
@@ -97,29 +116,42 @@ def main():
     cells = {name: {'native_status': 'pending'} for name in NAMES}
     cells['zero'] = dict(original['cells']['30/input_zero'], reused_from='30/input_zero',
         reused_file='studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json')
-    for experiment in read(STUDY / 'index.json')['experiments']:
-        name = experiment['factors']['algorithm.config.direction']
-        assert name in NAMES and name != 'zero' and len(experiment['runs']) == 1
-        folder = STUDY / 'runs' / experiment['runs'][0]['id']
-        result = read(folder / 'result.json') if (folder / 'result.json').exists() else {}
-        cells[name] = {'run_id': folder.name, 'native_status': result.get('status', 'pending')}
-        progress_file = folder / 'assets/direction_progress.json'
-        if progress_file.exists():
-            cells[name]['completed_prompt_rows'] = read(progress_file)['completed']
-        if result.get('status') != 'succeeded':
-            continue
-        cfg = yaml.safe_load((folder / 'config.yaml').read_text())
-        assert cfg['algorithm']['config']['direction'] == name and cfg['seed'] == 123
-        cell, _ = load_cell(STUDY, folder, cfg, prompts['rendered_prompts'], prompts, snapshot, reference)
-        assert cell['model_digest'] == original['cells']['30/input_first']['model_digest']
-        assert cell['runtime'] == original['cells']['30/input_first']['runtime']
-        progress = read(progress_file)
-        assert progress['completed'] == len(progress['rows']) == 480 and progress['direction'] == name
-        assert [r['question_id'] for r in progress['rows']] == [p['question_id'] for p in prompts['rendered_prompts']]
-        assert all(r['direction']['full_prompt_mean_preserved'] for r in progress['rows'])
-        cell.update(direction_rows=[{'question_id': r['question_id'], **r['direction']} for r in progress['rows']],
-            progress_sha256=sha(progress_file))
-        cells[name] = cell
+    for owner in owners:
+        for experiment in read(owner / 'index.json')['experiments']:
+            name = experiment['factors']['algorithm.config.direction']
+            assert name in NAMES and name != 'zero' and len(experiment['runs']) == 1
+            replacement = None
+            if owner == RECOVERY:
+                previous = cells[name]
+                failed_path = STUDY / 'runs' / previous['run_id'] / 'result.json'
+                failed = read(failed_path)
+                require_resource_failure(previous, failed.get('error', ''))
+                replacement = dict(previous, error=failed['error'], result_sha256=sha(failed_path))
+            folder = owner / 'runs' / experiment['runs'][0]['id']
+            result = read(folder / 'result.json') if (folder / 'result.json').exists() else {}
+            cells[name] = {'run_id': folder.name, 'study_path': owner.relative_to(ROOT).as_posix(),
+                'native_status': result.get('status', 'pending'), 'replaced_resource_failure': replacement}
+            progress_file = folder / 'assets/direction_progress.json'
+            if progress_file.exists():
+                cells[name]['completed_prompt_rows'] = read(progress_file)['completed']
+            if result.get('status') != 'succeeded':
+                continue
+            cfg = yaml.safe_load((folder / 'config.yaml').read_text())
+            assert cfg['algorithm']['config']['direction'] == name and cfg['seed'] == 123
+            expected = original['cells']['30/input_first']['actual_settings']
+            assert cfg['algorithm']['config']['spec'] == expected['spec']
+            assert cfg['algorithm']['config']['eval'] == expected['eval']
+            cell, _ = load_cell(owner, folder, cfg, prompts['rendered_prompts'], prompts, snapshot, reference)
+            assert cell['model_digest'] == original['cells']['30/input_first']['model_digest']
+            assert cell['runtime'] == original['cells']['30/input_first']['runtime']
+            progress = read(progress_file)
+            assert progress['completed'] == len(progress['rows']) == 480 and progress['direction'] == name
+            assert [r['question_id'] for r in progress['rows']] == [p['question_id'] for p in prompts['rendered_prompts']]
+            assert all(r['direction']['full_prompt_mean_preserved'] for r in progress['rows'])
+            cell.update(direction_rows=[{'question_id': r['question_id'], **r['direction']} for r in progress['rows']],
+                progress_sha256=sha(progress_file), study_path=owner.relative_to(ROOT).as_posix(),
+                replaced_resource_failure=replacement)
+            cells[name] = cell
     for cell in cells.values():
         if 'rows' in cell:
             cell['totals']['category_mean_pooled_tau'] = category_mean(cell['rows'])
@@ -138,13 +170,23 @@ def main():
                 pair.pop('rows')
                 existing.append(dict(first='30/' + method, second=name, **pair))
     ready = all('rows' in cell for cell in cells.values())
+    native_validation = {owner.name: read(owner / 'spec_mtp_study_check.json')
+        for owner in owners if (owner / 'spec_mtp_study_check.json').exists()}
     if ready:
-        native, process = read(STUDY / 'spec_mtp_study_check.json'), read(STUDY / 'process.json')
+        final_owner = owners[-1]
+        native, process = read(final_owner / 'spec_mtp_study_check.json'), read(final_owner / 'process.json')
         assert native['passed'] and native['complete'] and process['complete'] and process['spec_mtp']['passed']
+        assert len({c['source_digest'] for n, c in cells.items() if n != 'zero'}) == 1
+        if final_owner == RECOVERY:
+            initial = native_validation[STUDY.name]
+            assert not initial['passed']
+            assert set(initial['failed_runs']) == {c['replaced_resource_failure']['run_id']
+                for c in cells.values() if c.get('replaced_resource_failure')}
     body = {'complete': ready, 'budget': 30, 'fixed_prompts': 480, 'argmax_is_gate_AR_is_diagnostic': True,
         'no_timing': True, 'original_evidence_sha256': sha(BASE / 'docs/paired_evidence_v1.json'),
         'source_refs_sha256': sha(STUDY / 'docs/source_refs.json'), 'analyzer_sha256': sha(Path(__file__)),
         'reused_analyzer_sha256': sha(BASE / 'analyze_results.py'),
+        'native_validation': native_validation,
         'cells': cells, 'vs_template': comparisons, 'vs_existing_five': existing}
     target = STUDY / ('docs/direction_evidence_v1.json' if ready else 'docs/direction_pending.json')
     text = json.dumps(body, indent=2, allow_nan=False) + '\n'

@@ -11,6 +11,10 @@
 
 目标BC30=1.63，BC60双方均列相对1.74差值，不按τ选主配置。AR独立审计失配单列，不能宣称与独立AR一致；不阻止τ计算。τ验收要求全480、全部提交token的验证前向argmax自检通过，不以预检替代结果。
 
+聚合定义：pooled τ=Σcommitted/Σdecode_calls；prompt mean τ为逐条committed/max(decode_calls,1)的等权均值；category mean τ先按原始category各算pooled τ，再对类别等权。类别样本数不等，不能把该权重称为论文已确认的任务权重；分组见[prompt清单](prompts_manifest.json)。
+
+计数定义：committed为解码阶段实际提交数，包含bonus，经过EOS/预算裁剪，不含prefill首token。argmax审计覆盖完整新输出（含prefill首token），因此全480条的argmax checked比Σcommitted多480；实际model calls=Σdecode_calls+480。accepted为候选接受数，不能替代committed或τ。
+
 [PLAN](PLAN.md)引用G.2具体说明：Qwen3 BC60单mask/29节点，双mask/19节点为对照；保持动态树剪枝，BF16/T0/256/seed123，无测速/预热。
 
 Mean mask按Eq5 λ=.1更新，与后续4B用户指定的ESP frozen mean不同。四格全部新Run，旧冻结PLAN不回写；旧AR门失败result归档；仅重新验收后记录真实native状态及新validator SHA，不重跑execute。新增argmax必须全过；独立AR差异不阻塞native summarize/process。

@@ -1,6 +1,6 @@
 # Qwen3-4B BF16 paired report
 
-完整验收：False；已完成 8/11。
+完整验收：False；已完成 9/11。
 
 | Cell | native | accepted | calls (prefill+decode) | new tokens | pooled τ | prompt mean τ | AR exact/n (rate) | argmax checked |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -12,7 +12,7 @@
 | 30/output_first | succeeded | 24573 | 56716 | 81209 | 1.4355395120563341 | 1.4825319338594185 | 184/480 (38.33%) | 81209 |
 | 60/frozen_mean | succeeded | 26913 | 54197 | 81006 | 1.4990785040117653 | 1.5710319322666075 | 165/480 (34.38%) | 81006 |
 | 60/input_zero | succeeded | 27523 | 53309 | 80733 | 1.519108822805656 | 1.5789239399696458 | 167/480 (34.79%) | 80733 |
-| 60/input_first | pending | pending | pending | pending | pending | pending | pending | pending |
+| 60/input_first | succeeded | 31611 | 49875 | 81307 | 1.6363397104970139 | 1.6658595242934762 | 162/480 (33.75%) | 81307 |
 | 60/output_zero | pending | pending | pending | pending | pending | pending | pending | pending |
 | 60/output_first | pending | pending | pending | pending | pending | pending | pending | pending |
 
@@ -27,6 +27,7 @@
 | 30/output_first | 475/0/5 | -25164 |
 | 60/frozen_mean | 475/1/4 | -27683 |
 | 60/input_zero | 478/0/2 | -28571 |
+| 60/input_first | 478/0/2 | -32005 |
 
 以下胜负指第二方法相对第一方法；accepted越高越好，calls越低越好，两个指标分别判定。
 
@@ -43,6 +44,8 @@
 | 30/input_first → 30/output_first | 118/31/331 | 121/33/326 | -2798 | 3048 | 311 |
 | 30/output_zero → 30/output_first | 209/72/199 | 201/64/215 | 191 | 139 | 332 |
 | 60/frozen_mean → 60/input_zero | 225/29/226 | 232/35/213 | 610 | -888 | -273 |
+| 60/frozen_mean → 60/input_first | 317/41/122 | 300/33/147 | 4698 | -4322 | 301 |
+| 60/input_zero → 60/input_first | 374/36/70 | 354/28/98 | 4088 | -3434 | 574 |
 
 accepted为EOS/预算裁剪前候选接受数；committed及τ包含bonus、按裁剪后实际解码提交数计算，不含prefill首token。argmax审计含首token且必须全过；独立AR首分叉和输出长度全部保留，不作为失败门。AR参考不冒充Spec验证argmax审计。
 

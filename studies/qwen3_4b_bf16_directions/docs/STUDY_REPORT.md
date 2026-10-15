@@ -1,10 +1,10 @@
 # BC30固定480方向对照阶段报告
 
-当前步骤：template全480及原生Run终验成功；random0完成46条后遇外部GPU进程停止，原队列已进入random1。
+当前步骤：原队列已自然结束，template全480成功；三个随机格及content均未完整，已登记独立补齐Study。
 实测自检：template的80,932个提交token全过，pooled τ=1.507777653；完整矩阵仍未完成。
 出处：[首格有效结果快照](direction_partial_v1.json)，完整token/trace及Run均留本机；零偏置单列旧结果复用来源。
-下一步：原队列继续random1→random2→content；队列退出后按[补齐协议](RECOVERY_PLAN.md)用新version/Run完整补跑缺失因素，不重跑成功格。
-阻塞：random0资源中断待补齐，并非数学门失败；整个方向目标仍未完成，BC60未声明，不测速。
+下一步：按[补齐执行PLAN](../../qwen3_4b_bf16_directions_recovery/docs/PLAN.md)单队列完整补四格；仅资源拒绝改为prompt边界等待，不重跑成功格。
+阻塞：四格资源中断/未获准入待补齐，非数学门失败；整个方向目标仍未完成，BC60未声明，不测速。
 
 2026-10-16新指令已冻结[PLAN](PLAN.md)。四窗口不能回答总体唯一方向问题，本轮不以其结果代替全量。CPU控制/读出七项及文档四项通过；`tools/analyze_4b_full_directions.py`复用原五方法native读出，pending只记进度，不补零或平局。原生5格全部成功、Study process通过才发布正式JSON；方向与旧五方法的关系按PLAN单列。
 
@@ -32,3 +32,5 @@ CPU集成记录：PR22首轮远端CI为497 passed/3 failed（run 38768912287）�
 random0原Run `be910fe1fa042b28`在北京时间00:57:07的下一prompt准入时观察到真实GPU Python PID65348，按冻结规则抛出`Foreign GPU work appeared`，原生状态failed。此前完整46条共9,028个提交token经原生`_check_argmax`对token/hash/owner链复核通过，实际5,923次模型调用。该格不是方法正确性失败或OOM，也没有有效全480τ。
 
 证据：[resource_interruption_v1.json](resource_interruption_v1.json)，绑定原failed result、完整私有partial JSONL和progress SHA；完整失败Run保留，不把46条拼接成全量或重签成成功。外部PID随后已不在实际GPU列表，原串行队列自动进入random1；不杀外部作业，不重启当前有效进程、不另开队列。原队列结束后仅为缺失因素建立新版本完整480补齐，具体门与唯一有效格选择见[RECOVERY_PLAN](RECOVERY_PLAN.md)。原Study可能保留失败终验，最终如需跨Study组合，会逐项披露，不宣称原失败Study通过。
+
+原队列最终自然exit1：random1完成50条、random2完成9条后分别遇GPU Python PID28472/62864；content在加载前遇PID62864未获准入。原Study终验passed=false，状态原样保留。新增三格partial逐token/hash/owner核验通过，共105次完整prompt执行、20,977个提交token、13,854次模型调用仅列资源损耗，不作为有效全量结果。全部终态与SHA见[resource_interruptions_v2.json](resource_interruptions_v2.json)。补齐版只将两个资源assert改为同进程等待5秒再查，方向control原文保持，15项方向/旧配对/文档CPU回归及Ruff通过；等待不改prompt、不作为测速。

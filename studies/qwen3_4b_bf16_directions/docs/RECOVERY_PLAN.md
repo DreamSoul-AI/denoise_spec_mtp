@@ -4,7 +4,9 @@
 
 原队列已自动进入random1，不中断它，不另起GPU队列、不杀外部进程。先让原队列到终态，逐项核实哪些因素完整成功、哪些因资源中断失败。已成功template全480和旧zero全480绝不重跑。
 
-队列退出后，仅对未完整成功的指定因素建立新recovery Study：换algorithm.config.version、新Run ID，完整480从头执行，不覆盖旧Run、不删数据、不宣称支持KV checkpoint恢复。不更改数据、prompt、模型、dtype、控制公式、seed、停止或正确性门。复用原direction_control.py原字节及全部科学/source/input引用，差异仅为Study路径、声明的失败因素和新version。原46条只作为保留的失败证据，不参与最终有效格的重复计数。
+队列退出后，仅对未完整成功的指定因素建立新recovery Study：换algorithm.config.version、新Run ID，完整480从头执行，不覆盖旧Run、不删数据、不宣称支持KV checkpoint恢复。不更改数据、prompt、模型、dtype、控制公式、seed、停止或正确性门。复用原control函数原文及全部科学/source/input引用；资源等待的明确差异见下段，另有Study路径、失败因素与新version差异。原partial只作为保留的失败证据，不参与最终有效格的重复计数。
+
+队列终态补充：随机1/2也因真实GPU进程中断、content加载前未获准入，原队列已自然exit1，无任务被人工停止。重复短时占用暴露原assert式资源处理会浪费完整prompt。因此补齐Study保留`control()`完整原文及科学56文件，只将两个资源拒绝调用点改为同一Run在加载前/prompt边界sleep5秒后再查，等待期间不做forward、不重启。完整driver不再声称逐字节相同，新增资源helper源码差异由新Study冻结；详情见[补齐执行PLAN](../../qwen3_4b_bf16_directions_recovery/docs/PLAN.md)。这不改变方向构造、数据或数学门，不是新方法。
 
 补跑前仍只看GPU实际驻留Python与可用显存，free≥14GiB后单队列round1串行；如果仍有外部占用，不启动第二队列，也不因CPU进程阻塞。新队列同样不自动重试失败格，后续根据真实终态再处理。
 

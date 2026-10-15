@@ -288,3 +288,4 @@
 /docs/research/esp-third-party-audit-2026-10-15.json -text whitespace=cr-at-eol
 /studies/qwen3_4b_bf16_directions/** -text whitespace=cr-at-eol
 /tools/analyze_4b_full_directions.py -text whitespace=cr-at-eol
+/studies/qwen3_4b_bf16_directions_recovery/** -text whitespace=cr-at-eol

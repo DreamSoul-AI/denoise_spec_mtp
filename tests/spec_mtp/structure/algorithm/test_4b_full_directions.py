@@ -1,4 +1,6 @@
 import importlib.util
+import ast
+import json
 from pathlib import Path
 import sys
 
@@ -90,3 +92,32 @@ def test_tau_pairs_use_ratios_and_category_pooling(monkeypatch):
     assert m.compare(second, first)['tau'] == {'win': 1, 'tie': 1, 'loss': 1}
     assert m.category_mean(first) == pytest.approx(13 / 12)
     assert m.category_mean(first) != sum(r['committed'] / r['decode_calls'] for r in first) / 3
+
+
+@pytest.mark.parametrize('initial', [False, True])
+def test_recovery_waits_without_restarting_or_changing_controls(monkeypatch, tmp_path, initial):
+    from types import SimpleNamespace
+    monkeypatch.setattr(sys, 'path', sys.path.copy())
+    path = ROOT / 'studies/qwen3_4b_bf16_directions_recovery/direction_control.py'
+    spec = importlib.util.spec_from_file_location('recovery_direction_control', path)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    original = ROOT / 'studies/qwen3_4b_bf16_directions/direction_control.py'
+    def control_source(file):
+        source = file.read_text()
+        node = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == 'control')
+        return ast.get_source_segment(source, node)
+    assert control_source(path) == control_source(original)
+    calls, sleeps = [], []
+    checks = iter([{'passed': False, 'foreign_gpu_python_pids': [42]},
+                   {'passed': False, 'foreign_gpu_python_pids': [43]},
+                   {'passed': True, 'foreign_gpu_python_pids': []}])
+    def admission(initial):
+        calls.append(initial)
+        return next(checks)
+    monkeypatch.setattr(m, 'ROOT', tmp_path)
+    monkeypatch.setattr(m, 'admission', admission)
+    monkeypatch.setattr(m, 'time', SimpleNamespace(sleep=sleeps.append))
+    assert m.wait_admission(initial=initial)['passed']
+    assert calls == [initial] * 3 and sleeps == [5, 5]
+    assert json.loads((tmp_path / '.tmp/full-direction-resource-wait.json').read_text())['status'] == 'admitted'

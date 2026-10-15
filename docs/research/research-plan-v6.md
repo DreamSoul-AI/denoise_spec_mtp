@@ -4,6 +4,8 @@ subtitle: "denoising speculative decoding 研究计划（论文版 v6，草案�
 date: "2026-10-13"
 ---
 
+> 历史探索稿（2026-10-13）。含未验证理论、当时待测设想和异条件历史结果，不代表当前执行或已证实贡献。当前计划已按新版模板重写为[中文](../research-plan.md) / [English](../research-plan.en.md)；本稿原文保留，Kalman/高阶等不因保留而恢复研究。
+
 # denoising speculative decoding: Training-Free Kalman-Filtered Output-Space Masks for Parallel Drafting
 
 > **项目正式名称**：**denoising speculative decoding**（全小写）。代码仓库目录仍为 `denoise_spec_mtp`，仅作路径引用。

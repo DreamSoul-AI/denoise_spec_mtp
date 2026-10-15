@@ -2,6 +2,8 @@
 
 ESP reproduction + EMA-velocity masks.
 
+当前研究计划：[中文](docs/research-plan.md) / [English](docs/research-plan.en.md)。按新版规范组织文献、数据、模型、算法、指标与实验；旧v6为历史草稿。正在运行的全480方向Study继续执行，结果另见[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)，不改其冻结PLAN。
+
 Training-free multi-token prediction:
 
 1. **ESP** (Embedding-Space Probing), [arXiv:2603.17942](https://arxiv.org/abs/2603.17942). PDF is local-only: [docs/papers/index.md](docs/papers/index.md).

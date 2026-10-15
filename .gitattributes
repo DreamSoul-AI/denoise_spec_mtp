@@ -289,3 +289,9 @@
 /studies/qwen3_4b_bf16_directions/** -text whitespace=cr-at-eol
 /tools/analyze_4b_full_directions.py -text whitespace=cr-at-eol
 /studies/qwen3_4b_bf16_directions_recovery/** -text whitespace=cr-at-eol
+
+# Preserve imported research standards and translations as upstream bytes.
+"docs/research/standards/研究计划规范 Research Plan Standard.md" -text whitespace=cr-at-eol
+"docs/research/standards/研究计划模板 Research Plan Template.md" -text whitespace=cr-at-eol
+"docs/research/standards/research_plan_standard_en.md" -text whitespace=cr-at-eol
+"docs/research/standards/research_plan_template_en.md" -text whitespace=cr-at-eol

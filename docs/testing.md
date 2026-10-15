@@ -99,3 +99,5 @@ test_4b_untimed验证三method tiny token/全部语义/calls保持、全局时�
 全量方向新增`test_4b_full_directions.py`七项：五种声明控制逐token提交时完整mean与零阶一致、固定v保持、随机同范数/可重复、content后缀初始化、五格tiny BF16原生decoder的argmax全覆盖，以及τ配对按精确比值判平和category pooled聚合的差别。只验证控制与原生边界，不冒充真实480条结果。
 
 `test_esp_third_party.py`核对8个原字节文件SHA、三个Python文件可编译、prefix父行/剩余输出上限、直接调用原第三方验证器的self-match假阳性反例，以及真实预检失败不许转为有效τ/全480的回归。四项CPU回归通过，不能替代真实8B测量。原码排除Ruff/mypy自动规范约束，保留原有语法警告；外部审计工具与新增测试仍执行检查，真实BF16预检见[三预算审计](research/esp-third-party-audit-2026-10-15.json)。
+
+研究计划模板引入时同步固定Transformers为已验收的5.12.1，避免CI自动安装5.20.0导致正数cache.crop接口被拒绝（75失败/427通过）；来源与恢复验证见[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)的626930b。未改缓存科学源码，未替换正在运行的GPU环境。

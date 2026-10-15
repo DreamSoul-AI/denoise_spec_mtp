@@ -1,0 +1,120 @@
+"""Read native full480 direction Runs and reuse the original five-method readout."""
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+import torch  # noqa: F401 - Windows torch-first
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+BASE = ROOT / 'studies/qwen3_4b_bf16_five_methods'
+STUDY = ROOT / 'studies/qwen3_4b_bf16_directions'
+sys.path.insert(0, str(BASE))
+from analyze_results import load_cell, compare_rows  # noqa: E402
+
+NAMES = ('template', 'random0', 'random1', 'random2', 'zero', 'content')
+
+
+def read(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def category_mean(rows):
+    categories = {r['category'] for r in rows}
+    return sum(sum(r['committed'] for r in rows if r['category'] == c) /
+               max(sum(r['decode_calls'] for r in rows if r['category'] == c), 1)
+               for c in categories) / len(categories)
+
+
+def compare(first, second):
+    result = compare_rows(first, second)
+    for a, b, r in zip(first, second, result['rows']):
+        diff = b['committed'] * max(a['decode_calls'], 1) - a['committed'] * max(b['decode_calls'], 1)
+        r['tau'] = 'win' if diff > 0 else 'loss' if diff < 0 else 'tie'
+    result['tau'] = {s: sum(r['tau'] == s for r in result['rows']) for s in ('win', 'tie', 'loss')}
+    return result
+
+
+def main():
+    from spec_mtp.structure.artifact.sources import check_frozen, manifest as sources
+    from rpipe.structure.artifact.provenance import check_frozen as pcheck
+    from rpipe.structure.make.expand import load_study_yaml
+    decl = load_study_yaml(STUDY)
+    check_frozen(STUDY, decl, sources())
+    pcheck(STUDY, decl)
+    original = read(BASE / 'docs/paired_evidence_v1.json')
+    prompts = read(BASE / 'docs/prompts_manifest.json')
+    snapshot = read(BASE / 'docs/modelscope_snapshot.json')
+    ar_cell = original['cells']['AR']
+    ar_path = BASE / 'runs' / ar_cell['run_id'] / 'assets/decode_observations.json'
+    assert sha(ar_path) == ar_cell['files_sha256']['assets/decode_observations.json']
+    ar = read(ar_path)['out']['evidence']
+    reference = [{'question_id': p['question_id'], 'output_ids': r['output_ids'][len(p['input_ids']):],
+                  'model_calls': r['stats']['ar_calls']} for p, r in zip(prompts['rendered_prompts'], ar)]
+    assert len(reference) == len(ar) == 480
+    cells = {name: {'native_status': 'pending'} for name in NAMES}
+    cells['zero'] = dict(original['cells']['30/input_zero'], reused_from='30/input_zero',
+        reused_file='studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json')
+    for experiment in read(STUDY / 'index.json')['experiments']:
+        name = experiment['factors']['algorithm.config.direction']
+        assert name in NAMES and name != 'zero' and len(experiment['runs']) == 1
+        folder = STUDY / 'runs' / experiment['runs'][0]['id']
+        result = read(folder / 'result.json') if (folder / 'result.json').exists() else {}
+        cells[name] = {'run_id': folder.name, 'native_status': result.get('status', 'pending')}
+        progress_file = folder / 'assets/direction_progress.json'
+        if progress_file.exists():
+            cells[name]['completed_prompt_rows'] = read(progress_file)['completed']
+        if result.get('status') != 'succeeded':
+            continue
+        cfg = yaml.safe_load((folder / 'config.yaml').read_text())
+        assert cfg['algorithm']['config']['direction'] == name and cfg['seed'] == 123
+        cell, _ = load_cell(STUDY, folder, cfg, prompts['rendered_prompts'], prompts, snapshot, reference)
+        assert cell['model_digest'] == original['cells']['30/input_first']['model_digest']
+        assert cell['runtime'] == original['cells']['30/input_first']['runtime']
+        progress = read(progress_file)
+        assert progress['completed'] == len(progress['rows']) == 480 and progress['direction'] == name
+        assert [r['question_id'] for r in progress['rows']] == [p['question_id'] for p in prompts['rendered_prompts']]
+        assert all(r['direction']['full_prompt_mean_preserved'] for r in progress['rows'])
+        cell.update(direction_rows=[{'question_id': r['question_id'], **r['direction']} for r in progress['rows']],
+            progress_sha256=sha(progress_file))
+        cells[name] = cell
+    for cell in cells.values():
+        if 'rows' in cell:
+            cell['totals']['category_mean_pooled_tau'] = category_mean(cell['rows'])
+    comparisons = []
+    if 'rows' in cells['template']:
+        for name, cell in cells.items():
+            if name != 'template' and 'rows' in cell:
+                comparisons.append(dict(first='template', second=name, **compare(cells['template']['rows'], cell['rows'])))
+    existing = []
+    for name, cell in cells.items():
+        if 'rows' in cell:
+            for method in ('frozen_mean', 'input_zero', 'input_first', 'output_zero', 'output_first'):
+                old = original['cells']['30/' + method]
+                existing.append(dict(first='30/' + method, second=name, **compare(old['rows'], cell['rows'])))
+    ready = all('rows' in cell for cell in cells.values())
+    if ready:
+        native, process = read(STUDY / 'spec_mtp_study_check.json'), read(STUDY / 'process.json')
+        assert native['passed'] and native['complete'] and process['complete'] and process['spec_mtp']['passed']
+    body = {'complete': ready, 'budget': 30, 'fixed_prompts': 480, 'argmax_is_gate_AR_is_diagnostic': True,
+        'no_timing': True, 'original_evidence_sha256': sha(BASE / 'docs/paired_evidence_v1.json'),
+        'source_refs_sha256': sha(STUDY / 'docs/source_refs.json'), 'analyzer_sha256': sha(Path(__file__)),
+        'reused_analyzer_sha256': sha(BASE / 'analyze_results.py'),
+        'cells': cells, 'vs_template': comparisons, 'vs_existing_five': existing}
+    target = STUDY / ('docs/direction_evidence_v1.json' if ready else 'docs/direction_pending.json')
+    text = json.dumps(body, indent=2, allow_nan=False) + '\n'
+    if ready and target.exists():
+        assert target.read_text(encoding='utf-8') == text
+    else:
+        target.write_text(text, encoding='utf-8')
+    print(json.dumps({'complete': ready, 'full_cells': sum('rows' in c for c in cells.values()),
+        'progress': {n: c.get('completed_prompt_rows', 480 if 'rows' in c else 0) for n, c in cells.items()}}))
+
+
+if __name__ == '__main__':
+    main()

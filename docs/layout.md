@@ -86,3 +86,4 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 - `tools/analyze_4b_window_results.py`：固定窗口 logits 的原生树重建、节点预算与正确父节点的候选覆盖反事实，不冒称实际接受收益。
 - `src/spec_mtp/structure/algorithm/reference/esp_reproduction_artifacts/`：非作者官方HF第三方原码；ORIGIN绑定commit与逐文件SHA，upstream文件不格式化或改写。`tools/audit_esp_third_party.py`仅作外部BF16固定输入与数学门验收，协议见Table1 Study的`docs/THIRD_PARTY_PLAN.md`，不替换原生解码器。
 - `studies/qwen3_4b_bf16_directions/`：固定480条BC30方向对照；Study作用域只控制输入速度方向，复用原生解码/验证/Untimed合同和旧零阶结果，单队列串行，不修改科学包或数据。
+- `tools/analyze_4b_full_directions.py`：复用五方法native读出，新增方向相对template和旧五方法的逐promptτ/accepted/calls配对；pending仅记进度，不补结果或写平局。

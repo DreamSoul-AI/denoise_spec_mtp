@@ -138,3 +138,5 @@ eval.warmup=false，Study局部仅关闭decoder clock，兼容时长字段是0�
 
 
 2026-10-15 最新τ主线：[全480 argmax审计](../studies/esp_table1_bf16_full_argmax/README.md)替代无argmax记录的v1。BF16/T0/默认归约/λ=.1 updating mean/动态树剪枝完全保留，BC60单mask为主、双mask仅对照。AR一致率及逐条首分叉独立报告，不作为τ执行门；全部提交token必须等于对应验证forward的argmax。v1部分日志/旧冻结合同保留；v2四Run在模型加载前缓存接入失败，保留失败后补接同一ModelScope本地snapshot，以v3新四Run串行运行。当前第一格BC10 Run dfe1b9c8d5d12e92已开始真实BF16解码，未完成全480。停止compact attention、单行RMSNorm与逐层数值机理；4B五方法仍等待Table1结果。新增观察器无额外forward，首token、截断尾部、错误argmax与恢复回归通过；上一push的CI两项launcher文档遗漏已用378c6a9修复，尚待新远端CI。
+
+2026-10-15 BF16阶段结果：[8B Table1](../studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)四格全480及原生process通过，318,830提交token自检全过；BC30 pooledτ1.563378、BC60单mask1.647301未达到1.63/1.74，三聚合/双mask对照/AR差异全部保留，PR #10经CI合dev。[4B BF16五方法+AR](../studies/qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)11/11及原生process通过，809,118个Spec提交token自检全过，全部20组逐prompt对照与首分叉保留。输入一阶本次总accepted最高/calls最少，两输出对mean基线小幅总量改善，速度项对输出零阶无稳定联合收益；不外推总体优越或同输出加速。正式JSON与真实图重复读出字节一致、图已目检；两Study原生数字表去掉本机日志链接，原始Run/权重/cache未上传。[集成与CI记录](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12)；冻结PLAN/科学来源保持，不新增FP32模型实验、8B其他用途、算子机理或测速，其他研究暂停。

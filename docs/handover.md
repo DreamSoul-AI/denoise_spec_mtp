@@ -263,3 +263,22 @@ BC60输入一阶c8743c781d4b51af全480原生succeeded，81,307提交token argmax
 8B Table1补原生NUMBERS.md：仅用vendored RPipe render_numbers读取已完成原执行Study的process/index，无模型forward、无重新process或execute。先逐字节核对native-process-revalidation-v1.json记录的process/Study gate SHA，确认complete/passed及四Experiment；生成后再次核对原process/index SHA不变。公开数字表的四个本机Run日志链接改为纯文本，数字表未改，额外标注单Run n=1/std=0、计时关闭及来源process/formatter SHA。四格原生τ的四位小数为1.3990/1.5634/1.6473/1.6037，与既有正式证据和负结论一致；正式JSON/Run/冻结PLAN/科学源码不改。README及STUDY_REPORT已补数字表入口，未把日志或原始tokens纳入Git。4B矩阵仍由原串行队列执行，当前9/11。
 
 BC60输出零阶20467bfc4ca9c6ce全480原生succeeded，80,620提交token argmax全过；owner/实际观测路径/prefill/实际BF16 mask范数及原始证据/模型输入/来源/两套冻结门经阅读器复核通过，当前10/11、16组480条配对。accepted27,828、committed80,140、decode calls52,416、主calls52,896；pooledτ1.5289224664224663、prompt mean1.5791263993793005；独立AR一致172/480（35.83%）仅诊断，相对AR调用数W/T/L=476/0/4、Δcalls−28,984。相对BC60输入零阶为Δaccepted+305/Δcalls−413/Δnew tokens−113，接受数W/T/L=216/48/216、calls229/39/212；相对输入一阶为−3,783/+3,021/−687，接受数90/28/362、calls114/40/326；相对frozen mean为+915/−1,301/−386，接受数246/23/211、calls245/27/208。480条首分叉/审计总数、全部16组配对WTL/总量差及无context裁剪检查通过，逐条负例和输出长度保留。输出零阶对输入零阶两预算总量均有小幅改善，但BC60接受数胜负次数相同且对输入一阶更差，不称普遍优势或同输出加速。原串行队列已进入最后一格BC60输出一阶1f2401cb7c6b1a34（18:31 +08:00 prepared），实际model digest/runtime/全部prompt与AR相同，seed123、双mask/naive动态剪枝/BC60/output_hidden/order1/β=.9/β′=.99及manifest/tied-storage契约已核对。source538e52c929a542a8及冻结PLAN/配置保持，正式paired证据/真实图/4B原生数字表仍待最后一格和native process。PR #12保持draft；未重跑execute，未测速或恢复数值机理。
+
+## 2026-10-15 BF16阶段终验
+
+本节为当前结果，上方逐格记录保留当时状态。历史4B FP32已由PR #7归档合dev；8B Table1四格由PR #10完成报告及原生验收，但论文τ目标未达到。4B BF16现已完成11/11 Run和native Study process，原串行队列exit 0，planned=11/succeeded=11/failed=0/pending=0，GPU子进程已退出。各Run启动日志恰有一次execute finished事件；未重跑已完成execute。
+
+| 阶段 | 已核验结果 | 正式依据 |
+| --- | --- | --- |
+| 4B FP32归档 | 明确FP32，不能代替BF16证据；PR #7已合dev | [归档PR](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/7) |
+| 8B BF16 Table1 | 四格全480、318,830提交token自检全过；BC30 pooledτ1.563378、BC60单mask1.647301，未达1.63/1.74 | [报告及数字表](../studies/esp_table1_bf16_full_argmax/README.md)、[原生重新验收](../studies/esp_table1_bf16_full_argmax/docs/native-process-revalidation-v1.json) |
+| 4B BF16五方法+AR | 11/11原生成功；4,800条Spec prompt/809,118提交token自检全过；全部20组逐prompt配对 | [报告](../studies/qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)、[正式证据](../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json)、[原生终验](../studies/qwen3_4b_bf16_five_methods/docs/native-process-evidence-v1.json) |
+| 集成与CI | 工作分支按长期授权经PR进入dev；检查与最终集成状态以托管记录为准 | [PR #12](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12) |
+
+最后一格BC60输出一阶1f2401cb7c6b1a34全480原生succeeded：accepted27,903、committed80,272、decode calls52,471、主calls52,951、new tokens/argmax checked80,752；pooledτ1.5298355281965277、prompt mean1.5762885704720164，独立AR一致161/480（33.54%）仅诊断。相对输出零阶为Δaccepted+75/Δcalls+55/Δnew tokens+132，接受数W/T/L=206/69/205、calls202/61/217；相对输入零阶为+380/−358/+19，接受数241/41/198、calls227/44/209；相对输入一阶为−3,708/+3,076/−555，接受数84/43/353、calls105/51/324。全20组480条的qid、WTL、总量差、首分叉和无context裁剪核验通过，全部负例保留。
+
+结论：两预算均由输入一阶取得最高总accepted/最少主calls；两个输出方法对frozen/updating mean均有小幅总量改善，但均落后输入一阶。输出一阶对输出零阶，BC30为accepted+191/calls+139/new tokens+332，BC60为+75/+55/+132；两预算prompt meanτ均下降，未显示稳定联合收益。单seed固定480条、不同输出路径/长度及预定义不同β不支持总体优越、纯空间因果或同输出加速结论；AR一致率与首分叉仅诊断，不声称token exact。
+
+正式paired_evidence_v1.json与真实四面板图已重复读出，字节完全一致，SHA分别8e85ac6ea9984047abf0ffd5d6653b28b6aadd74aa876139fa10465dc5bbf274、3811fc32f14be2b04b9f6df8ee4db6cfb9306e3e0e51f26f4d7977c18011aa93。真实图已目检；4B原生report命令exit 0，公开NUMBERS.md只将11个本机日志链接改为纯文本，表格行与原生renderer逐行相同，原process/index/quality SHA不变。native-process-evidence-v1.json绑定这些产物、PLAN、index/provenance/来源锁及原生process的SHA；未发布完整Run、输出tokens、权重或缓存。
+
+首次make科学来源538e52c929a542a8（56文件）、代码8047281及模型digest535de659a78af3855c5eafe361e9244ec4d793fc2abd2e95e24a71debe64605f保持；两套冻结门、11格实际BF16/tied-storage及输入/权重契约通过。模型/forward/最终mask为BF16，输出EMA/范数的原生FP32内部状态明确披露，无FP32模型研究。8B归档再次只读核验：四格1,920条记录、所有raw/输入/argmax/来源SHA、旧失败result备份及execute_rerun=false完整，旧validator SHA和原执行science670c744e0535dcad未变。未新增8B forward、算子机理或测速，未强推、合main、删除分支或数据；其他研究仍暂停。

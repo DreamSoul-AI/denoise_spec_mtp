@@ -107,7 +107,7 @@ RPipe 要求报告附图：解码使用真实接受数或轨迹图及来源图�
 [4B同链复验](output_space_4b_recheck_v2/README.md)及[固定新4条](output_space_4b_holdout/README.md)真实四Run/Study门通过；[固定输入EMA](output_space_4b_input_control/README.md)两新Run复用其输出/AR。当前只比较接受/主calls/AR，不测速。output_space_4b_recheck是失败v1原位归档，勿继续其pending或重签锁。
 
 
-2026-10-15 最新执行顺序：已有 Qwen3-4B 结果全部为 **FP32**，本轮先按主题提交、工作分支 PR 经 CI 合入 dev。其他研究暂停；最高优先复现 ESP Table 1（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=0.1）。8B 仅用于该复现；随后 Qwen3-4B/BF16 五方法加 AR 配对。新增实验不用 FP32、不测速。不得强推、合 main、删分支或数据。
+2026-10-15 阶段顺序：历史Qwen3-4B **FP32**结果归档并按PR流程合dev → ESP Table1复现（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=.1）→ Qwen3-4B/BF16五方法加AR配对。8B仅用于该Table1复现，其他研究暂停；各阶段实际结果见下，不用历史FP32替代BF16证据。
 
 
-2026-10-15 最新进度：[8B全480 argmax审计](esp_table1_bf16_full_argmax/README.md)四格及原生process已完成，全部318,830个输出token审计通过，AR仅诊断。BC30 τ1.563378、BC60单mask1.647301未复现目标1.63/1.74，三聚合及双mask对照全部保留；PR #10经CI合dev。[4B BF16五方法配对](qwen3_4b_bf16_five_methods/README.md)已冻结并串行运行；逐格原生状态、argmax覆盖及配对结果见[报告](qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)，完整两预算结论待验收，冻结PLAN不回写。不恢复算子机理、不测速，8B不再用于其他研究。
+2026-10-15 阶段结果：[8B全480 argmax审计](esp_table1_bf16_full_argmax/README.md)四格及原生process完成，318,830个输出token审计通过，AR仅诊断。BC30 τ1.563378、BC60单mask1.647301未复现目标1.63/1.74，三聚合及双mask对照全部保留；PR #10经CI合dev。[4B BF16五方法配对](qwen3_4b_bf16_five_methods/README.md)11/11及原生process通过，809,118个Spec提交token自检全过；全部20组逐prompt对照、AR差异、数字表及真实图见[报告](qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)，[集成与CI](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12)。冻结PLAN不回写。未新增FP32模型实验、算子机理或测速；未强推、合main、删除分支或数据，8B未用于其他研究。

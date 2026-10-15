@@ -112,3 +112,16 @@ def test_cpu_downloader_requires_verified_content(monkeypatch):
     assert module.admission()['passed'] and module.admission()['verified_cpu_preparation_count'] == 1
     monkeypatch.setattr(module.hashlib, 'sha256', lambda _: SimpleNamespace(hexdigest=lambda: 'changed'))
     assert not module.admission()['passed']
+
+
+def test_verified_cpu_ci_descendants_not_unrelated_jobs(monkeypatch):
+    import json
+    module = tool('capture_4b_geometry')
+    processes = [{'ProcessId': -1, 'ParentProcessId': 0, 'CommandLine': 'python release-ci.py'},
+                 {'ProcessId': -3, 'ParentProcessId': -2, 'CommandLine': None},
+                 {'ProcessId': -2, 'ParentProcessId': -1, 'CommandLine': None}]
+    monkeypatch.setattr(module.subprocess, 'check_output', lambda args, **kw:
+                        'GPU-test, 19000, 2000' if args[0] == 'nvidia-smi' else json.dumps(processes))
+    assert module.admission()['passed'] and module.admission()['recognized_cpu_ci_count'] == 3
+    processes.append({'ProcessId': -4, 'ParentProcessId': 0, 'CommandLine': 'python train.py'})
+    assert not module.admission()['passed']

@@ -19,14 +19,15 @@ def admission(initial=True):
                                    '--format=csv,noheader,nounits'], text=True).strip().split(', ')
     assert len(gpu) == 3, 'Only the declared single GPU is supported'
     command = ("Get-CimInstance Win32_Process | Where-Object {$_.Name -eq 'python.exe'} | "
-               'Select-Object ProcessId,CommandLine | ConvertTo-Json -Compress')
+               'Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress')
     raw = subprocess.check_output(['powershell', '-NoProfile', '-Command', command], text=True)
     processes = json.loads(raw) if raw.strip() else []
     if isinstance(processes, dict):
         processes = [processes]
     foreign = [p for p in processes if p['ProcessId'] != os.getpid()]
     cpu_ci = [p for p in foreign if any(name in (p['CommandLine'] or '') for name in
-                                      ('watch-cleanup.py', 'watch-third.py', 'release-ci.py'))]
+                                      ('watch-cleanup.py', 'watch-third.py', 'release-ci.py'))
+              or ('RPipe' in (p['CommandLine'] or '') and 'and not gpu and not slow' in (p['CommandLine'] or ''))]
     # Exact inspected scripts only: downloader and container build without --gpus/devices.
     cpu_scripts = {'download_layers.py': '10689bac808d0e5fa1958d306508f459d3c4637dc92a51bf5b6c1bb915545026',
                    'build_official_container_v2.py': 'b22cbe9814bcfcf85e9e6caade2a60a2258d2bb83f5e1d856124753bf8976e44'}
@@ -39,6 +40,14 @@ def admission(initial=True):
                     and f'.tmp/paroquant-reference/{name}' in command and script.is_file()
                     and hashlib.sha256(script.read_bytes()).hexdigest() == digest):
                 verified_cpu.append(p)
+    # Windows venv launchers can briefly expose a child with no command line.
+    for _ in foreign:
+        known_ids = {p['ProcessId'] for p in cpu_ci + verified_cpu}
+        children = [p for p in foreign if p not in cpu_ci and p not in verified_cpu
+                    and p.get('ParentProcessId') in known_ids]
+        if not children:
+            break
+        cpu_ci.extend(children)
     unknown = [p for p in foreign if p not in cpu_ci and p not in verified_cpu]
     passed = not unknown and (not initial or int(gpu[1]) >= 18 * 1024)
     return {'passed': passed, 'gpu_uuid': gpu[0], 'free_mib': int(gpu[1]), 'used_mib': int(gpu[2]),

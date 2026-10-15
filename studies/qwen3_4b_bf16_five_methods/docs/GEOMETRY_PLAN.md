@@ -17,6 +17,8 @@
 
 前两次准入因发现未知 Python 作业延期，未加载模型。随后核验量化任务 `download_layers.py`：只调用下载和文件哈希，不加载模型；SHA256 `10689bac808d0e5fa1958d306508f459d3c4637dc92a51bf5b6c1bb915545026`。另核验 `build_official_container_v2.py`：仅准备容器、编译扩展，Docker create 没有 GPU/device 参数；SHA256 `b22cbe9814bcfcf85e9e6caade2a60a2258d2bb83f5e1d856124753bf8976e44`。仅路径与 SHA 同时匹配时按已核验 CPU 准备作业放行，变化或其他未知作业仍延期。保留前两次延期证据。
 
+第三次加载成功后，逐格准入发现新 CPU watcher 即退出，尚无生成；第四次在初检延期。为识别 Windows venv launcher 的短暂无命令行子进程，将已核验 CPU CI watcher/release-ci、显式排除 GPU 的 RPipe 测试及其 Python 后代按父 PID 链分类；不关联的未知模型作业仍拒绝，并有回归覆盖。所有延期/退出记录保留，不将模型加载计为生成结果。
+
 使用未修改的 SpecDecoder/HFCausalLM/真实 provider，只增加只读 hook，记录实际输入 mask、原生 final-normalized hidden、provider 的原始 state/proxy。只处理 root 与实际接受路径上的 owner；拒绝分支没有真实延续，不混入目标统计。槽 j 的目标为该 owner 之后第 j+1 个实际生成 token 的 embedding，末尾无目标者跳过并计数。另比较真实 owner hidden 与其预测的下一 token embedding，区分原始 hidden、范数缩放后的实际 BF16 mask、真实 embedding。
 
 验证全部提交 token 的原生 verifier-argmax 审计、输出为原完整 Run 的前缀、hook 未增加 forward。独立 AR 前缀一致率只从已有共享 AR 读出，不作为失败门。完整向量/原始 token 仅本机保存，公开逐点几何标量、分位数、计数及 SHA。几何分析在 CPU 完成；不改变算子/归约开关，不分析 BF16 算子数值分叉。

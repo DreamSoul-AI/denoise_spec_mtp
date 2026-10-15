@@ -15,6 +15,8 @@ python -m pytest tests/spec_mtp
 
 现有 GPU 环境不执行上面的 CPU torch 安装。测试使用独立 --basetemp=.tmp/<new-id>。Ruff 的 vendored facade 例外见 [兼容记录](bugs.md)。tiny 接受数是回归基线；完整链还检查原始 token、来源漂移、证据缺失和 Study 完整性。
 
+Transformers固定为已验证的`5.12.1`，与本轮4B完整结果的`decode_inputs.json.runtime.transformers`一致。2026-10-16，未设上限的安装解析到`5.20.0`后，CI出现75 failed/427 passed，原正数长度`cache.crop(keep_len)`被其新API拒绝（[失败记录](https://github.com/DreamSoul-AI/denoising-speculative-decoding/actions/runs/38786263761)）。本次只固定安装版本，不修改科学缓存源码或正在运行的GPU环境；更高版本兼容性尚未验收。
+
 CPU 剖析：`python tools/profile_cpu.py`。输出身份：`python tools/decode_fingerprint.py`。Windows：`python tools/windows_selfcheck.py`。
 
 分支门：`.github/workflows/branch-flow.yml` 的 `Branch flow` 只核对 PR metadata，不 checkout 或运行 PR 代码。工作分支先进入 dev；main 只接受同仓库 dev。默认分支为 main，两个长期分支均要求现有 cpu-checks 与 Branch flow，保留既有审批、防强推和防删除规则。
@@ -93,6 +95,8 @@ test_4b_untimed验证三method tiny token/全部语义/calls保持、全局时�
 追加原输入一阶轨迹的反向capture回归，核验native mask逐元素相同、当前owner不变、原输入后续mask恢复及旧Run续接；随机偏置同范数、独立种子可重复与内容初始化保留完整mean均覆盖。窗口11项加文档3项共14项通过，全仓Ruff通过。真实双向24格72次forward/72次局部选择检查、方向32格76次forward/99次检查见报告第十/十一节，不能把重复控制当独立样本。
 
 ## 非官方ESP原码验收
+
+全量方向新增`test_4b_full_directions.py`七项：五种声明控制逐token提交时完整mean与零阶一致、固定v保持、随机同范数/可重复、content后缀初始化、五格tiny BF16原生decoder的argmax全覆盖，以及τ配对按精确比值判平和category pooled聚合的差别。只验证控制与原生边界，不冒充真实480条结果。
 
 `test_esp_third_party.py`核对8个原字节文件SHA、三个Python文件可编译、prefix父行/剩余输出上限、直接调用原第三方验证器的self-match假阳性反例，以及真实预检失败不许转为有效τ/全480的回归。四项CPU回归通过，不能替代真实8B测量。原码排除Ruff/mypy自动规范约束，保留原有语法警告；外部审计工具与新增测试仍执行检查，真实BF16预检见[三预算审计](research/esp-third-party-audit-2026-10-15.json)。
 

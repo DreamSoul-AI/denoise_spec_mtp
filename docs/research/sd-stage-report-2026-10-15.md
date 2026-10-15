@@ -1,6 +1,25 @@
 # SD 阶段报告：8B ESP 复现与 4B BF16 方法比较
 
-目标交付最新状态：固定数据五方法加AR完整11/11通过；指定四组方向控制完成，未改prompt。[非官方HF原码尝试](esp-third-party-reproduction-2026-10-15.md)已完成三预算8B BF16预检，BC10/30/60在固定q121首token的数学门均失败（同次验证logit差40.75/33.5/33.25），共6次forward，未跑该原码全480、没有有效τ。原码、冻结协议和[真实结果](esp-third-party-audit-2026-10-15.json)独立保留；不把它与下文自实现全480混为同一baseline。PR20已合dev并删除远程工作分支，本报告追加项继续按PR/dev流程交付。
+当前状态：五方法加AR及BC30全480方向六格均完成，数学门全过；新中英文计划已由PR23合dev。
+最新结论：random0/1/2 τ=1.495188134/1.464349086/1.523884714，均高于zero1.422420206；content1.364829262低于zero，不支持收益只来自e2−e1。
+出处：[六格最终报告](4b-full-direction-controls-2026-10-16.md)与[正式JSON](../../studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json)，含全部配对、来源、归档失败与BC60不追加理由。
+下一步：CPU回归、PR22合dev及删除对应远程分支；无新方法或GPU矩阵，无测速。
+阻塞：无。8B自实现τ目标仍未复现；指定非官方HF原码预检失败，没有其有效τ。
+
+<details>
+<summary>历史阶段快照（保留出处；其中运行中表述不代表当前状态）</summary>
+
+最新完整格：随机2 τ=1.523884714、80,583个提交token全argmax通过；相对固定e2−e1（τ=1.507777653）的逐promptτ为267胜/47平/166负，相对zero为401/17/62。出处：[五格有效快照](../../studies/qwen3_4b_bf16_directions/docs/direction_partial_v4.json)。三个预定随机种子均高于zero，随机2也高于template及原生input_first，不支持“收益只来自e2−e1”；随机0/1弱于template同样保留，不挑种子回写主方法。content尚未完整，不作全矩阵排名。量化v3第二窗口已单Run终态并释放GPU，原SD队列已接content，见[实际交接记录](../../studies/qwen3_4b_bf16_directions_recovery/docs/STUDY_REPORT.md)。数据和prompt不改。
+
+全480方向对照新增完整格：同范数随机0 τ=1.495188134，81,425个提交token全argmax通过；相对zero的accepted胜/平/负为363/29/88、逐promptτ为360/27/93，template对应τ仍为1.507777653。来源：[三格有效结果快照](../../studies/qwen3_4b_bf16_directions/docs/direction_partial_v2.json)与[方向报告](../../studies/qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)。本批收益并非仅e2−e1方向出现；其余随机种子与content仍待完整，不能推断任意方向有效或全矩阵排名。队列已自动进入随机1，不改数据/配置。
+
+2026-10-16追加指示：四窗口不足以回答方向唯一性；现已冻结[BC30全480方向对照计划](../../studies/qwen3_4b_bf16_directions/docs/PLAN.md)，新增严格固定e2−e1、三个同范数随机方向和内容初始化五格，零偏置复用旧输入零阶。执行与结果另见[新Study报告](../../studies/qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)，未完成格子不填数字，BC60待本轮完成后再决定。目标模式继续active。
+
+首格已完整验收：严格固定e2−e1全480的pooled τ=1.507777653（80,932个提交token自检全过），原生输入一阶含EMA更新的旧值为1.511957584，二者不能混称同一方法。出处：[完整首格/旧零阶证据快照](../../studies/qwen3_4b_bf16_directions/docs/direction_partial_v1.json)；随机三种子及内容初始化仍在单队列执行，整个方向Study未完成，暂不判唯一方向或全量排名。
+
+资源事件追加：原队列已自然结束，三个随机格分别完成46/50/9条后遇真实GPU外部Python，content在加载前未获准入；105次完整prompt执行的20,977个提交token复核全过，仅记资源损耗，不拼接为全量。原Study保留failed终验。独立补齐Study仅重跑四个未完整因素，按prompt边界等待外部GPU释放，单队列继续；成功template及旧zero不重跑。出处：[四格资源记录](../../studies/qwen3_4b_bf16_directions/docs/resource_interruptions_v2.json)、[补齐协议](../../studies/qwen3_4b_bf16_directions/docs/RECOVERY_PLAN.md)及[补齐执行PLAN](../../studies/qwen3_4b_bf16_directions_recovery/docs/PLAN.md)。未完成因素仍不计完整结果。
+
+此前交付状态：固定数据五方法加AR完整11/11通过；指定四组方向的四窗口控制完成，未改prompt，全480扩展仍在执行。[非官方HF原码尝试](esp-third-party-reproduction-2026-10-15.md)已完成三预算8B BF16预检，BC10/30/60在固定q121首token的数学门均失败（同次验证logit差40.75/33.5/33.25），共6次forward，未跑该原码全480、没有有效τ。原码、冻结协议和[真实结果](esp-third-party-audit-2026-10-15.json)独立保留；不把它与下文自实现全480混为同一baseline。PR20已合dev并删除远程工作分支，本报告追加项继续按PR/dev流程交付。
 
 最新 4B 追加阶段见[候选质量与固定窗口报告](4b-mask-window-2026-10-15.md)。同一输出零阶前缀下，输入一阶在4个窗口的首目标排名更好，其中q121接受0→1；输出四种局部改法均未增益。CPU还发现，保存的138个输入速度状态接近固定聊天模板首差分（最大相对误差0.095%），不能把当前优势直接解读成内容速度预测成功。追加2个条件窗口没有输出增益，输入局部排名反而更低。全部数字、树结构限制、条件样本局限在该报告逐项标出处；原全量τ和下文历史建议不回写成新矩阵结论。
 
@@ -11,6 +30,9 @@
 口径更新：本报告的 8B 数字为此前按论文自实现的结果，不满足后续“必须运行原作者官方代码”的复现要求。原始数字与结论保留；来源核查见[官方代码复现报告](esp-official-code-reproduction-2026-10-15.md)。最新 4B 输出方法差距分析见[独立诊断](4b-mask-geometry-2026-10-15.md)，不替代作者代码复现。
 
 截至 2026-10-15。**8B 的数学无损自检通过，但论文 Table 1 的 τ 数值未复现；4B 本批样本中输入一阶最好，输出速度项未显示稳定联合收益。** 两阶段已完成原生 Run/Study 验收，结果经 PR 合入 dev；本报告汇总已有结果，不新增模型运行或测速。历史 4B FP32 已独立标注归档，不混入以下 BF16 比较。
+
+
+</details>
 
 ## 一、8B ESP Table 1 复现
 

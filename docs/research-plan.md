@@ -8,7 +8,7 @@
 
 本计划回答三个问题：ESP论文的主要接受长度是否复现；五种现有mask在同一数据和模型上表现如何；输入一阶的收益是否依赖聊天模板首差分e2−e1这一特定方向。文献先用于明确比较对象和替代解释，再组织已有及正在运行的验证。新方法、新模型范围与创新性均不据旧草稿自动成立。
 
-当前状态：五方法加AR已完整验收；8B自实现未达到论文目标，作者官方入口仍未核验到，指定第三方尝试数学门失败；BC30方向对照已有五格完整证据，最后content全480正在原独立队列执行。完整方向矩阵尚未完成。[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)单独交付其工具、冻结协议及结果；本计划先经独立文档PR进入dev。
+当前状态：五方法加AR及BC30方向六格各480均完整验收；新增405,073个token、连同复用zero共485,860个token全数学门通过。8B自实现未达到论文目标，作者官方入口未确认，非官方第三方预检数学门失败。计划经PR23合dev；[六格最终报告](research/4b-full-direction-controls-2026-10-16.md)与正式证据由[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)交付，本轮不追加方向BC60。
 
 本次由本会话执行文档与既有实验收尾，路线和资源边界按Enmao当前指示。优先完成本次计划及PR流程，不停止现有GPU任务。共享一张24GB GPU，单队列、非抢占；不测速、不改prompt、不另起研究方法。后续新增研究的负责人、期限与预算待另定。旧[研究计划v6](research/research-plan-v6.md)保留为历史设想，Kalman、高阶和非tied映射不属于当前执行范围。
 
@@ -37,7 +37,7 @@
 | R1：8B论文主要τ能否复现 | 按Table1目标和Qwen3单mask主协议比较；若主要值仍有明显缺口，不宣布数值复现 | 自实现有缺口，作者官方入口未确认，第三方预检失败；缺口不归因为ESP方法无效 |
 | H1：输出零/一阶在本批优于输入一阶 | 同480、4B BF16、同BC/树/停止条件；若两输出整体弱于输入一阶则不支持 | 原五方法全量不支持；速度项也未显示稳定联合收益，见第九章 |
 | H2：输入收益只来自e2−e1特定方向 | 三个预先固定的同范数随机方向均无收益才与该解释相容；出现明确随机收益即反驳其“唯一”措辞 | 三个完整随机格均高于zero，random2也高于template，不支持唯一方向解释；不推出任意方向均有效 |
-| R2：内容初始化在同条件下如何表现 | 保持原prompt与完整mean，只变原生速度初始化后缀；与template/zero配对 | content全480运行中，尚无完整τ；其范数未另匹配，不能解释为纯方向效应 |
+| R2：内容初始化在同条件下如何表现 | 保持原prompt与完整mean，只变原生速度初始化后缀；与template/zero配对 | content全480完成，τ1.364829262低于zero1.422420206；其范数未另匹配，不能解释为纯方向效应 |
 
 本次贡献目标是可追溯的复现边界与现有方法/指定对照比较，不声称新算法或普遍最优。文献界定基线和验证责任，数据与模型限定推断范围，算法限定变化因素，指标和配对实验检验上述问题。参数β、状态空间、输出路径及范数差异仍是混杂，不能把输入/输出比较全部差异归于一个空间选择。
 
@@ -98,8 +98,8 @@ tied模型不做逆映射。输出代理只按原生root/候选owner和已接受
 | --- | --- | --- | --- |
 | E1：ESP Table1来源与数值复现 | 作者入口核查、自实现参考、指定第三方预检分别记录 | 8B BF16/T0、原480；主BC10/1、30/1、60/1，60/2附加；λ0.1 updating mean | 自实现四格完成但未达到目标；官方入口未确认；第三方预检失败后停止，无新8B排队 |
 | E2：五方法加AR | 六方法共享输入；BC30/60分别比较五种mask | 4B BF16/T0，双mask、naive动态树剪枝、draft budget9/19，seed123+index，max_new_tokens256/EOS，默认归约 | 1共享AR+10个Spec Run，共5280次prompt执行但只有480个评价输入；已11/11原生验收 |
-| E3：指定方向全480 | template、random0/1/2、zero、content；每个方向相对template及旧五方法配对 | 同E2 BC30；mean/树/停止/输入全固定；方向种子提前指定，解码seed不变 | 五个新增完整路径+复用zero，新增有效预算2400次prompt执行；五格已完整、content运行中 |
-| E4：范围与证据整合 | CPU重算、出处/边界、规范/中英文计划、PR/dev集成 | 复用同一raw及既有工具，保留所有有效/失败格 | 不增加GPU矩阵；待E3全部完整后终验/图/报告，BC60方向是否需要另作书面决定 |
+| E3：指定方向全480 | template、random0/1/2、zero、content；每个方向相对template及旧五方法配对 | 同E2 BC30；mean/树/停止/输入全固定；方向种子提前指定，解码seed不变 | 五个新增完整路径+复用zero，新增有效预算2400次prompt执行；六格全完整，补齐Study process通过 |
+| E4：范围与证据整合 | CPU重算、出处/边界、规范/中英文计划、PR/dev集成 | 复用同一raw及既有工具，保留所有有效/失败格 | 不增加GPU矩阵；E3终验/图/报告完成；BC60方向本轮不追加，理由见最终报告 |
 
 ### （一）基线复现与后续安排
 
@@ -121,7 +121,7 @@ E3是对既有输入速度解释的指定控制，不是新增方法主表。随
 
 ### （三）执行安排与优化方法
 
-当前执行顺序是原单队列完成content，再CPU正式读出、来源/argmax/原生process核对、结果报告及PR22。当前文档PR可先独立进入dev，不更改E3冻结PLAN。正常提交、push、PR合dev及合后远程工作分支清理按用户授权执行；不合main、不force push、不删本地分支、Run或数据。归档旧PR/issues只在状态和关联已核实后做，不因旧日期直接关闭。
+原GPU单队列已自然exit0，content完成；CPU正式读出、来源/argmax/原生process核对通过。计划PR23已合dev，PR22收尾结果交付，不更改E3冻结PLAN。正常提交、push、PR合dev及合后远程工作分支清理按用户授权执行；不合main、不force push、不删本地分支、Run或数据。归档旧PR/issues只在状态和关联已核实后做，不因旧日期直接关闭。
 
 GPU准入只看nvidia-smi实际占用与足够空闲显存，不把未识别CPU进程当GPU作业。每组完整结束后再让卡，共享GPU的量化插跑窗口已完成一次实际交接，不能中止当前组。资源短暂冲突在prompt边界等待同一Run，来源/argmax/OOM等失败仍如实终止该格并保留，不用改prompt修结果。既有成功template和zero不重跑。
 
@@ -133,7 +133,7 @@ GPU准入只看nvidia-smi实际占用与足够空闲显存，不把未识别CPU�
 | --- | --- | --- |
 | E1自实现 | 8B protocol_evidence及[阶段报告](research/sd-stage-report-2026-10-15.md) | 四格数学门全过、共318830 token；BC30/60单mask目标未复现；不是作者代码复现 |
 | E2五方法 | [paired_evidence_v1.json](../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json)，`cells`和`pairs` | 11/11原生验收；4800次Spec prompt执行共809118 token全argmax通过；主方法τ见下表 |
-| E3方向中间有效证据 | [固定commit b9e45d6的五格快照](https://github.com/DreamSoul-AI/denoising-speculative-decoding/blob/b9e45d6352a37e11860b81634a6da19cddc9bc7f/studies/qwen3_4b_bf16_directions/docs/direction_partial_v4.json)及[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22) | `complete=false`；template、随机0/1/2及zero各480完整，content运行中。原Study资源失败不改写为通过 |
+| E3完整证据 | [direction_evidence_v1.json](../studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json)、[最终报告](research/4b-full-direction-controls-2026-10-16.md)、[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22) | `complete=true`；六格各480完整。原资源失败Study仍passed=false；补齐Study passed=true，不改签旧失败 |
 | 第三方与来源负结果 | 官方来源核查、第三方ORIGIN及审计JSON | 找不到核验入口不证明未开源；非官方首token门失败，不虚构τ、不重跑8B |
 
 | 已验收主方法 | 4B BC30 pooled τ | 4B BC60 pooled τ |
@@ -146,9 +146,9 @@ GPU准入只看nvidia-smi实际占用与足够空闲显存，不把未识别CPU�
 
 表中每个值来自E2证据`cells[预算/方法].totals.pooled_tau`，共享AR作为诊断参考，不给AR虚构draft接受τ。逐prompt接受数/calls赢平输、AR首分叉及输出长度都在该文件，完整结果不被本表舍入替代。本批输入一阶整体最好；输出一阶相对输出零阶增量小，不能据接受数或调用数某一列单独宣布联合收益，更不能外推等输出速度。
 
-E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.464349086、随机2为1.523884714、zero1.422420206，均来自上述五格快照。随机2相对template逐promptτ267胜/47平/166负；三个随机种子均高于zero，故不支持本批收益只由e2−e1方向造成的解释。仍有逐prompt反例，且content未完整、输出长度不同；这不是推荐最佳随机种子作新方法，也不证明任意方向有效。零偏置复用和失败资源工作量单列，不能把补齐成功包装成原失败Study通过。
+E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.464349086、随机2为1.523884714、zero1.422420206、content1.364829262，均来自上述正式六格证据。随机2相对template逐promptτ267胜/47平/166负；三个随机种子均高于zero，故不支持本批收益只由e2−e1方向造成的解释。仍有逐prompt反例，content范数未匹配且输出长度不同；这不是推荐最佳随机种子作新方法，也不证明任意方向有效。零偏置复用和失败资源工作量单列，不能把补齐成功包装成原失败Study通过。
 
-下一步仅为既有全480收尾与文档集成：content完成后发布完整六格结果/图及结论边界，再决定是否有必要安排BC60方向控制。旧0.6B罕见事件、算子归因、Kalman和新方法继续归档。未得到新的研究指示前，不把本计划中的开放问题自行升级为额外实验。
+本轮不追加BC60方向矩阵：新增五个有效格已有2,400次prompt执行、405,073 token/276,523模型调用，三随机种子已否定本批e2−e1唯一性；BC60回答跨预算泛化，不能消除content范数混杂。失败完整partial另记20,977 token/13,854 calls，不拼接有效样本，细节见最终报告。下一步仅为CPU回归及PR22/dev闭环。旧0.6B罕见事件、算子归因、Kalman和新方法继续归档；开放问题不自行升级为额外实验。
 
 ## 十、GitHub使用与计划变更
 

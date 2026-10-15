@@ -19,3 +19,13 @@
 ## PR20合并后的追加清理
 
 PR [#20](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/20) 的两项CPU检查及Branch flow通过，已合dev，merge commit为`7f91bbb7e84e2b9e6a91ead3f7d1e92e2c6d2ac9`。切换到`feature/esp-third-party-reproduction`后，确认`759b119caae0da73275300807c85f926de155b2d`包含于dev且远程tip未变，执行`git push origin --delete feature/sd-stage-report`成功。该删除不影响本地分支和数据。后续第三方验收PR合并后的最终分支清单记录在该PR说明及本地验收证据中，避免为记录自身删除反复新开PR。
+
+## PR23研究计划合并后的清理（2026-10-16）
+
+新模板中英文计划及文献证据经[PR23](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/23)两项CPU CI与Branch flow通过后，普通merge进入dev：`b00ecc0a188bb1a2845f061e958fdac37da7bcce`。GitHub未启用AutoMerge，本轮没有修改仓库设置或跳过保护，实际在检查通过后普通合并。
+
+| 远程分支 | 删除前tip | 实际结果 |
+| --- | --- | --- |
+| feature/sd-research-plan-template | cd0a2fae3569bc15eb57c2abb79e276942538963 | 核dev包含head、远程tip未变，主仓切回dev并fast-forward后，`git push origin --delete feature/sd-research-plan-template`成功；ls-remote确认不存在 |
+
+删除后远程仅剩dev（上述merge）、main（`b636f90e54c7641be6914fbccec13f64bd9cc04c`，未变）及仍在运行的`feature/4b-full-direction-controls`（本次核验tip `b9e45d6352a37e11860b81634a6da19cddc9bc7f`）。本地计划分支、Run、worktree和数据保留；content全480原进程继续，不把计划PR完成记作整个方向目标完成。合并及删除的闭环同时记录在PR23说明和主仓本机`.tmp/research-plan-template-20261016/closure.json`。

@@ -1,5 +1,7 @@
 # Research notes
 
+当前优先：[Table1差距分析与无GPU计划](esp-table1-gap-analysis-2026-10-16.md)、[可复算CPU账本](esp-table1-gap-analysis-2026-10-16.json)。聚焦8B主复现缺口、统计/合同边界与已有效工作的来源；4B方向作为背景，bias/random/Kalman后置，不开新GPU组。
+
 最新完整交付：[4B BC30固定480方向最终报告](4b-full-direction-controls-2026-10-16.md)。六格均完整、485,860 token全数学门通过；content已完成。三随机方向均高于zero，不支持e2−e1唯一性；BC60方向本轮未追加，工作量与理由单列。以下历史阶段表述以各报告快照时点为准。
 
 当前计划：[中文十章计划](../research-plan.md)、[English translation](../research-plan.en.md)；[新版规范与模板来源](standards/README.md)。文献证据、问题、六方面安排、实际结果和未验收边界已整合；旧v6为历史设想，不作为当前Kalman/新方法执行授权。全480方向对照已完成，结果交付在[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)，本次文档不改冻结Study。

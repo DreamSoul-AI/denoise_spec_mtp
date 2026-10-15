@@ -1,5 +1,7 @@
 # SD 阶段报告：8B ESP 复现与 4B BF16 方法比较
 
+最新研究重点：[Table1差距分析](esp-table1-gap-analysis-2026-10-16.md)。仅CPU重算既有证据，BC30/60差距不能由prefill/尾部统计单独解释，聚合变化仅部分缩小缺口；作者合同与逐任务数据缺失仍限制归因。偏置/random/Kalman后置，GPU留给量化，不开新矩阵。
+
 当前状态：五方法加AR及BC30全480方向六格均完成，数学门全过；新中英文计划已由PR23合dev。
 最新结论：random0/1/2 τ=1.495188134/1.464349086/1.523884714，均高于zero1.422420206；content1.364829262低于zero，不支持收益只来自e2−e1。
 出处：[六格最终报告](4b-full-direction-controls-2026-10-16.md)与[正式JSON](../../studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json)，含全部配对、来源、归档失败与BC60不追加理由。

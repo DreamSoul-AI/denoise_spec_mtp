@@ -295,3 +295,6 @@
 "docs/research/standards/研究计划模板 Research Plan Template.md" -text whitespace=cr-at-eol
 "docs/research/standards/research_plan_standard_en.md" -text whitespace=cr-at-eol
 "docs/research/standards/research_plan_template_en.md" -text whitespace=cr-at-eol
+
+/tools/analyze_esp_table1_gap.py -text whitespace=cr-at-eol
+/docs/research/esp-table1-gap-analysis-2026-10-16.json -text whitespace=cr-at-eol

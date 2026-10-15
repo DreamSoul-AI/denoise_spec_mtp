@@ -9,6 +9,8 @@ Training-free multi-token prediction:
 
 Agent notes: [AGENTS.md](AGENTS.md). Layout and the SpecMTP `origin` / shared rule: [docs/layout.md](docs/layout.md). Decode / paper mismatches: [docs/architecture.md](docs/architecture.md). Structure mapping: [docs/rpipe-migration.md](docs/rpipe-migration.md). How to run a Study: [studies/README.md](studies/README.md). Recorded accepts: [docs/history-extrapolation.md](docs/history-extrapolation.md).
 
+主仓执行副本的正式证据与本机归档对账：[ESP 工作副本对账](docs/research/esp-working-copy-reconciliation-2026-10-15.md)。
+
 `src/rpipe/` is a file copy of `diaoenmao/RPipe` `main` at `7a15c46b75c5eb951cccd60ed7b9fc3463db90f5` (v0.3.1). SpecMTP registers onto that copy through a Study recipe.
 
 ## Quick start

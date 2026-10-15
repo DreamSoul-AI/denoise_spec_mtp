@@ -1,6 +1,6 @@
 # Qwen3-4B BF16五方法配对
 
-[计划](docs/PLAN.md)已首次make冻结，11格串行链运行中；独立AR、BC30五方法与BC60 frozen mean各480条均已原生成功，六Spec格全部提交token的argmax审计全过，两种输出方法的owner/观测路径/实际BF16 mask范数验收也通过。当前7/11：BC30输入一阶总accepted最高、主calls最少；输出一阶相对输出零阶accepted+191但calls+139、输出总长+332，接受数W/T/L=209/72/199、调用数201/64/215，未显示稳定联合收益。BC60 frozen mean pooled τ=1.499079、AR一致165/480，81,006个提交token审计全过；BC60输入零阶执行中，完整两预算结论仍待完成。独立AR差异及输出长度单列诊断，不阻止验收，也不作同输出测速结论。前置[8B Table1全480报告](../esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)与原生process已完成，PR #10已经CI通过合dev；τ目标未复现，负结果保留。
+[计划](docs/PLAN.md)已首次make冻结，11格串行链运行中；独立AR、BC30五方法与BC60 frozen mean/输入零阶各480条均已原生成功，七Spec格全部提交token的argmax审计全过，两种输出方法的owner/观测路径/实际BF16 mask范数验收也通过。当前8/11：BC30输入一阶总accepted最高、主calls最少；输出一阶相对输出零阶accepted+191但calls+139、输出总长+332，接受数W/T/L=209/72/199、调用数201/64/215，未显示稳定联合收益。BC60输入零阶pooled τ=1.519109、AR一致167/480，80,733个提交token审计全过；相对frozen mean总accepted+610/calls−888/new tokens−273，接受数W/T/L=225/29/226、calls232/35/213，逐prompt混合。BC60输入一阶执行中，完整两预算结论仍待完成。独立AR差异及输出长度单列诊断，不阻止验收，也不作同输出测速结论。前置[8B Table1全480报告](../esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)与原生process已完成，PR #10已经CI通过合dev；τ目标未复现，负结果保留。
 
 在同一480条SpecBench上运行五方法×BC30/60加独立AR（共11 Run），统一双mask动态剪枝树/BF16/T0/256。owner映射、BF16原生验收回归及模型/输入来源核验已完成。原生source digest为538e52c929a542a8（56文件），代码8047281；2026-10-15 12:09 +08:00独立AR 0e25348a3a60d601进入execute，实际cuda BF16/tied-storage与480输入、权重SHA的首forward前检查全过。队列round1/单GPU，不使用旧FP32结果替代，不测速、不恢复算子机理。
 

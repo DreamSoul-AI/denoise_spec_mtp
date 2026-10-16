@@ -92,3 +92,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 `tools/analyze_esp_table1_gap.py`仅用标准库读取既有8B/4B证据，复算Table1差距、尾部/prefill计数与分组/配对账本；不加载模型或GPU，不改变原Run。
 
 `tools/reconcile_esp_table1_contract.py`只在CPU重渲染既有Table1输入、核对完整轨迹/EOS及调用权重分解；前100 token仅为已观测路径计数，不是新生成。需要本机原Run与已有tokenizer，不下载权重或加载模型。
+
+`tools/analyze_esp_repeat_roots.py`只读已有单mask原480轨迹，核验重复root被剪枝时的回退数量；同调用数乐观账本不是真实关闭剪枝收益，不加载模型或GPU。

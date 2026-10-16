@@ -1,5 +1,7 @@
 # Research notes
 
+当前归因与下一步GPU假设：研究计划[中文第三章](../research-plan.md) / [English SectionIII](../research-plan.en.md)，[计数与显存准入证据](esp-table1-attribution-hypotheses-2026-10-16.json)。输入/停止/计数事实与作者未知合同分开；重复剪枝原路径直接机会约0.005，不能补主缺口。G-M原生配置已验证，当前峰值加2GiB容量门未过，未make/launch。
+
 最新CPU对账：[Table1输入合同与计数聚合](esp-table1-cpu-contract-reconciliation-2026-10-16.md)、[完整CPU证据](esp-table1-cpu-contract-reconciliation-2026-10-16.json)。四格480输入重渲染精确，EOS/权重分解及已观测前100计数闭合；仍未解释作者缺口，不重跑GPU。
 
 当前缺口与启动触发：[Table1协议缺口登记](esp-table1-protocol-gaps-2026-10-16.md)。作者公开帖与ConFu评论已区分；记录所需作者合同、CPU对账及停止条件。PR36非官方结果完整，本轮不重跑GPU、不刷新OpenReview。

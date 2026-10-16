@@ -12,6 +12,8 @@
 
 本轮GPU实验与PR22/23已完成，当前仅做已有证据CPU对账、文档与分支卫生。按Enmao最新排班，SD官方Table1/8B步骤获得GPU优先授权，取得可核验官方入口并满足实际非抢占准入后立即串行推进；当前入口仍缺失，GPU最新实测已空闲，详见[启动就绪清单](research/esp-official-launch-readiness-2026-10-16.md)。不因优先授权改用自实现或已失败第三方充当官方，不启动其他新SD实验。共享一张24GB GPU，非抢占；不测速、不改prompt、不另起研究方法。后续新增研究的负责人、期限与预算待另定。旧[研究计划v6](research/research-plan-v6.md)保留为历史设想，Kalman、高阶和非tied映射不属于当前执行范围。
 
+最新执行授权与状态：官方入口仍缺时允许本地或HF第三方栈按Table1协议运行并标明非作者官方；本次已对既有同协议三主格480及60/2完成[原始证据复核](research/esp-table1-nonofficial-full480-recheck-2026-10-16.md)，318,830 token数学门全过，BC30/60 τ=1.563378/1.647301仍未达目标。原Run/结果保留，无缺格，不重跑或重签已有格；HF原码旧数学门失败不扩全480。官方入口条件只约束“作者官方”归属，不再阻塞非官方结果交付；不扩新方法或算子研究。
+
 ## 二、文献调研
 
 本次为围绕上述问题的定向证据更新，不声称完成系统综述或重读旧稿全部60篇。信息截止及本次核对日期为2026-10-16。实际使用arXiv原文/摘要、Spec-Bench官方仓库、已有来源核查及结果文件；从旧v6参考文献追踪基础工作，并检索了“SpecBench official github hemingxia Spec-Bench”，核对当前官方入口为`hemingkx/Spec-Bench`。后续若补查，关键词围绕training-free multi-token prediction、embedding-space probing、speculative verification、dynamic draft tree和mask initialization，不扩大为新实验授权。

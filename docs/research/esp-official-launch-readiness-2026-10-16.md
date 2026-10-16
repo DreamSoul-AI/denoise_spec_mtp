@@ -1,7 +1,7 @@
 # ESP官方Table1启动就绪与阻塞清单
 
-最新来源核验：`2026-10-16T02:44:54.926370+00:00`；两个官方组织8项代码索引查询共1个命中，固定原文核验为LLVM SPEC CPU基准脚本，已排除；仍无ESP原生入口。本轮OpenReview请求0。
-官方repo/实现commit/原生入口仍缺失；本轮无GPU操作、无新τ。入口到位后立即按固定480、8B BF16/T0、BC10/30/60单mask及同前向argmax门执行；4B后续对照排在官方8B之后。
+最新来源核验：`2026-10-16T03:11:47.757764+00:00`；出版metadata未新增官方入口。最新授权允许非官方本地/HF栈；本地全480三主格及60/2已从原始Run复核通过，不再列为待执行。
+官方repo/实现commit/原生入口仍缺失；[非作者官方全480复核](esp-table1-nonofficial-full480-recheck-2026-10-16.md)已交付有效负结果，318,830 token全数学门通过。本轮无GPU/新execute，复用完整格子；官方入口缺失只阻塞作者原码线，不阻塞非官方结果报告。
 
 初始GPU快照检查时间：`2026-10-15T23:54:54.960767+00:00`（历史快照，非本轮实时准入）。最新授权允许SD官方Table1/8B任务优先使用GPU；固定prompt、不新造方法、不抢占现有作业。
 
@@ -133,3 +133,7 @@ v1源包SHA256为`6170a5b8a630017e3ff373b1285c312e5a6e21c15a54ebc2c33c8cba10667e
 唯一命中为[qualcomm/cpullvm-toolchain中的libcxx/test/benchmarks/spec.gen.py](https://github.com/qualcomm/cpullvm-toolchain/blob/359d273ca205f6e5837bf6970f08690171ea3525/libcxx/test/benchmarks/spec.gen.py)，commit `359d273ca205f6e5837bf6970f08690171ea3525`、blob `0eeb2192d47f02b45e6a0822c1286fa6c8b7f831`。读取固定原文后，L23–31显示它为包含C++且排除Fortran的SPEC CPU intrate/fprate集合生成测试；不是本项目使用的LLM Spec-Bench，也不是ESP原码。机构所有权和同名benchmark命中均未被当作作者实现依据。
 
 9份响应及原文SHA、查询计数和固定blob断言通过。**当前仍缺ESP作者原生入口；无法在入口缺失时执行“官方路径”，本轮没有加载8B、占GPU、创建Run或生成新τ。** 不用自实现、同名benchmark或空壳补出入口。取得可核验代码后立即按本清单实际准入，执行固定480、Qwen3-8B BF16/T0、BC10/1、30/1、60/1，目标BC30/60为1.63/1.74，正确性门为提交token等于同验证前向argmax，AR只诊断。不改prompt、不钻算子、不测速、不用逆映射。本轮暂缓OpenReview，未新增请求。
+
+## 最新非官方栈授权与全480交付
+
+最新用户允许官方仍缺时采用本地或HF栈并明确非官方。[全480复核报告](esp-table1-nonofficial-full480-recheck-2026-10-16.md)及[审计](esp-table1-nonofficial-full480-recheck-2026-10-16.json)已核验全部三主格与60/2对照，原始argmax/owner门全过，BC30/60未达论文目标。没有缺格，不为占卡重复已有数字，不重签Run或改prompt。HF原码旧数学门失败，未扩全480；作者入口仍只读追踪。本次出版/索引刷新无新增官方入口，OpenReview请求0。此前“不得以自实现充当官方”继续保护归属，不能解释成最新非官方授权无效。

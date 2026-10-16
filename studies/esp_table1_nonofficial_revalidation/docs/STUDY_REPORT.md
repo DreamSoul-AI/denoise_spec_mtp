@@ -1,5 +1,10 @@
 # 非官方8B独立复验：BC10/BC30全480检查点
 
+> 当前资源阻塞：BC60原队列worker66500存活，主机RAM不足，尚未载模；原队列保留自动等待。
+> BC10/30全480成功，BC30 τ=1.5633775043382236，79762个token自检全过；未达论文1.63。
+> CPU准备与组合34项检查已完成，4B八个新范数格尚未make；需RAM恢复后先完成BC60。
+> 最新资源数值、实际命令和来源见[RAM检查点](ram_wait_checkpoint_20261016.json)，不放宽门、不重开或终止其他任务。
+
 BC10/BC30单mask均已原生成功，不是三格全矩阵结论。BC60已由原队列接续，等待实测峰值加2GiB的主机RAM准入。固定SpecBench480、Qwen3-8B BF16/eager/T0、lambda=.1 updating mean、动态树剪枝、256/EOS、seed123；无测速。
 
 | 指标 | 新BC10 | 与旧BC10差值 |
@@ -47,3 +52,11 @@ CPU队列另用现有4B读出函数重算正式paired_evidence_v1.json（SHA8e85
 目标状态为active。原队列PID50576、监控50640、BC30 worker72280及Run88d13ec4ecf0023c均已核实；未中断或重复启动。BC30进度文件已到367/480，该值仅表示进度，不是全480有效τ或终验。初始准入记录在15:18:33北京时间通过：host_available=22004486144字节，旧实测峰值17305047040加2GiB门为19452530688字节；没有放宽RAM门。BC60单mask Runa8e6bba1dd1d80e2仍由原队列后接。
 
 进度及准入来源：执行副本studies/esp_table1_nonofficial_revalidation/runs/88d13ec4ecf0023c/assets/revalidation_progress.json、resource_admission_initial.json；进程命令已匹配同一Study/Run。CPU结果读取、数学门与4B配对回归18项通过（test_repeat_readout.py、test_nonofficial_revalidation.py、structure/algorithm/test_4b_bf16_readout.py），GPU不可见环境执行。PR44/45/46的cpu-checks和Branch flow均已通过；同主题后续证据攒到完整里程碑再收尾，不以代码检查代替GPU结果。
+
+## 当前资源阻塞与集成边界
+
+同一BC60主机RAM不足条件已连续三个目标轮次复核；PID66500的cmdline和父队列50576均实时匹配，Run尚无progress/result，不以缺少文件单独判停。具体available、当前worker RSS、实测峰值加2GiB门及差额见ram_wait_checkpoint_20261016.json。这不是算法失败或AR门失败；原生等待会在资源恢复后自行重新准入，无须重开。
+
+可独立推进的CPU读出、Table1差值、4B11格/20对对账、范数八格准备和组合34项检查已完成。正常下一步必须先等BC60按冻结协议自然完成，再CPU终验三格和Study process，最后才make/串行launch八个4B范数格；不能用另一个GPU任务绕过排班或审批拒绝。当前没有可安全释放的本任务大内存进程，不终止其他应用或任务。目标未完成，需外部可用RAM改变后继续。
+
+PR44/45/46已分别CI通过合dev；集成只发生在主仓及远端，活动4bb28c7执行树保持原字节。已合普通分支3本地/3远端已清，活动分支按例外保留；清单在docs/research/remote-branch-cleanup-2026-10-15.md。当前阻塞记录与后续结果同主题合批，不另外新开小PR。

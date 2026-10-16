@@ -115,3 +115,5 @@ BC10/30全480均原生成功并CPU逐token复核，PR44/45/46各自cpu-checks及
 三条各核本地/远端tip一致且是origin/dev祖先，主仓先退出到dev后git branch -d删除；远端普通push --delete，无强推。相对此前28/2，累计已清**31个本地、5个远端**。后续成果在analysis/sd-repeat-norm-results合批，不单开清理PR。
 
 活动experiment/sd-nonofficial-repeat-norm虽已随PR44成为dev祖先，仍是BC60原队列的冻结执行分支，按活动例外保留本地、远端和工作树。集成前后HEAD均4bb28c79830b8f1db7cddf30cf80d6ddd5bd6e98；study.yaml SHA256均545c64f9fdf9e73582f929e5e6033d9f78eeb648f9bfcd8ffc37667b01cc08ae，未编辑活动源码/声明或重签Run。BC60 worker66500已自然接续，等待实测峰值加2GiB主机RAM准入；不可把“接续”等同于已载模。此分支在队列自然终结、保存证据且退出后再清，不删除数据。
+
+合批后组合CPU检查34项通过（bias_norm_scan、repeat_readout、nonofficial_revalidation、docs、docs_index、4b_bf16_readout）；未启动额外GPU任务。活动执行树17份未跟踪旧范数准备源码已只读复制到本机.tmp/legacy-norm-preparation-20261016，逐文件尺寸/SHA及与已合dev版本的比较见manifest.json（4份字节不同）。原17份未移动、未覆盖，活动Run不变；待8B自然退出后仍需再次核验来源，保存完整旧目录（含被忽略缓存）再切换，不把这份源码副本当成实验结果备份。

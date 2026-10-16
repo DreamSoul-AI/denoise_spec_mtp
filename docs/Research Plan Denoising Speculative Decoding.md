@@ -3,7 +3,7 @@
 English translation of the [Chinese master](<研究计划 Denoising Speculative Decoding.md>), updated 2026-10-16. The Chinese version governs. This plan follows the [new standard and template](research/standards/README.md), pinned to RPipe commit `e461133218deabf8755b3e8657650e1e4a3cd9f4`, already merged into its dev branch. It organizes existing research and evidence; it does not retroactively preregister experiments whose results have been seen, or change frozen Study contracts.
 
 
-> Nonofficial8B repeat: BC10/BC30 single-mask full480 succeeded natively; BC60 awaits RAM admission in the original queue. The4B norm scan is not made/launched.
+> Nonofficial8B repeat: BC10/BC30 single-mask full480 succeeded natively; BC60 is blocked on RAM admission in the original live worker66500; external RAM availability must recover. The4B norm scan is not made/launched.
 > BC30 pooled tau=1.5633775043382236, below paper1.63 by0.06662249566177625; all79762 token checks passed; AR175/480 is diagnostic.
 > BC10 tau=1.3990470307950233; each completed cell ties its old Run on accepted/calls/tau for all480 prompts, with480 matching output/AR hashes.
 > Values and paths: [BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json) / [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json). BC60 is pending; this is not full-matrix completion.

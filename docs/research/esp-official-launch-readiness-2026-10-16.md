@@ -1,6 +1,6 @@
 # ESP官方Table1启动就绪与阻塞清单
 
-最新来源核验：`2026-10-16T02:14:02.904081+00:00`；两位已确认作者的公开组织/事件/本人PR未带来可核验入口，OpenReview一次正常刷新仍429。
+最新来源核验：`2026-10-16T02:28:03.456776+00:00`；两位已确认作者31个公开自有仓库、40个分支头及release元数据未带来可核验入口。本轮暂缓OpenReview，未新增请求。
 官方repo/实现commit/原生入口仍缺失；本轮无GPU操作、无新τ。入口到位后立即按固定480、8B BF16/T0、BC10/30/60单mask及同前向argmax门执行；4B后续对照排在官方8B之后。
 
 初始GPU快照检查时间：`2026-10-15T23:54:54.960767+00:00`（历史快照，非本轮实时准入）。最新授权允许SD官方Table1/8B任务优先使用GPU；固定prompt、不新造方法、不抢占现有作业。
@@ -100,3 +100,19 @@ v1源包SHA256为`6170a5b8a630017e3ff373b1285c312e5a6e21c15a54ebc2c33c8cba10667e
 距离此前OpenReview note限流已超过一小时，本轮仅正常刷新一次同一[公开API](https://api2.openreview.net/notes?id=mKj4fO0BU4)：`2026-10-16T02:14:02.904037+00:00`实际仍返回429/text-html、162字节，未返回Retry-After；响应SHA与前次相同，为`413d294fad14524bf94e764b33ff0f327682549408545171fcf9240189c154ae`。未取得code/supplement字段；已停止进一步请求，不尝试替代路由、代理或受限附件路径。访问失败不证明未开源。
 
 本轮7份响应SHA及公开查询计数复核通过；官方repo/实现commit/entrypoint仍null，没有GPU测量、模型加载、Run、τ或新方法。启动所需缺口仍为能核验作者来源的原生代码/附件，不将新增的公开活动记录、论文源包或历史自实现当作官方实现。按最新次序先解决并运行官方8B，再推进所需4B BF16五方法加AR；现有4B历史结果保留，本轮不重跑已有格子。固定prompt、argmax正确性门和AR仅诊断不变，不钻算子、不测速、不用逆映射、不合main。
+
+## 两位作者全部公开自有仓库的当前分支与发布资产
+
+单次只读GitHub GraphQL查询补齐此前只覆盖主页的分支/release范围；完整查询、31库/40分支头manifest、响应时间/字节数/SHA见[启动审计JSON](esp-official-launch-readiness-2026-10-16.json)的`repository_assets_followup`。原始响应只留本机`.tmp/esp-author-repository-assets-20261016T022759Z/`。以下为实际返回，不纳入私有仓库；自有仓库统计包含fork。
+
+| 已确认账号 | 公开自有仓库 | 当前分支头 | release |
+| --- | ---: | ---: | ---: |
+| [RaghavvGoel](https://github.com/RaghavvGoel) | 22 | 31 | 0 |
+| [mgagrani](https://github.com/mgagrani) | 9 | 9 | 0 |
+| 合计 | 31 | 40 | 0 |
+
+逐层核对仓库、分支及release连接均无未取分页，实际节点数等于API totalCount。共同作者`deeprlcourse`实际返回0分支，保留此事实，没有补造master；其主页main/gh-pages均保留独立head。论文相关repo/分支名称筛查为0命中；release均0，因此本次未得到由release提供的可下载实验附件。并未检查所有工作流artifact，不能把release为空等同于任意公开附件不存在。
+
+此前未列出的分支包括早年课程/机器人实验、依赖更新、revert和archive分支，完整名称与head SHA留manifest。本次只查当前引用和发布元数据，未逐行审计40个分支源码、历史/删除/私有分支；不因名字不相关就证明其内容不可能涉及ESP，也不声称作者未开源。主页commit仍是主页版本，不冒充算法版本。
+
+响应原字节SHA、两账号31仓库/40分支的去重和分页完整性断言通过。**仍未取得可核验的作者ESP原生入口，官方repo/实现commit/entrypoint为null；本轮OpenReview请求0、GPU操作0、Run和新τ均无。** 入口到位后按上表固定SpecBench全480、Qwen3-8B BF16/T0、BC10/1、30/1、60/1和同验证前向argmax门执行；独立AR仅报告，目标1.63/1.74不改。不占卡跑无关工作、不用自实现/空壳代替官方、不钻算子、不测速。

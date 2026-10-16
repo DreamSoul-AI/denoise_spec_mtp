@@ -1173,5 +1173,324 @@
     "openreview_requests": 1,
     "completed_at_utc": "2026-10-16T02:14:02.904081+00:00",
     "scope_limit": "Two already identified public author accounts only. Public organization visibility is not full membership; event lists are bounded API returns, not all-time activity; authored-PR search excludes private/unindexed records. No author identity assigned to namesake profiles. One normal OpenReview request after more than one hour since previous 429; latest 429 means no resource fields acquired; no retry or alternate route used."
+  },
+  "repository_assets_followup": {
+    "scope": "Read-only public owned repositories, current branch refs, releases and release-asset metadata for two previously identified authors",
+    "checked_at_utc": "2026-10-16T02:28:03.456776+00:00",
+    "endpoint": "https://api.github.com/graphql",
+    "query": "query { first:user(login:\"RaghavvGoel\"){repositories(first:100,ownerAffiliations:[OWNER],privacy:PUBLIC){totalCount pageInfo{hasNextPage endCursor} nodes{nameWithOwner isFork pushedAt refs(refPrefix:\"refs/heads/\",first:100){totalCount pageInfo{hasNextPage endCursor} nodes{name target{oid}}} releases(first:10){totalCount pageInfo{hasNextPage endCursor} nodes{tagName url releaseAssets(first:20){totalCount pageInfo{hasNextPage endCursor} nodes{name downloadUrl size}}}}}}} second:user(login:\"mgagrani\"){repositories(first:100,ownerAffiliations:[OWNER],privacy:PUBLIC){totalCount pageInfo{hasNextPage endCursor} nodes{nameWithOwner isFork pushedAt refs(refPrefix:\"refs/heads/\",first:100){totalCount pageInfo{hasNextPage endCursor} nodes{name target{oid}}} releases(first:10){totalCount pageInfo{hasNextPage endCursor} nodes{tagName url releaseAssets(first:20){totalCount pageInfo{hasNextPage endCursor} nodes{name downloadUrl size}}}}}}} rateLimit{cost remaining resetAt} }",
+    "snapshot": ".tmp\\esp-author-repository-assets-20261016T022759Z\\author_repository_assets.response",
+    "bytes": 11984,
+    "sha256": "47418689cbdfdc75dc0ec67224c044c73ae33e13f2a57665c6a04a326b84e6e5",
+    "all_connection_pages_complete": true,
+    "accounts": {
+      "RaghavvGoel": {
+        "public_owned_repositories": 22,
+        "branch_heads": 31,
+        "releases": 0
+      },
+      "mgagrani": {
+        "public_owned_repositories": 9,
+        "branch_heads": 9,
+        "releases": 0
+      }
+    },
+    "repositories": [
+      {
+        "repository": "RaghavvGoel/hello-world",
+        "fork": false,
+        "pushed_at": "2016-11-15T08:39:01Z",
+        "branch_heads": {
+          "master": "7099124be0f130f536c109f0dfdb1714d53551e4"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/SM_Lab12-2016179-",
+        "fork": false,
+        "pushed_at": "2016-11-15T09:18:21Z",
+        "branch_heads": {
+          "insertion-sort": "c34b7578318fc94d12401416b007fc25584a3d5b",
+          "master": "7cb84f8ecaf5dba4a98dd67d9161cb91c513273a"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/raghav16179.github.io",
+        "fork": false,
+        "pushed_at": "2016-11-27T09:56:23Z",
+        "branch_heads": {
+          "master": "3e944b1d55baa6af528992b39a59415b5fb60e71"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/CleanerRobot",
+        "fork": false,
+        "pushed_at": "2018-03-22T14:14:43Z",
+        "branch_heads": {
+          "Experiment1-1": "c34a85fa2b8c3474c72103a2c44ba6a69a181b34",
+          "Experiment1": "f2b273396c91e935e174e641a0dc165cc86ab12b",
+          "master": "b47c845ae884b85a8925424a73c3043d82e4208d"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/Swarm",
+        "fork": false,
+        "pushed_at": "2018-05-20T14:28:45Z",
+        "branch_heads": {
+          "master": "882f548948531435481f4e51276d2f3e4d74b6a8"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/ComputerVision",
+        "fork": false,
+        "pushed_at": "2019-03-07T18:20:15Z",
+        "branch_heads": {
+          "master": "85a168de2c459d11abd52858f7fd0b5eb36bb7c6"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/HuskyAndMarkers",
+        "fork": false,
+        "pushed_at": "2019-06-20T04:28:09Z",
+        "branch_heads": {
+          "master": "38c33e4b0e809faf1a92a1a9de7fea609a12c207"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/DynamicCachePartitioning",
+        "fork": false,
+        "pushed_at": "2019-05-05T11:50:15Z",
+        "branch_heads": {
+          "master": "53d0820764a97e9620c9c3c08a0a14e303d01325"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/gem5Aladdin_cache",
+        "fork": false,
+        "pushed_at": "2019-05-05T13:21:52Z",
+        "branch_heads": {
+          "master": "0d2d0093bc0ae9b39313cbba214cc9eeece8fde6"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/RL_HW1",
+        "fork": false,
+        "pushed_at": "2019-08-29T14:30:26Z",
+        "branch_heads": {
+          "master": "ab9376fa8c89a2e0b909ad4baa1de394df4f8b6a"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/RL_HW2",
+        "fork": false,
+        "pushed_at": "2019-09-11T18:15:45Z",
+        "branch_heads": {
+          "master": "f64ef2243566765699b82219dfceb392387470be"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/RL_HW3",
+        "fork": false,
+        "pushed_at": "2019-09-25T18:28:26Z",
+        "branch_heads": {
+          "master": "247be376a436c75665087c907b368ec08d43e7aa"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/ElectricalMechanicalCouplingBacksteppingController",
+        "fork": false,
+        "pushed_at": "2019-11-27T07:03:08Z",
+        "branch_heads": {
+          "master": "b2712a76dc7aee39091fe853003ef44dcc7050ba"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/IntegralBarrierLyapunov",
+        "fork": false,
+        "pushed_at": "2020-12-29T21:25:20Z",
+        "branch_heads": {
+          "master": "e5bf7b53aa767537786dcdf66ce78ada8e0680ba"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/LyapunovBasedControlWhenUnknownParameters",
+        "fork": false,
+        "pushed_at": "2019-11-27T08:53:44Z",
+        "branch_heads": {
+          "master": "cb019dd2636f754b4624e89e24fdb337733183b2"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/EulerLangrangeDynamics_ParameterAdaptionWithNoise",
+        "fork": false,
+        "pushed_at": "2019-12-07T14:10:26Z",
+        "branch_heads": {
+          "master": "9884c7959b126b9f0744ed0af661d80879472db7"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/marl_transfer_new",
+        "fork": false,
+        "pushed_at": "2022-12-08T06:16:28Z",
+        "branch_heads": {
+          "dependabot/pip/certifi-2022.12.7": "4cdfe302225ee4fb2abd7bfb7ce8495d0283166b",
+          "dependabot/pip/numpy-1.22.0": "058984519ee445dc1938e06b21eda73bf71b8e3a",
+          "dependabot/pip/protobuf-3.18.3": "7a875e13792971ca3e763f63bf646a33c82e84bc",
+          "dependabot/pip/urllib3-1.26.5": "b94fd9451eeaa7c5feadac4ad19cd5a7a62824eb",
+          "master": "02a84c20ec58dffb00212a5e2a9b1477cd8739d0"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/twostreamfusion",
+        "fork": true,
+        "pushed_at": "2016-09-27T08:45:53Z",
+        "branch_heads": {
+          "master": "a098f0828d087ab26f7b03465f7990059d088cb2"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/two-stream-pytorch",
+        "fork": true,
+        "pushed_at": "2022-05-21T18:28:16Z",
+        "branch_heads": {
+          "master": "b76f6affdbf321ce2a7c478c7efccb8e85b18b37",
+          "revert-3-version-2": "23563bb18e4d5938a9cef720bd9496dc25efd810"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/yolov3",
+        "fork": true,
+        "pushed_at": "2022-06-25T19:12:38Z",
+        "branch_heads": {
+          "archive": "98068efebc699e7a652fb495f3e7a23bf296affd",
+          "master": "5279c41844ebf477579bc7c65b3ca78750f09de4"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/TwoStreamUnet",
+        "fork": false,
+        "pushed_at": "2023-03-05T05:12:13Z",
+        "branch_heads": {
+          "master": "7476c8244c090fd283a9dc37bb5a08639a16f097"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "RaghavvGoel/raghavvgoel.github.io",
+        "fork": false,
+        "pushed_at": "2026-10-13T22:51:36Z",
+        "branch_heads": {
+          "master": "039d875e79ee55a032f2f7ba6c58651825cdc0f0"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "mgagrani/hello-world",
+        "fork": false,
+        "pushed_at": "2017-08-25T21:00:08Z",
+        "branch_heads": {
+          "master": "a376a96ca21a39b6f6e24efed3d9b4b1e317a90f"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "mgagrani/CS567-practice",
+        "fork": false,
+        "pushed_at": "2017-08-31T20:13:35Z",
+        "branch_heads": {
+          "master": "5aaf521251ac8a222187c6f8fd749c23de45d1da"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "mgagrani/deeprlcourse",
+        "fork": false,
+        "pushed_at": "2019-02-08T05:31:21Z",
+        "branch_heads": {},
+        "release_count": 0
+      },
+      {
+        "repository": "mgagrani/homework",
+        "fork": true,
+        "pushed_at": "2019-02-03T23:20:01Z",
+        "branch_heads": {
+          "master": "dde95f4e126e14a343a53efe25d1c2205854ea3a"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "mgagrani/Reinforcement-Learning",
+        "fork": false,
+        "pushed_at": "2020-01-04T06:24:51Z",
+        "branch_heads": {
+          "master": "5b01271f007a0235448a3460157b6fa3e1be5be0"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "mgagrani/Deep-learning-course-project",
+        "fork": false,
+        "pushed_at": "2020-01-27T04:50:03Z",
+        "branch_heads": {
+          "master": "e2ed23d9a3d340f31d0c66766cf96c69043731be"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "mgagrani/TSDE",
+        "fork": false,
+        "pushed_at": "2020-03-01T20:02:56Z",
+        "branch_heads": {
+          "master": "29e4eabfeaddd8a89379331d4a7893fbb35db468"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "mgagrani/MABC",
+        "fork": false,
+        "pushed_at": "2020-03-05T09:29:08Z",
+        "branch_heads": {
+          "master": "e7b962c65faf71e84a688e860ad6d1e5710825d2"
+        },
+        "release_count": 0
+      },
+      {
+        "repository": "mgagrani/mgagrani.github.io",
+        "fork": false,
+        "pushed_at": "2026-07-29T01:50:45Z",
+        "branch_heads": {
+          "gh-pages": "557f1837646967b032c9fb1e04de33f70b33a6cc",
+          "main": "5eba01028084ccc00d1cbaad6212b2bf750e2579"
+        },
+        "release_count": 0
+      }
+    ],
+    "name_filter_regex": "2603|17942|(^|[/_-])esp([/_-]|$)|embedding.?space.?prob|multi.?token.?prob",
+    "name_filter_hits": [],
+    "official_repository": null,
+    "official_commit": null,
+    "native_entrypoint": null,
+    "gpu_execution": false,
+    "openreview_requests": 0,
+    "scope_limit": "Current public owned repositories including forks, current branch names/head SHAs and release metadata of two identified authors only. No whole-source/history/deleted/private-branch audit or workflow-artifact download. No matching name or release is not evidence that the authors have never released code."
   }
 }

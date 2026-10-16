@@ -7,6 +7,8 @@
 
 本轮补充：[协议缺口登记与启动触发](esp-table1-protocol-gaps-2026-10-16.md)。2026-10-16约11:49（Asia/Shanghai）公开作者帖可读，未取得ESP实现入口；论文短链获取失败，未刷新OpenReview。此为追加公开线索，不更新上方出版metadata核验时间，也不覆盖历史GPU快照；官方仍缺时不重跑矩阵。
 
+追加公开渠道：[协议缺口登记第六节](esp-table1-protocol-gaps-2026-10-16.md)。会议SlidesLive文本未提供入口；HF论文提交者所链接作者账号的models/datasets/spaces API于04:10:45 UTC均200/空列表，范围与SHA另列审计JSON `author_hf_followup`。未观看录屏、不推断作者未发布；OpenReview和GPU本轮均未操作。
+
 ## 当前执行状态
 
 - **尚无可执行官方入口**。本地交接、作者主页ESP条目、PMLR出版页及本轮有界公开检索未得到新增、可核验的作者repo/commit/原生入口。完整来源证据沿用[PR26重查](esp-official-recheck-2026-10-16.md)，不能把搜索不到写成未开源的证明。

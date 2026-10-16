@@ -160,6 +160,8 @@ E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.46
 
 当前未解合同集中在[Table1协议缺口登记](research/esp-table1-protocol-gaps-2026-10-16.md)：逐项区分本地事实、作者所需证据、CPU对账与官方启动触发。本轮作者公开帖未提供可核验代码入口；短链未成功解析，OpenReview未刷新。PR36非官方全480复核已完成，官方入口仍缺时不重跑GPU矩阵。
 
+[会议/HF公开渠道追加核验](research/esp-table1-protocol-gaps-2026-10-16.md)补齐作者账号公开资产范围：三种仓库API各返回0项，会议页面可见文本未提供代码；私有/组织资产及录屏内容未覆盖。作者入口仍缺，继续保持原480及现有结果，不以空闲GPU触发重跑。
+
 ## 十、GitHub使用与计划变更
 
 本文件是当前宏观计划入口，英文版逐章对应；Study级`docs/PLAN.md`是先于make冻结的执行合同，数字/图在其`STUDY_REPORT.md`和evidence中。原始tokens/trace、完整Run、模型和cache不进Git。每次正式运行沿用原生记录的commit、source/input/model摘要、配置、实际环境、seed、命令、RunID、失败和结果路径，不重建同名Run或重签历史成功记录。

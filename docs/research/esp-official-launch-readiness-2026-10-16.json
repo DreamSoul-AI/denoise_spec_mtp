@@ -1649,5 +1649,52 @@
     "completed_at_utc": "2026-10-16T02:44:54.926370+00:00",
     "scope_limit": "Eight targeted GitHub indexed-code queries in two official organizations; empty search does not cover private/unindexed/historical/other-named content or audit every branch. mask_update_mean is a paper label, not a required implementation symbol. Single candidate was inspected at its returned commit/blob; organization ownership alone does not establish ESP authorship.",
     "official_run_blocker": "No verified author ESP native entrypoint; idle GPU cannot execute an absent official implementation; self-implementation is not substituted."
+  },
+  "author_hf_followup": {
+    "author": "RaghavvGoel",
+    "identity_links": [
+      "https://huggingface.co/papers/2603.17942",
+      "https://huggingface.co/RaghavvGoel",
+      "https://raghavvgoel.github.io/"
+    ],
+    "scope": "public repositories returned by the three author-filtered HF APIs, not private repositories or all history",
+    "responses": {
+      "models": {
+        "url": "https://huggingface.co/api/models?author=RaghavvGoel&limit=100",
+        "fetched_at": "2026-10-16T04:10:45.334443+00:00",
+        "http_status": 200,
+        "content_type": "application/json; charset=utf-8",
+        "bytes": 2,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "raw_path": ".tmp/esp-author-hf-20261016T041044Z/models.response",
+        "link_header": null,
+        "returned_count": 0,
+        "ids": []
+      },
+      "datasets": {
+        "url": "https://huggingface.co/api/datasets?author=RaghavvGoel&limit=100",
+        "fetched_at": "2026-10-16T04:10:45.335578+00:00",
+        "http_status": 200,
+        "content_type": "application/json; charset=utf-8",
+        "bytes": 2,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "raw_path": ".tmp/esp-author-hf-20261016T041044Z/datasets.response",
+        "link_header": null,
+        "returned_count": 0,
+        "ids": []
+      },
+      "spaces": {
+        "url": "https://huggingface.co/api/spaces?author=RaghavvGoel&limit=100",
+        "fetched_at": "2026-10-16T04:10:45.320613+00:00",
+        "http_status": 200,
+        "content_type": "application/json; charset=utf-8",
+        "bytes": 2,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "raw_path": ".tmp/esp-author-hf-20261016T041044Z/spaces.response",
+        "link_header": null,
+        "returned_count": 0,
+        "ids": []
+      }
+    }
   }
 }

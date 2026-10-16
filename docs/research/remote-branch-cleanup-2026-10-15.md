@@ -39,3 +39,59 @@ PR [#20](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/20)
 | feature/4b-full-direction-controls | 0aad4d16b6016f002681e411616bedcc06906204 | 确认dev包含head且远程tip未变后删除；ls-remote确认不存在 |
 
 删除后仅余dev（上述merge）与main（`b636f90e54c7641be6914fbccec13f64bd9cc04c`，未变）。本地主仓dev已同步且干净；本地分支、worktree、Run及数据保留。此为该次清理快照，后续文档分支按相同PR流程维护，其自身删除闭环记录在对应PR说明，避免为记载自身删除重复开PR。
+
+## 2026-10-16 周期性本地、远端与worktree清理
+
+授权依据：Enmao本轮更正“此前不删分支作废”，已合入dev的本地/远端/废弃worktree清理，正在跑GPU者保留，未合过时项先列清单；以后约每合5个PR执行一次。已合判定为逐分支tip是origin/dev的祖先，并在删除前复核tip未变；仅git branch -d和普通远程delete，无强删/force。
+
+PR #41已于2026-10-16T05:47:26Z合dev，merge5ef98ba0c2dcd8187b557cd46652d1dcd74c49fa；Branch flow3s、cpu-checks4m12s通过。本地完整CPU511项通过，另10项迁移/原字节专项通过，ruff/mypy通过；原始本机检查日志保留.tmp/plan-consolidation-20261016。唯一中英文项目计划及60子计划归并已完成。
+
+### 实际删除分支
+
+| 范围 | 分支 | 删除前tip |
+| --- | --- | --- |
+| 本地 | `analysis/esp-cpu-contract-reconciliation` | `34b25d8d1ff0f23d8f9df1a545e49bc84548d1b7` |
+| 本地 | `analysis/esp-tau-attribution-hypotheses` | `0899fdb80c2f79389d2aef6c03b84cec1b33ae08` |
+| 本地 | `docs/esp-author-hf-channel` | `2967400739a1146b926ea46fe838e5dae2039219` |
+| 本地 | `docs/esp-author-public-channels` | `aeae7fbef2a141d7d46e4ec5c38b4fca4f69898a` |
+| 本地 | `docs/esp-author-release-leads` | `82857a620107dab324b154b77b746e180c8bacc9` |
+| 本地 | `docs/esp-author-repository-assets` | `8d2a10fc80e83129d91ab3df5961509425c1dcb3` |
+| 本地 | `docs/esp-author-version-assets` | `2a350036a00eab1218b4a7de2c1853e8cd96e8f6` |
+| 本地 | `docs/esp-nonofficial-full480-recheck` | `df9a28cbd6c8c00ac5fe71d5ab44ffb37a51c366` |
+| 本地 | `docs/esp-official-org-code-search` | `0696bfc489ceebd53244c3dfe39406ace1dbe270` |
+| 本地 | `docs/esp-protocol-gap-register` | `11ad94317092dd26ac3f8af2d1f39d231d92fce0` |
+| 本地 | `docs/unified-project-research-plan` | `10b1cf89606cd537a4aa894b003196252931a3e9` |
+| 本地 | `feature/4b-bf16-five-methods` | `5840ea2d0c877f2571ac57a4e9dc80c02562551e` |
+| 本地 | `feature/4b-full-direction-controls` | `0aad4d16b6016f002681e411616bedcc06906204` |
+| 本地 | `feature/esp-author-attachment-followup` | `1eb4aed24719c9fe41d33f7fef2e10978cb13949` |
+| 本地 | `feature/esp-coauthor-history-followup` | `3b6cb9ed00a2e0166e9b0e8792bfa2f5775e2f88` |
+| 本地 | `feature/esp-official-launch-readiness` | `1a31be7c9f2a06694d4055937f9617b0e9b82497` |
+| 本地 | `feature/esp-official-source-recheck` | `08fef38fc4398bf9ce6922f0b65af620b2ba2aea` |
+| 本地 | `feature/esp-organization-readme-followup` | `6a6b00651b27c27f4416965c9c398ba8a01ae422` |
+| 本地 | `feature/esp-table1-gap-analysis` | `9c8768fd108f11309a2b5fc35442e6a4b6d37c73` |
+| 本地 | `feature/esp-third-party-reproduction` | `44d90562c460c43018064938b01738d392e0d1f6` |
+| 本地 | `feature/output-space-prerequisite` | `bb4b526a3b85ac569bc67d13d8326e7c30494271` |
+| 本地 | `feature/research-ema-history-audit` | `9329cc347e3bd56ebc8bc6d1522d02f3c354e0a0` |
+| 本地 | `feature/sd-postmatrix-handoff` | `69af089f33f49e6343f2455f66fff6fd1235869e` |
+| 本地 | `feature/sd-research-plan-template` | `cd0a2fae3569bc15eb57c2abb79e276942538963` |
+| 本地 | `feature/sd-stage-report` | `759b119caae0da73275300807c85f926de155b2d` |
+| 本地 | `fix/verifier-argmax-gate` | `c9367661c5c5c84eae797e0040784fcf60768ee1` |
+| 本地 | `refactor/spec-rpipe` | `1219a1d88f10c2faee345b8d9bf6a42fd1e0110e` |
+| 远端origin | `docs/unified-project-research-plan` | `10b1cf89606cd537a4aa894b003196252931a3e9` |
+
+合计：本地27条，远端1条（其余旧远端在先前PR已清理）；均已包含于dev。删除后本地只剩main/dev、本轮清理工作分支与正在GPU执行的experiment/sd-nonofficial-repeat-norm。main仍为b636f90e54c7641be6914fbccec13f64bd9cc04c，未操作。
+
+### worktree、数据与未合清单
+
+- 废弃esp-native-gate-20261015：原tip c9367661c5c5c84eae797e0040784fcf60768ee1，tracked干净、未发现引用该目录的运行进程。该目录含历史实验数据，因此只把单文件.git指针原地改名为.git.worktree-archived-20261016，并在确认prune dry-run仅列此登记后移除Git worktree登记；没有删除目录、实验数据、缓存或结果。859份decode输入/观测、result/process/index及tensor/权重类证据逐文件尺寸/SHA核验前后不变。完整清单保留本机.tmp/branch-cleanup-20261016，原Git指针内容也可恢复。该目录是静态历史快照，不能再当活动checkout。
+- 正在跑GPU的experiment/sd-nonofficial-repeat-norm及4b-bf16-five-methods-20261015工作树完整保留；新范数扫描准备也在该执行树，未启动重叠GPU链。此分支未合且有效，不列为过时。
+- 当前chore/merged-branch-cleanup-20261016是本报告的活动分支，PR通过合dev后清理自身本地/远端；此刻不提前删除。没有其他未合、已过时候选需要裁定。
+- 查询时open PR=0、open issue=0，无可关闭的已处理开放项；PR #41已合。没有批量关闭未完成事项。
+
+### 后续规则
+
+本轮计数基线为合入PR #41之后的清理，随后每约5个合dev的PR复查一次；每次先核tip祖先关系、工作树/进程及数据，未合过时项先列清单。已合普通topic立即清远程，本地在退出该分支后删除；GPU活动分支/worktree、main/dev不动。数据目录即使来自废弃worktree也保留，清理的是Git登记与已合分支。
+
+### 自动审批记录：范数Study make延后
+
+工作目录：本机活动执行树`tmp/4b-bf16-five-methods-20261015`。命令：`D:/anaconda3/python.exe -m spec_mtp make studies/qwen3_4b_bf16_bias_norm_scan --round 1 --num-gpus 1 --init-gpu 0`（输出拟写入`.tmp/sd-repeat-20261016/norm-make.log`）。自动审批拒绝整条工具执行，理由为：8B GPU队列仍在运行，此时make可能重叠GPU/模型准备，违反显式单任务先后顺序；须等待8B队列退出，不得间接绕过。该make未执行，未触碰运行中8B源码/配置/队列；范数脚本及9项CPU测试就绪，但未make/launch。后续等8B自然退出再执行；不重复申请或启动旁路队列。

@@ -27,3 +27,7 @@
 ## 作者repo/commit与附件追加追踪
 
 [本轮只读跟进](esp-author-attachment-followup-2026-10-16.md)核对15个响应：主页commit未变，三个作者/组织精确论文号代码查询各0项，论坛ID6个命中逐项仅识别为元数据/索引/第三方记录；PMLR固定出版元数据extras为空。三个OpenReview常规附件候选均403，字段存在性未核验，未取得ZIP/PDF。官方实现repo/commit/入口仍为null，未启动GPU；主页/出版commit不冒充实现版本。
+
+## 共同作者与历史版本追加核查
+
+[共同作者/历史跟进](esp-coauthor-history-followup-2026-10-16.md)扩展检查19份响应：第一作者index最近10个版本的ESP条目均只链接论文；Mukul Gagrani主页ESP条目只链接PDF，网站repo最新commit不当作实现commit；PMLR条目历史extras仍为空。标题README检索未形成作者互指入口。本轮未重复相同OpenReview403请求，官方实现仍未核验，未启动GPU；此前附件访问限制保留原时间。

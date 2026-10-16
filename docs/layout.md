@@ -90,3 +90,5 @@ Study `recipe.py` 在 import 时调用 `register_sources()`。
 - `studies/qwen3_4b_bf16_directions_recovery/`：原队列终态后仅补未完整因素，原方向control不变，准入拒绝在同Run prompt边界等待而不丢弃进度；新version/Run，保留旧资源失败及已成功格。
 
 `tools/analyze_esp_table1_gap.py`仅用标准库读取既有8B/4B证据，复算Table1差距、尾部/prefill计数与分组/配对账本；不加载模型或GPU，不改变原Run。
+
+`tools/reconcile_esp_table1_contract.py`只在CPU重渲染既有Table1输入、核对完整轨迹/EOS及调用权重分解；前100 token仅为已观测路径计数，不是新生成。需要本机原Run与已有tokenizer，不下载权重或加载模型。

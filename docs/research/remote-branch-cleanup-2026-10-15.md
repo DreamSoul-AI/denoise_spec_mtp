@@ -91,3 +91,7 @@ PR #41已于2026-10-16T05:47:26Z合dev，merge5ef98ba0c2dcd8187b557cd46652d1dcd7
 ### 后续规则
 
 本轮计数基线为合入PR #41之后的清理，随后每约5个合dev的PR复查一次；每次先核tip祖先关系、工作树/进程及数据，未合过时项先列清单。已合普通topic立即清远程，本地在退出该分支后删除；GPU活动分支/worktree、main/dev不动。数据目录即使来自废弃worktree也保留，清理的是Git登记与已合分支。
+
+### 自动审批记录：范数Study make延后
+
+工作目录：本机活动执行树`tmp/4b-bf16-five-methods-20261015`。命令：`D:/anaconda3/python.exe -m spec_mtp make studies/qwen3_4b_bf16_bias_norm_scan --round 1 --num-gpus 1 --init-gpu 0`（输出拟写入`.tmp/sd-repeat-20261016/norm-make.log`）。自动审批拒绝整条工具执行，理由为：8B GPU队列仍在运行，此时make可能重叠GPU/模型准备，违反显式单任务先后顺序；须等待8B队列退出，不得间接绕过。该make未执行，未触碰运行中8B源码/配置/队列；范数脚本及9项CPU测试就绪，但未make/launch。后续等8B自然退出再执行；不重复申请或启动旁路队列。

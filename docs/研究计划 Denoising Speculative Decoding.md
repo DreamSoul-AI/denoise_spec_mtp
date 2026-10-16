@@ -265,6 +265,8 @@ E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.46
 
 最新收尾：PR #41双CI通过合dev（5ef98ba），唯一中英文计划归并完成。随后已清27本地/1远端已合分支、撤销1废弃worktree登记，859份实验文件哈希未变；GPU活动树保留，开放PR/issue查询均0，完整名单及约每5个合PR的规则见[分支清理记录](research/remote-branch-cleanup-2026-10-15.md)。未合过时项先列清单，不删除实验数据。
 
+范数扫描准备状态：脚本及9项CPU检查通过，未make/launch；8B运行中尝试提前make被自动审批以“可能重叠GPU/模型准备，需等8B队列结束”拒绝，整条命令未执行。准确命令和理由见[审批记录](research/remote-branch-cleanup-2026-10-15.md#自动审批记录范数study-make延后)，自然退出后再按串行顺序准备，不绕过。
+
 ### 归并验收与复放边界
 
 全称改名由git mv单独提交7c609f9；60份子计划归入独立章节后按12:53明确授权git rm，原文/公式与固定Git来源保留。当前导航、报告生成器及工具读计划位置同步迁移；Study provenance.include不允许跨Study目录，故旧计划include替换为项目路径/章节/历史Git blob元数据，而不是伪装外部include。该元数据随study.yaml锁定，原生框架不会自动读取中央计划；新执行如当前8B复验另显式核验计划Git blob。

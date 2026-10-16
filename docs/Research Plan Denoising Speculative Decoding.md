@@ -267,6 +267,8 @@ Plan PR23 and result[PR22](https://github.com/DreamSoul-AI/denoising-speculative
 
 Closeout: PR41 merged into dev at5ef98ba after both CI checks passed. The bilingual consolidation is complete. Cleanup removed27 local/one remote merged topics and retired one unused worktree registration while retaining all files;859 experiment-file hashes matched. The activeGPU tree remains. Open PR/issue queries were both zero. The [cleanup record](research/remote-branch-cleanup-2026-10-15.md) lists exact names and the roughly-every-five-merged-PR policy. List unmerged stale candidates before action; never delete experiment data.
 
+Norm-scan preparation: scripts and9 CPU checks passed; not made/launched. Auto-review rejected an early make while8B was active because GPU/model preparation could overlap; the command did not execute. The exact command/reason is in the [approval record](research/remote-branch-cleanup-2026-10-15.md). Wait for natural8B queue exit, then prepare serially without a workaround.
+
 ### Consolidation validation and replay boundary
 
 The full-name git mv is commit7c609f9. All60 standalone plans are consolidated before explicitly authorized git rm; original text/formulas and fixed Git identity remain. Navigation, report generators and live tool reads are relocated. RPipe provenance.include forbids paths outside a Study, so removed plan entries become project-path/section/historical-Git-blob metadata rather than invalid external includes. Metadata is frozen with study.yaml; native RPipe does not automatically read the central plan. New execution such as the running8B repeat explicitly verifies its pinned plan Git blob.

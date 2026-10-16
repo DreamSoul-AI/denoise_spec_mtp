@@ -1,6 +1,6 @@
 # ESP官方Table1启动就绪与阻塞清单
 
-最新来源核验：`2026-10-16T02:28:03.456776+00:00`；两位已确认作者31个公开自有仓库、40个分支头及release元数据未带来可核验入口。本轮暂缓OpenReview，未新增请求。
+最新来源核验：`2026-10-16T02:44:54.926370+00:00`；两个官方组织8项代码索引查询共1个命中，固定原文核验为LLVM SPEC CPU基准脚本，已排除；仍无ESP原生入口。本轮OpenReview请求0。
 官方repo/实现commit/原生入口仍缺失；本轮无GPU操作、无新τ。入口到位后立即按固定480、8B BF16/T0、BC10/30/60单mask及同前向argmax门执行；4B后续对照排在官方8B之后。
 
 初始GPU快照检查时间：`2026-10-15T23:54:54.960767+00:00`（历史快照，非本轮实时准入）。最新授权允许SD官方Table1/8B任务优先使用GPU；固定prompt、不新造方法、不抢占现有作业。
@@ -116,3 +116,20 @@ v1源包SHA256为`6170a5b8a630017e3ff373b1285c312e5a6e21c15a54ebc2c33c8cba10667e
 此前未列出的分支包括早年课程/机器人实验、依赖更新、revert和archive分支，完整名称与head SHA留manifest。本次只查当前引用和发布元数据，未逐行审计40个分支源码、历史/删除/私有分支；不因名字不相关就证明其内容不可能涉及ESP，也不声称作者未开源。主页commit仍是主页版本，不冒充算法版本。
 
 响应原字节SHA、两账号31仓库/40分支的去重和分页完整性断言通过。**仍未取得可核验的作者ESP原生入口，官方repo/实现commit/entrypoint为null；本轮OpenReview请求0、GPU操作0、Run和新τ均无。** 入口到位后按上表固定SpecBench全480、Qwen3-8B BF16/T0、BC10/1、30/1、60/1和同验证前向argmax门执行；独立AR仅报告，目标1.63/1.74不改。不占卡跑无关工作、不用自实现/空壳代替官方、不钻算子、不测速。
+
+## 官方组织代码内容的定向检索
+
+补查README/仓库名以外的代码索引。8项实际查询及唯一命中原文的固定commit/blob、9份响应SHA和1份原文SHA见[启动审计JSON](esp-official-launch-readiness-2026-10-16.json)的`organization_code_followup`；原始响应/脚本只留本机`.tmp/esp-org-code-search-20261016T024339Z/`，未执行或迁入src。
+
+| 代码检索词（分别限定org） | qualcomm命中 | Qualcomm-AI-research命中 |
+| --- | ---: | ---: |
+| 精确短题名Embedding-Space Probing | 0 | 0 |
+| SpecBench | 0 | 0 |
+| mask_update_mean | 0 | 0 |
+| spec_bench | 1 | 0 |
+
+全部响应incomplete_results=false，实际返回数与total_count一致；这只描述各次索引查询，不能推出所有分支/未索引/私有/其他命名实现不存在。mask_update_mean取自论文更新标签，不要求作者源码必须使用同名符号。
+
+唯一命中为[qualcomm/cpullvm-toolchain中的libcxx/test/benchmarks/spec.gen.py](https://github.com/qualcomm/cpullvm-toolchain/blob/359d273ca205f6e5837bf6970f08690171ea3525/libcxx/test/benchmarks/spec.gen.py)，commit `359d273ca205f6e5837bf6970f08690171ea3525`、blob `0eeb2192d47f02b45e6a0822c1286fa6c8b7f831`。读取固定原文后，L23–31显示它为包含C++且排除Fortran的SPEC CPU intrate/fprate集合生成测试；不是本项目使用的LLM Spec-Bench，也不是ESP原码。机构所有权和同名benchmark命中均未被当作作者实现依据。
+
+9份响应及原文SHA、查询计数和固定blob断言通过。**当前仍缺ESP作者原生入口；无法在入口缺失时执行“官方路径”，本轮没有加载8B、占GPU、创建Run或生成新τ。** 不用自实现、同名benchmark或空壳补出入口。取得可核验代码后立即按本清单实际准入，执行固定480、Qwen3-8B BF16/T0、BC10/1、30/1、60/1，目标BC30/60为1.63/1.74，正确性门为提交token等于同验证前向argmax，AR只诊断。不改prompt、不钻算子、不测速、不用逆映射。本轮暂缓OpenReview，未新增请求。

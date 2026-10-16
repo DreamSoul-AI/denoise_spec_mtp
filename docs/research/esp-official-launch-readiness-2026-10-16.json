@@ -1492,5 +1492,162 @@
     "gpu_execution": false,
     "openreview_requests": 0,
     "scope_limit": "Current public owned repositories including forks, current branch names/head SHAs and release metadata of two identified authors only. No whole-source/history/deleted/private-branch audit or workflow-artifact download. No matching name or release is not evidence that the authors have never released code."
+  },
+  "organization_code_followup": {
+    "scope": "Read-only official Qualcomm organization indexed code searches; bounded queries, no code execution",
+    "sources": [
+      {
+        "id": "qualcomm--title",
+        "endpoint": "search/code",
+        "query": "\"Embedding-Space Probing\" org:qualcomm",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:43:40.917622+00:00",
+        "snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\qualcomm--title.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "returned_count": 0,
+        "incomplete_results": false,
+        "items": []
+      },
+      {
+        "id": "qualcomm--specbench",
+        "endpoint": "search/code",
+        "query": "SpecBench org:qualcomm",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:43:41.059822+00:00",
+        "snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\qualcomm--specbench.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "returned_count": 0,
+        "incomplete_results": false,
+        "items": []
+      },
+      {
+        "id": "qualcomm--mask-update",
+        "endpoint": "search/code",
+        "query": "\"mask_update_mean\" org:qualcomm",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:43:42.107634+00:00",
+        "snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\qualcomm--mask-update.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "returned_count": 0,
+        "incomplete_results": false,
+        "items": []
+      },
+      {
+        "id": "Qualcomm-AI-research--title",
+        "endpoint": "search/code",
+        "query": "\"Embedding-Space Probing\" org:Qualcomm-AI-research",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:43:43.001913+00:00",
+        "snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\Qualcomm-AI-research--title.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "returned_count": 0,
+        "incomplete_results": false,
+        "items": []
+      },
+      {
+        "id": "Qualcomm-AI-research--specbench",
+        "endpoint": "search/code",
+        "query": "SpecBench org:Qualcomm-AI-research",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:43:43.944767+00:00",
+        "snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\Qualcomm-AI-research--specbench.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "returned_count": 0,
+        "incomplete_results": false,
+        "items": []
+      },
+      {
+        "id": "Qualcomm-AI-research--mask-update",
+        "endpoint": "search/code",
+        "query": "\"mask_update_mean\" org:Qualcomm-AI-research",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:43:43.698650+00:00",
+        "snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\Qualcomm-AI-research--mask-update.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "returned_count": 0,
+        "incomplete_results": false,
+        "items": []
+      },
+      {
+        "id": "qualcomm--spec_bench",
+        "endpoint": "search/code",
+        "query": "spec_bench org:qualcomm",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:44:19.020392+00:00",
+        "snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\qualcomm--spec_bench.response",
+        "bytes": 5015,
+        "sha256": "8bde65c8efc8ec8e855a7f59a000844e2ec5a545ee7d352e7d255cc8dc5cfe36",
+        "total_count": 1,
+        "returned_count": 1,
+        "incomplete_results": false,
+        "items": [
+          {
+            "repository": "qualcomm/cpullvm-toolchain",
+            "path": "libcxx/test/benchmarks/spec.gen.py",
+            "url": "https://github.com/qualcomm/cpullvm-toolchain/blob/359d273ca205f6e5837bf6970f08690171ea3525/libcxx/test/benchmarks/spec.gen.py",
+            "blob_sha": "0eeb2192d47f02b45e6a0822c1286fa6c8b7f831",
+            "api_url": "https://api.github.com/repositories/1077287602/contents/libcxx/test/benchmarks/spec.gen.py?ref=359d273ca205f6e5837bf6970f08690171ea3525"
+          }
+        ]
+      },
+      {
+        "id": "Qualcomm-AI-research--spec_bench",
+        "endpoint": "search/code",
+        "query": "spec_bench org:Qualcomm-AI-research",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:44:19.992088+00:00",
+        "snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\Qualcomm-AI-research--spec_bench.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "returned_count": 0,
+        "incomplete_results": false,
+        "items": []
+      },
+      {
+        "id": "spec_false_positive",
+        "url": "https://api.github.com/repositories/1077287602/contents/libcxx/test/benchmarks/spec.gen.py?ref=359d273ca205f6e5837bf6970f08690171ea3525",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:44:54.925684+00:00",
+        "snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\spec_false_positive.response",
+        "bytes": 3406,
+        "sha256": "3ee855b4ed3d04525e0a25a9c22400a0e07877ba08d02508dec8343dabfdda5b",
+        "repository": "qualcomm/cpullvm-toolchain",
+        "path": "libcxx/test/benchmarks/spec.gen.py",
+        "pinned_url": "https://github.com/qualcomm/cpullvm-toolchain/blob/359d273ca205f6e5837bf6970f08690171ea3525/libcxx/test/benchmarks/spec.gen.py",
+        "blob_sha": "0eeb2192d47f02b45e6a0822c1286fa6c8b7f831",
+        "raw_sha256": "51f42c69921c1e97460360785ce974934415cd7d6d8d42117bcde75806247b12",
+        "raw_snapshot": ".tmp\\esp-org-code-search-20261016T024339Z\\spec_false_positive.original.py",
+        "classification": "Excluded: libc++ SPEC CPU benchmark test generator, not LLM Spec-Bench or ESP implementation",
+        "verified_lines": [
+          23,
+          24,
+          27,
+          29,
+          31
+        ]
+      }
+    ],
+    "checked_at_utc": "2026-10-16T02:43:43.944978+00:00",
+    "official_repository": null,
+    "official_commit": null,
+    "native_entrypoint": null,
+    "gpu_execution": false,
+    "openreview_requests": 0,
+    "completed_at_utc": "2026-10-16T02:44:54.926370+00:00",
+    "scope_limit": "Eight targeted GitHub indexed-code queries in two official organizations; empty search does not cover private/unindexed/historical/other-named content or audit every branch. mask_update_mean is a paper label, not a required implementation symbol. Single candidate was inspected at its returned commit/blob; organization ownership alone does not establish ESP authorship.",
+    "official_run_blocker": "No verified author ESP native entrypoint; idle GPU cannot execute an absent official implementation; self-implementation is not substituted."
   }
 }

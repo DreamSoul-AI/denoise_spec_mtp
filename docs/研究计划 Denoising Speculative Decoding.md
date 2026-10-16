@@ -3560,3 +3560,12 @@ CUDA 仅另行授权的随机 tiny 串行门；实际 dtype、TF32、attention �
 
 </details>
 
+
+<a id="norm-continuation-20261016"></a>
+### 2026-10-16 范数首格恢复与七格续跑登记
+
+首格 template/0.5 的 480 条 execute 已完整结束，Run `6ee3f749ee20c450` 因 Study collect 包未导出 run 而失败；调用同一原生 collector 并用既有 revalidate_run 工具恢复验收，80,940 个提交 token 的 verifier argmax 门通过，原始文件 SHA 全部不变，不重跑 execute。失败 result 与恢复证据保留于 `.tmp/norm-collect-recovery-20261016/`。这不是 AR exact 门放宽。
+
+旧 v2-capacity 的冻结入口不改、不重签。剩余七格采用独立 continuation Study/新 version，仅移除已完成首格，原顺序、SpecBench480、prompt token IDs、4B BF16/T0、BC30 双 mask、种子123、范数倍率和全部科学实现不变；复用原 NormEval，修正阶段包导出并使用19:53显示进程白名单分类。CPU 汇总逐格绑定旧首格或新七格来源与数学门，不把旧 Study 七个未执行 Run 记为成功。对照仍复用零/一倍端点；不重复任何已有格。新增入口回归覆盖四个 phase 包及 callable。
+
+当前8B BC60 `a8e6bba1dd1d80e2` 已自然通过原 RAM 门并在运行，优先完成，不暂停、不重复开。续跑七格在它结束后单队列接续；准入保留实测 host peak+2GiB 与实际空闲显存，图形/远程桌面不阻塞、不杀进程。完成后统一报告三种 τ、配对胜平负、来源、入口故障及恢复边界，攒到完整里程碑 PR。

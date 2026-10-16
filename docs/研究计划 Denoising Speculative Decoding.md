@@ -3569,3 +3569,8 @@ CUDA 仅另行授权的随机 tiny 串行门；实际 dtype、TF32、attention �
 旧 v2-capacity 的冻结入口不改、不重签。剩余七格采用独立 continuation Study/新 version，仅移除已完成首格，原顺序、SpecBench480、prompt token IDs、4B BF16/T0、BC30 双 mask、种子123、范数倍率和全部科学实现不变；复用原 NormEval，修正阶段包导出并使用19:53显示进程白名单分类。CPU 汇总逐格绑定旧首格或新七格来源与数学门，不把旧 Study 七个未执行 Run 记为成功。对照仍复用零/一倍端点；不重复任何已有格。新增入口回归覆盖四个 phase 包及 callable。
 
 当前8B BC60 `a8e6bba1dd1d80e2` 已自然通过原 RAM 门并在运行，优先完成，不暂停、不重复开。续跑七格在它结束后单队列接续；准入保留实测 host peak+2GiB 与实际空闲显存，图形/远程桌面不阻塞、不杀进程。完成后统一报告三种 τ、配对胜平负、来源、入口故障及恢复边界，攒到完整里程碑 PR。
+
+
+续跑准备实况：七格原生make通过，新首格d288934359a7ede1。单一等待队列60480在BC60自然退出前不载模，只读入账器78720已确认原首格成功；失败旧watcher输出另存保留。四阶段native dispatcher和来源映射正/负回归通过，Ruff/mypy通过，完整套件仅两项工具文档门失败，补齐后89项定向检查通过。首格三种τ与配对详情见[续跑报告](../studies/qwen3_4b_bf16_bias_norm_continuation/docs/STUDY_REPORT.md)。本地/远端仅main、dev和仍载BC60的已合活动分支；本工作分支未合，均保留，无新增删除。
+
+V4 operational update: documentation-only helper SHA change; superseded unexecuted seven IDs retained with metadata backup. Current first Run `6719b3ae2c089133`, serial waiting queue `64880`, read-only ledger `50944`. Earlier60480/78720 CPU processes exited before replacement; BC60 was never interrupted. Native make/source bindings renewed only for the new version, not old completed evidence.

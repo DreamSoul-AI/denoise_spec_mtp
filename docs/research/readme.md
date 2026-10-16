@@ -1,6 +1,6 @@
 # Research notes
 
-当前执行与CPU准备（2026-10-16 19:46/19:53）：[4B范数/内存排班记录](sd-memory-fallback-2026-10-16.md)、[后续五方法独立复验准备](../../studies/qwen3_4b_bf16_paired_revalidation/docs/STUDY_REPORT.md)、[唯一中英文计划](<../研究计划 Denoising Speculative Decoding.md#paired-followup-20261016>)。原E2已11/11；新11格不填旧结果。范数只读逐格入账监视器已启动，未完整八格不出全曲线；原BC60格间优先。以下历史时点状态不替代当前排班。
+当前执行与CPU准备（2026-10-16 更新）：[范数首格恢复/七格续跑](../../studies/qwen3_4b_bf16_bias_norm_continuation/docs/STUDY_REPORT.md)、[4B范数/内存排班记录](sd-memory-fallback-2026-10-16.md)、[后续五方法独立复验准备](../../studies/qwen3_4b_bf16_paired_revalidation/docs/STUDY_REPORT.md)、[唯一中英文计划](<../研究计划 Denoising Speculative Decoding.md#norm-continuation-20261016>)。首格全480已恢复验收，旧失败历史/原始SHA保留；七格新版本等待正在运行的BC60自然退出。原E2已11/11，新配对仍未执行。未完成不出全范数曲线；以下历史时点状态不替代当前排班。
 
 当前归因与下一步GPU假设：研究计划[中文第三章](<../研究计划 Denoising Speculative Decoding.md>) / [English SectionIII](<../Research Plan Denoising Speculative Decoding.md>)，[计数与显存准入证据](esp-table1-attribution-hypotheses-2026-10-16.json)。输入/停止/计数事实与作者未知合同分开；重复剪枝原路径直接机会约0.005，不能补主缺口。G-M原生配置已验证，当前峰值加2GiB容量门未过，未make/launch。
 

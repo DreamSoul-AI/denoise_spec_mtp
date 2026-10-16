@@ -1,4 +1,8 @@
-"""Read-only CUDA/display classification for future queues; no process-control APIs."""
+"""Read-only CUDA/display classification; no process-control APIs.
+
+Usage: python tools/gpu_admission.py (import-only helper; no admission or process mutation).
+Call observe() through the prepared Study admission wrapper or queue.
+"""
 import datetime
 import os
 from pathlib import PureWindowsPath

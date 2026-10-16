@@ -1,9 +1,10 @@
 # SD RAM准入与4B空档执行
 
-> 4B BF16容量探针完成，256/256数学门通过，实测峰值8,808,693,760 bytes；正式门为10,956,177,408 bytes。
-> 范数v2八格已make，单一父队列79868已接首格6ee3f749ee20c450；worker73008独占GPU，完整480尚未完成，不填全量τ。
-> BC60原worker66500及RAM门保留，探针后已恢复；格间满足原8B准入时优先让回。
-> 最新35项相关回归、完整CPU套件553项及Ruff/mypy通过；按主题本地提交，完整里程碑再PR。
+> 首格template/0.5×全480完成；入口导出故障已通过原生collector与既有工具恢复，未重跑execute、未改原始SHA。
+> pooled τ=1.471389646；prompt平均1.517576442；类别平均1.479149404；argmax80,940/80,940，AR177/480仅诊断。
+> 来源：`.tmp/norm-collect-recovery-20261016/readout/norm_pending.json` 与 `recovery_evidence.json`，Run6ee3f749ee20c450。
+> BC60 worker66500自然通过原RAM门并运行；剩余七格独立版本续跑，保留原v2冻结入口与失败历史。
+> 显示进程分类已接入待运行Study，四phase导出与配置等82项定向CPU检查通过；不打断BC60。
 
 2026-10-16 19:15 Enmao追加授权：核验8B实测峰值加2GB门，安全回收本会话等待进程工作集；仍不足则在GPU空闲单队列执行原4B范数八格。不改prompt、BF16 only、不测速，不终止任何活实验或其他会话进程。
 
@@ -38,3 +39,15 @@ CPU核对真实make索引时发现读出合同误把完整factors与局部axis�
 ## 稳定源码最终CPU验收
 
 修复后稳定源码重新完整执行`python -m pytest tests/spec_mtp -q`，553项全部通过；`ruff check src tests studies tools`通过，`mypy`56个源文件无问题。仅保留第三方原字节代码已知SyntaxWarning。此前7项旧收集用例失败不算通过，以上是独立重跑结果；35项定向检查和真实原生make索引检查也均通过。当前源分支analysis/sd-pending-results保持本地合批，不为本轮文档/准备另开PR。
+
+## 20:13 首格恢复与原生入口修复
+
+唯一范数父队列79868在首格execute完成后因collect包缺少run导出退出；它的finally已恢复BC60。BC60随后自然通过原19,452,530,688 bytes门开始运行，不再是RAM等待。CPU旧入账watcher因原生失败退出，未误记成功。恢复使用原有collector和tools/revalidate_run.py，保留失败result（SHA9b822e70ccbbb9b546ebe83a7630a755559bacec59483584bb5e2587b65b6d0f）及原始六文件SHA；80,940 math tokens全通过，AR exact177/480不阻塞。首格accepted25,882、committed80,460、decode_calls54,683；Σcommitted/Σdecode_calls=1.4713896457765667。读出已通过原生来源、输入与raw门，六个有效端点不等于八新格完成。
+
+新continuation只接原axes[1:]七格、新version，原NormEval科学实现不动，修正四个phase包入口并接19:53显示进程分类；原v2入口/未运行七Run保留，不重签。新配对Study同步补四入口。82项定向回归通过，完整套件另行执行后才报告。原失败watcher输出保留；续跑入账使用新目录和逐来源映射。未启动第二GPU任务，不放松RAM门，不测速度。
+
+续跑make七Run成功，新首格d288934359a7ede1；唯一等待队列60480，CPU只读入账器78720，旧79868/75696已退出。队列不含suspend/terminate/kill，仅等待原BC60身份自然退出、实际CUDA空闲、VRAM10634MiB与实测峰值+2GiB。每格监测进程树RSS并向上更新下一格RAM门，不下调既有峰值。首格入账已单独严格复验，原失败watcher文件保留。
+
+完整618用例套件中仅两项工具文档检查失败（缺layout索引/用法docstring）；补齐后包含三项文档门、四阶段入口、来源映射、显示分类和原norm/paired门的89项定向检查全部通过。未声称重新全跑完整套件。工具仅docstring字节变化，因此旧新Study的七个未执行Run及冻结元数据保留备份，continuation version更新v4-documented，重新make新七ID；只替换本会话等待中的CPU队列60480/入账器78720，不触及BC60或其他GPU/显示进程。
+
+V4 operational update: documentation-only helper SHA change; superseded unexecuted seven IDs retained with metadata backup. Current first Run `6719b3ae2c089133`, serial waiting queue `64880`, read-only ledger `50944`. Earlier60480/78720 CPU processes exited before replacement; BC60 was never interrupted. Native make/source bindings renewed only for the new version, not old completed evidence.

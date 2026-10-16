@@ -1,0 +1,3 @@
+# Seven-cell norm continuation
+
+Original first cell `6ee3f749ee20c450` executed all480 and was recovered without execute rerun after a missing phase export. Its raw data and frozen sources remain unchanged. This new Study contains only original axes[1:] with a new version, correct native phase exports and display-aware admission; it reuses original NormEval unchanged. Run after active8B BC60 exits, serially, with measured host peak+2GiB. No prompt, data, scientific setting or argmax gate changes. Original seven pending Runs remain pending. Project plan/source hashes are in docs/source_refs.json. No formal results yet.

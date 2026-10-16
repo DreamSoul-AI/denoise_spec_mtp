@@ -19,7 +19,7 @@
     "studies/qwen3_4b_bf16_bias_norm_scan/docs/capacity_calibration_v1.json": "ea026cf0f55c2263dff5f5c37f54ee7591723ca4bc4f5c90fa4b1938f78dc023",
     "studies/esp_table1_nonofficial_revalidation/resource_admission.py": "701830bbcb5bddf6c5d31d1aa29000a83d19c526fef299574a5ca3a532cf10cb",
     "tools/analyze_4b_full_directions.py": "3af26b3f0bcb0dc38063695dae15c1940d964baea6026858d44e9738775c16db",
-    "tools/gpu_admission.py": "5f3dcdecf17af8bbc6509710b0ef469e68fd5ebdfcc72b485b52c74f7c949db2"
+    "tools/gpu_admission.py": "911117c8fa4a83240df9cc7ad39ab88f04178b70000c0be8aa78ded2ab6d42d0"
   },
   "authorization": "Enmao supervisor2026-10-16 19:46; independent repeat after existing norm eight, not missing old cells",
   "initial_capacity_scope": "Reuse measured4B BC30 maximum-input capacity plus2GiB; BC60 peak not separately guaranteed; per-prompt reserve and per-Run samples remain required"

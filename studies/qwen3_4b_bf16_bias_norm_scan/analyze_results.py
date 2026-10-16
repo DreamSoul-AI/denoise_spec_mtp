@@ -182,7 +182,37 @@ def verify_reused(data_root, output_dir=None):
     return body
 
 
-def main(data_root=None, study_dir=None, output_dir=None):
+def continuation_entries(study, decl, entries, continuation):
+    """Map only unexecuted old cells to identical scientific configurations."""
+    from rpipe.structure.control.merge import deep_merge
+    from rpipe.structure.artifact.provenance import check_frozen as pcheck
+    from spec_mtp.structure.artifact.sources import check_frozen, manifest
+    new_decl = yaml.safe_load((continuation / 'study.yaml').read_text(encoding='utf-8'))
+    assert new_decl['axes'] == {'algorithm.config': decl['axes']['algorithm.config'][1:]}
+    old_common = yaml.safe_load((study / 'experiment_config.yaml').read_text(encoding='utf-8'))
+    new_common = yaml.safe_load((continuation / 'experiment_config.yaml').read_text(encoding='utf-8'))
+    scientific = dict(new_common, experiment=old_common['experiment'])
+    scientific['algorithm'] = dict(new_common['algorithm'], config=dict(new_common['algorithm']['config']))
+    scientific['algorithm']['config']['version'] = old_common['algorithm']['config']['version']
+    assert scientific == old_common, 'Continuation changed scientific settings'
+    check_frozen(continuation, new_decl, manifest())
+    pcheck(continuation, new_decl)
+    newer = read(continuation / 'index.json')['experiments']
+    expected = [deep_merge(new_common['algorithm']['config'], a) for a in new_decl['axes']['algorithm.config']]
+    assert [e['factors']['algorithm.config'] for e in newer] == expected
+    assert len(newer) == 7 and all(len(e['runs']) == 1 for e in newer)
+    assert len({e['runs'][0]['id'] for e in newer}) == 7
+    for old in entries[1:]:
+        folder = study / 'runs' / old['runs'][0]['id']
+        assert not (folder / 'result.json').exists() and not (folder / 'assets/decode_observations.json').exists()
+    first = study / 'runs' / entries[0]['runs'][0]['id']
+    result = read(first / 'result.json')
+    recovery = result['spec_mtp']['revalidation']
+    assert result['status'] == 'succeeded' and recovery['execute_rerun'] is False
+    return [(study, entries[0]), *[(continuation, e) for e in newer]]
+
+
+def main(data_root=None, study_dir=None, output_dir=None, continuation_study=None):
     from norm_control import check_refs
     from rpipe.structure.artifact.provenance import check_frozen as pcheck
     from rpipe.structure.make.expand import load_study_yaml
@@ -198,21 +228,23 @@ def main(data_root=None, study_dir=None, output_dir=None):
     formal, original, prompts, snapshot, reference, cells = load_reused(data_root)
     entries = read(study / 'index.json')['experiments']
     check_matrix(decl, entries)
-    for exp in entries:
+    continuation = Path(continuation_study).resolve() if continuation_study else None
+    selected = continuation_entries(study, decl, entries, continuation) if continuation else [(study, e) for e in entries]
+    for cell_study, exp in selected:
         setting = exp['factors']['algorithm.config']
         mode, scale = setting['direction'], setting['spec']['ema']['step_scale']
         name = f'{mode}/{scale:g}'
         assert name not in cells and len(exp['runs']) == 1
-        folder = study / 'runs' / exp['runs'][0]['id']
+        folder = cell_study / 'runs' / exp['runs'][0]['id']
         result = read(folder / 'result.json') if (folder / 'result.json').exists() else {}
-        cells[name] = {'run_id': folder.name, 'native_status': result.get('status', 'pending')}
+        cells[name] = {'run_id': folder.name, 'study_path': str(cell_study), 'native_status': result.get('status', 'pending')}
         if result.get('status') != 'succeeded':
             continue
         cfg = yaml.safe_load((folder / 'config.yaml').read_text(encoding='utf-8'))
         assert cfg['algorithm']['config']['spec'] == setting['spec']
         assert cfg['seed'] == 123 and cfg['algorithm']['config']['direction'] == mode
         assert cfg['algorithm']['config']['spec']['ema']['step_scale'] == scale
-        cell, _ = _pair.load_cell(study, folder, cfg, prompts['rendered_prompts'], prompts, snapshot, reference)
+        cell, _ = _pair.load_cell(cell_study, folder, cfg, prompts['rendered_prompts'], prompts, snapshot, reference)
         assert cell['model_digest'] == formal['cells']['30/input_first']['model_digest']
         assert cell['runtime'] == formal['cells']['30/input_first']['runtime']
         progress = read(folder / 'assets/norm_progress.json')
@@ -222,7 +254,7 @@ def main(data_root=None, study_dir=None, output_dir=None):
             assert p['question_id'] == r['question_id'] == canonical['question_id']
             assert all(p[k] == r[k] for k in ('accepted', 'committed', 'decode_calls', 'new_tokens', 'argmax_checked_tokens'))
             assert p['bias']['step_scale'] == scale and p['bias']['full_prompt_mean_preserved']
-        cell.update(progress_sha256=sha(folder / 'assets/norm_progress.json'),
+        cell.update(study_path=str(cell_study), revalidation=result.get('spec_mtp', {}).get('revalidation'), progress_sha256=sha(folder / 'assets/norm_progress.json'),
             bias_and_depth_rows=[{k: v for k, v in r.items() if k != 'gpu_admission'} for r in progress['rows']])
         cell['depth_rows'] = depth_rows(read(folder / 'assets/decode_observations.json')['out']['evidence'], prompts['rendered_prompts'])
         cells[name] = cell
@@ -245,11 +277,13 @@ def main(data_root=None, study_dir=None, output_dir=None):
         if all('rows' in c for c in rows):
             means[f'{scale:g}'] = sum(c['totals']['pooled_tau'] for c in rows) / 3
     if ready:
-        native = read(study / 'spec_mtp_study_check.json')
-        process = read(study / 'process.json')
+        native = read((continuation or study) / 'spec_mtp_study_check.json')
+        process = read((continuation or study) / 'process.json')
         assert native['passed'] and native['complete'] and process['complete'] and process['spec_mtp']['passed']
     body = {'complete': ready, 'author_official': False, 'no_timing': True, 'fixed_prompts': 480,
         'budget': 30, 'mask_count': 2, 'new_cells': 8, 'reused_cells': 5,
+        'continuation_study': str(continuation) if continuation else None,
+        'original_study_fully_complete': ready and continuation is None,
         'source_refs_sha256': sha(study / 'docs/source_refs.json'), 'analyzer_sha256': sha(Path(__file__)),
         'paired_formal_sha256': sha(BASE / 'docs/paired_evidence_v1.json'),
         'direction_formal_sha256': sha(ROOT / 'studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json'),
@@ -272,6 +306,7 @@ if __name__ == '__main__':
     parser.add_argument('--data-root', type=Path, default=ROOT, help='Checkout containing the original immutable 4B Runs')
     parser.add_argument('--study-dir', type=Path, help='Frozen native norm Study, after the 8B queue exits')
     parser.add_argument('--output-dir', type=Path, help='Separate CPU output directory')
+    parser.add_argument('--continuation-study', type=Path, help='Seven-cell operational continuation; first original cell retained')
     parser.add_argument('--check-reused', action='store_true', help='Read-only old endpoints; never make/accept new cells or plot')
     args = parser.parse_args()
     if args.check_reused:
@@ -279,4 +314,4 @@ if __name__ == '__main__':
         print(json.dumps({'complete': proof['complete'], 'reused_cells': len(proof['cells']),
                           'raw_argmax_checked_tokens': proof['raw_argmax_checked_tokens'], 'new_cells_inspected': False}))
     else:
-        main(args.data_root, args.study_dir, args.output_dir)
+        main(args.data_root, args.study_dir, args.output_dir, args.continuation_study)

@@ -291,3 +291,5 @@
 /studies/qwen3_4b_bf16_paired_revalidation/** -text whitespace=cr-at-eol
 /tools/gpu_admission.py -text
 /tools/audit_4b_norm_queue.py -text
+
+/studies/qwen3_4b_bf16_bias_norm_continuation/** -text whitespace=cr-at-eol

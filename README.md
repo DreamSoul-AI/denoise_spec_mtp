@@ -2,7 +2,7 @@
 
 ESP reproduction + EMA-velocity masks.
 
-当前研究计划：[中文](<docs/研究计划 Denoising Speculative Decoding.md>) / [English](<docs/Research Plan Denoising Speculative Decoding.md>)。按新版规范组织文献、数据、模型、算法、指标与实验；旧v6为历史草稿。全480方向Study已完成并由[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)合dev，冻结PLAN及历史证据保留。当前优先追踪原作者官方Table1/8B路径；[启动清单](docs/research/esp-official-launch-readiness-2026-10-16.md)所列官方入口与实时非抢占准入满足后启动。最新允许标明非作者官方的本地/HF栈；[本地全480结果复核](docs/research/esp-table1-nonofficial-full480-recheck-2026-10-16.md)三主格完整、数学门全过，但未达论文τ目标。继续追官方入口，不重复已有格或新造方法占卡。
+当前研究计划：[中文](<docs/研究计划 Denoising Speculative Decoding.md>) / [English](<docs/Research Plan Denoising Speculative Decoding.md>)。原作者可运行入口未核验到，按Enmao 2026-10-16最新指示停止追找；现有实现标明**非作者官方复现**。旧[全480证据复核](docs/research/esp-table1-nonofficial-full480-recheck-2026-10-16.md)数学门全过，BC30/BC60单mask pooled τ=1.563378/1.647301，未达论文1.63/1.74。当前[8B独立复验](studies/esp_table1_nonofficial_revalidation/docs/STUDY_REPORT.md)按BC10→30→60单队列运行；完成后接固定480的4B偏置范数扫描。已有4B五方法加AR及六格方向对照完整结果继续复用，不改prompt、不测速。
 
 Training-free multi-token prediction:
 
@@ -49,6 +49,6 @@ Follow-up: [three-prompt small matrix](studies/output_space_small_matrix/README.
 历史Qwen3-4B **FP32**：[同prompt first26复验](studies/output_space_4b_recheck_v2/docs/STUDY_REPORT.md)两阶总接受均高于输入，[固定4条新输入](studies/output_space_4b_holdout/docs/STUDY_REPORT.md)未保持收益，[历史输入EMA同链控制](studies/output_space_4b_input_control/docs/STUDY_REPORT.md)已执行。三批全AR一致，计时关闭；这些结果及此前0.6B机理/罕见事件记录保留归档，不代替当前BF16证据。
 
 
-当前原作者代码复现：[官方来源核查与复现报告](docs/research/esp-official-code-reproduction-2026-10-15.md)。尚未核验到作者 ESP 可运行实现，OpenReview 附件访问不完整；本轮未迁入源码或启动 GPU。历史自实现结果不满足本轮原作者代码要求。
+历史原作者代码核查（2026-10-15）：[官方来源核查与复现报告](docs/research/esp-official-code-reproduction-2026-10-15.md)。尚未核验到作者 ESP 可运行实现，OpenReview 附件访问不完整；当次未迁入源码或启动GPU。该记录保留原作者代码要求下的历史结论；当前非官方独立复验按上文最新授权执行。
 
 2026-10-15 历史自实现结果：历史4B FP32归档经PR #7合dev；[ESP Table1全480 BF16复现](studies/esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)四格和原生process完成，BC30 pooled τ=1.563378、BC60单mask=1.647301，未达到1.63/1.74，负结果保留，PR #10经CI合dev。[4B BF16五方法加AR配对](studies/qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)已完成11/11及原生Study process，同480条、BC30/60、双mask动态剪枝树，809,118个Spec提交token自检全过。输入一阶本次总accepted最高、主calls最少；两输出方法对mean基线有小幅总量改善，输出一阶相对输出零阶未显示稳定联合收益。全部逐prompt负例与AR差异保留，AR一致率不作失败门；[集成与CI记录](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12)。其他研究暂停；8B仅限该Table1复现，未新增FP32模型实验、测速、强推、合main或删除分支和数据。

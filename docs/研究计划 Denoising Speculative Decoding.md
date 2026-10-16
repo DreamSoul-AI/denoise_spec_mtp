@@ -3,10 +3,10 @@
 中文正本，更新于2026-10-16。[English translation](<Research Plan Denoising Speculative Decoding.md>)。采用[新版规范与模板](research/standards/README.md)，来源为RPipe已合入dev的`e461133218deabf8755b3e8657650e1e4a3cd9f4`。本次是对已有研究与证据的整理，不是对已看到结果的实验重新预注册，也不改运行中的Study合同。
 
 
-> 当前8B非官方复验：BC10/单mask全480已原生成功；BC30运行、BC60待。4B范数扫描未make/launch。
-> BC10 pooled tau=1.3990470307950233；79757个token自检全过，AR188/480仅诊断。
-> 与旧BC10逐prompt accepted/calls/tau均480平，输出/AR摘要各480一致；三种tau聚合差均0。
-> 数值及原始路径见[检查点](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json)；不能据此声称论文BC30/60目标已复现。
+> 当前8B非官方复验：BC10/BC30单mask全480原生成功；BC60原队列等待RAM准入。4B范数扫描未make/launch。
+> BC30 pooled tau=1.5633775043382236，较论文1.63低0.06662249566177625；79762个token自检全过，AR175/480仅诊断。
+> BC10 tau=1.3990470307950233；两格与各自旧Run逐prompt accepted/calls/tau均480平，输出/AR摘要各480一致。
+> 数值及路径见[BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json) / [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json)；BC60待完整终验，尚非全矩阵。
 
 ## 一、当前范围、状态与执行优先级
 
@@ -16,7 +16,7 @@
 
 执行顺序：A，按最新“开跑复原”指示进行一轮新的8B（若主机RAM准入不足则可运行的最大既有规模）全480非官方Table1独立复验，BC10/30/60单mask，λ0.1 updating mean、dynamic/pruning、256/EOS、原seed123；旧完整结果复用作基线，显式新version/Run，不覆盖或重签。B，4B BF16 BC30做偏置范数扫描，倍率0/0.5/1/2；原e2−e1与随机种子0/1/2均预先保留，0与1倍复用已有完整结果，仅新跑四方向×0.5/2共8格。C，从τ曲线、逐prompt接受/calls/τ胜平负、实际偏置范数和输出长度检验机制；不择优种子或改主prompt。BC60范数泛化暂不扩组。
 
-GPU政策已改为：原则上不空闲，有用实验可执行；**同一时间仅一个GPU任务，准入为所选任务已测进程树峰值主机RSS加2GB主机RAM**（执行保守取2GiB），同时实际GPU空闲且显存能容纳模型/工作集。旧“显存峰值加2GiB”门废止，不把CPU进程逐一登记/SHA作为门，不杀其他任务，不跑完整约32GiB量化训练。2026-10-16约13:02实际GPU由量化Python占用，主机available约19.99GB；本项目等待该GPU任务自然结束后只启动一条串行链，不伪称已跑。8B旧实测峰值进程树RSS为17305047040字节，加2GiB需19452530688字节；这是采样峰值，不保证新路径不增长，运行中记录资源且保留失败。不得把旧VRAM差661MiB当新政策的主机RAM阻塞。
+GPU政策已改为：原则上不空闲，有用实验可执行；**同一时间仅一个GPU任务，准入为所选任务已测进程树峰值主机RSS加2GB主机RAM**（执行保守取2GiB），同时实际GPU空闲且显存能容纳模型/工作集。旧“显存峰值加2GiB”门废止，不把CPU进程逐一登记/SHA作为门，不杀其他任务，不跑完整约32GiB量化训练。历史排班快照：2026-10-16约13:02实际GPU由量化Python占用，主机available约19.99GB；本项目等待该GPU任务自然结束后只启动一条串行链，不伪称已跑。8B旧实测峰值进程树RSS为17305047040字节，加2GiB需19452530688字节；这是采样峰值，不保证新路径不增长，运行中记录资源且保留失败。不得把旧VRAM差661MiB当新政策的主机RAM阻塞。
 
 唯一有效项目计划为本文件和[英文对应版](<Research Plan Denoising Speculative Decoding.md>)。所有60份子计划/专项协议/评审/历史v6整合到第十一章独立章节，旧单独文件按12:53明确授权git rm；来源字节、Git blob、换行及新锚点见归并清单。历史“必须独立PLAN”“先AR exact”“追作者入口”等原文只作历史记录，不能覆盖本章。迁移不重签原Run，不把当前计划内容当原冻结字节；新Run记录不可变的项目计划commit/blob和章节。正在运行的其他任务不受改名影响。
 

@@ -1,6 +1,6 @@
 # q241–q244真实跨任务批次与首个canonical跟进
 
-2026-10-14。依据[原草案PLAN](PLAN.md)及[真实执行增补](EXECUTION_PLAN.md)完成四个原生Run、16输出和20次固定窗口诊断；全部独立AR一致、无context缩短，来源/输入/model/有效因素/Study门通过。原始PLAN和checker协议的“未运行”是当时状态，未修改或重签；本报告记录实际执行。source670c744e0535dcad，ModelScope11文件实际hash、Qwen3-0.6B tied/FP32/eager/T0、100新token预算、static[1,1]/k2、beta.9/beta_prime.99，原生runtime默认与原配方保持。
+2026-10-14。依据[原草案PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-plan>)及[真实执行增补](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-execution-plan>)完成四个原生Run、16输出和20次固定窗口诊断；全部独立AR一致、无context缩短，来源/输入/model/有效因素/Study门通过。原始PLAN和checker协议的“未运行”是当时状态，未修改或重签；本报告记录实际执行。source670c744e0535dcad，ModelScope11文件实际hash、Qwen3-0.6B tied/FP32/eager/T0、100新token预算、static[1,1]/k2、beta.9/beta_prime.99，原生runtime默认与原配方保持。
 
 ## 原生与固定双向结果
 
@@ -26,7 +26,7 @@
 
 ## 首个阳性q241：canonical量化预测未保持
 
-按原跟进准则选第一file-order有接受变化的可行单位q241，一阶←零阶、entry716、原11→12；另写[CANONICAL_PLAN](CANONICAL_PLAN.md)，在任何canonical计算前冻结，未把新格子附加到原生Study或重签其产物。
+按原跟进准则选第一file-order有接受变化的可行单位q241，一阶←零阶、entry716、原11→12；另写[CANONICAL_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-canonical-plan>)，在任何canonical计算前冻结，未把新格子附加到原生Study或重签其产物。
 
 | 对照 | accepted | decode calls |
 | --- | ---: | ---: |
@@ -68,7 +68,7 @@ q178本轮[入口Phi与RMSNorm对照](../../output_space_extension/docs/STUDY_RE
 
 ## q241结构化归因与状态因素反例（2026-10-15）
 
-按新冻结[STATE_FACTOR_PLAN](STATE_FACTOR_PLAN.md)，执行[选择性回填工具](../../../tools/diagnose_q241_state_factors.py)与[结构化分析](../analyze_state_factors.py)。复用q241/seed123/entry716及已有792-position teacher状态，六次生成共600新token、525forward、零teacher／warmup，全部独立AR一致。两个native审计控制重现旧完整语义路径、stats和全部captured张量；四新格在每个真实KV root>716只回填一个坐标，核对另一坐标和incoming proxies未在patch修改，后续自然变化保留。旧成功原生Run和canonical格不重跑、不重签。
+按新冻结[STATE_FACTOR_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-state-factor-plan>)，执行[选择性回填工具](../../../tools/diagnose_q241_state_factors.py)与[结构化分析](../analyze_state_factors.py)。复用q241/seed123/entry716及已有792-position teacher状态，六次生成共600新token、525forward、零teacher／warmup，全部独立AR一致。两个native审计控制重现旧完整语义路径、stats和全部captured张量；四新格在每个真实KV root>716只回填一个坐标，核对另一坐标和incoming proxies未在patch修改，后续自然变化保留。旧成功原生Run和canonical格不重跑、不重签。
 
 | committed同步因素 | 自值accepted | 一阶←零阶accepted | 移植相对自值 |
 | --- | ---: | ---: | ---: |
@@ -95,7 +95,7 @@ native自值对双同步自值的首个接受分叉发生在root756，共同根7
 
 ## 固定帧state／proxy分离与两prompt两seed扩展（2026-10-15）
 
-本轮在4a02551之后另冻[LOCAL_FACTOR_PLAN](LOCAL_FACTOR_PLAN.md)与[STATE_EXTENSION_PLAN](STATE_EXTENSION_PLAN.md)，实现[固定帧工具](../../../tools/diagnose_q241_local_factors.py)和[扩展工具](../../../tools/diagnose_state_extension.py)，正式[诊断](local_factor_diagnosis_v1.json)、[扩展诊断](state_extension_diagnosis_v1.json)及[独立离线复核](local_extension_analysis_v1.json)保留所有格与质量门。旧工具／协议／成功Run未修改。
+本轮在4a02551之后另冻[LOCAL_FACTOR_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-local-factor-plan>)与[STATE_EXTENSION_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-state-extension-plan>)，实现[固定帧工具](../../../tools/diagnose_q241_local_factors.py)和[扩展工具](../../../tools/diagnose_state_extension.py)，正式[诊断](local_factor_diagnosis_v1.json)、[扩展诊断](state_extension_diagnosis_v1.json)及[独立离线复核](local_extension_analysis_v1.json)保留所有格与质量门。旧工具／协议／成功Run未修改。
 
 ### 首次分叉的时序与真实owner链
 
@@ -155,7 +155,7 @@ local两完整控制200new／172forward+24固定块／零teacher，wall22.613秒
 
 ## 非T0完整路径与实际owner1对照（2026-10-15）
 
-依据6cca8fc另冻[SAMPLING_PLAN](SAMPLING_PLAN.md)与[OWNER_PLAN](OWNER_PLAN.md)，执行[采样工具](../../../tools/diagnose_sampling_paths.py)、[owner1工具](../../../tools/diagnose_q241_owner1.py)及[复核](../analyze_sampling_owner.py)。正式[采样诊断](sampling_diagnosis_v1.json)、[owner诊断](owner1_diagnosis_v1.json)、[联合分析](sampling_owner_analysis_v1.json)保留完整路径、256条件验证draw、概率与负结果。原科学source/default/配方、旧诊断工具和合同保持。
+依据6cca8fc另冻[SAMPLING_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-sampling-plan>)与[OWNER_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-owner-plan>)，执行[采样工具](../../../tools/diagnose_sampling_paths.py)、[owner1工具](../../../tools/diagnose_q241_owner1.py)及[复核](../analyze_sampling_owner.py)。正式[采样诊断](sampling_diagnosis_v1.json)、[owner诊断](owner1_diagnosis_v1.json)、[联合分析](sampling_owner_analysis_v1.json)保留完整路径、256条件验证draw、概率与负结果。原科学source/default/配方、旧诊断工具和合同保持。
 
 ### 原source719上下文中的随机验证
 
@@ -208,7 +208,7 @@ sampling wall47.418秒，.5s采样RSS5500076032 bytes、GPU全局7129MiB、最�
 
 ## 四prompt三seed完整采样扩展与罕见事件检测边界（2026-10-15）
 
-按a5ede78后新冻结[SAMPLING_EXPANSION_PLAN](SAMPLING_EXPANSION_PLAN.md)与[RARE_EVENT_PLAN](RARE_EVENT_PLAN.md)，执行[多prompt工具](../../../tools/diagnose_sampling_expansion.py)、[罕见抽样工具](../../../tools/diagnose_rare_events.py)和[离线复核](../analyze_sampling_expansion.py)。旧q241 seeds123/124两行保留为development，不重跑；新加q241 seed125及q242/243/244 seeds123/124/125，共10新单位。全部T=.8、max100/EOS和原源/默认配方，独立AR、两native、两观测和两self/graft门通过，模型/输入/来源/窗口范围保持。
+按a5ede78后新冻结[SAMPLING_EXPANSION_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-sampling-expansion-plan>)与[RARE_EVENT_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-rare-event-plan>)，执行[多prompt工具](../../../tools/diagnose_sampling_expansion.py)、[罕见抽样工具](../../../tools/diagnose_rare_events.py)和[离线复核](../analyze_sampling_expansion.py)。旧q241 seeds123/124两行保留为development，不重跑；新加q241 seed125及q242/243/244 seeds123/124/125，共10新单位。全部T=.8、max100/EOS和原源/默认配方，独立AR、两native、两观测和两self/graft门通过，模型/输入/来源/窗口范围保持。
 
 ### 完整矩阵的正负边界
 
@@ -252,7 +252,7 @@ sampling wall47.418秒，.5s采样RSS5500076032 bytes、GPU全局7129MiB、最�
 
 ## 报告更新后继续H7：首个局部方向不能预测净方向（2026-10-15）
 
-完成上节矩阵／rare报告后、查看首次分叉前，另冻[FIRST_DELTA_PLAN](FIRST_DELTA_PLAN.md)，执行[完整轨迹计数工具](../analyze_first_delta.py)，结果存[结构化分析](first_delta_analysis_v1.json)。这是对已知最终数的解释性检验，不称新held-out样本；没有新模型forward、draw、prompt或窗口搜索。
+完成上节矩阵／rare报告后、查看首次分叉前，另冻[FIRST_DELTA_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-first-delta-plan>)，执行[完整轨迹计数工具](../analyze_first_delta.py)，结果存[结构化分析](first_delta_analysis_v1.json)。这是对已知最终数的解释性检验，不称新held-out样本；没有新模型forward、draw、prompt或窗口搜索。
 
 H7要求：首个按时间出现的self/graft语义分叉之accepted-node数差符号，应与最终净接受差符号相同。仅比较TRACE_KEYS，排除mask norm等早期诊断元数据。每侧accepted须等于全部trace accepted_nodes计数和，首个分叉真实root必须相同；后续只按实际共有／独有root作计数，不强迫对齐或只选能解释净差的根。
 
@@ -269,7 +269,7 @@ q244三seed的首变和最终都是负，属于当前prompt／温度／预算下
 
 ## 新prompt／seed扩展：固定prompt方向预测被反驳（2026-10-15）
 
-按985c7c1后另冻[SAMPLING_CONTINUATION_PLAN](SAMPLING_CONTINUATION_PLAN.md)，新执行q242/244 seed126和按文件顺序新增q245/246 seeds126/127，共六单位。新输入见[渲染清单](sampling_continuation_inputs_v1.json)，长度647/901/405/745，旧prompt与native AR输入一致，新prompt无截断或替换。仍为T=.8/max100/同科学source/default/ModelScope snapshot。每单位七次生成，fresh AR／observer／原值self／单槽范围／完整输出门通过。
+按985c7c1后另冻[SAMPLING_CONTINUATION_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-sampling-continuation-plan>)，新执行q242/244 seed126和按文件顺序新增q245/246 seeds126/127，共六单位。新输入见[渲染清单](sampling_continuation_inputs_v1.json)，长度647/901/405/745，旧prompt与native AR输入一致，新prompt无截断或替换。仍为T=.8/max100/同科学source/default/ModelScope snapshot。每单位七次生成，fresh AR／observer／原值self／单槽范围／完整输出门通过。
 
 | qid | seed | 实际entry | 零阶accepted | self | graft | graft-self |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -305,7 +305,7 @@ rare实际wall41.474秒、.5s采样RSS1142521856 bytes、GPU全局3827MiB、最�
 
 ### 报告更新后执行H10：新采样捕获范围未出现合法第二槽反例
 
-H8报告写回后另冻[SAMPLED_DEPTH_PLAN](SAMPLED_DEPTH_PLAN.md)，在查看新selected tensors前声明合法事件与等state门；[二阶分析](sampled_depth_analysis_v1.json)保存原六root规则的全部34共有捕获窗口和各单元独有／未访问窗口，零额外forward/draw。要求两侧first candidate均等于本seed的sampled AR目标、两侧node1实际接受、第一目标非EOS且存在第二目标，再比较node2接受；bit相同的current anchor/v合法翻转才反驳H10。
+H8报告写回后另冻[SAMPLED_DEPTH_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-sampled-depth-plan>)，在查看新selected tensors前声明合法事件与等state门；[二阶分析](sampled_depth_analysis_v1.json)保存原六root规则的全部34共有捕获窗口和各单元独有／未访问窗口，零额外forward/draw。要求两侧first candidate均等于本seed的sampled AR目标、两侧node1实际接受、第一目标非EOS且存在第二目标，再比较node2接受；bit相同的current anchor/v合法翻转才反驳H10。
 
 全部34窗口未出现合法second flip，故H10在此有限捕获未被反驳，不宣称完整路径只受第一槽影响。旧q178/q182的合法depth2反例仍保留；新负结果不推翻它们。current state相同不代表相同KV／全历史canonical控制，新sampled窗口的纯state/proxy分解仍未完成。
 
@@ -319,7 +319,7 @@ H8报告写回后另冻[SAMPLED_DEPTH_PLAN](SAMPLED_DEPTH_PLAN.md)，在查看�
 
 依据用户新指示，1274bb2及此前0.6B完整路径／固定窗口／罕见事件证据保留为历史阶段，暂停新增0.6B rare和单位置机理实验。没有本任务的0.6B生成进程待停止，未终止其他项目进程。已测结论仍限于0.6B；未执行的sampled同KV因素分解、原温度极小尾可达性保留为未验证，当前不继续消耗其预算。
 
-主模型转为Qwen3-4B，优先执行[4B同prompt配对复验](../../output_space_4b_recheck/docs/PLAN.md)及独立新prompt确认。先查历史结果，再区分旧输入空间EMA与新输出零/一阶，接受数／主路径调用数／逐token独立AR为指标；不测速、不推送或合并。权重、cache和旧raw仍在本机原位置，未移动、删除或重签。
+主模型转为Qwen3-4B，优先执行[4B同prompt配对复验](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-4b-recheck-docs-plan>)及独立新prompt确认。先查历史结果，再区分旧输入空间EMA与新输出零/一阶，接受数／主路径调用数／逐token独立AR为指标；不测速、不推送或合并。权重、cache和旧raw仍在本机原位置，未移动、删除或重签。
 
 
 2026-10-15：本阶段已暂停归档。4B FP32 完成结果见 [recheck v2](../../output_space_4b_recheck_v2/docs/STUDY_REPORT.md)；当前最高优先为 ESP Table 1 BF16 复现。

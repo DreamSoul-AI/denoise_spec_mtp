@@ -13,4 +13,4 @@ AR输出四格都与原始preflight的前32token完全相同；基线格的ESP32
 
 第四格失败是工具生命周期：Algorithm的finally恢复deterministic后，native write/summarize gate复查运行设置而拒绝，正确性门没有放宽。记录该限制；后续仅采用已全链通过的false/false组合，暂不采用deterministic=true。若后续需采用deterministic=true，应让设置覆盖prepare至finalisation并另建新Run验证，不能重签本Run。v1仅make/CPU恢复测试失败，未跑GPU；v2执行四格，旧pending目录保留。
 
-[PLAN](PLAN.md)、[逐token/实际flags/哈希证据](numerics_evidence_v1.json)、[扩大验证](../../esp_table1_bf16_reduction_check/docs/PLAN.md)。扩大验证沿用原13条/三BC/256上限与AR审计；三格全通过后才排全480。科学源码和默认配方没有修改，不进入4B五方法。
+[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-numerics-docs-plan>)、[逐token/实际flags/哈希证据](numerics_evidence_v1.json)、[扩大验证](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-reduction-check-docs-plan>)。扩大验证沿用原13条/三BC/256上限与AR审计；三格全通过后才排全480。科学源码和默认配方没有修改，不进入4B五方法。

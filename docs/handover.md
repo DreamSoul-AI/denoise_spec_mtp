@@ -4,7 +4,7 @@
 
 ## q178算子对照与下一Study草案（2026-10-14）
 
-root85之后provider槽计算S64、norm精度N64、norm后端N32各self/一阶←零阶，共8次AR一致；所有完整语义路径保持self8/27、移植9/26。profiler真实关联provider的NormTwoOps reduce_kernel；这只收紧后续provider运算的必要性，入口85和transformer内部舍入仍未独立隔离。正式[报告](../studies/output_space_extension/docs/STUDY_REPORT.md)保留完整边界、scalar和资源。新[跨任务Study](../studies/output_space_cross_task/README.md)固定summarization q241–244并已分词，仅草案、未make/launch；固定行q_proj kernel隔离协议未执行。[最小提交候选](research/publication-plan.md)为依赖PR6树的437f201，33文件逐blob哈希与PR草稿本地保存，后续研究暂缓。源码/default/旧合同与工具不改，未推送/合并/删除，用户workspace保留。
+root85之后provider槽计算S64、norm精度N64、norm后端N32各self/一阶←零阶，共8次AR一致；所有完整语义路径保持self8/27、移植9/26。profiler真实关联provider的NormTwoOps reduce_kernel；这只收紧后续provider运算的必要性，入口85和transformer内部舍入仍未独立隔离。正式[报告](../studies/output_space_extension/docs/STUDY_REPORT.md)保留完整边界、scalar和资源。新[跨任务Study](../studies/output_space_cross_task/README.md)固定summarization q241–244并已分词，仅草案、未make/launch；固定行q_proj kernel隔离协议未执行。[最小提交候选](<研究计划 Denoising Speculative Decoding.md#legacy-docs-research-publication-plan>)为依赖PR6树的437f201，33文件逐blob哈希与PR草稿本地保存，后续研究暂缓。源码/default/旧合同与工具不改，未推送/合并/删除，用户workspace保留。
 
 
 ## q178数值隔离与q179–q182（2026-10-14）
@@ -33,7 +33,7 @@ root85之后provider槽计算S64、norm精度N64、norm后端N32各self/一阶�
 
 ## 输出空间最小阶段（2026-10-14）
 
-用户要求自主继续，采用feature/output-space-prerequisite（父1219a1d/PR6；PR6当前CI全部成功但未合并）。输出零/一阶normalized final-hidden masks只支持实际tied模型与unpruned静态链，复用验证/KV/RPipe六阶段。先写[PLAN](../studies/output_space_prerequisite/docs/PLAN.md)再实现；270全量、Ruff、56文件mypy与旧36格严格轨迹通过。四个新真实Qwen3-0.6B/q171/FP32/seed123/100token Run已成功，来源/原始证据/Study完整性门通过。输入均值链accepted17，输出order0/order1均10，三者均与独立AR的47token完全一致。保留负结果，不调参、不扩大矩阵。报告、数字和图见[新Study](../studies/output_space_prerequisite/README.md)。源码digest670c744e0535dcad，旧input baseline历史证据未改、未重签。wheel/sdist 41条CLI命令及两独立安装target的output-hidden解码通过；正式材料已保留，最终提交按本地分支核验。本轮无新公开推送、合并或发布。
+用户要求自主继续，采用feature/output-space-prerequisite（父1219a1d/PR6；PR6当前CI全部成功但未合并）。输出零/一阶normalized final-hidden masks只支持实际tied模型与unpruned静态链，复用验证/KV/RPipe六阶段。先写[PLAN](<研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-prerequisite-docs-plan>)再实现；270全量、Ruff、56文件mypy与旧36格严格轨迹通过。四个新真实Qwen3-0.6B/q171/FP32/seed123/100token Run已成功，来源/原始证据/Study完整性门通过。输入均值链accepted17，输出order0/order1均10，三者均与独立AR的47token完全一致。保留负结果，不调参、不扩大矩阵。报告、数字和图见[新Study](../studies/output_space_prerequisite/README.md)。源码digest670c744e0535dcad，旧input baseline历史证据未改、未重签。wheel/sdist 41条CLI命令及两独立安装target的output-hidden解码通过；正式材料已保留，最终提交按本地分支核验。本轮无新公开推送、合并或发布。
 
 ## ModelScope四格正式接续（2026-10-14）
 
@@ -60,7 +60,7 @@ root85之后provider槽计算S64、norm精度N64、norm后端N32各self/一阶�
 - C-004 在当前main同一v0.3.1的两步Toy/Stub新Run复现并备份前后result，已提交 [Issue #36](https://github.com/DreamSoul-AI/RPipe/issues/36)。未改上游代码或权限。
 - input_mask_baseline 新version为input-mask-baseline-v031-win5090-20261014-v2，四Run已make，succeeded=0/failed=0/pending=4。Study/default ModelScope离线核验均CacheNotFound E1022；等待Qwen3-0.6B snapshot路径。资源inventory不等于校准，真实四格尚未launch，研究质量未通过。
 
-接手先读取当前工作树、远端/CI与 [四格PLAN](../studies/input_mask_baseline/docs/PLAN.md) / [前检](../studies/input_mask_baseline/docs/v031_device_preflight.json)。权重可取得后只核对原配方并串行校准/执行四格，不能以其他规模模型或Tiny替代。PLAN已经进入锁；任何来源/输入调整先明确变更与新version，不对旧成功Run重新make。原始工程日志/raw在本机.tmp/v031-20261014，clone只有正式摘要；历史下面49dec9c段保留当时状态。
+接手先读取当前工作树、远端/CI与 [四格PLAN](<研究计划 Denoising Speculative Decoding.md#legacy-studies-input-mask-baseline-docs-plan>) / [前检](../studies/input_mask_baseline/docs/v031_device_preflight.json)。权重可取得后只核对原配方并串行校准/执行四格，不能以其他规模模型或Tiny替代。PLAN已经进入锁；任何来源/输入调整先明确变更与新version，不对旧成功Run重新make。原始工程日志/raw在本机.tmp/v031-20261014，clone只有正式摘要；历史下面49dec9c段保留当时状态。
 
 ## 49dec9c 原交接（2026-10-14）
 
@@ -72,7 +72,7 @@ root85之后provider槽计算S64、norm精度N64、norm后端N32各self/一阶�
 | 当前执行基线 | src/rpipe/ORIGIN 第一行 804b3823ab6d2af46cbda1a65688ca8b76c60b22，v0.3.0；101 个上游文件只有 Windows torch-first 例外，保留 MIT |
 | 新上游固定参考 | v0.3.1 commit 7a15c46b75c5eb951cccd60ed7b9fc3463db90f5；annotated tag cd7a750de0d13889916eba84b53ed4a339d47a32；未更新 vendor |
 | 已完成职责重构 | [rpipe-migration.md](rpipe-migration.md)；flow 阶段、API 桥、artifact 核验、数据 init 拆分与兼容 facade；没有第二套 runner |
-| 新研究 Study | [input_mask_baseline PLAN](../studies/input_mask_baseline/docs/PLAN.md)：Qwen3-0.6B，q171 translation 新 prompt，frozen_mean / gamma_last / AR / alignment，seed123；未执行 |
+| 新研究 Study | [input_mask_baseline PLAN](<研究计划 Denoising Speculative Decoding.md#legacy-studies-input-mask-baseline-docs-plan>)：Qwen3-0.6B，q171 translation 新 prompt，frozen_mean / gamma_last / AR / alignment，seed123；未执行 |
 | 工程证据 | [smoke 报告](../studies/smoke/docs/STUDY_REPORT.md#八职责重构检查点2026-10-14)、[本轮 JSON](../studies/smoke/docs/refactor_validation.json)：239 回归、Ruff、55 文件 mypy、36 格完整轨迹对照、4 Run 原生离线模板六阶段通过 |
 | 分支政策 | main 为 default，工作 PR → dev → 同仓库 dev PR → main；保留 CI，不直接推长期分支，不自动合并/发布 |
 
@@ -140,7 +140,7 @@ eval.warmup=false，Study局部仅关闭decoder clock，兼容时长字段是0�
 2026-10-15 最新执行顺序：已有 Qwen3-4B 结果全部为 **FP32**，本轮先按主题提交、工作分支 PR 经 CI 合入 dev。其他研究暂停；最高优先复现 ESP Table 1（Qwen3-8B/BF16/T0、BC10/30/60、动态树与剪枝、mean mask λ=0.1）。8B 仅用于该复现；随后 Qwen3-4B/BF16 五方法加 AR 配对。新增实验不用 FP32、不测速。不得强推、合 main、删分支或数据。
 
 
-2026-10-15 FP32 收尾已核实：工具/测试 bdb3f6c、证据 8a0969c；[PR #7](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/7) 的 Branch flow 与两个 cpu-checks 均 SUCCESS，已于 2026-10-14T19:17:08Z 合入 dev，merge 8677376e1ac878a159a3095711eac43420d97bde。未合 main、未强推、未删除分支/数据。8B/BF16 仅按 [Table 1 计划](research/esp-table1-bf16-reproduction-plan.md) 继续；其他研究暂停。
+2026-10-15 FP32 收尾已核实：工具/测试 bdb3f6c、证据 8a0969c；[PR #7](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/7) 的 Branch flow 与两个 cpu-checks 均 SUCCESS，已于 2026-10-14T19:17:08Z 合入 dev，merge 8677376e1ac878a159a3095711eac43420d97bde。未合 main、未强推、未删除分支/数据。8B/BF16 仅按 [Table 1 计划](<研究计划 Denoising Speculative Decoding.md#legacy-docs-research-esp-table1-bf16-reproduction-plan>) 继续；其他研究暂停。
 
 
 2026-10-15 ESP v2 G.2协议修订：Qwen3 BC60主配置改为单mask/29 draft，双mask/19 draft固定作对照；旧冻结PLAN哈希不变。新修订预检单maskτ=1.636982、Δ1.74=-0.103018、exact3/13；双mask复用τ=1.579408、Δ=-0.160592、exact5/13，均为失配诊断值，不称成功。详见[修订报告](../studies/esp_table1_bf16_qwen_protocol/docs/STUDY_REPORT.md)。全480四格已冻结并串行启动，BF16/T0/256/seed123、Eq5 λ=.1 updating mean保持；4B frozen mean是后续不同基线，其他研究暂停。完整Run/权重/缓存留本机；没有测速、强推、合main或删除数据。

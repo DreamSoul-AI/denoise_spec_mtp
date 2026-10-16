@@ -4,7 +4,7 @@
 
 ## 先前分析与预声明假设
 
-[PLAN](PLAN.md)在新输出前整理q173与q171/172/174的窗口位置、自然接受差异与margin，并提出H1排序边界、H2实际owner路径混入recipient历史、H3终止/未利用owner对照。q173 root83距输入末尾14，较q171/172/174的0/3/9晚，但其注入L2 .05366并不最大；q171更长后续路径仍null，q174到EOS即停，所以位置/幅度不能单独解释特殊性。q173后期94/97的自然两方法margin分别跨正负，而先前其他prompt受扰后没有跨越。已有q173量只覆盖原五个固定观测根，未补造全位置logits。
+[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-plan>)在新输出前整理q173与q171/172/174的窗口位置、自然接受差异与margin，并提出H1排序边界、H2实际owner路径混入recipient历史、H3终止/未利用owner对照。q173 root83距输入末尾14，较q171/172/174的0/3/9晚，但其注入L2 .05366并不最大；q171更长后续路径仍null，q174到EOS即停，所以位置/幅度不能单独解释特殊性。q173后期94/97的自然两方法margin分别跨正负，而先前其他prompt受扰后没有跨越。已有q173量只覆盖原五个固定观测根，未补造全位置logits。
 
 新输入按文件顺序translation skip14/take4，q175/176/177/178，input35/46/52/76token；[prompt清单](prompts_manifest.json)冻结文本、datasetSHA与独立渲染IDs。仍同一ModelScope Qwen3-0.6B文件快照、实际tied权重、FP32/eager/CUDA、非thinking、T0/EOS/预算100、unpruned[1,1]/k2/BC9、beta .9/beta_prime .99。源码670c744e0535dcad，生成器123/124/125/126；T0的这些seed不代表随机重复。
 
@@ -65,11 +65,11 @@ native launch实际wall103.791秒，.5秒采样RSS峰6592802816 bytes、线程55
 
 ModelScope缓存通过同目录junction复用11文件，未重新下载、改环境或权重；snapshot provider default/master仍不能声称远端immutable revision，实际hash绑定本地文件。原生make→launch→process→report及来源/输入/模型/独立AR/完整性门均通过，diagnostic前后PLAN/选择/tool/helpers/原raw/runtime/src也一致。首次独立tokenizer清单的BatchEncoding JSON失败发生在make/解码前，改为模板文本再分词并与原生IDs核验相同；未改变选择或源代码，说明保留.tmp。
 
-正式复跑需新version和Run目录，按[PLAN](PLAN.md)执行；诊断工具[diagnose_extension.py](../../../tools/diagnose_extension.py)消费已冻结的窗口文件，out必须新目录。离线[analyze_results.py](../analyze_results.py)检查SHA并拒绝覆盖不同既存JSON。完整selected张量333134109 bytes，仅本机.tmp/extension-transfer-20261014-v1，SHA1ea61e0ae8566854a81dafc8806f82dd3144a3fc135a7e87483b7440cf97f2ef，不随Git。14项针对性/新Study展开/文档检查、Ruff及mypy56通过；完整旧科学回归不重跑冒充新批次。没有推送、合并或删数据。
+正式复跑需新version和Run目录，按[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-plan>)执行；诊断工具[diagnose_extension.py](../../../tools/diagnose_extension.py)消费已冻结的窗口文件，out必须新目录。离线[analyze_results.py](../analyze_results.py)检查SHA并拒绝覆盖不同既存JSON。完整selected张量333134109 bytes，仅本机.tmp/extension-transfer-20261014-v1，SHA1ea61e0ae8566854a81dafc8806f82dd3144a3fc135a7e87483b7440cf97f2ef，不随Git。14项针对性/新Study展开/文档检查、Ruff及mypy56通过；完整旧科学回归不重跑冒充新批次。没有推送、合并或删数据。
 
 ## q178确定性与规范committed-state对照（2026-10-14）
 
-按测量前 [NUMERICAL_PLAN](NUMERICAL_PLAN.md) 执行11次生成与1次112-position teacher前向。原native/default/src不改，原两个工具不改；严格FP32/eager、TF32两项关闭、matmul highest、CUBLAS_WORKSPACE_CONFIG=:4096:8、deterministic algorithms=true且warn_only=false、cudnn deterministic=true/benchmark=false只覆盖该诊断子进程。新prompt原生实验继续原deterministic=false配方。结果见[测量证据](numerical_diagnosis_v1.json)、[离线核验](numerical_analysis_v1.json)、[PLAN评审](NUMERICAL_PLAN_REVIEW.md)，原预声明文件未改或重签。
+按测量前 [NUMERICAL_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-numerical-plan>) 执行11次生成与1次112-position teacher前向。原native/default/src不改，原两个工具不改；严格FP32/eager、TF32两项关闭、matmul highest、CUBLAS_WORKSPACE_CONFIG=:4096:8、deterministic algorithms=true且warn_only=false、cudnn deterministic=true/benchmark=false只覆盖该诊断子进程。新prompt原生实验继续原deterministic=false配方。结果见[测量证据](numerical_diagnosis_v1.json)、[离线核验](numerical_analysis_v1.json)、[PLAN评审](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-numerical-plan-review>)，原预声明文件未改或重签。
 
 | q178固定模式 | 无移植零阶 | 无移植一阶 | 一阶←零阶 | 零阶←一阶 | decode calls（无移植/移植） |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -91,7 +91,7 @@ ModelScope缓存通过同目录junction复用11文件，未重新下载、改环
 
 ## q178 provider算子隔离（2026-10-14）
 
-本轮先冻结[OPERATOR_PLAN](OPERATOR_PLAN.md)，在已有规范前缀anchor/v和root85单槽移植上，分别改变**root85之后**的代理映射计算。S64把模拟EMA/slot计算放到CPU FP64，再将slot转回FP32并保留原GPU norm；N64/N32保留原GPU FP32 slot，只把norm标量分别换为CPU FP64归约后转FP32／CPU FP32归约，scale乘除仍在GPU。每次调用使用当时真实proxies，映射本身不改anchor/v/proxies；后续模型输出和proxy历史可以变化。
+本轮先冻结[OPERATOR_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-operator-plan>)，在已有规范前缀anchor/v和root85单槽移植上，分别改变**root85之后**的代理映射计算。S64把模拟EMA/slot计算放到CPU FP64，再将slot转回FP32并保留原GPU norm；N64/N32保留原GPU FP32 slot，只把norm标量分别换为CPU FP64归约后转FP32／CPU FP32归约，scale乘除仍在GPU。每次调用使用当时真实proxies，映射本身不改anchor/v/proxies；后续模型输出和proxy历史可以变化。
 
 | 映射方式 | self accepted / calls | 一阶←零阶 accepted / calls | 相对对应native的完整语义轨迹 |
 | --- | ---: | ---: | --- |
@@ -104,11 +104,11 @@ root86/89/108的六组冻结状态输入逐组重算：native生成的全部mask
 
 CPU/CUDA profiler捕获一次规范self root86 provider mapping，共84个CUDA launch、3个aten::linalg_vector_norm调用；External id将norm关联到实际符号`_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIfNS0_10NormTwoOpsIfffLb1EEEjfLi4ELi4EEEEEvT1_`。这定位的是provider中的norm归约。N32在相同FP32输入下替换该算子后端，N64改变归约精度，均没有改变本固定对照的完整路径。不能据此把旧pos88 transformer hidden微差归因给这个kernel，也没有隔离其内部指令／归约树。
 
-解释范围是：root85之后这些provider运算的舍入／归约实现不是维持本次移植路径和8→9差异的必要条件。root85原donor/self向量保持native，root86初次排序因此不受本次变体直接干预；**入口向量映射的舍入、transformer生成proxy hidden的舍入、算子交互、反向零阶对照均未独立排除**。后者已写成新Study的[固定行q_proj协议草案](../../output_space_cross_task/docs/KERNEL_PLAN.md)，尚未执行。规范状态同步也不是精确实数模型。
+解释范围是：root85之后这些provider运算的舍入／归约实现不是维持本次移植路径和8→9差异的必要条件。root85原donor/self向量保持native，root86初次排序因此不受本次变体直接干预；**入口向量映射的舍入、transformer生成proxy hidden的舍入、算子交互、反向零阶对照均未独立排除**。后者已写成新Study的[固定行q_proj协议草案](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-kernel-plan>)，尚未执行。规范状态同步也不是精确实数模型。
 
 8次完整输出均与独立AR一致，288new tokens/220 model forwards，辅助模型forward0；实际采样wall26.896秒、RSS5150023680 bytes、线程13、GPU全局6267MiB、最低可用主存11469459456 bytes。资源采样.5s含背景且可能漏短峰，不是allocator峰或速度比较。selected182573933 bytes只在本机.tmp/q178-operators-20261014-v1，SHA0a6cc44cf424e83d1ecc2d34a433e6cca8255b1c60581edf54649f2ba19c1538；Chrome trace也只在本机，其SHA与真实kernel名已保留[正式证据](operator_diagnosis_v1.json)。profiler的单cycle事件提示已保留日志，没有丢弃失败数据或安装依赖。
 
-[PLAN结果评审](OPERATOR_PLAN_REVIEW.md)保留边界；[跨任务Study](../../output_space_cross_task/README.md)仅草案和分词预检，q241–244未make/launch。[最小提交清单与PR草稿](../../../docs/research/publication-plan.md)仅本地准备。科学src670c744e0535dcad、默认、原PLAN／旧helper／成功Run保持不变；未推送、合并或删除，完整weights/cache/raw tensors不入Git。
+[PLAN结果评审](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-operator-plan-review>)保留边界；[跨任务Study](../../output_space_cross_task/README.md)仅草案和分词预检，q241–244未make/launch。[最小提交清单与PR草稿](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-docs-research-publication-plan>)仅本地准备。科学src670c744e0535dcad、默认、原PLAN／旧helper／成功Run保持不变；未推送、合并或删除，完整weights/cache/raw tensors不入Git。
 
 工具导航验收发现新CLI缺少docstring运行示例，补齐示例和layout导航；测量时原文以[源码快照](operator_tool_v1.py.txt)保留并核对旧tool SHA，执行AST除模块docstring外一致，旧报告未重签。初次分析原JSON保留，[后续离线复核](operator_analysis_v2.json)绑定当前分析器。草案description冒号未加引号被配置展开拒绝，已就地修复，失败发生在make／模型运行前并保留记录。
 
@@ -116,7 +116,7 @@ CPU/CUDA profiler捕获一次规范self root86 provider mapping，共84个CUDA l
 
 ## 固定 CUDA norm 图与 q_proj 行对照（2026-10-14）
 
-本轮以[norm新增合同](NORM_KERNEL_PLAN.md)和[q_proj执行增补](../../output_space_cross_task/docs/KERNEL_EXECUTION_PLAN.md)推进，原OPERATOR_PLAN／KERNEL_PLAN、科学src/default与旧成功Run不改。两组都是旧q178的局部诊断，不是新的cross-task结果。证据为[norm完整记录](norm_kernel_diagnosis_v1.json)、[q_proj完整记录](qproj_kernel_diagnosis_v1.json)和[离线核验](kernel_analysis_v1.json)。
+本轮以[norm新增合同](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-norm-kernel-plan>)和[q_proj执行增补](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-cross-task-docs-kernel-execution-plan>)推进，原OPERATOR_PLAN／KERNEL_PLAN、科学src/default与旧成功Run不改。两组都是旧q178的局部诊断，不是新的cross-task结果。证据为[norm完整记录](norm_kernel_diagnosis_v1.json)、[q_proj完整记录](qproj_kernel_diagnosis_v1.json)和[离线核验](kernel_analysis_v1.json)。
 
 | 实验 | 固定干预 | self accepted / calls | 一阶←零阶 accepted / calls | 完整语义路径 | 数值干预有效性 |
 | --- | --- | ---: | ---: | --- | --- |
@@ -151,7 +151,7 @@ norm实际wall27.943秒、RSS5438509056 bytes、全局GPU5654MiB；q_proj wall26
 
 ## 入口Phi与另一算子RMSNorm（2026-10-14）
 
-根据[PHI_RMS_PLAN](PHI_RMS_PLAN.md)单独冻结8格。入口85 owner0第二槽先按native FP32构造slot并保持native FP32 scale，再用CPU FP64完整norm/乘/除，最终一次cast回FP32；没有修改EMA或重新估scale。两个donor/self向量均真正变化，max_abs1.490116e-8、L2约4.04e-8至4.17e-8，因此本轮是有效入口映射数值干预，区别于上轮返回值bit相同的norm图控制。
+根据[PHI_RMS_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-phi-rms-plan>)单独冻结8格。入口85 owner0第二槽先按native FP32构造slot并保持native FP32 scale，再用CPU FP64完整norm/乘/除，最终一次cast回FP32；没有修改EMA或重新估scale。两个donor/self向量均真正变化，max_abs1.490116e-8、L2约4.04e-8至4.17e-8，因此本轮是有效入口映射数值干预，区别于上轮返回值bit相同的norm图控制。
 
 另固定第0层post_attention_layernorm、85块row4。FP32 singleton替换两格返回值bit同native，是数值无效等价控制；FP64参考按原FP32 input/weight/epsilon表述计算square/mean/rsqrt/product再cast回F32，两格max_abs1.192093e-7／2.384186e-7，其他行逐元素保持。绑定实际Qwen3RMSNorm实现源码、shape/stride及native/singleton CUDA事件，不用该行结果代表其它层或attention。未随机加噪或按结果挑新行。
 
@@ -163,7 +163,7 @@ norm实际wall27.943秒、RSS5438509056 bytes、全局GPU5654MiB；q_proj wall26
 
 ## q178算子级舍入分解（2026-10-15）
 
-按[ROUNDING_FACTOR_PLAN](ROUNDING_FACTOR_PLAN.md)执行[可复现工具](../../../tools/diagnose_q178_rounding_factors.py)，没有新模型forward或token。复用上一轮FP32槽、scale、两种native RMS输入；只读取缓存中第0层gamma，权重文件SHA和installed Qwen3 norm实现前后相同，原始数学/native返回门通过。完整[80格标量记录](rounding_factor_diagnosis_v1.json)保留正负结果、CUDA profile、来源和中间标量，未将任一格改称新接受率实验。
+按[ROUNDING_FACTOR_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-rounding-factor-plan>)执行[可复现工具](../../../tools/diagnose_q178_rounding_factors.py)，没有新模型forward或token。复用上一轮FP32槽、scale、两种native RMS输入；只读取缓存中第0层gamma，权重文件SHA和installed Qwen3 norm实现前后相同，原始数学/native返回门通过。完整[80格标量记录](rounding_factor_diagnosis_v1.json)保留正负结果、CUDA profile、来源和中间标量，未将任一格改称新接受率实验。
 
 Phi三位编码依次是norm、scale*slot、division的64位开关，0保留对应FP32输入/运算，1用FP64，最后转回FP32。两个donor的000精确复现原值，111精确复现上一轮CPU64替换。
 

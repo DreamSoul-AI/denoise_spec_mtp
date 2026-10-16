@@ -2,7 +2,7 @@
 
 ESP reproduction + EMA-velocity masks.
 
-当前研究计划：[中文](docs/research-plan.md) / [English](docs/research-plan.en.md)。按新版规范组织文献、数据、模型、算法、指标与实验；旧v6为历史草稿。全480方向Study已完成并由[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)合dev，冻结PLAN及历史证据保留。当前优先追踪原作者官方Table1/8B路径；[启动清单](docs/research/esp-official-launch-readiness-2026-10-16.md)所列官方入口与实时非抢占准入满足后启动。最新允许标明非作者官方的本地/HF栈；[本地全480结果复核](docs/research/esp-table1-nonofficial-full480-recheck-2026-10-16.md)三主格完整、数学门全过，但未达论文τ目标。继续追官方入口，不重复已有格或新造方法占卡。
+当前研究计划：[中文](<docs/研究计划 Denoising Speculative Decoding.md>) / [English](<docs/Research Plan Denoising Speculative Decoding.md>)。按新版规范组织文献、数据、模型、算法、指标与实验；旧v6为历史草稿。全480方向Study已完成并由[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)合dev，冻结PLAN及历史证据保留。当前优先追踪原作者官方Table1/8B路径；[启动清单](docs/research/esp-official-launch-readiness-2026-10-16.md)所列官方入口与实时非抢占准入满足后启动。最新允许标明非作者官方的本地/HF栈；[本地全480结果复核](docs/research/esp-table1-nonofficial-full480-recheck-2026-10-16.md)三主格完整、数学门全过，但未达论文τ目标。继续追官方入口，不重复已有格或新造方法占卡。
 
 Training-free multi-token prediction:
 

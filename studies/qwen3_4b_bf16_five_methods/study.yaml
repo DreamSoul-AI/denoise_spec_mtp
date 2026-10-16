@@ -5,8 +5,16 @@ experiment:
 recipe: recipe.py
 freeze: true
 provenance:
+  project_plan:
+    path: docs/研究计划 Denoising Speculative Decoding.md
+    historical_sections:
+    - anchor: legacy-studies-qwen3-4b-bf16-five-methods-docs-plan
+      source_commit: aed4eee23ea5e6b9772b388eec9aa50a38452089
+      source_path: studies/qwen3_4b_bf16_five_methods/docs/PLAN.md
+      git_blob_sha256: e0cf97834d9e095585fc941ac7dd76a6ca9b7712bde1cc0c6440b750cb617816
+    policy: Historical replay uses the pinned Git version; current central-plan edits
+      never re-sign old Runs.
   include:
-  - docs/PLAN.md
   - docs/modelscope_snapshot.json
   - docs/modelscope-content-verification-v1.json
   - docs/prompts_manifest.json

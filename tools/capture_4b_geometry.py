@@ -238,7 +238,7 @@ def main():
         snapshot = json.loads((study / 'docs/modelscope_snapshot.json').read_text())
         assert manifest()['digest'] == '538e52c929a542a8'
         report['source_binding'] = {'source_digest': manifest()['digest'], 'tool_sha256': sha(__file__),
-            'plan_sha256': sha(study / 'docs/GEOMETRY_PLAN.md'), 'paired_local_sha256': sha(study / 'docs/paired_evidence_v1.json')}
+            'plan_sha256': sha((Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md')), 'paired_local_sha256': sha(study / 'docs/paired_evidence_v1.json')}
         cache = study / 'shared/model/modelscope/Qwen/Qwen3-4B'
         for file in snapshot['files']:
             assert sha(cache / file['path']) == file['sha256']

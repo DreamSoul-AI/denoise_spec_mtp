@@ -24,7 +24,7 @@ lines.append(('在本批固定输入上，零阶与一阶相对输入基线均�
     '本批结果未同时支持“输出零阶与一阶都比输入基线有总接受收益”。')+
     '这是当前同树／同prompt／同模型条件的事实，不代表各prompt均改善、速度提高或统计泛化。\n\n')
 lines += ['## 协议与历史证据\n\n',
-    '[冻结PLAN](PLAN.md)与[输入清单](prompts_manifest.json)：Qwen3-4B，FP32/eager/CUDA，T0，EOS/max100，非thinking，seed123+prompt序号；三方法同unpruned静态[1,1]、k2/BC9。输入基线是本研究ESP冻结输入均值；输出beta=.9、beta_prime=.99、缩放映射保持原科学实现。实际输入/输出共享权重由两output decoder的storage门核实；四Run实际model_digest相同。\n\n',
+    '[冻结PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-4b-recheck-v2-docs-plan>)与[输入清单](prompts_manifest.json)：Qwen3-4B，FP32/eager/CUDA，T0，EOS/max100，非thinking，seed123+prompt序号；三方法同unpruned静态[1,1]、k2/BC9。输入基线是本研究ESP冻结输入均值；输出beta=.9、beta_prime=.99、缩放映射保持原科学实现。实际输入/输出共享权重由两output decoder的storage门核实；四Run实际model_digest相同。\n\n',
     '[历史检索](history_inventory.json)找到的4B数字是输入空间方法：first26单槽680/704/777，[7,2]双槽621/704，全480冻结均值12809与选定EMA15009；旧Run原始制品未保留，未找到能核验的旧output0/output1结果与配置。因此不宣称精确复现旧输出收益，亦不直接拿不同树的旧接受数与本次配对比较。旧输入EMA选定参数也不当作输出一阶参数。\n\n',
     '[模型快照](modelscope_snapshot.json)记录本机14文件SHA，文件名/大小与官方ModelScope列表一致，离线权重经Study shared junction复用。预存目录的原始下载来源及不可变remote revision未确认，不把名/大小相同当字节一致；实际模型摘要见[原生证据](execution_v1.json)。没有新下载或权重量化/卸载，直接CUDA载入同FP32模型仅避免完整host副本。\n\n',
     'eval.warmup=false；Study局部适配在execute期间替换decoder模块时钟为恒定0，不读取解码clock，全局时间模块不变。原生兼容timing/throughput/speedup字段若为0均为禁用占位，不能解释为零延迟或性能数据。这里仅比较调用计数，不测速。\n\n',
@@ -47,9 +47,9 @@ lines.append('## 验收、失败保全与边界\n\n')
 lines.append(f"四Run全部succeeded、source/model/input/完整性/AR硬门通过；科学source仍{x['source_digest']}，package/default未改。实际生成新token（含三份内部AR审计）{x['total_generated_tokens_including_audits']}，实际生成forward总数{x['total_generation_model_forwards_including_audits']}，零teacher、零warmup。完整Runs/cache/weights在本机，formal证据随本地提交，不推送/PR/合并。\n\n")
 if primary:
     lines.append('[首次激活失败记录](first_run_failure.json)：v1基线在26条execute完成/全部AR相同后因Study collect入口导出模块而失败；原Run与锁未重签，v2仅修正原生phase callable导出，以新版本完成上述验收。旧失败额外26×spec/AR生成单列，不混作新的独立seed或成功Run。8项phase入口回归防止重现；关闭计时/调用语义与注册恢复另有回归。\n\n')
-    lines.append('0.6B rare／单位置机理分析已暂停，结果归档原报告与1274bb2；其有限窗口结论不能代替本4B配对验收。此报告写回后继续预声明[4条新prompt确认](../../output_space_4b_holdout/docs/PLAN.md)，不选择有利prompt或改参数。\n')
+    lines.append('0.6B rare／单位置机理分析已暂停，结果归档原报告与1274bb2；其有限窗口结论不能代替本4B配对验收。此报告写回后继续预声明[4条新prompt确认](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-4b-holdout-docs-plan>)，不选择有利prompt或改参数。\n')
 else:
-    lines.append('这些4条是first26之外固定summarization/translation skip2/take2，按主批次启动前协议选择，不因主批次收益替换。与[主first26报告](../../output_space_4b_recheck_v2/docs/STUDY_REPORT.md)分层，不当额外独立seed或总体显著性证据。下一步应在4B扩大固定任务范围或配方对照；当前不恢复0.6B罕见位置分析。\n')
+    lines.append('这些4条是first26之外固定summarization/translation skip2/take2，按主批次启动前协议选择，不因主批次收益替换。与[主first26报告](STUDY_REPORT.md)分层，不当额外独立seed或总体显著性证据。下一步应在4B扩大固定任务范围或配方对照；当前不恢复0.6B罕见位置分析。\n')
 lines.append('\n未验证：未定位旧output-space4B正结果的完整配方，历史最优输入EMA的同链配对，多seed采样／多设备／更长预算／速度与全量任务泛化。不能从调用减少直接推断加速。\n')
 (docs/'STUDY_REPORT.md').write_text(''.join(lines),encoding='utf-8',newline='\n')
 

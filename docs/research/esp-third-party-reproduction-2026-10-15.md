@@ -18,7 +18,7 @@
 
 ## 二、冻结设置和真实执行
 
-预检先于GPU运行写入[THIRD_PARTY_PLAN](../../studies/esp_table1_bf16_full_argmax/docs/THIRD_PARTY_PLAN.md)，工具与协议冻结于`237db03`（原码与验收主体为`f07f57d`）。复现命令：
+预检先于GPU运行写入[THIRD_PARTY_PLAN](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-full-argmax-docs-third-party-plan>)，工具与协议冻结于`237db03`（原码与验收主体为`f07f57d`）。复现命令：
 
 ```text
 python tools/audit_esp_third_party.py --study studies/esp_table1_bf16_full_argmax --model-cache D:/models/Qwen3-8B --out .tmp/esp-third-party-v1

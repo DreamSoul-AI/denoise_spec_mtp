@@ -4,7 +4,7 @@
 
 ## 固定协议与原始证据
 
-[PLAN](PLAN.md)在执行前声明选择、预算、停止门和匹配前缀分析；[prompt manifest](prompts_manifest.json)冻结数据hash、qid、文本及独立tokenizer渲染后的输入IDs。[执行原始精选](execution_v1.json)、[原生NUMBERS](NUMBERS.md)、[轨迹诊断](trajectory_diagnosis.json)保存所有结果而非只保留最好的prompt。
+[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-small-matrix-docs-plan>)在执行前声明选择、预算、停止门和匹配前缀分析；[prompt manifest](prompts_manifest.json)冻结数据hash、qid、文本及独立tokenizer渲染后的输入IDs。[执行原始精选](execution_v1.json)、[原生NUMBERS](NUMBERS.md)、[轨迹诊断](trajectory_diagnosis.json)保存所有结果而非只保留最好的prompt。
 
 模型同一ModelScope Qwen3-0.6B、实际tied权重、FP32/eager/CUDA、非thinking、T0、100-token/EOS、seed123。prompt窗口translation skip11/take3，输入长度39/69/32；原生per-prompt生成器seed123/124/125，T0不依赖抽样。匹配unpruned static[1,1]链、k2/BC9、原输入均值/输出0/1配方；beta=.9、beta_prime=.99、gamma/rho=1无改动。源码670c744e0535dcad及数据/modelhash均与前置阶段绑定一致。不是旧BC30/[14]的跨协议比较。
 
@@ -63,7 +63,7 @@
 
 ## q173固定窗口测量与反事实对照（2026-10-14）
 
-上述矩阵之后，按独立 [WINDOW_PLAN](WINDOW_PLAN.md) 固定root83/94/97，只读观察原SpecDecoder/provider/model；再按 [SCALE_PLAN](SCALE_PLAN.md) 对root83作固定2×2方向/范数介入。[窗口证据](window_diagnosis_v1.json)、[尺度证据](scale_diagnosis_v1.json)记录源码/tool/PLAN/原矩阵/本机张量SHA与实际runtime。三次q173重放各33token，完整output/接受/提交/KV与原生Run一致；observer模型调用次数28/32/30均等于1+原decode_calls。另有1个完整AR序列teacher-force与9个隔离prefix+seedmask前向；尺度对照仅4个前向、0新生成token。没有新增正式接受格子、重签旧Run或改变科学src/参数。
+上述矩阵之后，按独立 [WINDOW_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-small-matrix-docs-window-plan>) 固定root83/94/97，只读观察原SpecDecoder/provider/model；再按 [SCALE_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-small-matrix-docs-scale-plan>) 对root83作固定2×2方向/范数介入。[窗口证据](window_diagnosis_v1.json)、[尺度证据](scale_diagnosis_v1.json)记录源码/tool/PLAN/原矩阵/本机张量SHA与实际runtime。三次q173重放各33token，完整output/接受/提交/KV与原生Run一致；observer模型调用次数28/32/30均等于1+原decode_calls。另有1个完整AR序列teacher-force与9个隔离prefix+seedmask前向；尺度对照仅4个前向、0新生成token。没有新增正式接受格子、重签旧Run或改变科学src/参数。
 
 ### 起草证据的正确时序
 
@@ -116,7 +116,7 @@ root83实际输入/输出seed范数=.1912895/.9250697，原观察同时改变方
 
 ## q173单次历史代理移植（2026-10-14）
 
-按测量前冻结的 [TRANSFER_PLAN](TRANSFER_PLAN.md)，只在root83返回的mask张量中替换owner0第二槽（零基[0,1]），进行一阶←零阶、零阶←一阶、以及一阶原值回填三次重放。固定donor来自已保留窗口张量；没有修改committed状态、其他mask、默认配方或科学源码。转移的是完整向量，范数分别.925069749/.925069809，L2差.053660285；未再归一化，不能称为数学上严格等范数的纯方向介入。这里的差异主要为方向，范数仅有浮点末位差异；本轮不靠该近似作跨尺度结论。
+按测量前冻结的 [TRANSFER_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-small-matrix-docs-transfer-plan>)，只在root83返回的mask张量中替换owner0第二槽（零基[0,1]），进行一阶←零阶、零阶←一阶、以及一阶原值回填三次重放。固定donor来自已保留窗口张量；没有修改committed状态、其他mask、默认配方或科学源码。转移的是完整向量，范数分别.925069749/.925069809，L2差.053660285；未再归一化，不能称为数学上严格等范数的纯方向介入。这里的差异主要为方向，范数仅有浮点末位差异；本轮不靠该近似作跨尺度结论。
 
 [干预证据](transfer_diagnosis_v1.json)保留完整实际验证/提交/KV轨迹、source/model/runtime/PLAN/tool/raw绑定及全部预定窗口。[离线路径核验](transfer_path_diagnosis_v1.json)来自本机张量的逐元素比较，无新增forward。新工具不复用原观察器的baseline接受路径：先按实际root步进确定preceding seed owner，再核对真实trace；五个预定根83/84/86/94/97本轮全部访问，没有强制访问或替换窗口。
 
@@ -147,7 +147,7 @@ root83实际输入/输出seed范数=.1912895/.9250697，原观察同时改变方
 
 ## 跨prompt固定干预复现：q171、q172、q174（2026-10-14）
 
-按新 [CROSS_PROMPT_PLAN](CROSS_PROMPT_PLAN.md) 在测量前固定三个已有prompt/seed，未按新hidden或logits挑位置。选择规则为两输出方法第一次共同命中的前一个共同访问且均拒绝的根：q171/seed123/root63（原命中64）、q172/seed123/root42（命中43）、q174/seed125/root41（命中42）。q171来自先前prerequisite；q172/174来自本矩阵。三条原零/一阶接受轨迹相同，属于既有一阶优势未出现或输入/输出命中位置不同的样本；T0下这些seed不是随机重复实验。
+按新 [CROSS_PROMPT_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-small-matrix-docs-cross-prompt-plan>) 在测量前固定三个已有prompt/seed，未按新hidden或logits挑位置。选择规则为两输出方法第一次共同命中的前一个共同访问且均拒绝的根：q171/seed123/root63（原命中64）、q172/seed123/root42（命中43）、q174/seed125/root41（命中42）。q171来自先前prerequisite；q172/174来自本矩阵。三条原零/一阶接受轨迹相同，属于既有一阶优势未出现或输入/输出命中位置不同的样本；T0下这些seed不是随机重复实验。
 
 复用既有observe()/transfer()且不改两份工具，先每prompt观察原零/一阶，再作一阶←零阶、零阶←一阶及一阶原值回填。每次仍只交换指定根owner0第二槽[0,1]，同位第一槽和其他mask保持逐元素不变。观察窗口为从固定根到终止的原两方法访问根并集，本次共36/9/2根。新runner只连接已保存输入与既有工具，不增加decoder、sampler、cache或调度实现；源670c744e0535dcad和原config/Run/默认配方保留。
 
@@ -189,7 +189,7 @@ q174只有41→42(owner0)这一段：终止块root42的incoming proxy pair改变
 
 ## 四个新prompt扩展与累计矩阵（2026-10-14）
 
-按[扩展PLAN](../../output_space_extension/docs/PLAN.md)先分析q173的晚窗口、局部正负margin与owner路径，再预声明q175–q178。已完成4新原生Run×4prompt和20次固定双向/原值回填诊断，全部输出与独立AR一致，科学源/default/旧Run保留。详细新结果与假设边界在[扩展STUDY_REPORT](../../output_space_extension/docs/STUDY_REPORT.md)；表是八个开发prompt的累计描述，不是八个独立seed或单个可部署新方法。
+按[扩展PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-plan>)先分析q173的晚窗口、局部正负margin与owner路径，再预声明q175–q178。已完成4新原生Run×4prompt和20次固定双向/原值回填诊断，全部输出与独立AR一致，科学源/default/旧Run保留。详细新结果与假设边界在[扩展STUDY_REPORT](../../output_space_extension/docs/STUDY_REPORT.md)；表是八个开发prompt的累计描述，不是八个独立seed或单个可部署新方法。
 
 | qid | 输入accepted | 原零阶 | 原一阶 | 干预根 | 一阶←零阶 | 零阶←一阶 | 一阶原值回填 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -208,7 +208,7 @@ q173为何特殊目前可收紧为有限假设：晚位置与注入幅度不单�
 
 ## q178数值对照与q179–q182：累计12prompt（2026-10-14）
 
-[数值预声明](../../output_space_extension/docs/NUMERICAL_PLAN.md)/[PLAN评审](../../output_space_extension/docs/NUMERICAL_PLAN_REVIEW.md)和[后续四prompt PLAN](../../output_space_followup/docs/PLAN.md)/[PLAN_REVIEW](../../output_space_followup/docs/PLAN_REVIEW.md)分别保存固定合同与结果反馈，不重签旧成功Run。
+[数值预声明](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-numerical-plan>)/[PLAN评审](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-numerical-plan-review>)和[后续四prompt PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-followup-docs-plan>)/[PLAN_REVIEW](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-followup-docs-plan-review>)分别保存固定合同与结果反馈，不重签旧成功Run。
 
 q178严格FP32确定性重复的全部已捕获张量与实际语义轨迹逐元素相同，变路径microdelta仍存在。首个同位状态漂移root89的anchor来自同一真实position88在不同块的row2（原86块）或row0（新88块）；变路径anchor与其88块exact hidden逐元素相同。这定位到确定性块/KV/owner路径变化，未做低层CUDA kernel profiler。规范teacher前缀anchor/v同步的两个self控制仍8/27，双向移植仍9/26且与严格移植全语义路径相同，因此这些committed-state微差不是该固定效果的必要条件；proxy内部舍入未独立隔离。详细事实在[数值报告](../../output_space_extension/docs/STUDY_REPORT.md)。
 

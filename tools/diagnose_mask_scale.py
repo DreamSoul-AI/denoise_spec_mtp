@@ -46,7 +46,7 @@ def main():
     assert file_hash(args.diagnostic / 'selected_tensors.pt') == observer['raw_tensor_sha256']
     assert file_hash(study / 'docs/execution_v1.json') == observer['source_binding']['matrix_sha256']
     assert manifest()['digest'] == data['source_digest'] == '670c744e0535dcad'
-    binding = {'plan_sha256': file_hash(study / 'docs/SCALE_PLAN.md'),
+    binding = {'plan_sha256': file_hash((Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md')),
                'tool_sha256': file_hash(Path(__file__)),
                'helper_sha256': file_hash(Path(__file__).with_name('diagnose_output_windows.py')),
                'observer_sha256': file_hash(args.diagnostic / 'diagnosis.json'),
@@ -91,7 +91,7 @@ def main():
         assert runtime() == rows['output_order1']['runtime'] and manifest()['digest'] == binding['source_digest']
         for name, metadata in snapshot['files'].items():
             assert file_hash(cache / name) == metadata['sha256']
-        assert file_hash(study / 'docs/SCALE_PLAN.md') == binding['plan_sha256']
+        assert file_hash((Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md')) == binding['plan_sha256']
         report['model_digest'] = data['model_digest']
         report['runtime'] = runtime()
         report['forward_calls'] = 4

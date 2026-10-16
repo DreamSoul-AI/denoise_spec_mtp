@@ -1,6 +1,6 @@
 # ESP Table 1 corrected Qwen3 preflight
 
-[PLAN](docs/PLAN.md): BC60/1 primary (29 nodes), BC60/2 control (19 nodes). One new Run fills the missing primary; three frozen earlier cells are reused. Both BC60 results and target deltas are always reported. BF16/T0/256/seed123/updating mean, no speed tests.
+[PLAN](<../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-qwen-protocol-docs-plan>): BC60/1 primary (29 nodes), BC60/2 control (19 nodes). One new Run fills the missing primary; three frozen earlier cells are reused. Both BC60 results and target deltas are always reported. BF16/T0/256/seed123/updating mean, no speed tests.
 
 ## 当前研究验收与后续入口
 

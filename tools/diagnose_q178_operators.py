@@ -111,7 +111,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     study = root / 'studies/output_space_extension'
     read = lambda p: json.loads(p.read_text(encoding='utf-8'))
-    paths = {'plan': study / 'docs/OPERATOR_PLAN.md', 'native': study / 'docs/execution_v1.json',
+    paths = {'plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'), 'native': study / 'docs/execution_v1.json',
         'old_report': root / '.tmp/q178-numerical-20261014-v1/diagnosis.json',
         'old_tensor': root / '.tmp/q178-numerical-20261014-v1/selected_tensors.pt',
         'snapshot': study / 'docs/modelscope_snapshot.json', 'tool': Path(__file__),

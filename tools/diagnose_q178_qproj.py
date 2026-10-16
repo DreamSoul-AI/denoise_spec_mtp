@@ -110,9 +110,9 @@ def main():
     root = Path(__file__).resolve().parents[1]
     report, tensors = {'quality_passed': False, 'cases': [], 'block_replays': [], 'linear_comparisons': []}, {}
     try:
-        c = load(args.out, root / 'studies/output_space_cross_task/docs/KERNEL_EXECUTION_PLAN.md', Path(__file__))
+        c = load(args.out, (root / 'docs/研究计划 Denoising Speculative Decoding.md'), Path(__file__))
         # Bind the original fixed target declaration as well as its execution addendum.
-        original_plan = root / 'studies/output_space_cross_task/docs/KERNEL_PLAN.md'
+        original_plan = (root / 'docs/研究计划 Denoising Speculative Decoding.md')
         c.paths['original_kernel_plan'] = original_plan
         c.binding['original_kernel_plan'] = file_hash(original_plan)
         report.update(version='q178-fixed-qproj-20261014-v1', source_binding=c.binding,

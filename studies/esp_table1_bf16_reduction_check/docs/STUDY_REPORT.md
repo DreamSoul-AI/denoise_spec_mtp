@@ -12,6 +12,6 @@ BF16、T0、eager、dynamic/pruning、λ=.1 updating mean及实际checkpoint均�
 
 部分AR自身也随归约模式改变，不能把不同数值约定的接受数当作严格同AR路径增益。每格仍与自己的独立AR比较并保留原AR差异；逐条边界见[证据](reduction_evidence_v1.json)。q81 BC10第75个新token（index74）再分叉，原32-token观察只能限定为局部结果。
 
-假设收紧：归约模式能影响BF16批量核行为与argmax边界，但关闭它不是充分修复；亦不说明树/cache语义错误。下一项[最小形状对照](../../esp_table1_bf16_shape_check/docs/PLAN.md)只控制nn.Linear的batch行几何，仍用于ESP8B正确性门。不触及mask新方法/default/src、4B或Kalman。若单行linear仍失配，不能宣称linear是唯一来源。
+假设收紧：归约模式能影响BF16批量核行为与argmax边界，但关闭它不是充分修复；亦不说明树/cache语义错误。下一项[最小形状对照](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-shape-check-docs-plan>)只控制nn.Linear的batch行几何，仍用于ESP8B正确性门。不触及mask新方法/default/src、4B或Kalman。若单行linear仍失配，不能宣称linear是唯一来源。
 
-[冻结协议](PLAN.md)、[权重清单](modelscope_snapshot.json)、[完整token/flags/计数/哈希](reduction_evidence_v1.json)。整个Study质量不完整通过，没有可用Table1成功结论。
+[冻结协议](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-reduction-check-docs-plan>)、[权重清单](modelscope_snapshot.json)、[完整token/flags/计数/哈希](reduction_evidence_v1.json)。整个Study质量不完整通过，没有可用Table1成功结论。

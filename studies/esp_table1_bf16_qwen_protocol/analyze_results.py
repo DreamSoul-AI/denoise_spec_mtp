@@ -98,7 +98,7 @@ def main():
         exact='pending' if c['pending'] else f"{c['exact_count']}/{c['n']}"
         lines.append(f"| {c['BC']}/{c['num_masks']} | {c['role']} | {exact} | "+' | '.join(values)+' |')
     lines+=['','目标BC30=1.63，BC60双方均列相对1.74差值，不按τ选主配置。失配格τ是诊断值，不能算复现成功；预检不代替全480。','',
-            '[PLAN](PLAN.md)引用G.2具体说明：Qwen3 BC60单mask/29节点，双mask/19节点为对照；保持动态树剪枝，BF16/T0/256/seed123，无测速/预热。','',
+            '[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-qwen-protocol-docs-plan>)引用G.2具体说明：Qwen3 BC60单mask/29节点，双mask/19节点为对照；保持动态树剪枝，BF16/T0/256/seed123，无测速/预热。','',
             'Mean mask按Eq5 λ=.1更新，与后续4B用户指定的ESP frozen mean不同。原执行冻结PLAN不回写，已有三格按哈希复用，原生exact门不放宽。',
             '',f'逐prompt计数、全部token及哈希见[{filename}]({filename})。全部480的差值须另列，未运行不能用预检外推。']
     (study/'docs/STUDY_REPORT.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')

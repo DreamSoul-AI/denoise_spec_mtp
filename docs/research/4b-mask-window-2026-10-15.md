@@ -1,7 +1,7 @@
 现状：固定数据下[五方法加AR](../../studies/qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)完整11/11已验收；追加早期/双向/方向72格、192次forward，数学门全过。<br>
 发现：原e2−e1对零偏置3胜1负；随机0也在q241提升，否定本批“只有原方向有效”，见[方向读出](4b-direction-controls-readout-2026-10-15.json) `comparisons`。<br>
 发现：q121/q241双向替换接受数0↔1；其余保留反例，见[输出轨迹](4b-reciprocal-output-readout-2026-10-15.json)/[输入轨迹](4b-reciprocal-input-readout-2026-10-15.json)。<br>
-下一步：按10月16日追加指示执行[BC30全480方向对照](../../studies/qwen3_4b_bf16_directions/docs/PLAN.md)，四窗口不能替代全量结论；新Study独立留证，不改变prompt。<br>
+下一步：按10月16日追加指示执行[BC30全480方向对照](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-directions-docs-plan>)，四窗口不能替代全量结论；新Study独立留证，不改变prompt。<br>
 阻塞：主实验及局部方向控制已通过PR20交付；第三方失败证据已通过PR21交付，无有效τ。新全量Study尚未得出结果，pending不补零，目标模式继续active。
 
 # 4B 输出侧候选质量与固定窗口阶段报告
@@ -21,7 +21,7 @@
 
 模型为原魔搭 Qwen3-4B BF16，T0/eager/default、双mask动态剪枝树、BC30/9节点，tied storage核验。输出EMA/范数沿用原生FP32内部状态，模型/forward/实际mask为BF16。没有FP32模型、新AR或teacher前向、8B、测速、算子数值追踪。原作者ESP来源缺口仍见[独立核查](esp-official-code-reproduction-2026-10-15.md)，本轮不替代官方代码复现。
 
-工具：[CPU向量/转移分析](../../tools/analyze_4b_velocity.py)、[窗口工具](../../tools/diagnose_4b_mask_windows.py)、[树读出](../../tools/analyze_4b_window_results.py)。先提交[无条件窗口协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_WINDOW_PLAN.md)，再执行采集。首批测量工具为 Git commit `ce7c329` 的原字节，SHA在原始标量 `tool_sha256`，后续条件入口不重新签收首批。
+工具：[CPU向量/转移分析](../../tools/analyze_4b_velocity.py)、[窗口工具](../../tools/diagnose_4b_mask_windows.py)、[树读出](../../tools/analyze_4b_window_results.py)。先提交[无条件窗口协议](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-window-plan>)，再执行采集。首批测量工具为 Git commit `ce7c329` 的原字节，SHA在原始标量 `tool_sha256`，后续条件入口不重新签收首批。
 
 ## 二、CPU排除与收紧
 
@@ -139,7 +139,7 @@ CPU读出直接读取保存的GPU实际树。另计算两种**候选覆盖上界
 
 ## 五、追加条件窗口与当前执行状态
 
-为检验有真实第二深度机会时的输出速度作用，已另行冻结[条件协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_ACTIVE_PLAN.md)：q121/q401各选原控制第一次下一块accepted_nodes=[1]的前驱，R=3/19，下一R=4/20。2窗口×6格，新增forward上限64。该样本按原控制结果条件选择，必须与上述4个无条件窗口分表，不能混算全量胜率。
+为检验有真实第二深度机会时的输出速度作用，已另行冻结[条件协议](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-active-plan>)：q121/q401各选原控制第一次下一块accepted_nodes=[1]的前驱，R=3/19，下一R=4/20。2窗口×6格，新增forward上限64。该样本按原控制结果条件选择，必须与上述4个无条件窗口分表，不能混算全量胜率。
 
 **追加12/12格已完成，45次总forward，低于64预算。** 2/2零阶控制续接旧Run，12/12当前owner argmax不变、局部数学自检通过，36次局部选择检查；12/12下一验证短链仍与旧零阶轨迹一致。只有控制门和数学门作检查，没有新增独立AR前向。
 
@@ -188,7 +188,7 @@ CPU读出直接读取保存的GPU实际树。另计算两种**候选覆盖上界
 
 ### 设置与来源
 
-按[独立冻结协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_TEMPLATE_PLAN.md)，复用相同4个无条件窗口及2个条件窗口，每个只跑四格：原输出零阶、原生输入一阶、相同已更新mean加固定模板首差分、相同已更新mean加零速度。后两者只替换局部mask读出的速度，不改已提交真实历史；零速度mean等于updating mean，不是ESP frozen mean。未来验证块仍用相同输出零阶mask规则。
+按[独立冻结协议](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-template-plan>)，复用相同4个无条件窗口及2个条件窗口，每个只跑四格：原输出零阶、原生输入一阶、相同已更新mean加固定模板首差分、相同已更新mean加零速度。后两者只替换局部mask读出的速度，不改已提交真实历史；零速度mean等于updating mean，不是ESP frozen mean。未来验证块仍用相同输出零阶mask规则。
 
 | 批次 | 原始观测 | CPU读出 | 总forward | 局部argmax选择检查 |
 | --- | --- | --- | --- | --- |
@@ -249,7 +249,7 @@ CPU读出直接读取保存的GPU实际树。另计算两种**候选覆盖上界
 
 ### 固定早期16格
 
-按[早期协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_EARLY_TEMPLATE_PLAN.md)预先固定q121/R1→2、q401/R0→1、q241/R1→3、q161/R2→4。在原输出零阶的同一真实前缀/cache/tree上，只改变当前块的mask构造。q161的原输入两路径差异在R3，但输出零阶跳过R3，因此这里是邻近负对照，不声称精确复现R3。
+按[早期协议](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-early-template-plan>)预先固定q121/R1→2、q401/R0→1、q241/R1→3、q161/R2→4。在原输出零阶的同一真实前缀/cache/tree上，只改变当前块的mask构造。q161的原输入两路径差异在R3，但输出零阶跳过R3，因此这里是邻近负对照，不声称精确复现R3。
 
 新门一次放行，实际初始free=21,537MiB，所有准入记录的foreign_gpu_python_pids为空。16格全部完成，44次总forward（上限64），54次局部argmax选择检查全过，16格当前owner argmax及下一短链保持，4个零阶控制续接旧Run。没有AR新增前向、测速或8B。
 
@@ -272,7 +272,7 @@ q161的零速度第二目标排名5、d2宽8，原生速度变43、d2宽7，实�
 
 ## 十、原输入与输出轨迹上的双向构造互换
 
-按[双向协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_RECIPROCAL_PLAN.md)，分别重建原输出零阶、原输入一阶的4个早期窗口。同一origin内，只换当前块mask构造为输出零阶、输入一阶或输出一阶；当前prefix/cache/tree/位置/注意力固定，下一验证块mask回到该origin原规则。输入origin只读观察原生final hidden，按真实已提交历史维护两种输出shadow，不改变原输入provider或生成历史。
+按[双向协议](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-reciprocal-plan>)，分别重建原输出零阶、原输入一阶的4个早期窗口。同一origin内，只换当前块mask构造为输出零阶、输入一阶或输出一阶；当前prefix/cache/tree/位置/注意力固定，下一验证块mask回到该origin原规则。输入origin只读观察原生final hidden，按真实已提交历史维护两种输出shadow，不改变原输入provider或生成历史。
 
 | origin | 原始观测 | 读出 | forward | 局部argmax选择检查 |
 | --- | --- | --- | --- | --- |
@@ -305,7 +305,7 @@ q161的零速度第二目标排名5、d2宽8，原生速度变43、d2宽7，实�
 
 ## 十一、Enmao指定的四类方向对照
 
-按[方向协议](../../studies/qwen3_4b_bf16_five_methods/docs/MASK_DIRECTION_PLAN.md)，只在相同4处输出origin早期窗口追加分析格。数据SHA和原480条manifest不变，模型实际input_ids始终取原manifest。对照不是新主方法，不进入五方法排名或改写其完整Run。
+按[方向协议](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-direction-plan>)，只在相同4处输出origin早期窗口追加分析格。数据SHA和原480条manifest不变，模型实际input_ids始终取原manifest。对照不是新主方法，不进入五方法排名或改写其完整Run。
 
 四类为原固定e2−e1、同范数随机方向（固定种子0/1/2，不选最优）、零偏置updating mean、内容初始化速度；另保留原生输入速度与输出零阶控制。所有输入格的完整prompt mean和后续λ更新相同。正文起始从原SpecBench第一turn及原tokenizer offset核验，四处均index3；仅把速度初始化移到正文首差分，继续原prompt后缀和committed历史EMA，不重写prompt或模板。
 

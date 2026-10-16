@@ -101,7 +101,7 @@ def main():
     data = read(study / 'docs/execution_v1.json')
     selection = read(study / 'docs/window_selection_v1.json')['prompts'][3]
     assert selection['question_id'] == 178 and selection['intervention_root'] == 85
-    paths = {'plan': study / 'docs/NUMERICAL_PLAN.md', 'matrix': study / 'docs/execution_v1.json',
+    paths = {'plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'), 'matrix': study / 'docs/execution_v1.json',
         'selection': study / 'docs/window_selection_v1.json', 'snapshot': study / 'docs/modelscope_snapshot.json',
         'tool': Path(__file__), 'observer_helper': Path(__file__).with_name('diagnose_output_windows.py'),
         'transfer_helper': Path(__file__).with_name('diagnose_proxy_transfer.py'),

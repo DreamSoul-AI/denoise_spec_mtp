@@ -1,6 +1,7 @@
 import importlib.util
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -36,7 +37,9 @@ def test_recorded_preflight_cannot_be_reported_as_valid_tau():
         assert row['first_rejection']['argmax_minus_chosen_logit'] > 0
     for path, key in [('tools/audit_esp_third_party.py', 'tool_sha256'),
                       ('studies/esp_table1_bf16_full_argmax/docs/THIRD_PARTY_PLAN.md', 'plan_sha256')]:
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == report[key]
+        original = subprocess.check_output(['git', 'show', f'aed4eee23ea5e6b9772b388eec9aa50a38452089:{path}'], cwd=ROOT)
+        candidates = (original, original.replace(b'\n', b'\r\n'))
+        assert report[key] in {hashlib.sha256(data).hexdigest() for data in candidates}
 
 
 def test_audit_uses_prefix_parent_and_limits_remaining(monkeypatch):

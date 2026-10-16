@@ -2,9 +2,9 @@
 
 ## 一、问题、假设与当前实现
 
-宏观方案是 [research-plan-v6.md](research-plan-v6.md)。其 §5.11 与 E1–E2 需要先有可靠输入空间基线，再检验未实现的输出空间 mask。已有结构只共享 provider 向量，owner 的位置和 attention 已独立；现有 EMA 更新来自提交 token 的输入 embedding。输出 hidden 外推、Kalman 和 PLD/STAND/LADE 等外部 baseline 未补写成支持。
+宏观方案是 [research-plan-v6.md](<../研究计划 Denoising Speculative Decoding.md#legacy-docs-research-research-plan-v6>)。其 §5.11 与 E1–E2 需要先有可靠输入空间基线，再检验未实现的输出空间 mask。已有结构只共享 provider 向量，owner 的位置和 attention 已独立；现有 EMA 更新来自提交 token 的输入 embedding。输出 hidden 外推、Kalman 和 PLD/STAND/LADE 等外部 baseline 未补写成支持。
 
-提取 [input_mask_baseline](../../studies/input_mask_baseline/docs/PLAN.md)：在同一真实预训练模型、固定新 prompt 与原解码配方上，现有 frozen_mean、gamma_last 及 AR 能否留下可核验的一致输出、接受/cache 轨迹与来源？这是工程与数值前置问题；若任一 token 不一致则否决流程质量。它不检验 H1–H13，不要求 EMA 接受数优于 ESP，也不以吞吐证明机制。
+提取 [input_mask_baseline](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-input-mask-baseline-docs-plan>)：在同一真实预训练模型、固定新 prompt 与原解码配方上，现有 frozen_mean、gamma_last 及 AR 能否留下可核验的一致输出、接受/cache 轨迹与来源？这是工程与数值前置问题；若任一 token 不一致则否决流程质量。它不检验 H1–H13，不要求 EMA 接受数优于 ESP，也不以吞吐证明机制。
 
 “免训练”只表示本轮不更新模型权重；调 β/λ/γ 或选择数据仍可产生选择偏差，不能据此宣称没有过拟合/迁移问题。原草案中的此类解释保留为待验证主张；本轮不选参，不使用最好重复替代失败。
 

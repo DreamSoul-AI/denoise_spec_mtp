@@ -156,9 +156,9 @@ def main():
     assert manifest()['digest'] == data['source_digest'] == '670c744e0535dcad'
     assert file_hash(matrix) == observer['source_binding']['matrix_sha256']
     assert file_hash(tensor_path) == observer['raw_tensor_sha256'] == '47166a3b41e0c00ed39110593fe7f83b20323c2e3714fe0355f2a43aaa9dc14c'
-    paths = {'plan': study / 'docs/TRANSFER_PLAN.md', 'matrix': matrix, 'tool': Path(__file__),
+    paths = {'plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'), 'matrix': matrix, 'tool': Path(__file__),
              'helper': Path(__file__).with_name('diagnose_output_windows.py'),
-             'window_plan': study / 'docs/WINDOW_PLAN.md',
+             'window_plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'),
              'observer': args.diagnostic / 'diagnosis.json', 'tensor': tensor_path,
              'snapshot': study / 'docs/modelscope_snapshot.json'}
     rows = {r['case']: r for r in data['runs']}

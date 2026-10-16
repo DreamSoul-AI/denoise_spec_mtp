@@ -91,7 +91,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     report, tensors = {'quality_passed': False, 'cases': [], 'entry_vectors': [], 'norm_comparisons': []}, {}
     try:
-        c = load(args.out, root / 'studies/output_space_extension/docs/PHI_RMS_PLAN.md', Path(__file__))
+        c = load(args.out, (root / 'docs/研究计划 Denoising Speculative Decoding.md'), Path(__file__))
         norm = c.model.hf.model.layers[0].post_attention_layernorm
         c.paths['norm_implementation'] = Path(inspect.getsourcefile(type(norm)))
         c.binding['norm_implementation'] = file_hash(c.paths['norm_implementation'])

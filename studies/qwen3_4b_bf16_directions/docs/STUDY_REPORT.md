@@ -6,7 +6,7 @@
 下一步：CPU回归、PR22合dev、清理对应远程分支；本轮BC60方向不追加，理由见最终报告。
 阻塞：无；以下为保留的历史阶段快照，未完成表述仅指各自快照时点，不代表当前状态。
 
-2026-10-16新指令已冻结[PLAN](PLAN.md)。四窗口不能回答总体唯一方向问题，本轮不以其结果代替全量。`tools/analyze_4b_full_directions.py`复用原五方法native读出，pending只记进度，不补零或平局。最终取原template成功格、补齐Study四个预定成功格及旧zero；补齐Study process必须通过，原Study资源失败终验原样保留。六格均完整并通过来源与数学门核对后才发布正式JSON；方向与旧五方法的关系按PLAN单列。
+2026-10-16新指令已冻结[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-directions-docs-plan>)。四窗口不能回答总体唯一方向问题，本轮不以其结果代替全量。`tools/analyze_4b_full_directions.py`复用原五方法native读出，pending只记进度，不补零或平局。最终取原template成功格、补齐Study四个预定成功格及旧zero；补齐Study process必须通过，原Study资源失败终验原样保留。六格均完整并通过来源与数学门核对后才发布正式JSON；方向与旧五方法的关系按PLAN单列。
 
 新版研究计划已按模板十章重写并纳入文献表：[中文正本](https://github.com/DreamSoul-AI/denoising-speculative-decoding/blob/b00ecc0a188bb1a2845f061e958fdac37da7bcce/docs/research-plan.md)、[英文译本](https://github.com/DreamSoul-AI/denoising-speculative-decoding/blob/b00ecc0a188bb1a2845f061e958fdac37da7bcce/docs/research-plan.en.md)，由PR23经CI合dev。两个中文规范/模板逐字节沿用RPipe固定版本；英文规范/模板仅各一处导航适配，来源和SHA在其standards README。本次是对现有研究的组织补全，不是事后预注册；本Study及补齐Study的冻结PLAN/科学源码原字节保持，content原进程未被打断。计划远程分支已清理，当前方向工作分支保留，见[清理记录](../../../docs/research/remote-branch-cleanup-2026-10-15.md)。
 
@@ -73,7 +73,7 @@ Run `95aff7e5e533a947`完整480并原生succeeded，来源：[direction_partial_
 
 random0原Run `be910fe1fa042b28`在北京时间00:57:07的下一prompt准入时观察到真实GPU Python PID65348，按冻结规则抛出`Foreign GPU work appeared`，原生状态failed。此前完整46条共9,028个提交token经原生`_check_argmax`对token/hash/owner链复核通过，实际5,923次模型调用。该格不是方法正确性失败或OOM，也没有有效全480τ。
 
-证据：[resource_interruption_v1.json](resource_interruption_v1.json)，绑定原failed result、完整私有partial JSONL和progress SHA；完整失败Run保留，不把46条拼接成全量或重签成成功。外部PID随后已不在实际GPU列表，原串行队列自动进入random1；不杀外部作业，不重启当前有效进程、不另开队列。原队列结束后仅为缺失因素建立新版本完整480补齐，具体门与唯一有效格选择见[RECOVERY_PLAN](RECOVERY_PLAN.md)。原Study可能保留失败终验，最终如需跨Study组合，会逐项披露，不宣称原失败Study通过。
+证据：[resource_interruption_v1.json](resource_interruption_v1.json)，绑定原failed result、完整私有partial JSONL和progress SHA；完整失败Run保留，不把46条拼接成全量或重签成成功。外部PID随后已不在实际GPU列表，原串行队列自动进入random1；不杀外部作业，不重启当前有效进程、不另开队列。原队列结束后仅为缺失因素建立新版本完整480补齐，具体门与唯一有效格选择见[RECOVERY_PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-directions-docs-recovery-plan>)。原Study可能保留失败终验，最终如需跨Study组合，会逐项披露，不宣称原失败Study通过。
 
 原队列最终自然exit1：random1完成50条、random2完成9条后分别遇GPU Python PID28472/62864；content在加载前遇PID62864未获准入。原Study终验passed=false，状态原样保留。新增三格partial逐token/hash/owner核验通过，共105次完整prompt执行、20,977个提交token、13,854次模型调用仅列资源损耗，不作为有效全量结果。全部终态与SHA见[resource_interruptions_v2.json](resource_interruptions_v2.json)。补齐版只将两个资源assert改为同进程等待5秒再查，方向control原文保持，15项方向/旧配对/文档CPU回归及Ruff通过；等待不改prompt、不作为测速。
 

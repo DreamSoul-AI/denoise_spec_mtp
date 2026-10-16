@@ -38,8 +38,7 @@ def main():
     from spec_mtp.structure.artifact.sources import manifest
     from spec_mtp.structure.artifact.evidence import runtime
     root = Path(__file__).resolve().parents[1]
-    study = root / 'studies/output_space_cross_task'
-    paths = {'tool': Path(__file__), 'plan': study / 'docs/SAMPLING_CONTINUATION_PLAN.md',
+    paths = {'tool': Path(__file__), 'plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'),
         'helper': root / 'tools/diagnose_sampling_paths.py',
         'owner_report': root / '.tmp/q241-owner1-20261015-v1/diagnosis.json',
         'owner_tensor': root / '.tmp/q241-owner1-20261015-v1/selected_tensors.pt',

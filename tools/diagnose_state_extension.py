@@ -39,7 +39,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     study = root / 'studies/output_space_cross_task'
     read = lambda p: json.loads(p.read_text(encoding='utf-8'))
-    paths = {'tool': Path(__file__), 'plan': study / 'docs/STATE_EXTENSION_PLAN.md',
+    paths = {'tool': Path(__file__), 'plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'),
         'matrix': study / 'docs/execution_v1.json', 'selection': study / 'docs/window_selection_v1.json',
         'snapshot': study / 'docs/modelscope_snapshot.json'}
     for name in ('diagnose_output_windows.py', 'diagnose_proxy_transfer.py', 'diagnose_q178_numerics.py',

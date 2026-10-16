@@ -1,6 +1,6 @@
 # Study Report: output_space_prerequisite
 
-2026-10-14：四格执行完成，来源/原始证据/正确性/Study完整性质量门通过。输出零阶与一阶均与独立AR逐token一致，但接受数均低于匹配输入均值链；保留负结果，不调参。依据见 [PLAN](PLAN.md)、[精选原始证据](execution_v1.json)、[原生数字表](NUMBERS.md)。
+2026-10-14：四格执行完成，来源/原始证据/正确性/Study完整性质量门通过。输出零阶与一阶均与独立AR逐token一致，但接受数均低于匹配输入均值链；保留负结果，不调参。依据见 [PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-prerequisite-docs-plan>)、[精选原始证据](execution_v1.json)、[原生数字表](NUMBERS.md)。
 
 ## 条件与结果
 

@@ -1,6 +1,6 @@
 # PR说明草稿
 
-状态：仅本地草稿，未新建PR、未推送；基线依赖与文件范围见[publication-plan.md](publication-plan.md)。
+状态：仅本地草稿，未新建PR、未推送；基线依赖与文件范围见[publication-plan.md](<../研究计划 Denoising Speculative Decoding.md#legacy-docs-research-publication-plan>)。
 
 标题：feat: add tied output-hidden order0/order1 masks for static chains
 

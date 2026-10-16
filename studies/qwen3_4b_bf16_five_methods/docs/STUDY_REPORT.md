@@ -66,7 +66,7 @@ accepted为EOS/预算裁剪前候选接受数；committed及τ包含bonus、按�
 
 逐prompt计数、两两赢平输及AR首分叉见[paired_evidence_v1.json](paired_evidence_v1.json)。
 
-[冻结计划](PLAN.md)；原始tokens、完整Run和权重仅本机保留。
+[冻结计划](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-plan>)；原始tokens、完整Run和权重仅本机保留。
 
 ![Full480 paired wins ties losses](figures/paired_outcomes.png)
 

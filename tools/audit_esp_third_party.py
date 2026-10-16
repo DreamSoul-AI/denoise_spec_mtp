@@ -64,7 +64,7 @@ def main():
     assert not args.out.exists()
     args.out.mkdir(parents=True)
     report = {'status': 'preflight', 'author_official': False, 'no_timing': True, 'rows': [],
-        'tool_sha256': sha(__file__), 'plan_sha256': sha(args.study / 'docs/THIRD_PARTY_PLAN.md'),
+        'tool_sha256': sha(__file__), 'plan_sha256': sha((Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md')),
         'settings': {'model': 'Qwen/Qwen3-8B', 'dtype': 'bfloat16', 'temperature': 0,
                      'max_new_tokens': 256, 'block_complexities': [10, 30, 60], 'num_masks': 1,
                      'seed': 123, 'pilot_question_id': 121, 'forward_cap_per_bc': 24},

@@ -379,7 +379,7 @@ def main():
               'variants': variants, 'template_control': args.template_control,
               'reference_method': 'input_first' if args.input_origin else 'output_zero',
               'sample_mode': 'selected_early_predecessors' if args.early_template else 'conditioned_top1_only' if args.active_depth else 'unconditioned_first_root_ge8',
-              'plan_sha256': sha(args.study / ('docs/' + plan))}
+              'plan_sha256': sha(Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'), 'plan_section': 'legacy-studies-qwen3-4b-bf16-five-methods-docs-' + plan[:-3].lower().replace('_', '-')}
     if args.reciprocal:
         report['sample_mode'] = 'reciprocal_input_origin' if args.input_origin else 'reciprocal_output_origin'
     if args.direction_controls:

@@ -40,7 +40,7 @@ def observe_initial_bias(provider, mode, info):
         masks = provider.masks()
         info.update(step_scale=provider.step_scale, initial_mean_norm=float(provider._level.float().norm()),
             effective_step_norm=float(step.float().norm()),
-            rounded_slot_displacement_norms=(masks - provider._level).float().norm(dim=-1).tolist())
+            rounded_slot_displacement_norms=(masks.float() - provider._level.float()).norm(dim=-1).tolist())
         assert all(torch.isfinite(x).all() for x in (step, masks))
 
     provider.init_from_prompt = init

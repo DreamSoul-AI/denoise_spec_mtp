@@ -31,6 +31,7 @@ def test_native_scale_retains_mean_and_seed_direction(monkeypatch, mode):
         provider = EMAVelocityMaskProvider(2, embeds, beta=.9999, level='order0', lam=.1, step_scale=scale)
         info = {}
         m.observe_initial_bias(provider, mode, info).init_from_prompt(embeds[:8])
+        assert info['rounded_slot_displacement_norms'] == (provider.masks().float() - provider._level.float()).norm(dim=-1).tolist()
         zero = ESPMaskProvider(2, embeds, lam=.1)
         zero.init_from_prompt(embeds[:8])
         directions.append(provider._velocity.clone())

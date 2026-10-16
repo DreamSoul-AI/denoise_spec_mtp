@@ -107,3 +107,92 @@ def test_first_block_pairing_excludes_changed_prefill_and_missing_blocks(monkeyp
     second[0]['question_id'] = 99
     with pytest.raises(AssertionError):
         readout.first_block_compare(first, second)
+
+
+def norm_reader(monkeypatch):
+    m = module(monkeypatch)
+    monkeypatch.syspath_prepend(str(m.STUDY))
+    spec = importlib.util.spec_from_file_location('sd_norm_cpu_acceptance', m.STUDY / 'analyze_results.py')
+    reader = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(reader)
+    return reader
+
+
+@pytest.mark.parametrize('damage', ['missing', 'duplicate', 'order', 'wrong_scale', 'wrong_spec', 'extra_run'])
+def test_norm_matrix_must_match_all_eight_frozen_cases(monkeypatch, damage):
+    import copy
+    m = norm_reader(monkeypatch)
+    decl = yaml.safe_load((m.STUDY / 'study.yaml').read_text(encoding='utf-8'))
+    entries = [{'factors': {'algorithm.config': copy.deepcopy(c)}, 'runs': [{'id': str(i)}]}
+               for i, c in enumerate(decl['axes']['algorithm.config'])]
+    m.check_matrix(decl, entries)
+    if damage == 'missing':
+        entries.pop()
+    elif damage == 'duplicate':
+        entries[-1] = copy.deepcopy(entries[0])
+    elif damage == 'order':
+        entries.reverse()
+    elif damage == 'wrong_scale':
+        entries[0]['factors']['algorithm.config']['spec']['ema']['step_scale'] = 1.
+    elif damage == 'wrong_spec':
+        entries[0]['factors']['algorithm.config']['spec']['ema']['beta'] = .9
+    else:
+        entries[0]['runs'].append({'id': 'extra'})
+    with pytest.raises(AssertionError):
+        m.check_matrix(decl, entries)
+
+
+def test_reused_only_readout_never_accepts_new_runs_or_plots(monkeypatch, tmp_path):
+    from spec_mtp.structure.artifact import sources
+    m = norm_reader(monkeypatch)
+    rows = [dict(question_id=i, category='a', accepted=1, model_calls=3, new_tokens=5,
+                 committed=4, decode_calls=2) for i in range(480)]
+    depth = [dict(question_id=i, initial_prefix_sha256='same', first_block_accepted=1) for i in range(480)]
+    names = ('zero/0', 'template/1', 'random0/1', 'random1/1', 'random2/1')
+    cells = {name: dict(run_id=name.replace('/', '_'), rows=rows, depth_rows=depth,
+                       totals={'pooled_tau': 2., 'argmax_checked_tokens': 2400},
+                       raw_argmax_checked_tokens=2400, raw_files_rechecked=6, files_sha256={}) for name in names}
+    reference = [{'output_ids': [1]} for _ in range(480)]
+    formal = {'cells': {'AR': {'run_id': 'AR', 'files_sha256': {'assets/decode_observations.json': 'fixture'}}}}
+    monkeypatch.setattr(m, 'load_reused', lambda root: (formal, None, None, None, reference, cells))
+    def forbidden(*args, **kwargs):
+        pytest.fail('Reused-only mode cannot accept a new Run, check a new freeze or plot')
+    monkeypatch.setattr(m._pair, 'load_cell', forbidden)
+    monkeypatch.setattr(sources, 'check_frozen', forbidden)
+    monkeypatch.setattr(m, 'plot', forbidden)
+    proof = m.verify_reused(tmp_path / 'raw', tmp_path / 'output')
+    assert proof['complete'] is False and proof['new_cells_inspected'] is False and proof['reused_only']
+    assert len(proof['cells']) == 5 and len(proof['expected_new_cases']) == 8
+    assert proof['raw_argmax_checked_tokens'] == 12000
+    assert (tmp_path / 'output/reused_readiness_v1.json').is_file()
+    assert not (tmp_path / 'output/norm_evidence_v1.json').exists()
+    assert not (tmp_path / 'output/figures').exists()
+
+
+def test_reused_only_missing_private_evidence_fails_without_new_outputs(monkeypatch, tmp_path):
+    m = norm_reader(monkeypatch)
+    with pytest.raises(FileNotFoundError):
+        m.verify_reused(tmp_path / 'absent', tmp_path / 'output')
+    assert not (tmp_path / 'output').exists()
+
+
+def test_published_reuse_checkpoint_matches_existing_endpoints(monkeypatch):
+    m = norm_reader(monkeypatch)
+    proof = m.read(m.STUDY / 'docs/reused_readiness_v1.json')
+    original = m.read(ROOT / 'studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json')
+    assert not proof['complete'] and proof['reused_only'] and not proof['new_cells_inspected']
+    assert len(proof['cells']) == 5 and len(proof['expected_new_cases']) == 8
+    for path, expected in proof['formal_sources'].items():
+        assert '\\' not in path and path.startswith('studies/')
+        assert m.sha(ROOT / path) == expected
+    for name, cell in proof['cells'].items():
+        source = original['cells'][name.split('/')[0]]
+        assert cell['totals'] == source['totals']
+        assert cell['files_sha256'] == source['files_sha256']
+        assert cell['raw_argmax_checked_tokens'] == source['totals']['argmax_checked_tokens']
+        assert cell['raw_files_rechecked'] == len(source['files_sha256']) == 6
+    assert sum(c['raw_argmax_checked_tokens'] for c in proof['cells'].values()) == proof['raw_argmax_checked_tokens'] == 405083
+    for pair in proof['paired_comparisons']:
+        first = pair['first_block_same_prefix']
+        assert first['total'] == first['same_prefix_with_block'] + first['different_prefix'] + first['missing_block'] == 480
+        assert sum(first['accepted'].values()) == first['same_prefix_with_block'] == 480

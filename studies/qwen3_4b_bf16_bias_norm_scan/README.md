@@ -10,7 +10,7 @@ Native prepare/execute/collect/summarize/write/process are retained. Readout rep
 
 ## CPU preparation status
 
-Nine CPU checks cover unchanged mean/fixed direction across0/.5/1/2, declared eight-cell order and immutable references, native tiny BF16 verifier-argmax at .5/2, refusal to claim an unmade scan complete, and first-block pairing that excludes changed prefill tokens or absent blocks. The readout verifies all reused raw files against their formal hashes; first-block comparisons include only equal original-input-plus-prefill prefixes and report exclusions. New curves are written only after all eight native cells and process pass.
+The initial nine CPU checks cover unchanged mean/fixed direction across0/.5/1/2, declared eight-cell order and immutable references, native tiny BF16 verifier-argmax at .5/2, refusal to claim an unmade scan complete, and first-block pairing that excludes changed prefill tokens or absent blocks. The readout verifies all reused raw files against their formal hashes; first-block comparisons include only equal original-input-plus-prefill prefixes and report exclusions. New curves are written only after all eight native cells and process pass.
 
 This source preparation does not make/launch a Study. Auto-review rejected an early make during the live8B queue, so wait for that queue to exit naturally. Do not retry via another checkout or indirect runner. The active execution worktree retains its original prepared-copy snapshot until it is idle; any later source synchronization must preserve those local files before replacing them.
 
@@ -19,3 +19,26 @@ Linux CI initially reported521passed/2failed because Git normalized the imported
 A second CI exposed the same conversion on question.jsonl (521passed/2failed). Keep the already-frozen working dataset byte-for-byte (SHA7dd26882...,480 CRLF records), rather than changing its expected SHA. Its former Git LF blob SHA4b6d33e7... has exactly the same480 parsed records/order. Add -text to preserve the frozen data bytes; the current dataset and prompt manifest are unchanged, so no model inputs are altered. Windows git archive applied checkout-style line conversion and was not a valid Linux-byte simulation; subsequent verification materializes raw git cat-file blobs instead.
 
 Mask-displacement observations convert the already-stored BF16 mask and mean to FP32 before subtraction/norm, avoiding an extra BF16 subtraction rounding in the reported metric. This is read-only measurement, with no FP32 model forward or change to native masks/EMA/tree. Existing scale-control tests check that definition explicitly.
+
+## 只读端点准备与后续验收
+
+等待8B期间，在主仓根目录的CPU终端执行以下只读命令；所有新输出在主仓.tmp，实际执行副本只读。该模式核对旧端点/共享AR、正式SHA、原输入/计数及已存argmax/owner，不调用make、原生新格验收或绘图。
+
+```powershell
+$sdOldCuda = $env:CUDA_VISIBLE_DEVICES
+$sdOldPath = $env:PYTHONPATH
+try {
+    $env:PYTHONUTF8 = '1'
+    $env:CUDA_VISIBLE_DEVICES = ''
+    $env:PYTHONPATH = 'src'
+    & D:\anaconda3\python.exe studies/qwen3_4b_bf16_bias_norm_scan/analyze_results.py --check-reused --data-root 'D:/360安全浏览器下载/Agent/DreamSoul/tmp/4b-bf16-five-methods-20261015' --output-dir .tmp/norm-readiness-20261016
+    if ($LASTEXITCODE -ne 0) { throw 'Reused endpoint evidence missing or inconsistent' }
+} finally {
+    $env:CUDA_VISIBLE_DEVICES = $sdOldCuda
+    $env:PYTHONPATH = $sdOldPath
+}
+```
+
+[实际准备报告](docs/STUDY_REPORT.md)和[CPU检查点](docs/reused_readiness_v1.json)覆盖5个旧端点、30份Spec源文件、405083个原始argmax/owner记录。输出明确complete=false、reused_only=true、new_cells_inspected=false；0.5×/2×八格仍未执行，不能由端点推算曲线。
+
+后续正常读出支持--data-root（旧Run根副本）、--study-dir（完成后的冻结范数Study）、--output-dir（独立CPU报告目录）；须从冻结Study所属执行根目录、使用该副本src调用，保留原生相对输入和来源检查。正常读出会严格比较索引与原八格声明和顺序、每格一个Run、实际cfg完整spec、逐token门、480条progress与原生Study process；正式JSON和曲线只在全13端点通过后生成。新输出先写独立目录，验收后按主题合dev，不重签或覆盖旧结果。

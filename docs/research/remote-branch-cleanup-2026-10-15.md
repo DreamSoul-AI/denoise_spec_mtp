@@ -117,3 +117,9 @@ BC10/30全480均原生成功并CPU逐token复核，PR44/45/46各自cpu-checks及
 活动experiment/sd-nonofficial-repeat-norm虽已随PR44成为dev祖先，仍是BC60原队列的冻结执行分支，按活动例外保留本地、远端和工作树。集成前后HEAD均4bb28c79830b8f1db7cddf30cf80d6ddd5bd6e98；study.yaml SHA256均545c64f9fdf9e73582f929e5e6033d9f78eeb648f9bfcd8ffc37667b01cc08ae，未编辑活动源码/声明或重签Run。BC60 worker66500已自然接续，等待实测峰值加2GiB主机RAM准入；不可把“接续”等同于已载模。此分支在队列自然终结、保存证据且退出后再清，不删除数据。
 
 合批后组合CPU检查34项通过（bias_norm_scan、repeat_readout、nonofficial_revalidation、docs、docs_index、4b_bf16_readout）；未启动额外GPU任务。活动执行树17份未跟踪旧范数准备源码已只读复制到本机.tmp/legacy-norm-preparation-20261016，逐文件尺寸/SHA及与已合dev版本的比较见manifest.json（4份字节不同）。原17份未移动、未覆盖，活动Run不变；待8B自然退出后仍需再次核验来源，保存完整旧目录（含被忽略缓存）再切换，不把这份源码副本当成实验结果备份。
+
+### PR47 CPU队列交付后的自身清理
+
+PR47已双CI通过合dev，merge4856cee0d86c1c80c4215b7e330878901890fb13；分析工作分支analysis/sd-repeat-norm-results在退出后删除本地和远端，tip fee5c066b18f9857f48803ff8bc4f27ffa91ebb7，已核为origin/dev祖先。累计清理为**32个本地、6个远端**；main仍b636f90e54c7641be6914fbccec13f64bd9cc04c。原BC60 worker66500、队列50576保留，活动执行树HEAD仍4bb28c7；未删除数据。
+
+后续同主题结果在analysis/sd-bc60-norm-results攒到里程碑再PR，当前未合分支不删。CPU验收与只读4B对账已落dev，不以此声称BC60或范数八格完成；量化PPL实际占卡期间，原准入门继续非抢占等待。

@@ -193,6 +193,14 @@ B：新`qwen3_4b_bf16_bias_norm_scan`，ModelScope原Qwen3-4B内容，BF16/eager
 
 正确性门：全部提交token逐一等于同次验证前向正确owner的argmax，含prefill首token、EOS/预算裁剪后的全输出，native来源/输入/数量/owner门必须全过。独立AR逐token一致率及首分叉只诊断；norm组复用原AR，不另加AR GPU。无teacher/warmup/时间测量，decoder timing保持零哨兵，不将资源观察时间当TPS/SR。任何来源/数学/非有限/OOM失败保留并停止该格，不自动重复；外部GPU工作只在组间交接或prompt边界等待，不抢占。跨模型先退出/释放后再加载；只允许一条串行调度链。当前状态pending，不用空值当0或平局。
 
+### 2026-10-16 CPU准备补充：范数端点与验收边界
+
+按17:52指示保留BC60原进程及实测峰值加2GiB门，等待期间推进CPU；八个4B新格仍排在8B之后。只读入口已核5个旧端点的30份Spec文件SHA、405083个已存argmax/前向owner记录和共享AR的81880个token，完整原始路径/正式源SHA及数据见[端点检查点](../studies/qwen3_4b_bf16_bias_norm_scan/docs/reused_readiness_v1.json)和[准备报告](../studies/qwen3_4b_bf16_bias_norm_scan/docs/STUDY_REPORT.md)。本次没有make、模型forward或新格验收；新倍率0.5/2保持未观测。
+
+全480原input IDs+实际prefill token均相同且首块存在时，template/random0/random1/random2相对零偏置的首块接受数胜平负分别26/341/113、56/361/63、55/367/58、30/361/89。原完整路径τ仍为1.507777653/1.495188134/1.464349086/1.523884714，对比zero1.422420206。首块普遍获益解释受限，逐prompt胜负不等于均值接受差；后续分叉路径、调用权重和长度影响仍须分别报告，不由此新增方法或算子研究。范数扫描绑定E3固定v端点；E2原生更新输入一阶1.51195758单独保留。
+
+验收脚本现显式要求索引与八格预注册及顺序完整相等，每格一个Run、cfg完整spec一致；缺格/重复/乱序/倍率或beta漂移/多Run均拒绝。--check-reused只读旧端点且始终complete=false/new_cells_inspected=false，不绘新曲线；正常模式仍保留native source/input/argmax/process门。范数18项及相关读出/配对/文档共50项CPU回归通过，当前新格尚未make，冻结计划commit/blob及科学源码、默认配方、数据/prompt未改。
+
 ## 九、执行记录与结论
 
 | 记录 | 实际证据 | 结果与边界 |

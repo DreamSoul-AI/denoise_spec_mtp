@@ -91,25 +91,28 @@ def verify_contract(inputs, previous, cfg):
     assert inputs['eos_ids'] == previous['eos_ids'] and inputs['eos_ids']
     assert inputs['model_digest'] == previous['model_digest']
 
-def main(baseline_runs=None):
+def main(baseline_runs=None, study_dir=None, output_dir=None):
     from revalidation_contract import check_refs
     from rpipe.structure.artifact.provenance import check_frozen as pcheck
     from rpipe.structure.make.expand import load_study_yaml
     from spec_mtp.structure.artifact.sources import check_frozen, manifest
     from spec_mtp.structure.artifact.validation import verify_evidence
     from spec_mtp.structure.artifact.evidence import digest
+    study = STUDY if study_dir is None else Path(study_dir).resolve()
+    output = study / 'docs' if output_dir is None else Path(output_dir).resolve()
+    assert Path.cwd().resolve() == study.parents[1], 'Run from the frozen execution checkout root for declared relative inputs'
     baseline_runs = BASE / 'runs' if baseline_runs is None else Path(baseline_runs)
     check_refs()
-    decl = load_study_yaml(STUDY)
-    check_frozen(STUDY, decl, manifest())
-    pcheck(STUDY, decl)
+    decl = load_study_yaml(study)
+    check_frozen(study, decl, manifest())
+    pcheck(study, decl)
     original = read(BASE / 'docs/protocol_evidence_v1.json')
     prompt_manifest = read(BASE / 'docs/prompts_manifest.json')
     prompts = prompt_manifest['rendered_prompts']
     snapshot = read(BASE / 'docs/modelscope_snapshot.json')
     assert len(prompts) == 480
     baseline = {c['BC']: c for c in original['cells'] if c['role'] == 'primary'}
-    entries = read(STUDY / 'index.json')['experiments']
+    entries = read(study / 'index.json')['experiments']
     assert len(entries) == 3
     cells = {}
     for entry in entries:
@@ -118,10 +121,10 @@ def main(baseline_runs=None):
         assert budget in TARGETS and budget not in cells and spec['num_masks'] == 1 and len(entry['runs']) == 1
         assert spec['method'] == 'esp' and spec['tree'] == {'mode': 'dynamic', 'pruning': True}
         assert spec['mask'] == {'init': 'mean_prompt', 'lam': .1, 'update': True}
-        folder = STUDY / 'runs' / entry['runs'][0]['id']
+        folder = study / 'runs' / entry['runs'][0]['id']
         result = read(folder / 'result.json') if (folder / 'result.json').exists() else {}
         cells[budget] = {'BC': budget, 'num_masks': 1, 'run_id': folder.name,
-            'run_path': folder.relative_to(ROOT).as_posix(), 'native_status': result.get('status', 'pending'), 'target': TARGETS[budget], 'complete': False}
+            'run_path': folder.relative_to(study.parents[1]).as_posix(), 'native_status': result.get('status', 'pending'), 'target': TARGETS[budget], 'complete': False}
         if result.get('status') != 'succeeded':
             continue
         assert result['spec_mtp']['passed'] and result['spec_mtp']['validation_policy'] == 'verifier-argmax-v1'
@@ -164,15 +167,16 @@ def main(baseline_runs=None):
     assert set(cells) == set(TARGETS)
     ready = all(c['complete'] for c in cells.values())
     if ready:
-        process, native = read(STUDY / 'process.json'), read(STUDY / 'spec_mtp_study_check.json')
+        process, native = read(study / 'process.json'), read(study / 'spec_mtp_study_check.json')
         assert process['complete'] and process['spec_mtp']['passed'] and native['complete'] and native['passed']
     body = {'complete': ready, 'author_official': False, 'no_timing': True, 'fixed_prompts': 480,
         'correctness_gate': 'all committed tokens equal actual verifier-forward argmax; independent AR diagnostic only',
         'original_evidence_sha256': sha(BASE / 'docs/protocol_evidence_v1.json'),
-        'source_refs_sha256': sha(STUDY / 'docs/source_refs.json'), 'analyzer_sha256': sha(Path(__file__)),
+        'source_refs_sha256': sha(study / 'docs/source_refs.json'), 'analyzer_sha256': sha(Path(__file__)),
         'reused_aggregation_sha256': sha(BASE / 'analyze_results.py'),
-        'cells': [cells[bc] for bc in TARGETS]}
-    path = STUDY / 'docs' / ('repeat_evidence_v1.json' if ready else 'repeat_pending.json')
+        'execution_root': str(study.parents[1]), 'cells': [cells[bc] for bc in TARGETS]}
+    output.mkdir(parents=True, exist_ok=True)
+    path = output / ('repeat_evidence_v1.json' if ready else 'repeat_pending.json')
     text = json.dumps(body, indent=2, allow_nan=False) + '\n'
     if ready and path.exists():
         assert path.read_text(encoding='utf-8') == text
@@ -200,7 +204,7 @@ def main(baseline_runs=None):
         '逐prompt accepted/calls/τ赢平输、输出长度、旧/新输出与AR摘要是否相同、AR首分叉及所有新旧目标差值见JSON；不同长度/轨迹的配对计数不能解释为速度或同前缀因果。', '',
         '三格完整且原生process通过才生成正式repeat_evidence_v1.json；各已完成格可以单独列有效τ，但不称全矩阵完成。数学自检通过不等于论文目标数值已复现。', '',
         f"来源：`{'repeat_evidence_v1.json' if ready else 'repeat_pending.json'}`，每格files_sha256给出Run原始结果/输入/审计路径与哈希；旧结果`studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json`，新Run路径为每格run_path。原始tokens、logits、完整Run仅本机保留。"]
-    (STUDY / 'docs/STUDY_REPORT.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    (output / 'STUDY_REPORT.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     print(json.dumps({'complete': ready, 'cells_complete': sum(c['complete'] for c in cells.values())}))
 
 
@@ -209,4 +213,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--baseline-runs', type=Path, default=BASE / 'runs',
                         help='Old immutable Run directory, when stored in another checkout')
-    main(parser.parse_args().baseline_runs)
+    parser.add_argument('--study-dir', type=Path, help='Frozen native Study in its execution checkout')
+    parser.add_argument('--output-dir', type=Path, help='CPU report directory; avoid writing into a live execution tree')
+    args = parser.parse_args()
+    main(args.baseline_runs, args.study_dir, args.output_dir)

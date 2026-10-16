@@ -6,7 +6,7 @@ English translation of the [Chinese master](<研究计划 Denoising Speculative 
 > Nonofficial8B repeat: BC10/BC30 single-mask full480 succeeded natively; BC60 is blocked on RAM admission in the original live worker66500; external RAM availability must recover. The4B norm scan is not made/launched.
 > BC30 pooled tau=1.5633775043382236, below paper1.63 by0.06662249566177625; all79762 token checks passed; AR175/480 is diagnostic.
 > BC10 tau=1.3990470307950233; each completed cell ties its old Run on accepted/calls/tau for all480 prompts, with480 matching output/AR hashes.
-> Values and paths: [BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json) / [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json). BC60 is pending; this is not full-matrix completion.
+> CPU acceptance rehearsed: two valid cells, BC60 pending;30 readout/documentation tests passed. [CPU checkpoint](../studies/esp_table1_nonofficial_revalidation/docs/cpu_acceptance_checkpoint_v1.json). Original values: [BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json) / [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json). BC60 is pending; this is not full-matrix completion.
 
 ## I. Current scope, status and execution priority
 

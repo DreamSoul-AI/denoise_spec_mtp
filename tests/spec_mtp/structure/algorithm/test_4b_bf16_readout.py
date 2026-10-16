@@ -84,3 +84,40 @@ def test_readout_retains_ar_mismatch_and_audit_counts_after_native_validation(re
     with pytest.raises(AssertionError):
         reader.load_cell(tmp_path, folder, {'algorithm': {'config': settings}}, prompts, {},
                          {'config': dict(vocab_size=20, hidden_size=4)}, reference)
+
+
+@pytest.fixture
+def published_reader(reader, monkeypatch):
+    import sys
+    monkeypatch.setitem(sys.modules, 'analyze_results', reader)
+    spec = importlib.util.spec_from_file_location('bf16_published_counts', STUDY / 'verify_published.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_published_counts_reaggregate_without_rewriting_original(published_reader):
+    path = STUDY / 'docs/paired_evidence_v1.json'
+    before = path.read_bytes()
+    result = published_reader.verify(path)
+    assert (result['cells_checked'], result['pairs_checked']) == (11, 20)
+    assert result['source_sha256'] == '8e85ac6ea9984047abf0ffd5d6653b28b6aadd74aa876139fa10465dc5bbf274'
+    assert result['cells']['30/input_first']['pooled_tau'] == pytest.approx(1.51195758)
+    assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize('damage', ['totals', 'pair', 'missing_pair', 'prompt_order'])
+def test_published_counts_reject_inconsistent_or_incomplete_pairs(published_reader, tmp_path, damage):
+    body = published_reader.read(STUDY / 'docs/paired_evidence_v1.json')
+    if damage == 'totals':
+        body['cells']['30/input_first']['totals']['pooled_tau'] += .1
+    elif damage == 'pair':
+        body['pairs'][0]['calls']['win'] += 1
+    elif damage == 'missing_pair':
+        body['pairs'].pop()
+    else:
+        body['cells']['AR']['rows'].reverse()
+    path = tmp_path / 'changed.json'
+    path.write_text(json.dumps(body))
+    with pytest.raises(AssertionError):
+        published_reader.verify(path)

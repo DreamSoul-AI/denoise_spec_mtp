@@ -2,7 +2,7 @@
 
 > 当前资源阻塞：BC60原队列worker66500存活，主机RAM不足，尚未载模；原队列保留自动等待。
 > BC10/30全480成功，BC30 τ=1.5633775043382236，79762个token自检全过；未达论文1.63。
-> CPU准备与组合34项检查已完成，4B八个新范数格尚未make；需RAM恢复后先完成BC60。
+> CPU验收入口已实际演练，读出与文档30项回归全过；4B八个新范数格尚未make，仍排在BC60之后。
 > 最新资源数值、实际命令和来源见[RAM检查点](ram_wait_checkpoint_20261016.json)，不放宽门、不重开或终止其他任务。
 
 BC10/BC30单mask均已原生成功，不是三格全矩阵结论。BC60已由原队列接续，等待实测峰值加2GiB的主机RAM准入。固定SpecBench480、Qwen3-8B BF16/eager/T0、lambda=.1 updating mean、动态树剪枝、256/EOS、seed123；无测速。
@@ -60,3 +60,13 @@ CPU队列另用现有4B读出函数重算正式paired_evidence_v1.json（SHA8e85
 可独立推进的CPU读出、Table1差值、4B11格/20对对账、范数八格准备和组合34项检查已完成。正常下一步必须先等BC60按冻结协议自然完成，再CPU终验三格和Study process，最后才make/串行launch八个4B范数格；不能用另一个GPU任务绕过排班或审批拒绝。当前没有可安全释放的本任务大内存进程，不终止其他应用或任务。目标未完成，需外部可用RAM改变后继续。
 
 PR44/45/46已分别CI通过合dev；集成只发生在主仓及远端，活动4bb28c7执行树保持原字节。已合普通分支3本地/3远端已清，活动分支按例外保留；清单在docs/research/remote-branch-cleanup-2026-10-15.md。当前阻塞记录与后续结果同主题合批，不另外新开小PR。
+
+## 等内存期间的CPU验收队列（2026-10-16 17:18）
+
+已按17:09指示继续CPU工作，BC60原进程不杀、不重开、不放宽门，量化PPL按实际GPU占用协调。新增读出支持--study-dir/--output-dir，从原执行CWD与冻结src读取，把报告写到主仓.tmp；原工作树与声明未改。原生绝对输入身份要求保留执行CWD，错误CWD会明确拒绝。
+
+实际演练完整8B读出后返回complete=false/cells_complete=2；BC10/30数学审计、输入/权重SHA、原生来源、三种τ与旧值配对均通过，BC60没有结果时只写pending，不生成全矩阵正式证据。数值在[cpu_acceptance_checkpoint_v1.json](cpu_acceptance_checkpoint_v1.json)中与已合的两份检查点再核一致。BC10三聚合1.3990470307950233/1.43176588861066/1.4030335607141575，论文无BC10目标；BC30三聚合1.5633775043382236/1.5932322369198653/1.5633872721805147，减论文1.63分别为-0.06662249566177625/-0.03676776308013463/-0.06661272781948524。旧Run对应差均0；主指标仍pooled，不换口径追目标。
+
+4B新增verify_published.py只读入口复用已存在summarize/compare_rows，核11格、20对、各480个qid/category顺序、两种胜平负及输出长度/调用口径；源SHA8e85ac6ea9984047abf0ffd5d6653b28b6aadd74aa876139fa10465dc5bbf274不变。CPU检查点保存全10个Spec格τ、AR调用与完整20对汇总，既有逐prompt记录仍在原paired_evidence_v1.json；这是已发布计数重算，不重新验收历史Run，也不声称新增逐token审计。
+
+读出/配对与文档30项回归及ruff通过；新增回归验证输出与执行树分离、待完成矩阵不能声称成功，以及损坏totals/pair、缺pair和prompt乱序必须拒绝。BC60放行后的验收顺序、完整PowerShell命令和CUDA/PYTHONPATH恢复在[Study README](../README.md#bc60放行后的cpu验收)；4B入口见其README。下一步仍是原BC60完成后同一CPU命令生成正式三格证据，然后再按单队列运行4B范数八个新格。

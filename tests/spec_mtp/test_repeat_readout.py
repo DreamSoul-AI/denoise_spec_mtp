@@ -110,3 +110,63 @@ def test_completed_checkpoint_reconciles_all480_pairs(monkeypatch, budget):
     assert snapshot['totals']['committed'] + 480 == snapshot['totals']['new_tokens'] == snapshot['totals']['argmax_checked_tokens']
     assert snapshot['totals']['main_calls'] == snapshot['totals']['decode_calls'] + 480
     assert snapshot['files']['argmax_audit.jsonl'] == old['argmax_audit_sha256']
+
+
+def test_cross_checkout_pending_readout_writes_only_separate_output(monkeypatch, tmp_path):
+    m = reader(monkeypatch)
+    monkeypatch.syspath_prepend(str(ROOT / 'studies/esp_table1_nonofficial_revalidation'))
+    import revalidation_contract
+    from rpipe.structure.artifact import provenance
+    from rpipe.structure.make import expand
+    from spec_mtp.structure.artifact import sources
+    monkeypatch.setattr(revalidation_contract, 'check_refs', lambda: None)
+    monkeypatch.setattr(provenance, 'check_frozen', lambda *args: None)
+    monkeypatch.setattr(sources, 'check_frozen', lambda *args: None)
+    monkeypatch.setattr(sources, 'manifest', lambda: {})
+    monkeypatch.setattr(expand, 'load_study_yaml', lambda *args: {})
+    execution = tmp_path / 'execution'
+    study, base, output = execution / 'studies/repeat', tmp_path / 'baseline', tmp_path / 'readout'
+    (study / 'docs').mkdir(parents=True)
+    (base / 'docs').mkdir(parents=True)
+    monkeypatch.setattr(m, 'BASE', base)
+    for path, value in [(base / 'docs/protocol_evidence_v1.json', {'cells': [
+            {'BC': bc, 'role': 'primary'} for bc in (10, 30, 60)]}),
+            (base / 'docs/prompts_manifest.json', {'rendered_prompts': [{}] * 480}),
+            (base / 'docs/modelscope_snapshot.json', {}), (study / 'docs/source_refs.json', {})]:
+        path.write_text(json.dumps(value))
+    (base / 'analyze_results.py').write_text('fixture')
+    entries = [{'factors': {'algorithm.config': {'spec': {'block_complexity': bc, 'num_masks': 1,
+        'method': 'esp', 'tree': {'mode': 'dynamic', 'pruning': True},
+        'mask': {'init': 'mean_prompt', 'lam': .1, 'update': True}}}}, 'runs': [{'id': str(bc)}]}
+        for bc in (10, 30, 60)]
+    (study / 'index.json').write_text(json.dumps({'experiments': entries}))
+    before = {p.relative_to(study): p.read_bytes() for p in study.rglob('*') if p.is_file()}
+    monkeypatch.chdir(execution)
+    m.main(study_dir=study, output_dir=output)
+    body = m.read(output / 'repeat_pending.json')
+    assert body['complete'] is False and body['execution_root'] == str(execution)
+    assert [c['BC'] for c in body['cells']] == [10, 30, 60]
+    assert all(c['complete'] is False for c in body['cells'])
+    assert not (output / 'repeat_evidence_v1.json').exists()
+    assert before == {p.relative_to(study): p.read_bytes() for p in study.rglob('*') if p.is_file()}
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(AssertionError, match='frozen execution checkout root'):
+        m.main(study_dir=study, output_dir=output)
+
+
+def test_cpu_acceptance_checkpoint_matches_completed_cells_and_published_pairs(monkeypatch):
+    m = reader(monkeypatch)
+    proof = m.read(ROOT / 'studies/esp_table1_nonofficial_revalidation/docs/cpu_acceptance_checkpoint_v1.json')
+    assert not proof['complete_8b_matrix'] and proof['no_model_forward'] and proof['no_timing']
+    assert [c['BC'] for c in proof['table1_cells'] if c['complete']] == [10, 30]
+    for cell in proof['table1_cells'][:2]:
+        path = ROOT / cell['checkpoint']
+        assert m.sha(path) == cell['checkpoint_sha256']
+        original = m.read(path)
+        assert cell['pooled_tau'] == original['totals']['pooled_tau']
+        assert cell['paired'] == {k: v for k, v in original['vs_original'].items() if k != 'rows'}
+    paired = m.read(ROOT / 'studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json')
+    recheck = proof['four_b_published_reaggregation']
+    assert (recheck['cells_checked'], recheck['pairs_checked']) == (11, 20)
+    assert recheck['cells'] == {k: v['totals'] for k, v in paired['cells'].items()}
+    assert recheck['pairs'] == [{k: v for k, v in p.items() if k != 'rows'} for p in paired['pairs']]

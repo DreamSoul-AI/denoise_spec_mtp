@@ -1,5 +1,10 @@
 # 4B BF16 输出 mask 差距诊断
 
+> 2026-10-16 CPU复核：11格共66份原始文件SHA吻合，10个Spec格809,118个保存token的argmax审计全过；未新增forward。
+> 旧10格深度/位置/裁剪及6组τ分解逐项不变；新增20组同前缀首块配对，来源见[审计JSON](4b-paired-raw-audit-2026-10-16.json)。
+> 输出一阶对零阶首块BC30/BC60均0胜480平0负；输出对输入一阶首块多赢，完整路径τ却更低，首块不能外推全程。
+> 下一步保留BC60 worker66500等待原RAM门；完成8B终验后接已冻结4B范数扫描；未重跑已有格、不测速。
+
 后续进展：[候选质量与固定窗口阶段报告](4b-mask-window-2026-10-15.md)已执行原建议的局部干预，并以原保存向量收紧归一化假设、发现输入模板差分混杂。下文保留本阶段原始口径；后续有限窗口不替代全量矩阵。
 
 2026-10-15，按 Enmao 最新指示开展独立诊断。**全 480 条计数表明，输出方法落后的主要差距在第一深度；第二深度反而抵消了部分差距。没有发现明显的范数缩放实现错误。4 个 prompt 的几何观测还给出反例：输出 mask 对真实下一 token embedding 的余弦均值反而较高，不能用“输出方向更不相似”直接解释全量落后。首槽速度作用、固定范数映射和不同 EMA 配方是更具体的待验证因素，尚未证明单一因果。**
@@ -161,3 +166,28 @@ CPU 全 10 格 SHA、480 条/格的计数和 τ 恒等式通过；新增 tiny BF
 $env:PYTHONPATH='src'
 D:/anaconda3/python.exe tools/analyze_4b_geometry.py --study studies/qwen3_4b_bf16_five_methods --capture docs/research/4b-mask-geometry-observations-2026-10-15.json --out .tmp/4b-geometry-audit-new.json
 ```
+
+## 八、2026-10-16 CPU完整原始审计与首块对账
+
+本次复用原分析工具新增可选`--audit-raw`，未另建Study或科学方法。来源为[正式五方法证据](../../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json)的11格原生Run；[审计JSON](4b-paired-raw-audit-2026-10-16.json)记录66份文件SHA、11个Run ID、当前数学检查器SHA、20组配对。10个Spec格共809,118个保存token全部通过`validation._check_argmax`（含对应forward归属、hash和实际提交覆盖）；独立AR的81,880 token仅作共同参考，不伪称经过树验证门。所有文件只读，未重签旧Run或重算logits。
+
+原[CPU计数JSON](4b-mask-geometry-cpu-2026-10-15.json)的10格全部字段与6组τ分解逐项复现，属于**既有结论复核**。新对账覆盖正式20组比较，每组480条首块均前缀相同且存在验证块。下表胜平负均为后者的首块accepted减前者；完整路径τ仍见第二节，不能混成同一统计量。
+
+| BC | 后者−前者 | 首块胜/平/负 | 同前缀有效条数 |
+| --- | --- | --- | --- |
+| 30 | 输出零阶−输入一阶 | 114/339/27 | 480 |
+| 30 | 输出一阶−输入一阶 | 114/339/27 | 480 |
+| 30 | 输出一阶−输出零阶 | 0/480/0 | 480 |
+| 60 | 输出零阶−输入一阶 | 131/306/43 | 480 |
+| 60 | 输出一阶−输入一阶 | 131/306/43 | 480 |
+| 60 | 输出一阶−输出零阶 | 0/480/0 | 480 |
+
+出处：审计JSON的`saved_audit.pairs[*].first_block`；`win`是后者接受数更高。首块多赢不能解释完整路径落后，也不能据此认定输出整体更好。两个输出order共享mean mask的prefill候选来源，因此首块相同有实现上的时序依据；`init_hidden`依次观察全部prompt hidden，不能将平局误解为“初始速度必为零”。首槽无直接速度与后续候选的间接速度影响是不同路径，仍保留旧报告的有限窗口边界；本次没有做算子数值追踪或新因果干预。
+
+只读复算（先在进程环境设置`PYTHONUTF8=1`、`PYTHONPATH=src`、`CUDA_VISIBLE_DEVICES=''`，结束恢复原环境；Study指向保存原始Run的实际工作树）：
+
+```powershell
+D:/anaconda3/python.exe tools/analyze_4b_geometry.py --study D:/360安全浏览器下载/Agent/DreamSoul/tmp/4b-bf16-five-methods-20261015/studies/qwen3_4b_bf16_five_methods --audit-raw --out .tmp/4b-raw-audit-new.json
+```
+
+输出必须选新路径；缺少或篡改原始文件会拒绝验收，不以公开汇总代替raw。当前BC60仍由原队列等待既定主机RAM门，不杀进程、不放松门；量化可在空档按既有调度用卡。8B三格完整且CPU终验通过后，才允许切换冻结执行源码、接入本机已有ModelScope缓存并make/launch已登记范数八格；0/1倍复用，0.5/2倍尚无新结果，不画虚构曲线。

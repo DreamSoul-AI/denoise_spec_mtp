@@ -151,3 +151,36 @@ def test_geometry_summary_pairs_only_identical_shared_targets():
     points.append(points[0])
     with pytest.raises(AssertionError, match='Duplicate'):
         module.summarize_geometry(capture)
+
+
+def test_saved_audit_rejects_missing_or_changed_native_files(tmp_path):
+    import json
+    module = tool('analyze_4b_geometry')
+    formal = ROOT / 'studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json'
+    paired = json.loads(formal.read_text(encoding='utf-8'))
+    (tmp_path / 'docs').mkdir()
+    (tmp_path / 'docs/paired_evidence_v1.json').write_bytes(formal.read_bytes())
+    with pytest.raises(FileNotFoundError):
+        module.audit_saved(tmp_path, paired)
+    first = paired['cells']['AR']
+    path = tmp_path / 'runs' / first['run_id'] / next(iter(first['files_sha256']))
+    path.parent.mkdir(parents=True)
+    path.write_bytes(b'corrupt native artifact')
+    with pytest.raises(AssertionError):
+        module.audit_saved(tmp_path, paired)
+    assert path.read_bytes() == b'corrupt native artifact'
+    assert set(tmp_path.iterdir()) == {tmp_path / 'docs', tmp_path / 'runs'}
+
+
+def test_published_saved_audit_preserves_full_coverage_and_old_accounting():
+    import json
+    audit = json.loads((ROOT / 'docs/research/4b-paired-raw-audit-2026-10-16.json').read_text(encoding='utf-8'))
+    saved = audit['saved_audit']
+    assert saved['raw_files_checked'] == 66 and saved['raw_argmax_checked_tokens'] == 809118
+    assert saved['shared_AR_tokens'] == 81880 and len(saved['pairs']) == 20
+    assert audit['prior_accounting']['all_10_cells_equal'] and audit['prior_accounting']['all_6_tau_decompositions_equal']
+    for pair in saved['pairs']:
+        assert pair['first_block']['same_prefix_with_block'] == 480
+        if pair['first'].endswith('/output_zero') and pair['second'].endswith('/output_first'):
+            assert pair['first_block']['accepted'] == dict(win=0, tie=480, loss=0)
+    assert audit['no_model_forward'] and audit['no_timing'] and audit['new_gpu_runs'] == 0

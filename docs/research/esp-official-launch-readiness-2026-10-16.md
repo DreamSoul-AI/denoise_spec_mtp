@@ -54,3 +54,11 @@
 [ICML Downloads公开目录](https://icml.cc/Downloads/2026)包含该论文题名；会议poster候选`https://icml.cc/virtual/2026/poster/61857`仍未取得页面资源字段：本轮web搜索报告该路径被robots.txt阻止，未用其他工具绕过。第三方索引只能给候选URL，不能据此认证代码或附件。[旧题名论文](https://openreview.net/pdf?id=Drfx9Gnqrv)在搜索索引可见，不等于本轮成功取得OpenReview附件。近期429后本轮对OpenReview实际请求为0，访问状态沿用原时间，不虚报新请求。
 
 **启动状态不变：官方repo/commit/entrypoint缺失，未启动GPU、没有新τ。** 目标仍为BC30/60的1.63/1.74；本次更新不改变480条prompt、BF16/T0、单mask、argmax门或冻结Study。后续只依据新增的作者/出版代码链接、可访问附件字段或身份可核验的发布事件继续；入口到位立即按上表原字节/协议/实际非抢占准入顺序执行，不再次等待授权。现有自实现与失败HF第三方仍不得改称官方。
+
+### 作者arXiv v2源包核验
+
+论文[固定v2页面](https://arxiv.org/abs/2603.17942v2)明确提供TeX Source链接；从该[官方源包](https://arxiv.org/src/2603.17942v2)实际取得HTTP200/application-gzip，1,895,189字节，SHA256=`734691dea1e1af91e8375a5306d1f0c0548677db44f86e6f6db0bab833811beb`。这是作者上传论文源包的版本/哈希，**不是ESP实现commit**。
+
+只在内存读取tar目录和选定文本：37个条目（34个普通文件、3个目录），内容为TeX/参考文献/样式/论文图片；目录中没有Python/notebook/shell/ZIP实验文件或anc/code/src/scripts目录。16份TeX/JSON逐一记录原字节SHA，未找到GitHub/GitLab/HF代码仓库URL；扫描范围不含参考文献、样式、PDF和图片内部文本，不作更广的无链接断言。未解包到src、未执行任何源包内容。
+
+现有审计JSON在10份GitHub响应之外追加这一份arXiv源包响应及其完整成员清单/16份文本SHA。本次补到了可访问的作者原始资料，但其中未识别到原生实验入口；因此官方实现与GPU启动状态保持缺失/未运行。不能用论文TeX中的算法描述自行重写来代替原码要求。

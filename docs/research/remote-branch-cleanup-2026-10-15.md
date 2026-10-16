@@ -101,3 +101,17 @@ PR #41已于2026-10-16T05:47:26Z合dev，merge5ef98ba0c2dcd8187b557cd46652d1dcd7
 PR42已双CI通过合dev（8bc2df1，cpu-checks5m41s、Branch flow2s），其自身chore/merged-branch-cleanup-20261016已退出并删除本地/远端。因此最终为**28个本地、2个远端**；上表27/1以外新增这条自身分支（tip ddb1101cf3d016ec9b3444514cddf8d87e4f4dac）。周期复查基线更新为PR42合入后。活动8B分支和数据仍保留。
 
 PR43的Linux CI为513 passed/1 failed，失败仅是新复制helper被Git转为LF、原字节CRLF断言不等。另用主仓集成分支保留原Git字节并补-text属性，保留严格字节断言；没有编辑活动GPU工作树、原Run或科学包。替代PR包含原8B执行代码，原PR按替代关系关闭但保留未合活动分支；不因CI问题重跑GPU。
+
+### 2026-10-16 16:57里程碑合批与清理
+
+BC10/30全480均原生成功并CPU逐token复核，PR44/45/46各自cpu-checks及Branch flow通过后，按长期授权合入dev：44→17ad1de0caaa3ebb35058ec991126f74f81f76b7；45→f83155c196e3d62422ef8b0ce815972b53dccc02；46→03a8f529c30f0061b7a6523c53fc7e5e1dd4f95d。PR45只集成后续范数扫描代码，未make或启动。CPU检查不是其尚未取得的GPU实验结果。
+
+| 本地与远端均已删除的分支 | 删除前tip |
+| --- | --- |
+| fix/nonofficial-repeat-byte-provenance | 3a9d3a6b0233757f6a119fc845426b4215258f4d |
+| experiment/4b-bias-norm-scan | 924ab4d8e5a7a660cf6c631b9983f0babf9ea907 |
+| analysis/nonofficial-repeat-readout | 3393c26568536dbcdb3d3d663b502e4d058e7d09 |
+
+三条各核本地/远端tip一致且是origin/dev祖先，主仓先退出到dev后git branch -d删除；远端普通push --delete，无强推。相对此前28/2，累计已清**31个本地、5个远端**。后续成果在analysis/sd-repeat-norm-results合批，不单开清理PR。
+
+活动experiment/sd-nonofficial-repeat-norm虽已随PR44成为dev祖先，仍是BC60原队列的冻结执行分支，按活动例外保留本地、远端和工作树。集成前后HEAD均4bb28c79830b8f1db7cddf30cf80d6ddd5bd6e98；study.yaml SHA256均545c64f9fdf9e73582f929e5e6033d9f78eeb648f9bfcd8ffc37667b01cc08ae，未编辑活动源码/声明或重签Run。BC60 worker66500已自然接续，等待实测峰值加2GiB主机RAM准入；不可把“接续”等同于已载模。此分支在队列自然终结、保存证据且退出后再清，不删除数据。

@@ -58,7 +58,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     read = lambda p: json.loads(p.read_text(encoding='utf-8'))
     studies = {name: root / 'studies' / name for name in ('output_space_prerequisite', 'output_space_small_matrix')}
-    paths = {'plan': studies['output_space_small_matrix'] / 'docs/CROSS_PROMPT_PLAN.md',
+    paths = {'plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'),
              'tool': Path(__file__), 'observer_helper': Path(__file__).with_name('diagnose_output_windows.py'),
              'transfer_helper': Path(__file__).with_name('diagnose_proxy_transfer.py')}
     datasets, rows = {}, {}

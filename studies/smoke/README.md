@@ -3,7 +3,7 @@
 这是基于 RPipe Study/Experiment/Run 合同的可复用数值门，不是预训练模型或论文矩阵。当前声明保留历史交付 version `rpipe-v030-20261013-delivery`，复制隔离目录并改新 Study 名和 version 后再实测，不直接复跑已有 Run。
 
 - 三个 Experiment：esp_static、esp_dynamic、ema_velocity；每个 seed=123，一个 Run。
-- 随机 tiny LLaMA、四个 synthetic prompt、CPU/eager、32-token 预算、T=0、EOS 不停止、AR 对照开启；具体配置与精度边界见 [PLAN](docs/PLAN.md)。
+- 随机 tiny LLaMA、四个 synthetic prompt、CPU/eager、32-token 预算、T=0、EOS 不停止、AR 对照开启；具体配置与精度边界见 [PLAN](<../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-smoke-docs-plan>)。
 - recipe 注册 Data/Model/eval Algorithm，默认 prepare/execute 执行；四个 Study hook 复用专项 collect、成功门和当前 index 终验，未复制 runner。
 - 历史验收保留 CPU/CUDA tiny、旧新 token/轨迹、失败边界和安装证据，见 [报告](docs/STUDY_REPORT.md) 与 [NUMBERS](docs/NUMBERS.md)。这些证据对应各自提交/version，不自动证明未来代码。
 

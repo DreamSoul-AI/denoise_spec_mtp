@@ -51,7 +51,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     study = root / 'studies/output_space_cross_task'
     read = lambda p: json.loads(p.read_text(encoding='utf-8'))
-    paths = {'tool': Path(__file__), 'plan': study / 'docs/SAMPLING_PLAN.md',
+    paths = {'tool': Path(__file__), 'plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'),
         'matrix': study / 'docs/execution_v1.json', 'snapshot': study / 'docs/modelscope_snapshot.json',
         'local_report': root / '.tmp/q241-local-factors-20261015-v1/diagnosis.json',
         'local_tensor': root / '.tmp/q241-local-factors-20261015-v1/selected_tensors.pt'}

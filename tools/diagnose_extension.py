@@ -60,7 +60,7 @@ def main():
     assert data['study_quality_passed'] and data['question_ids'] == [175, 176, 177, 178]
     assert selection['matrix_sha256'] == file_hash(study / 'docs/execution_v1.json')
     assert selection['runner_sha256'] == file_hash(Path(__file__))
-    paths = {'plan': study / 'docs/PLAN.md', 'matrix': study / 'docs/execution_v1.json',
+    paths = {'plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'), 'matrix': study / 'docs/execution_v1.json',
         'selection': study / 'docs/window_selection_v1.json', 'tool': Path(__file__),
         'snapshot': study / 'docs/modelscope_snapshot.json',
         'observer_helper': Path(__file__).with_name('diagnose_output_windows.py'),

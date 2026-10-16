@@ -5,9 +5,20 @@ experiment:
 recipe: recipe.py
 freeze: true
 provenance:
+  project_plan:
+    path: docs/研究计划 Denoising Speculative Decoding.md
+    historical_sections:
+    - anchor: legacy-studies-output-space-cross-task-docs-plan
+      source_commit: aed4eee23ea5e6b9772b388eec9aa50a38452089
+      source_path: studies/output_space_cross_task/docs/PLAN.md
+      git_blob_sha256: c27f4aba420e8f44a6004fe8db02914a08dfa5e50824e029879c46ffd3707329
+    - anchor: legacy-studies-output-space-cross-task-docs-execution-plan
+      source_commit: aed4eee23ea5e6b9772b388eec9aa50a38452089
+      source_path: studies/output_space_cross_task/docs/EXECUTION_PLAN.md
+      git_blob_sha256: 7051210ee105a6b449a8bf0562e2efd7a75c10e1357d31c3f8bfbaa3ad271040
+    policy: Historical replay uses the pinned Git version; current central-plan edits
+      never re-sign old Runs.
   include:
-  - docs/PLAN.md
-  - docs/EXECUTION_PLAN.md
   - docs/modelscope_snapshot.json
   - docs/prompts_manifest.json
   - check_hypotheses.py

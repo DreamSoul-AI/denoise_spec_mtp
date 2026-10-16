@@ -15,11 +15,11 @@
 
 全480方向对照新增完整格：同范数随机0 τ=1.495188134，81,425个提交token全argmax通过；相对zero的accepted胜/平/负为363/29/88、逐promptτ为360/27/93，template对应τ仍为1.507777653。来源：[三格有效结果快照](../../studies/qwen3_4b_bf16_directions/docs/direction_partial_v2.json)与[方向报告](../../studies/qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)。本批收益并非仅e2−e1方向出现；其余随机种子与content仍待完整，不能推断任意方向有效或全矩阵排名。队列已自动进入随机1，不改数据/配置。
 
-2026-10-16追加指示：四窗口不足以回答方向唯一性；现已冻结[BC30全480方向对照计划](../../studies/qwen3_4b_bf16_directions/docs/PLAN.md)，新增严格固定e2−e1、三个同范数随机方向和内容初始化五格，零偏置复用旧输入零阶。执行与结果另见[新Study报告](../../studies/qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)，未完成格子不填数字，BC60待本轮完成后再决定。目标模式继续active。
+2026-10-16追加指示：四窗口不足以回答方向唯一性；现已冻结[BC30全480方向对照计划](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-directions-docs-plan>)，新增严格固定e2−e1、三个同范数随机方向和内容初始化五格，零偏置复用旧输入零阶。执行与结果另见[新Study报告](../../studies/qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)，未完成格子不填数字，BC60待本轮完成后再决定。目标模式继续active。
 
 首格已完整验收：严格固定e2−e1全480的pooled τ=1.507777653（80,932个提交token自检全过），原生输入一阶含EMA更新的旧值为1.511957584，二者不能混称同一方法。出处：[完整首格/旧零阶证据快照](../../studies/qwen3_4b_bf16_directions/docs/direction_partial_v1.json)；随机三种子及内容初始化仍在单队列执行，整个方向Study未完成，暂不判唯一方向或全量排名。
 
-资源事件追加：原队列已自然结束，三个随机格分别完成46/50/9条后遇真实GPU外部Python，content在加载前未获准入；105次完整prompt执行的20,977个提交token复核全过，仅记资源损耗，不拼接为全量。原Study保留failed终验。独立补齐Study仅重跑四个未完整因素，按prompt边界等待外部GPU释放，单队列继续；成功template及旧zero不重跑。出处：[四格资源记录](../../studies/qwen3_4b_bf16_directions/docs/resource_interruptions_v2.json)、[补齐协议](../../studies/qwen3_4b_bf16_directions/docs/RECOVERY_PLAN.md)及[补齐执行PLAN](../../studies/qwen3_4b_bf16_directions_recovery/docs/PLAN.md)。未完成因素仍不计完整结果。
+资源事件追加：原队列已自然结束，三个随机格分别完成46/50/9条后遇真实GPU外部Python，content在加载前未获准入；105次完整prompt执行的20,977个提交token复核全过，仅记资源损耗，不拼接为全量。原Study保留failed终验。独立补齐Study仅重跑四个未完整因素，按prompt边界等待外部GPU释放，单队列继续；成功template及旧zero不重跑。出处：[四格资源记录](../../studies/qwen3_4b_bf16_directions/docs/resource_interruptions_v2.json)、[补齐协议](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-directions-docs-recovery-plan>)及[补齐执行PLAN](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-directions-recovery-docs-plan>)。未完成因素仍不计完整结果。
 
 此前交付状态：固定数据五方法加AR完整11/11通过；指定四组方向的四窗口控制完成，未改prompt，全480扩展仍在执行。[非官方HF原码尝试](esp-third-party-reproduction-2026-10-15.md)已完成三预算8B BF16预检，BC10/30/60在固定q121首token的数学门均失败（同次验证logit差40.75/33.5/33.25），共6次forward，未跑该原码全480、没有有效τ。原码、冻结协议和[真实结果](esp-third-party-audit-2026-10-15.json)独立保留；不把它与下文自实现全480混为同一baseline。PR20已合dev并删除远程工作分支，本报告追加项继续按PR/dev流程交付。
 
@@ -42,7 +42,7 @@
 
 Qwen/Qwen3-8B、BF16、T0；官方 SpecBench 全部 480 条、原顺序、首轮 non-thinking prompt；最大新输出 256，EOS 提前停止，seed 基数 123。ESP 按 Eq.5 用 λ=0.1 **updating mean**，动态树加剪枝，默认归约。BC10/1、30/1、60/1 为主配置；按论文 Appendix G.2，Qwen3 的 BC60 用单 mask、29 个 draft 节点；60/2（19 节点）只作预先固定的附加对照。8B 仅用于这项复现。
 
-设置依据：[冻结协议](../../studies/esp_table1_bf16_full_argmax/docs/PLAN.md)及[复现计划](esp-table1-bf16-reproduction-plan.md)；实际各格 `actual_spec`、`dtype`、`numeric_policy`、`runtime` 与全部数字见 [`studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json`](../../studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json)。模型内容哈希见[来源核验](../../studies/esp_table1_bf16_full_argmax/docs/modelscope-content-verification-v1.json)。
+设置依据：[冻结协议](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-full-argmax-docs-plan>)及[复现计划](<../研究计划 Denoising Speculative Decoding.md#legacy-docs-research-esp-table1-bf16-reproduction-plan>)；实际各格 `actual_spec`、`dtype`、`numeric_policy`、`runtime` 与全部数字见 [`studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json`](../../studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json)。模型内容哈希见[来源核验](../../studies/esp_table1_bf16_full_argmax/docs/modelscope-content-verification-v1.json)。
 
 τ 主口径为 `Σcommitted / Σdecode_calls`；committed 包含 bonus、按 EOS/长度裁剪后计数，不含 prefill 首 token。另报告逐 prompt τ 等权均值，以及先逐原始 category 算 pooled τ、再对类别等权的均值。后者不冒称论文已确认的任务权重。以下保留六位小数，论文目标取结果文件的 `target`，差值为 pooled τ 减目标。
 
@@ -59,7 +59,7 @@ Qwen/Qwen3-8B、BF16、T0；官方 SpecBench 全部 480 条、原顺序、首轮
 
 正确性门是**每个提交 token 等于对应验证前向 logits 的 argmax**，含 prefill 首 token。四格全部通过，共 318,830 个 token；四个原生 Run 和 Study process 均通过。独立 AR 的全序列一致条数如表，只作诊断。旧门失败格保留原失败证据，仅重新 summarize/write 验收，未重跑 execute。来源：上述结果的 `argmax_all_passed`、`native_status`、`gate_revalidation` 与[原生终验证据](../../studies/esp_table1_bf16_full_argmax/docs/native-process-revalidation-v1.json)。
 
-**已确认的协议差异及缺口，不是已证明的原因**：论文 Table 1 表注与正文对长度上限、硬件的描述不一致；本次遵循表注的输出上限。论文未完整固定精度、模型 immutable revision、thinking/template、截断和跨任务聚合权重；本次采用的 BF16、首轮 non-thinking、不截断等选择已披露。实测硬件与软件环境也不同，见结果 `runtime`。模型文件已与魔搭内容哈希核验，但不能据此认定与论文的历史 checkpoint 完全相同。这些是后续协议对齐候选，当前没有因果证据解释 τ 缺口；不进入 BF16 算子机理排查。依据：[复现计划“论文目标与未决口径”](esp-table1-bf16-reproduction-plan.md)。
+**已确认的协议差异及缺口，不是已证明的原因**：论文 Table 1 表注与正文对长度上限、硬件的描述不一致；本次遵循表注的输出上限。论文未完整固定精度、模型 immutable revision、thinking/template、截断和跨任务聚合权重；本次采用的 BF16、首轮 non-thinking、不截断等选择已披露。实测硬件与软件环境也不同，见结果 `runtime`。模型文件已与魔搭内容哈希核验，但不能据此认定与论文的历史 checkpoint 完全相同。这些是后续协议对齐候选，当前没有因果证据解释 τ 缺口；不进入 BF16 算子机理排查。依据：[复现计划“论文目标与未决口径”](<../研究计划 Denoising Speculative Decoding.md#legacy-docs-research-esp-table1-bf16-reproduction-plan>)。
 
 ## 二、4B BF16 五方法加 AR
 
@@ -76,7 +76,7 @@ Qwen/Qwen3-8B、BF16、T0；官方 SpecBench 全部 480 条、原顺序、首轮
 | 输出一阶 | 与输出零阶相同 hidden 映射和范数缩放，order=1 加 EMA 速度；β=0.9、β′=0.99。 |
 | 独立 AR | 同模型、输入、seed 和停止规则的逐 token greedy 参考，无 draft 接受数或 speculative τ。 |
 
-定义和实际参数来源：[`studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json`](../../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json) 的 `cells[*].actual_settings`，配合[冻结 PLAN](../../studies/qwen3_4b_bf16_five_methods/docs/PLAN.md)；实现为 [mask_providers.py](../../src/spec_mtp/structure/algorithm/mask_providers.py) 及[输出 provider](../../src/spec_mtp/structure/algorithm/output_masks.py)。实际 tied-storage 核对通过，无逆映射。最终 mask 为 BF16，输出 EMA/范数保留原生 FP32 内部状态，不能称所有内部计算均为 BF16；没有新增 FP32 模型实验。
+定义和实际参数来源：[`studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json`](../../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json) 的 `cells[*].actual_settings`，配合[冻结 PLAN](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-plan>)；实现为 [mask_providers.py](../../src/spec_mtp/structure/algorithm/mask_providers.py) 及[输出 provider](../../src/spec_mtp/structure/algorithm/output_masks.py)。实际 tied-storage 核对通过，无逆映射。最终 mask 为 BF16，输出 EMA/范数保留原生 FP32 内部状态，不能称所有内部计算均为 BF16；没有新增 FP32 模型实验。
 
 ### 各格 τ、计数与正确性门
 

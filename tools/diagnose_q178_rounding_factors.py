@@ -66,7 +66,7 @@ def main():
     from spec_mtp.structure.artifact.evidence import runtime
     root = Path(__file__).resolve().parents[1]
     study = root / 'studies/output_space_extension'
-    paths = {'tool': Path(__file__), 'plan': study / 'docs/ROUNDING_FACTOR_PLAN.md',
+    paths = {'tool': Path(__file__), 'plan': (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md'),
         'phi_tool': root / 'tools/diagnose_q178_phi_rms.py',
         'common': study / 'kernel_common.py',
         'report': root / '.tmp/q178-phi-rms-20261014-v1/diagnosis.json',

@@ -6,10 +6,10 @@
 | --- | --- | --- | --- |
 | [研究计划规范 Research Plan Standard.md](<研究计划规范 Research Plan Standard.md>) | 25618 | `61fc9fbe1130810b41ef25d3655eef2f83289b60306458ad5e4c17b9d4658bd3` | `61fc9fbe1130810b41ef25d3655eef2f83289b60306458ad5e4c17b9d4658bd3` |
 | [研究计划模板 Research Plan Template.md](<研究计划模板 Research Plan Template.md>) | 9309 | `b53a7250fd57f754a57a2ac3ddb918eefe7a0ac7a4c28096f39c858486370f44` | `b53a7250fd57f754a57a2ac3ddb918eefe7a0ac7a4c28096f39c858486370f44` |
-| [research_plan_standard_en.md](<research_plan_standard_en.md>) | 26252 | `b617cb114dd600d73e31b1d8e3de817d08be20662cf927e5d0462a75dbd592db` | `d8be264b48e4bf45d7416a31b90f52bee6349b71cac198e25bed4cba723ec423` |
-| [research_plan_template_en.md](<research_plan_template_en.md>) | 9779 | `6524e897ec2343bdb3a1f51315c8207dba0c8fe16b85fddc2f542115fe259b60` | `924af197d5c3971ae52160455c5a19dbd5dc760de4ec61b6fbf9f09fd2541519` |
+| [research_plan_standard_en.md](research_plan_standard_en.md) | 26252 | `b617cb114dd600d73e31b1d8e3de817d08be20662cf927e5d0462a75dbd592db` | `d8be264b48e4bf45d7416a31b90f52bee6349b71cac198e25bed4cba723ec423` |
+| [research_plan_template_en.md](research_plan_template_en.md) | 9779 | `6524e897ec2343bdb3a1f51315c8207dba0c8fe16b85fddc2f542115fe259b60` | `924af197d5c3971ae52160455c5a19dbd5dc760de4ec61b6fbf9f09fd2541519` |
 
-本仓主计划：[中文](../../research-plan.md)、[English](../../research-plan.en.md)。它们按模板十章重写，中文为主；运行中的Study PLAN不因模板对齐而改写。旧v6保留历史设想，不作为当前新增方法的执行授权。
+本仓主计划：[中文](<../../研究计划 Denoising Speculative Decoding.md>)、[English](<../../Research Plan Denoising Speculative Decoding.md>)。它们按模板十章重写，中文为主；按Enmao 12:53要求，Study子计划和旧v6均已并入唯一项目计划独立章节；原Git版本和Run签名保留，不恢复历史执行范围。
 
 原中文正本保留上游原文路径：文献调研规范、通用调研规范及校准调研大纲属于DEM资料集合，不在本仓，clone后这些引用不可打开。未伪造对应文件或静默改写正本。本次实际读取了用户工作区的文献调研规范，并在课题计划说明阅读深度；不把复制规范写成完成其中所有文献核验，也不因模板自动扩大实验范围。
 

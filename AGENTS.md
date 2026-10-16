@@ -20,7 +20,7 @@
 | 测试与 CI | [testing.md](docs/testing.md) |
 | Windows | [windows.md](docs/windows.md) |
 | 还没拍板的下一步 | [brainstorm.md](docs/brainstorm.md) |
-| 当前研究计划（非冻结Study合同） | [中文](docs/research-plan.md) / [English](docs/research-plan.en.md) |
+| 唯一项目研究计划 | [中文](<docs/研究计划 Denoising Speculative Decoding.md>) / [English](<docs/Research Plan Denoising Speculative Decoding.md>) |
 | 研究证据、历史草稿与规范入口 | [research/readme.md](docs/research/readme.md) |
 | 论文 PDF | [papers/index.md](docs/papers/index.md)。PDF 不进 git |
 | 问题与兼容性 | [bugs.md](docs/bugs.md) |
@@ -28,7 +28,7 @@
 | 异机接手与待验范围 | [handover.md](docs/handover.md) |
 | 已经记下的接受数 | [history-extrapolation.md](docs/history-extrapolation.md) |
 
-一般技术文档文件名用小写；Study 目录入口用 `README.md`，计划、报告和数字用 `docs/PLAN.md`、`docs/STUDY_REPORT.md`、`docs/NUMBERS.md`，与固定 RPipe 合同一致。不要维护第二套大小写文档。
+一般技术文档文件名用小写；Study 目录入口用 `README.md`，报告和数字用 `docs/STUDY_REPORT.md`、`docs/NUMBERS.md`。项目计划只保留 docs/ 下上述中英文两份（全称文件名按Enmao 12:53要求）；子Study计划写入项目计划独立章节，不新建PLAN.md。
 
 ## 3. 协作
 
@@ -47,10 +47,10 @@
 
 ## 5. 实验
 
-- 开跑前写 `studies/<name>/docs/PLAN.md`（问题、对照、指标、停止规则、[studies/README.md](studies/README.md) §5 排班）。
+- 开跑前在唯一项目计划写该Study独立章节，并在Study声明记录不可变计划commit/blob与章节（问题、对照、指标、停止规则、[studies/README.md](studies/README.md) §5 排班）。
 - `python -m spec_mtp make studies/<name>`，再 `python -m spec_mtp launch studies/<name>`。
 - `flow.prepare_shared: false`（RPipe make 下载只认 torchvision）。Run prepare 仍把 SpecBench 和权重写进 `shared/`。**不要写 `origin: foreign`**（[layout.md](docs/layout.md)）。权重用 ModelScope。
-- 实验验收遵循最新用户确认及冻结协议。当前BF16/T0研究的正确性门是全部提交token等于对应验证前向logits的argmax；独立AR一致率仅报告、不作失败门，见[当前研究计划](docs/research/esp-table1-bf16-reproduction-plan.md)。历史执行证据与已有成功Run不重签。按本次用户授权，旧AR门失败且execute完整的Run可仅重新验收：保留失败result备份、raw/输入/来源哈希及新validator SHA，不重跑execute。永久停止BF16 ESP相对独立AR的算子数值机理排查。接受数、τ及其口径写入报告，不把γ叫成slope。
+- 实验验收遵循最新用户确认及冻结协议。当前BF16/T0研究的正确性门是全部提交token等于对应验证前向logits的argmax；独立AR一致率仅报告、不作失败门，见[当前研究计划](<docs/研究计划 Denoising Speculative Decoding.md#legacy-docs-research-esp-table1-bf16-reproduction-plan>)。历史执行证据与已有成功Run不重签。按本次用户授权，旧AR门失败且execute完整的Run可仅重新验收：保留失败result备份、raw/输入/来源哈希及新validator SHA，不重跑execute。永久停止BF16 ESP相对独立AR的算子数值机理排查。接受数、τ及其口径写入报告，不把γ叫成slope。
 - 已有数字的格子不重跑。不复用一个 Run 目录。源码或输入变化用新的 algorithm.config.version；make/remake 不签收旧成功 Run。
 - Study collect 从 execute 的原始观测计算指标，summarize 跑成功门，write 再核验，process 只终验当前 index。
 - Windows：`PYTHONUTF8=1`，`D:\anaconda3\python.exe`，不另建 venv。

@@ -6,8 +6,16 @@ experiment:
 recipe: recipe.py
 freeze: true
 provenance:
+  project_plan:
+    path: docs/研究计划 Denoising Speculative Decoding.md
+    historical_sections:
+    - anchor: legacy-studies-output-space-4b-holdout-docs-plan
+      source_commit: aed4eee23ea5e6b9772b388eec9aa50a38452089
+      source_path: studies/output_space_4b_holdout/docs/PLAN.md
+      git_blob_sha256: 1ef5c46f3c3a824e45ffff9f354c4def5f3c7fc281cd1ad19c44df030603ff29
+    policy: Historical replay uses the pinned Git version; current central-plan edits
+      never re-sign old Runs.
   include:
-  - docs/PLAN.md
   - docs/modelscope_snapshot.json
   - docs/prompts_manifest.json
   - docs/history_inventory.json

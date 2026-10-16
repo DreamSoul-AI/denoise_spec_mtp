@@ -1,6 +1,6 @@
 # history-extrapolation
 
-精度范围：本页历史 Qwen3-4B 结果均标注为 FP32；不作为 BF16 复现证据。新增实验仅使用 BF16，当前最高优先见 [ESP Table 1 计划](research/esp-table1-bf16-reproduction-plan.md)。
+精度范围：本页历史 Qwen3-4B 结果均标注为 FP32；不作为 BF16 复现证据。新增实验仅使用 BF16，当前最高优先见 [ESP Table 1 计划](<研究计划 Denoising Speculative Decoding.md#legacy-docs-research-esp-table1-bf16-reproduction-plan>)。
 
 
 Recorded cells. The run directories were not kept. These numbers are not rerun.

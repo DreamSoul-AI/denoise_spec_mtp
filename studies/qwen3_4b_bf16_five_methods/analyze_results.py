@@ -221,7 +221,7 @@ def main():
         lines.append(f"| {pair['first']} → {pair['second']} | {wtl('accepted')} | {wtl('calls')} | {d['accepted']} | {d['model_calls']} | {d['new_tokens']} |")
     lines += ['', 'accepted为EOS/预算裁剪前候选接受数；committed及τ包含bonus、按裁剪后实际解码提交数计算，不含prefill首token。argmax审计含首token且必须全过；独立AR首分叉和输出长度全部保留，不作为失败门。AR参考不冒充Spec验证argmax审计。', '',
               '模型、forward及最终mask为BF16；输出EMA/范数沿用原生FP32内部状态。不同方法β等沿用预先定义配方，不声称差异仅由输入/输出空间造成。单seed、固定480条，不推断总体优越或测速收益；零计时字段为占位。', '',
-              f'逐prompt计数、两两赢平输及AR首分叉见[{name}]({name})。' if ready else '尚无完整实测结论；本机pending文件不作为公开证据。', '', '[冻结计划](PLAN.md)；原始tokens、完整Run和权重仅本机保留。']
+              f'逐prompt计数、两两赢平输及AR首分叉见[{name}]({name})。' if ready else '尚无完整实测结论；本机pending文件不作为公开证据。', '', '[冻结计划](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-plan>)；原始tokens、完整Run和权重仅本机保留。']
     if ready:
         lines += ['', '![Full480 paired wins ties losses](figures/paired_outcomes.png)', '',
                   '图：行方法相对列方法，格内为W/T/L，颜色为净赢数W−L，固定范围±480；接受数越高越好，调用数越低越好。两个预算的全部方法对照和输局均保留，对角不作比较。独立AR调用数、一致率、首分叉与输出长度另列于表格及正式证据；本图不表示测速或总体显著性。']

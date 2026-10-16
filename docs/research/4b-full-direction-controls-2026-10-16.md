@@ -8,7 +8,7 @@
 
 ## 一、固定设置与来源
 
-本轮按[先冻结PLAN](../../studies/qwen3_4b_bf16_directions/docs/PLAN.md)执行；资源失败后的四格完整补齐见[补齐PLAN](../../studies/qwen3_4b_bf16_directions_recovery/docs/PLAN.md)。不是事后预注册。Qwen3-4B BF16/T0、原SpecBench全480及原顺序、原non-thinking模板/input_ids、seed123+index、最大256/EOS、BC30双mask/draft9动态剪枝，默认归约；λ0.1 updating mean、γ1、不normalize、不extrapolate_ema。输入数据SHA256为`7dd26882f31ada100c2aa7447019b5349bddc55697021acbc5643fdc8740aa21`。
+本轮按[先冻结PLAN](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-directions-docs-plan>)执行；资源失败后的四格完整补齐见[补齐PLAN](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-directions-recovery-docs-plan>)。不是事后预注册。Qwen3-4B BF16/T0、原SpecBench全480及原顺序、原non-thinking模板/input_ids、seed123+index、最大256/EOS、BC30双mask/draft9动态剪枝，默认归约；λ0.1 updating mean、γ1、不normalize、不extrapolate_ema。输入数据SHA256为`7dd26882f31ada100c2aa7447019b5349bddc55697021acbc5643fdc8740aa21`。
 
 | 方向组 | 定义及旧方法对应 |
 | --- | --- |

@@ -77,7 +77,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     report, tensors = {'quality_passed': False, 'cases': [], 'frozen_comparisons': []}, {}
     try:
-        c = load(args.out, root / 'studies/output_space_extension/docs/NORM_KERNEL_PLAN.md', Path(__file__))
+        c = load(args.out, (root / 'docs/研究计划 Denoising Speculative Decoding.md'), Path(__file__))
         report.update(source_binding=c.binding, source_digest=c.native['source_digest'],
             model_digest=c.native['model_digest'], runtime=c.previous['runtime'], version='q178-norm-kernel-20261014-v1',
             generation_budget=800, auxiliary_model_forwards=0)

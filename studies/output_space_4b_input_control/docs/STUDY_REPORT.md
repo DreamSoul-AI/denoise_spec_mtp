@@ -16,7 +16,7 @@ first26中，历史EMA只比冻结均值多2接受／少3调用；零阶／一�
 
 ## 固定配方与复用
 
-[PLAN](PLAN.md)采用历史已选定输入EMA：beta=.9999、lam=.1、gamma/step_scale=1，level=order0、normalize=false、extrapolate_ema=false、update=true；三方法仍是同unpruned[1,1]/k2/BC9。只沿用现有mean_plus_gamma实现，没有扫描任何参数。源670c744e0535dcad，模型/精度/环境/输入IDs/序号seed/输出预算/EOS与原两批相同。参数是历史first26选择的，属于方法对照，不是只改变输入/输出空间的纯因果消融。
+[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-4b-input-control-docs-plan>)采用历史已选定输入EMA：beta=.9999、lam=.1、gamma/step_scale=1，level=order0、normalize=false、extrapolate_ema=false、update=true；三方法仍是同unpruned[1,1]/k2/BC9。只沿用现有mean_plus_gamma实现，没有扫描任何参数。源670c744e0535dcad，模型/精度/环境/输入IDs/序号seed/输出预算/EOS与原两批相同。参数是历史first26选择的，属于方法对照，不是只改变输入/输出空间的纯因果消融。
 
 [原始同prompt复验](../../output_space_4b_recheck_v2/docs/STUDY_REPORT.md)与[4条固定新prompt确认](../../output_space_4b_holdout/docs/STUDY_REPORT.md)的成功Run按前置哈希复用。新EMA逐token等于自身freshAR及旧独立AR，实际model_digest/runtime相同，无context裁剪。完整正负/逐prompt接受与调用/来源见[结构化结果](execution_v1.json)。旧output0/output1/AR零新增forward；没有用原成功Run重签新来源。
 

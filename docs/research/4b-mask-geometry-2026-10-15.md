@@ -74,7 +74,7 @@
 
 ## 五、最小几何观测
 
-观测协议已先提交：[GEOMETRY_PLAN](../../studies/qwen3_4b_bf16_five_methods/docs/GEOMETRY_PLAN.md)。只选 coding/math_reasoning/summarization/translation 各第一条（q121/q401/q241/q161），BC30、三方法、最多 64 新 token/EOS，共 12 格；选择不依赖结果。新增 forward/token 上限各 768；不新增独立 AR 或 teacher forward。
+观测协议已先提交：[GEOMETRY_PLAN](<../研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-geometry-plan>)。只选 coding/math_reasoning/summarization/translation 各第一条（q121/q401/q241/q161），BC30、三方法、最多 64 新 token/EOS，共 12 格；选择不依赖结果。新增 forward/token 上限各 768；不新增独立 AR 或 teacher forward。
 
 **12/12 格完成，627 个新 token 的 verifier-argmax 审计全过，421 次模型 forward（含 12 次 prefill），均在预算内。** 12 格输出都与对应旧完整 Run 前缀逐 token 一致；hook 不增加 forward。独立 AR 前缀一致 10/12，仅作诊断。GPU 只使用原 ModelScope 4B BF16/eager，tied storage、模型 digest 和科学源码 digest 均核对；所有几何统计在 CPU 完成。
 

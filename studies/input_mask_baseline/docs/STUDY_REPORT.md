@@ -1,6 +1,6 @@
 # Study Report: input_mask_baseline
 
-当前v4四格执行完成，真实输入空间前置质量门通过；v3的完整性误拒绝与证据保留。问题、条件和停止门见 [PLAN](PLAN.md)。四个真实模型 case 的结果不能由 Toy/Stub 或随机 tiny 代替；没有执行的数字留空。
+当前v4四格执行完成，真实输入空间前置质量门通过；v3的完整性误拒绝与证据保留。问题、条件和停止门见 [PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-input-mask-baseline-docs-plan>)。四个真实模型 case 的结果不能由 Toy/Stub 或随机 tiny 代替；没有执行的数字留空。
 
 ## v2历史前置状态（2026-10-14）
 

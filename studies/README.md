@@ -26,13 +26,12 @@ studies/<name>/
     run.py                      阶段实现；helper 可单独放置
   structure/                    该 Study 专用建构；没有则不建空壳
   docs/
-    PLAN.md                     开跑前确认的计划
     STUDY_REPORT.md             人写的结果与结论
     NUMBERS.md                  report 的数字表；不替代结论
     figures/                    真实结果图和图注
 ```
 
-从 [_template](_template/README.md) 复制，改目录和 `study` 名称，再写计划。现有 `smoke`、`input_mask_baseline` 与模板；只有提取并写明 PLAN 的部分进入执行，其余研究草案不是可执行 Study，历史接受数见 [history-extrapolation.md](../docs/history-extrapolation.md)。一次性环境排错放 `.tmp/diagnostics/`，必要结论并入关联报告。
+从 [_template](_template/README.md) 复制，改目录和 `study` 名称，在项目计划中写独立章节。现有 `smoke`、`input_mask_baseline` 与模板；只有项目计划中明确授权并冻结的部分进入执行，其余研究草案不是可执行 Study，历史接受数见 [history-extrapolation.md](../docs/history-extrapolation.md)。一次性环境排错放 `.tmp/diagnostics/`，必要结论并入关联报告。
 
 SpecMTP 声明使用 `recipe: recipe.py` 和 `source: spec_mtp`。Study recipe 的 import 调用 `register_sources()`，Run prepare 的 `register(ctx)` 检查构造合同；注册不读取 prompt、下载权重或执行大模型。库默认 source 保持原状。复用的 ESP/EMA/AR/alignment、mask、tree、KV cache 和数据/模型适配在 `src/spec_mtp/`，只有本轮独有实现才放 Study `structure/`。
 
@@ -45,7 +44,7 @@ SpecMTP 声明使用 `recipe: recipe.py` 和 `source: spec_mtp`。Study recipe �
 | prepare | 库检查来源、recipe 注册，构造 Data/Model/Algorithm，保存输入、权重与实际环境 | 默认阶段 + recipe / 专项 builder；无 Study 空壳 |
 | execute | 保存真实输出 token、AR 对照、接受/回退和 cache 观测 | 默认阶段调用专项 Algorithm |
 | collect | 从原始观测计算 CSV 与 Tracker 指标 | `flow/collect/run.py` |
-| summarize | 核验 token、指标和证据；exact-match 不为 1 就失败 | `flow/summarize/run.py` |
+| summarize | 核验全部提交token=验证forward argmax、指标及来源；AR exact仅诊断 | `flow/summarize/run.py` |
 | write | 在库定稿 result 前再核验来源、配置和输入 | `flow/write/run.py` |
 | process | Run scope 用默认处理；Study scope 只检查当前 index 并终验因素/seed/来源/证据 | `flow/process/run.py` |
 
@@ -63,7 +62,7 @@ write 先执行 Study hook 再由库定稿，其他阶段先库后 Study；prepa
 
 ## 5. 高效率排班与时长
 
-开跑前把排班写入 PLAN。先以 `make --round 1` 串行校准实际权重、KV、树、mask 与进程峰值；没有测量时不套用 RPipe 视觉训练的 auto 显存预算。测量后可用 `system.config.vram_bytes` 记录保守预算，小步增加独立 Run 并发。不同模型或明显不同耗时分组，每组等进程退出、显存释放后再进入下一组。
+开跑前把排班写入唯一项目计划对应章节。先以 `make --round 1` 串行校准实际权重、KV、树、mask 与进程峰值；没有测量时不套用 RPipe 视觉训练的 auto 显存预算。测量后可用 `system.config.vram_bytes` 记录保守预算，小步增加独立 Run 并发。不同模型或明显不同耗时分组，每组等进程退出、显存释放后再进入下一组。
 
 每个 Run 独占产物、KV cache、mask、RNG 和 logger；一次只启动一条 launch 调度链。速度对照串行运行相同任务量，记录预热、CUDA 同步、backend、生成长度和整体墙钟。seed 数量不决定并发。make 的估计是组内最慢估计求和，不能当作实测速度；计划填 est，报告填 actual，缺失就明确记未记录。
 
@@ -93,10 +92,10 @@ RPipe 要求报告附图：解码使用真实接受数或轨迹图及来源图�
 
 | **Study** | **职责与状态** | **正式依据** |
 | --- | --- | --- |
-| [smoke](smoke/README.md) | 随机 tiny 三 variant 的可复用门；历史 CPU/CUDA 串行验收已完成 | [PLAN](smoke/docs/PLAN.md)、[报告](smoke/docs/STUDY_REPORT.md)、[NUMBERS](smoke/docs/NUMBERS.md) |
-| [_template](_template/README.md) | 新研究起点，不能直接运行，不代表真实模型已通过 | [计划模板](_template/docs/PLAN.md)、[报告模板](_template/docs/STUDY_REPORT.md) |
-| [output_space_prerequisite](output_space_prerequisite/README.md) | tied输出hidden零/一阶两槽链式四格已通过；接受数17/10/10，单prompt负结果 | [PLAN](output_space_prerequisite/docs/PLAN.md) |
-| [output_space_small_matrix](output_space_small_matrix/README.md) | q172–q174小矩阵/匹配前缀诊断通过；混合小样本观察 | [PLAN](output_space_small_matrix/docs/PLAN.md)、[报告](output_space_small_matrix/docs/STUDY_REPORT.md) |
+| [smoke](smoke/README.md) | 随机 tiny 三 variant 的可复用门；历史 CPU/CUDA 串行验收已完成 | [PLAN](<../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-smoke-docs-plan>)、[报告](smoke/docs/STUDY_REPORT.md)、[NUMBERS](smoke/docs/NUMBERS.md) |
+| [_template](_template/README.md) | 新研究起点，不能直接运行，不代表真实模型已通过 | [计划模板](<../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies--template-docs-plan>)、[报告模板](_template/docs/STUDY_REPORT.md) |
+| [output_space_prerequisite](output_space_prerequisite/README.md) | tied输出hidden零/一阶两槽链式四格已通过；接受数17/10/10，单prompt负结果 | [PLAN](<../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-prerequisite-docs-plan>) |
+| [output_space_small_matrix](output_space_small_matrix/README.md) | q172–q174小矩阵/匹配前缀诊断通过；混合小样本观察 | [PLAN](<../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-small-matrix-docs-plan>)、[报告](output_space_small_matrix/docs/STUDY_REPORT.md) |
 
 新增 [input_mask_baseline](input_mask_baseline/README.md) 使用真实 Qwen3-0.6B / SpecBench q171，四个固定 case 是宏观方案 §5.11 / E1–E2 的前置门；计划与结果分别见其 docs。通用四阶段从 src/spec_mtp/flow 同名包导入，研究包内的默认 prepare/execute/make 不填空实现。
 
@@ -111,3 +110,9 @@ RPipe 要求报告附图：解码使用真实接受数或轨迹图及来源图�
 
 
 2026-10-15 阶段结果：[8B全480 argmax审计](esp_table1_bf16_full_argmax/README.md)四格及原生process完成，318,830个输出token审计通过，AR仅诊断。BC30 τ1.563378、BC60单mask1.647301未复现目标1.63/1.74，三聚合及双mask对照全部保留；PR #10经CI合dev。[4B BF16五方法配对](qwen3_4b_bf16_five_methods/README.md)11/11及原生process通过，809,118个Spec提交token自检全过；全部20组逐prompt对照、AR差异、数字表及真实图见[报告](qwen3_4b_bf16_five_methods/docs/STUDY_REPORT.md)，[集成与CI](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12)。冻结PLAN不回写。未新增FP32模型实验、算子机理或测速；未强推、合main、删除分支或数据，8B未用于其他研究。
+
+## 项目计划归并（2026-10-16）
+
+唯一入口为[中文](<../docs/研究计划 Denoising Speculative Decoding.md>)/[English](<../docs/Research Plan Denoising Speculative Decoding.md>)。全部60份旧子计划已归入各自章节，来源清单保存旧Git commit/blob/工作树换行SHA。旧Run不重签、不remake；复放旧合同使用固定历史Git版本。当前Study声明的provenance.project_plan记录项目路径、章节及历史来源；这份元数据随study.yaml冻结，RPipe不自动读取仓库外路径或实时中央文档。新执行需显式验证不可变Git计划blob，不能误称额外字段本身会读取/冻结中央文档。
+
+当前单GPU串行，准入=已测进程树峰值主机RAM+2GiB余量及实际GPU空闲/工作集可容纳；不逐个核查CPU脚本，不杀外部作业。旧并发/显存阈值章节仅历史通用说明。BF16/T0、不测速、固定480 prompt，当前独立8B复验后接已预注册4B范数扫描。

@@ -9,4 +9,4 @@
 
 第二格所有nn.Linear按单行调用原forward，模型权重digest两格相同，dtype不变；RMSNorm/attention/RoPE与ESP科学源码不改。CPU控制测试验证了拆分/行置换、权重/dtype不变以及成功/异常patch恢复，16项控制回归通过。线性批量行数单独不是充分修复，不能据此认定其是唯一来源。两格AR输出彼此一致：False；完整token与哈希见[证据](shape_evidence_v1.json)。不同数值约定不作同路径接受收益比较。
 
-[PLAN](PLAN.md)。下一最小问题：树中被屏蔽的KV位置虽为零softmax权重，矩阵尺寸仍不同；是否要固定每查询的有效KV与归约形状，并同时固定linear/norm行几何，才能与AR一致？此为待验证假设，不是已归因。仅为8B ESP复现继续，完整480/4B五方法暂不启动。
+[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-shape-check-docs-plan>)。下一最小问题：树中被屏蔽的KV位置虽为零softmax权重，矩阵尺寸仍不同；是否要固定每查询的有效KV与归约形状，并同时固定linear/norm行几何，才能与AR一致？此为待验证假设，不是已归因。仅为8B ESP复现继续，完整480/4B五方法暂不启动。

@@ -4,9 +4,9 @@
 
 ## 固定协议与证据
 
-[PLAN](PLAN.md)冻结下一连续translation skip18/take4、q179/180/181/182和两槽/窗口/停止规则；[prompt清单](prompts_manifest.json)先冻结文本/hash与独立渲染IDs，input长度99/35/37/38。ModelScope同一11文件快照/tied Qwen3-0.6B、FP32/eager/CUDA、非thinking、T0/EOS/预算100、static unpruned[1,1]/k2/BC9、beta.9/beta_prime.99、seed123+i。Native runtime仍deterministic=false/原TF32配置；q178严格精度覆盖只在独立子进程，没有传递到新Run。
+[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-followup-docs-plan>)冻结下一连续translation skip18/take4、q179/180/181/182和两槽/窗口/停止规则；[prompt清单](prompts_manifest.json)先冻结文本/hash与独立渲染IDs，input长度99/35/37/38。ModelScope同一11文件快照/tied Qwen3-0.6B、FP32/eager/CUDA、非thinking、T0/EOS/预算100、static unpruned[1,1]/k2/BC9、beta.9/beta_prime.99、seed123+i。Native runtime仍deterministic=false/原TF32配置；q178严格精度覆盖只在独立子进程，没有传递到新Run。
 
-[原生执行](execution_v1.json)、[NUMBERS](NUMBERS.md)、[逐prefix轨迹](trajectory_diagnosis.json)、[冻结窗口](window_selection_v1.json)、[双向执行](transfer_diagnosis_v1.json)、[离线范围/state汇总](analysis_v1.json)保留所有正负点。PLAN未修改，结果和后续假设在[PLAN_REVIEW](PLAN_REVIEW.md)，避免重签已成功Run。
+[原生执行](execution_v1.json)、[NUMBERS](NUMBERS.md)、[逐prefix轨迹](trajectory_diagnosis.json)、[冻结窗口](window_selection_v1.json)、[双向执行](transfer_diagnosis_v1.json)、[离线范围/state汇总](analysis_v1.json)保留所有正负点。PLAN未修改，结果和后续假设在[PLAN_REVIEW](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-followup-docs-plan-review>)，避免重签已成功Run。
 
 ## 小矩阵
 
@@ -33,7 +33,7 @@ Q180/181双向分别11/7个first seed发生逐元素变化，接受/提交/KV完
 
 本批没有运行q178那套canonical state同步，不将它的结论直接推广。Q179一阶←零阶36个匹配窗口只有9个anchor/v同时逐元素相同，max_abs anchor3.05176e-5/v2.98023e-6；反向38个只有25个anchor相同，anchor最大5.34058e-5且v始终0。Q182一阶←零阶7个匹配根前三个44/45/47相同，后期anchor最大2.67029e-5/v2.62260e-6；反向7个全相同且v0。小差异保留，未声称后期pureproxy归因。
 
-q178独立对照结果见[数值报告](../../output_space_extension/docs/STUDY_REPORT.md)及[规范评审](../../output_space_extension/docs/NUMERICAL_PLAN_REVIEW.md)：严格FP32重复全部已捕获张量相同，规范anchor/v同步后两个self控制8、双移植9且全语义路径仍同。这说明q178本固定committed-state微差并非必要，同时代理内数值与具体CUDA kernel仍未隔离。
+q178独立对照结果见[数值报告](../../output_space_extension/docs/STUDY_REPORT.md)及[规范评审](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-extension-docs-numerical-plan-review>)：严格FP32重复全部已捕获张量相同，规范anchor/v同步后两个self控制8、双移植9且全语义路径仍同。这说明q178本固定committed-state微差并非必要，同时代理内数值与具体CUDA kernel仍未隔离。
 
 排序边界是即时T0判定，owner历史会改变之后的seed和排序，不能作为二选一机制。累计12个同模型/任务开发prompt只有q173/178/179/182在固定移植后出现接受数变化，其余8个null（包括未利用owner/终止控制），不是发生概率估计。原一阶总数自然胜零阶的只有q173/q179，q182负1；总体accepted输入60/零45/一47为描述，不能推稳定方法优势、显著性或跨任务普遍性。第二层只有合法first prefix下才解释，不记碰巧匹配为depth2收益。
 

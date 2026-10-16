@@ -4,7 +4,7 @@
 
 | **项目** | **内容** |
 | --- | --- |
-| 研究目标 | 链接 [PLAN](PLAN.md)，填写问题与对照 |
+| 研究目标 | 链接 [PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies--template-docs-plan>)，填写问题与对照 |
 | 记录日期 / 实验日期 | 分别填写，历史回顾注明实际执行日期 |
 | 主要结果 | 按 Experiment 记录指标、单位、mean/std/min/max/n、阈值 |
 | 当前状态 | 执行完成 / 质量通过 / 失败 / 跳过 / 未执行分别说明 |

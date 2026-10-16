@@ -2,6 +2,9 @@
 
 中文正本，更新于2026-10-16。[English translation](<Research Plan Denoising Speculative Decoding.md>)。采用[新版规范与模板](research/standards/README.md)，来源为RPipe已合入dev的`e461133218deabf8755b3e8657650e1e4a3cd9f4`。本次是对已有研究与证据的整理，不是对已看到结果的实验重新预注册，也不改运行中的Study合同。
 
+
+> 当前执行快照（2026-10-16）：8B独立非官方复验已在隔离工作树启动，首格BC10 Run `80ff7a41958d8134`，检查点87/480；BC30/60尚未开始，未产生可验收新τ。其不可变预注册为`085722e30c5bb30387f65f268648b58321aa9146`第八章`current-execution-20261016`，执行源码`4bb28c7`。进度来自新Study Run的`assets/revalidation_progress.json`，容量来自执行树`.tmp/sd-repeat-20261016/resources.latest.json`；非测速。范数扫描在该串行队列自然退出后接续。
+
 ## 一、当前范围、状态与执行优先级
 
 本计划按Enmao 2026-10-16 12:44/12:53最终指示更新：停止追找官方ESP入口，现有实现统一标为**非作者官方复现**。当前研究问题为固定SpecBench480上Table1 τ缺口，以及输入偏置的范数是否比特定方向更能解释接受收益；不新增Kalman/新方法、不改prompt、不测速，仅BF16/T0。
@@ -14,7 +17,7 @@ GPU政策已改为：原则上不空闲，有用实验可执行；**同一时间
 
 唯一有效项目计划为本文件和[英文对应版](<Research Plan Denoising Speculative Decoding.md>)。所有60份子计划/专项协议/评审/历史v6整合到第十一章独立章节，旧单独文件按12:53明确授权git rm；来源字节、Git blob、换行及新锚点见归并清单。历史“必须独立PLAN”“先AR exact”“追作者入口”等原文只作历史记录，不能覆盖本章。迁移不重签原Run，不把当前计划内容当原冻结字节；新Run记录不可变的项目计划commit/blob和章节。正在运行的其他任务不受改名影响。
 
-文献与结果阅读深度、既有局限见后续章节。夜间PR22–40的完整结果/来源/对账均纳入第九/十章；最新机制与复验尚待GPU执行，计划不是成功结果。
+文献与结果阅读深度、既有局限见后续章节。夜间PR22–40的完整结果/来源/对账均纳入第九/十章；8B复验已启动、机制范数扫描尚待执行；进度不是成功结果。
 
 ## 二、文献调研
 
@@ -38,9 +41,9 @@ GPU政策已改为：原则上不空闲，有用实验可执行；**同一时间
 
 | 问题/假设 | 条件与可反驳预测 | 当前判断与下一证据 |
 | --- | --- | --- |
-| R1（当前最高优先）：8B论文主要τ能否复现 | 按Table1目标和Qwen3单mask主协议比较；若主要值仍有明显缺口，不宣布数值复现 | 自实现有缺口，作者官方入口未确认，第三方预检失败；缺口不归因为ESP方法无效 |
+| R1（当前最高优先）：8B论文主要τ能否复现 | 按Table1目标和Qwen3单mask主协议比较；若主要值仍有明显缺口，不宣布数值复现 | 自实现有缺口，现有实现为非作者官方，第三方预检失败；停止追入口，以新独立复验检验可复现性，不据此判定ESP无效 |
 | H1（已完成/归档）：输出零/一阶在本批优于输入一阶 | 同480、4B BF16、同BC/树/停止条件；若两输出整体弱于输入一阶则不支持 | 原五方法全量不支持；速度项也未显示稳定联合收益，见第九章 |
-| H2（归档/后置）：输入收益只来自e2−e1特定方向 | 三个预先固定的同范数随机方向均无收益才与该解释相容；出现明确随机收益即反驳其“唯一”措辞 | 三个完整随机格均高于zero，random2也高于template，不支持唯一方向解释；不推出任意方向均有效 |
+| H2（现有方向证据，范数扫描接续）：输入收益只来自e2−e1特定方向 | 三个预先固定的同范数随机方向均无收益才与该解释相容；出现明确随机收益即反驳其“唯一”措辞 | 三个完整随机格均高于zero，random2也高于template，不支持唯一方向解释；不推出任意方向均有效 |
 | R2（归档/后置）：内容初始化在同条件下如何表现 | 保持原prompt与完整mean，只变原生速度初始化后缀；与template/zero配对 | content全480完成，τ1.364829262低于zero1.422420206；其范数未另匹配，不能解释为纯方向效应 |
 
 最新CPU结果见[Table1差距分析](research/esp-table1-gap-analysis-2026-10-16.md)：BC30/60单mask距论文为−0.066622/−0.092699；逐prompt或六来源等权仍未达到目标，尾部计数差仅0.002248/0.003039。作者侧逐任务计数及完整合同缺失，不能唯一归因。
@@ -133,14 +136,14 @@ tied模型不做逆映射。输出代理只按原生root/候选owner和已接受
 
 | 实验与问题 | 对照及变化因素 | 固定条件与重复 | 预算、状态与判读 |
 | --- | --- | --- | --- |
-| E1：ESP Table1来源与数值复现 | 作者入口核查、自实现参考、指定第三方预检分别记录 | 8B BF16/T0、原480；主BC10/1、30/1、60/1，60/2附加；λ0.1 updating mean | 自实现四格完成但未达到目标；官方入口未确认；第三方预检失败后停止，无新8B排队 |
+| E1：ESP Table1来源与数值复现 | 作者入口核查、自实现参考、指定第三方预检分别记录 | 8B BF16/T0、原480；主BC10/1、30/1、60/1，60/2附加；λ0.1 updating mean | 自实现四格完成但未达到目标；官方入口未确认；第三方预检失败后停止；新独立8B非官方复验已排队执行 |
 | E2：五方法加AR | 六方法共享输入；BC30/60分别比较五种mask | 4B BF16/T0，双mask、naive动态树剪枝、draft budget9/19，seed123+index，max_new_tokens256/EOS，默认归约 | 1共享AR+10个Spec Run，共5280次prompt执行但只有480个评价输入；已11/11原生验收 |
 | E3：指定方向全480 | template、random0/1/2、zero、content；每个方向相对template及旧五方法配对 | 同E2 BC30；mean/树/停止/输入全固定；方向种子提前指定，解码seed不变 | 五个新增完整路径+复用zero，新增有效预算2400次prompt执行；六格全完整，补齐Study process通过 |
 | E4：范围与证据整合 | CPU重算、出处/边界、规范/中英文计划、PR/dev集成 | 复用同一raw及既有工具，保留所有有效/失败格 | 不增加GPU矩阵；E3终验/图/报告完成；BC60方向本轮不追加，理由见最终报告 |
 
 ### （一）基线复现与后续安排
 
-实现来源与实际范围以[作者来源核查](research/esp-official-code-reproduction-2026-10-15.md)、[8B执行证据](../studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json)及第三方报告为准。当前没有可运行作者入口的核验证据，不能用任意GitHub同名项目替代；后续若取得作者版本，再按Enmao范围对齐数据、模型和原生入口，记录必要适配。不凭模板再次自动启动8B。
+实现来源与实际范围以[作者来源核查](research/esp-official-code-reproduction-2026-10-15.md)、[8B执行证据](../studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json)及第三方报告为准。当前没有可运行作者入口的核验证据，不能用任意GitHub同名项目替代；后续若取得作者版本，再按Enmao范围对齐数据、模型和原生入口，记录必要适配。本次新8B独立复验依据12:44明确授权及第八章预注册执行，不依赖官方入口。
 
 | 目标与条件 | 计划目标及出处 | 本地实测及出处 | 差距与判断 |
 | --- | --- | --- | --- |
@@ -208,21 +211,49 @@ B：新`qwen3_4b_bf16_bias_norm_scan`，ModelScope原Qwen3-4B内容，BF16/eager
 
 E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.464349086、随机2为1.523884714、zero1.422420206、content1.364829262，均来自上述正式六格证据。随机2相对template逐promptτ267胜/47平/166负；三个随机种子均高于zero，故不支持本批收益只由e2−e1方向造成的解释。仍有逐prompt反例，content范数未匹配且输出长度不同；这不是推荐最佳随机种子作新方法，也不证明任意方向有效。零偏置复用和失败资源工作量单列，不能把补齐成功包装成原失败Study通过。
 
-本轮不追加BC60方向矩阵：新增五个有效格已有2,400次prompt执行、405,073 token/276,523模型调用，三随机种子已否定本批e2−e1唯一性；BC60回答跨预算泛化，不能消除content范数混杂。失败完整partial另记20,977 token/13,854 calls，不拼接有效样本，细节见最终报告。CPU回归及PR22/dev闭环已完成。当前无GPU主线是已有8B与4B证据的差距账本及作者合同对照，P0/P1/P2产物和停止条件见上述差距报告；不筛prompt、不重选聚合、不改预算追目标。SD官方Table1步骤按最新授权优先使用GPU，但先取得官方入口并重做实时非抢占准入；当前不启动自实现重跑或其他新实验。旧0.6B罕见事件、算子归因、Kalman和新方法继续归档；开放问题不自行升级为额外实验。
+本轮不追加BC60方向矩阵：新增五个有效格已有2,400次prompt执行、405,073 token/276,523模型调用，三随机种子已否定本批e2−e1唯一性；BC60回答跨预算泛化，不能消除content范数混杂。失败完整partial另记20,977 token/13,854 calls，不拼接有效样本，细节见最终报告。CPU回归及PR22/dev闭环已完成。当前接续第八章：8B独立非官方复验→4B范数扫描。已有CPU缺口账本保留，不再追入口，不改prompt、预算或聚合追目标；0.6B、算子、Kalman和新方法归档。
 
-最新CPU来源刷新见[官方路径重查](research/esp-official-recheck-2026-10-16.md)：出版版Table1目标1.63/1.74未变；Figure8十类与采样表八类标签不构成Table1样本/权重合同。本地固定480/13类不改；作者入口未核验且OpenReview访问不完整，当前无可启动官方GPU项，不因空闲重跑自实现或失败第三方。
+最新CPU来源刷新见[官方路径重查](research/esp-official-recheck-2026-10-16.md)：出版版Table1目标1.63/1.74未变；Figure8十类与采样表八类标签不构成Table1样本/权重合同。本地固定480/13类不改；入口与OpenReview覆盖有限。该来源核查已结束，不再作为新执行门。
 
-作者repo/commit/附件[追加追踪](research/esp-author-attachment-followup-2026-10-16.md)已完成本轮有界核查：主页commit未变、三个精确代码查询各0项、六个论坛ID命中均未核验出作者实现；OpenReview三个附件候选403，未取得代码。当前官方入口仍缺，GPU步骤不虚报启动；入口到位后沿启动清单立即核来源和实时准入，无需重复授权。
+作者repo/commit/附件[追加追踪](research/esp-author-attachment-followup-2026-10-16.md)已完成本轮有界核查：主页commit未变、三个精确代码查询各0项、六个论坛ID命中均未核验出作者实现；OpenReview三个附件候选403，未取得代码。未取得可核验作者代码；本轮不再续搜，不把非官方执行冒称官方。
 
-当前未解合同集中在[Table1协议缺口登记](research/esp-table1-protocol-gaps-2026-10-16.md)：逐项区分本地事实、作者所需证据、CPU对账与官方启动触发。本轮作者公开帖未提供可核验代码入口；短链未成功解析，OpenReview未刷新。PR36非官方全480复核已完成，官方入口仍缺时不重跑GPU矩阵。
+当前未解合同集中在[Table1协议缺口登记](research/esp-table1-protocol-gaps-2026-10-16.md)：逐项区分本地事实、作者所需证据、CPU对账与官方启动触发。本轮作者公开帖未提供可核验代码入口；短链未成功解析，OpenReview未刷新。PR36完成旧非官方全480原始证据复核；当前新复验独立记录version/Run，不覆盖旧结果。
 
-[会议/HF公开渠道追加核验](research/esp-table1-protocol-gaps-2026-10-16.md)补齐作者账号公开资产范围：三种仓库API各返回0项，会议页面可见文本未提供代码；私有/组织资产及录屏内容未覆盖。作者入口仍缺，继续保持原480及现有结果，不以空闲GPU触发重跑。
+[会议/HF公开渠道追加核验](research/esp-table1-protocol-gaps-2026-10-16.md)补齐作者账号公开资产范围：三种仓库API各返回0项，会议页面可见文本未提供代码；私有/组织资产及录屏内容未覆盖。此项仅历史来源覆盖记录，不再周期刷新。
 
-本轮[P1输入/P2计数CPU对账](research/esp-table1-cpu-contract-reconciliation-2026-10-16.md)完成：四格原480首轮重渲染均token精确、无过滤（输入21–1500 token；80条源记录有多轮但仅取首轮）。BC30/60低于256的320/323条均为EOS停止；pooled相对prompt mean的差−0.029855/−0.022197主要是类间调用权重。完整旧trace前100 token的pooled τ为1.564682/1.647816，仍未达1.63/1.74；这是已观测前缀计数，不是100-token新生成。原主结果不变；作者qid/模板/thinking/revision、实际100/256停止合同、逐条原始计数/任务权重仍缺，不能唯一归因。下一步仅在取得作者证据后CPU按qid/token摘要/分子分母对齐；官方入口到位再按启动清单申请GPU。无外部刷新、无模型forward，不改prompt、不重跑完整矩阵，bias/random/Kalman后置。
+本轮[P1输入/P2计数CPU对账](research/esp-table1-cpu-contract-reconciliation-2026-10-16.md)完成：四格原480首轮重渲染均token精确、无过滤（输入21–1500 token；80条源记录有多轮但仅取首轮）。BC30/60低于256的320/323条均为EOS停止；pooled相对prompt mean的差−0.029855/−0.022197主要是类间调用权重。完整旧trace前100 token的pooled τ为1.564682/1.647816，仍未达1.63/1.74；这是已观测前缀计数，不是100-token新生成。原主结果不变；作者qid/模板/thinking/revision、实际100/256停止合同、逐条原始计数/任务权重仍缺，不能唯一归因。现有对账不能唯一归因。当前下一步是已冻结的独立复验及范数曲线，保留输入与停止/聚合合同不变；原作者侧缺口如未来自然获得证据再核对，不主动循环追找。
+
+### 夜间至本轮合入台账（UTC；均已合dev）
+
+来源为本轮已取得的GitHub PR元数据；源码搜索类PR仅保留历史证据，12:44起不再续搜。PR36是旧全量证据复核，不是新增GPU执行；新独立复验见顶部快照。
+
+| PR | 合入时间 UTC | merge commit | 内容/证据范围 |
+| --- | --- | --- | --- |
+| [#22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22) | 2026-10-15T20:02:48Z | `d792ca578` | 六格方向全480，含随机3seed和失败恢复边界 |
+| [#23](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/23) | 2026-10-15T19:38:57Z | `b00ecc0a1` | 规范模板与中英文主计划 |
+| [#24](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/24) | 2026-10-15T20:17:26Z | `617278abb` | 完成状态、GPU交接、远程分支清单 |
+| [#25](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/25) | 2026-10-15T20:37:42Z | `0dc6568df` | 既有Table1差距与CPU优先缺口 |
+| [#26](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/26) | 2026-10-15T23:52:56Z | `c467c21b9` | 出版版Table1与公开入口核查 |
+| [#27](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/27) | 2026-10-16T00:02:06Z | `3eac53c9e` | 官方入口启动清单 |
+| [#28](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/28) | 2026-10-16T00:19:34Z | `8e2132b33` | 作者commit与附件访问范围 |
+| [#29](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/29) | 2026-10-16T00:49:08Z | `635a9a589` | 共同作者与历史refs核查 |
+| [#30](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/30) | 2026-10-16T01:08:43Z | `1e734ff61` | 组织README候选核查 |
+| [#31](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/31) | 2026-10-16T01:31:50Z | `eed894989` | release与arXiv源包核查 |
+| [#32](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/32) | 2026-10-16T01:51:52Z | `a9e6a6653` | 源版本与公开资产核查 |
+| [#33](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/33) | 2026-10-16T02:21:33Z | `d5f75ef02` | 发表渠道与OpenReview访问限制 |
+| [#34](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/34) | 2026-10-16T02:36:24Z | `a3acf6795` | 已识别作者公开branch/release refs |
+| [#35](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/35) | 2026-10-16T02:53:18Z | `c4f589a44` | 组织源码搜索线索 |
+| [#36](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/36) | 2026-10-16T03:26:47Z | `6ce71665e` | 非官方四格全480原始证据复核，无新GPU矩阵 |
+| [#37](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/37) | 2026-10-16T03:57:26Z | `776a2b4a2` | 协议缺口分层登记 |
+| [#38](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/38) | 2026-10-16T04:18:15Z | `8d0f49cc4` | 作者HF公开资产及会议渠道范围 |
+| [#39](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/39) | 2026-10-16T04:37:41Z | `437954bbe` | P1输入合同/P2计数聚合CPU对账 |
+| [#40](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/40) | 2026-10-16T04:57:05Z | `aed4eee23` | 重复root剪枝机会及可证伪假设 |
+
+文献阅读深度见第二章，旧v6的60条参考文献、定理条件和未核对项完整列于第十一章；没有因归并而宣称新增正文核验。关键未解项仍为作者实际输入/停止/τ权重、非官方实现与论文的差别、有限随机seed及内容幅度混杂；下一步先独立复验，再按已冻结8格范数扫描检验，不恢复入口搜索/算子链。
 
 ## 十、GitHub使用与计划变更
 
-本文件是当前宏观计划入口，英文版逐章对应；Study级`docs/PLAN.md`是先于make冻结的执行合同，数字/图在其`STUDY_REPORT.md`和evidence中。原始tokens/trace、完整Run、模型和cache不进Git。每次正式运行沿用原生记录的commit、source/input/model摘要、配置、实际环境、seed、命令、RunID、失败和结果路径，不重建同名Run或重签历史成功记录。
+本文件是当前宏观计划入口，英文版逐章对应；历史Study独立计划已并入第十一章，其先于make冻结的合同按固定Git版本核验，数字/图在其`STUDY_REPORT.md`和evidence中。原始tokens/trace、完整Run、模型和cache不进Git。每次正式运行沿用原生记录的commit、source/input/model摘要、配置、实际环境、seed、命令、RunID、失败和结果路径，不重建同名Run或重签历史成功记录。
 
 | 日期 | 变更与原因 | 影响范围 |
 | --- | --- | --- |
@@ -232,9 +263,78 @@ E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.46
 
 计划PR23与结果[PR22](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/22)均已合dev，对应远程分支均已删除，详见[清理记录](research/remote-branch-cleanup-2026-10-15.md)。规范正本、译本、来源与SHA见[standards README](research/standards/README.md)。旧v6更广的60篇参考文献仅为历史线索，不能当本次已全部审阅的证据。本文献表各作者原文、官方数据入口和实际使用的本仓报告即本次参考资料，关键事实已就近定位。
 
+### 归并验收与复放边界
+
+全称改名由git mv单独提交7c609f9；60份子计划归入独立章节后按12:53明确授权git rm，原文/公式与固定Git来源保留。当前导航、报告生成器及工具读计划位置同步迁移；Study provenance.include不允许跨Study目录，故旧计划include替换为项目路径/章节/历史Git blob元数据，而不是伪装外部include。该元数据随study.yaml锁定，原生框架不会自动读取中央计划；新执行如当前8B复验另显式核验计划Git blob。
+
+旧Run来源锁不重签；迁移后的Study声明/工具不应拿来冒充原执行源码。历史离线哈希读取固定Git blob并核对原换行SHA，复放完整旧Run仍需其原Git版本。正在执行的8B位于隔离工作树，未受此次主仓改动影响。科学源码src/spec_mtp、vendored src/rpipe、数据、原始结果JSON和权重均未修改。
+
+本轮检查：链接/60章节/历史原字节/第三方证据专项10项通过；ruff通过，mypy56文件通过。完整CPU套件及PR远端CI结果在PR中列实际状态；未执行的检查不记通过。规范正本4文件字节不变，其3种DEM外部引用按来源README明确不可随clone解析，链接测试只豁免这3种已知外部路径。
+
 ## 十一、子课题与历史冻结计划的完整归档
 
 以下60个独立章节归并原Study计划、专项协议、评审与历史草案。它们是历史原文，不构成恢复0.6B、FP32、算子机理或Kalman的执行授权；其“待执行/先exact”等表述按原时点保留，由本计划当前范围与正确性门覆盖。导航相对路径已随整合迁移；原字节、换行和Git blob身份见[归并清单](research/plan-consolidation-manifest.json)，需要核验历史签名时读取固定Git版本，不以当前计划重新签旧Run。
+
+- [docs/research/esp-table1-bf16-reproduction-plan.md](#legacy-docs-research-esp-table1-bf16-reproduction-plan)
+- [docs/research/publication-plan.md](#legacy-docs-research-publication-plan)
+- [docs/research/research-plan-v6.md](#legacy-docs-research-research-plan-v6)
+- [studies/_template/docs/PLAN.md](#legacy-studies--template-docs-plan)
+- [studies/esp_table1_bf16_full/docs/PLAN.md](#legacy-studies-esp-table1-bf16-full-docs-plan)
+- [studies/esp_table1_bf16_full_argmax/docs/PLAN.md](#legacy-studies-esp-table1-bf16-full-argmax-docs-plan)
+- [studies/esp_table1_bf16_full_argmax/docs/THIRD_PARTY_PLAN.md](#legacy-studies-esp-table1-bf16-full-argmax-docs-third-party-plan)
+- [studies/esp_table1_bf16_numerics/docs/PLAN.md](#legacy-studies-esp-table1-bf16-numerics-docs-plan)
+- [studies/esp_table1_bf16_preflight/docs/PLAN.md](#legacy-studies-esp-table1-bf16-preflight-docs-plan)
+- [studies/esp_table1_bf16_qwen_protocol/docs/PLAN.md](#legacy-studies-esp-table1-bf16-qwen-protocol-docs-plan)
+- [studies/esp_table1_bf16_reduction_check/docs/PLAN.md](#legacy-studies-esp-table1-bf16-reduction-check-docs-plan)
+- [studies/esp_table1_bf16_shape_check/docs/PLAN.md](#legacy-studies-esp-table1-bf16-shape-check-docs-plan)
+- [studies/input_mask_baseline/docs/PLAN.md](#legacy-studies-input-mask-baseline-docs-plan)
+- [studies/output_space_4b_holdout/docs/PLAN.md](#legacy-studies-output-space-4b-holdout-docs-plan)
+- [studies/output_space_4b_input_control/docs/PLAN.md](#legacy-studies-output-space-4b-input-control-docs-plan)
+- [studies/output_space_4b_recheck/docs/PLAN.md](#legacy-studies-output-space-4b-recheck-docs-plan)
+- [studies/output_space_4b_recheck_v2/docs/PLAN.md](#legacy-studies-output-space-4b-recheck-v2-docs-plan)
+- [studies/output_space_cross_task/docs/CANONICAL_PLAN.md](#legacy-studies-output-space-cross-task-docs-canonical-plan)
+- [studies/output_space_cross_task/docs/EXECUTION_PLAN.md](#legacy-studies-output-space-cross-task-docs-execution-plan)
+- [studies/output_space_cross_task/docs/FIRST_DELTA_PLAN.md](#legacy-studies-output-space-cross-task-docs-first-delta-plan)
+- [studies/output_space_cross_task/docs/KERNEL_EXECUTION_PLAN.md](#legacy-studies-output-space-cross-task-docs-kernel-execution-plan)
+- [studies/output_space_cross_task/docs/KERNEL_PLAN.md](#legacy-studies-output-space-cross-task-docs-kernel-plan)
+- [studies/output_space_cross_task/docs/LOCAL_FACTOR_PLAN.md](#legacy-studies-output-space-cross-task-docs-local-factor-plan)
+- [studies/output_space_cross_task/docs/OWNER_PLAN.md](#legacy-studies-output-space-cross-task-docs-owner-plan)
+- [studies/output_space_cross_task/docs/PLAN.md](#legacy-studies-output-space-cross-task-docs-plan)
+- [studies/output_space_cross_task/docs/RARE_EVENT_PLAN.md](#legacy-studies-output-space-cross-task-docs-rare-event-plan)
+- [studies/output_space_cross_task/docs/SAMPLED_DEPTH_PLAN.md](#legacy-studies-output-space-cross-task-docs-sampled-depth-plan)
+- [studies/output_space_cross_task/docs/SAMPLING_CONTINUATION_PLAN.md](#legacy-studies-output-space-cross-task-docs-sampling-continuation-plan)
+- [studies/output_space_cross_task/docs/SAMPLING_EXPANSION_PLAN.md](#legacy-studies-output-space-cross-task-docs-sampling-expansion-plan)
+- [studies/output_space_cross_task/docs/SAMPLING_PLAN.md](#legacy-studies-output-space-cross-task-docs-sampling-plan)
+- [studies/output_space_cross_task/docs/STATE_EXTENSION_PLAN.md](#legacy-studies-output-space-cross-task-docs-state-extension-plan)
+- [studies/output_space_cross_task/docs/STATE_FACTOR_PLAN.md](#legacy-studies-output-space-cross-task-docs-state-factor-plan)
+- [studies/output_space_extension/docs/NORM_KERNEL_PLAN.md](#legacy-studies-output-space-extension-docs-norm-kernel-plan)
+- [studies/output_space_extension/docs/NUMERICAL_PLAN.md](#legacy-studies-output-space-extension-docs-numerical-plan)
+- [studies/output_space_extension/docs/NUMERICAL_PLAN_REVIEW.md](#legacy-studies-output-space-extension-docs-numerical-plan-review)
+- [studies/output_space_extension/docs/OPERATOR_PLAN.md](#legacy-studies-output-space-extension-docs-operator-plan)
+- [studies/output_space_extension/docs/OPERATOR_PLAN_REVIEW.md](#legacy-studies-output-space-extension-docs-operator-plan-review)
+- [studies/output_space_extension/docs/PHI_RMS_PLAN.md](#legacy-studies-output-space-extension-docs-phi-rms-plan)
+- [studies/output_space_extension/docs/PLAN.md](#legacy-studies-output-space-extension-docs-plan)
+- [studies/output_space_extension/docs/ROUNDING_FACTOR_PLAN.md](#legacy-studies-output-space-extension-docs-rounding-factor-plan)
+- [studies/output_space_followup/docs/PLAN.md](#legacy-studies-output-space-followup-docs-plan)
+- [studies/output_space_followup/docs/PLAN_REVIEW.md](#legacy-studies-output-space-followup-docs-plan-review)
+- [studies/output_space_prerequisite/docs/PLAN.md](#legacy-studies-output-space-prerequisite-docs-plan)
+- [studies/output_space_small_matrix/docs/CROSS_PROMPT_PLAN.md](#legacy-studies-output-space-small-matrix-docs-cross-prompt-plan)
+- [studies/output_space_small_matrix/docs/PLAN.md](#legacy-studies-output-space-small-matrix-docs-plan)
+- [studies/output_space_small_matrix/docs/SCALE_PLAN.md](#legacy-studies-output-space-small-matrix-docs-scale-plan)
+- [studies/output_space_small_matrix/docs/TRANSFER_PLAN.md](#legacy-studies-output-space-small-matrix-docs-transfer-plan)
+- [studies/output_space_small_matrix/docs/WINDOW_PLAN.md](#legacy-studies-output-space-small-matrix-docs-window-plan)
+- [studies/qwen3_4b_bf16_directions/docs/PLAN.md](#legacy-studies-qwen3-4b-bf16-directions-docs-plan)
+- [studies/qwen3_4b_bf16_directions/docs/RECOVERY_PLAN.md](#legacy-studies-qwen3-4b-bf16-directions-docs-recovery-plan)
+- [studies/qwen3_4b_bf16_directions_recovery/docs/PLAN.md](#legacy-studies-qwen3-4b-bf16-directions-recovery-docs-plan)
+- [studies/qwen3_4b_bf16_five_methods/docs/GEOMETRY_PLAN.md](#legacy-studies-qwen3-4b-bf16-five-methods-docs-geometry-plan)
+- [studies/qwen3_4b_bf16_five_methods/docs/MASK_ACTIVE_PLAN.md](#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-active-plan)
+- [studies/qwen3_4b_bf16_five_methods/docs/MASK_DIRECTION_PLAN.md](#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-direction-plan)
+- [studies/qwen3_4b_bf16_five_methods/docs/MASK_EARLY_TEMPLATE_PLAN.md](#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-early-template-plan)
+- [studies/qwen3_4b_bf16_five_methods/docs/MASK_RECIPROCAL_PLAN.md](#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-reciprocal-plan)
+- [studies/qwen3_4b_bf16_five_methods/docs/MASK_TEMPLATE_PLAN.md](#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-template-plan)
+- [studies/qwen3_4b_bf16_five_methods/docs/MASK_WINDOW_PLAN.md](#legacy-studies-qwen3-4b-bf16-five-methods-docs-mask-window-plan)
+- [studies/qwen3_4b_bf16_five_methods/docs/PLAN.md](#legacy-studies-qwen3-4b-bf16-five-methods-docs-plan)
+- [studies/smoke/docs/PLAN.md](#legacy-studies-smoke-docs-plan)
 
 <a id="legacy-docs-research-esp-table1-bf16-reproduction-plan"></a>
 

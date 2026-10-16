@@ -17,7 +17,7 @@
 
 ## 协议与历史证据
 
-[冻结PLAN](PLAN.md)与[输入清单](prompts_manifest.json)：Qwen3-4B，FP32/eager/CUDA，T0，EOS/max100，非thinking，seed123+prompt序号；三方法同unpruned静态[1,1]、k2/BC9。输入基线是本研究ESP冻结输入均值；输出beta=.9、beta_prime=.99、缩放映射保持原科学实现。实际输入/输出共享权重由两output decoder的storage门核实；四Run实际model_digest相同。
+[冻结PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-4b-recheck-v2-docs-plan>)与[输入清单](prompts_manifest.json)：Qwen3-4B，FP32/eager/CUDA，T0，EOS/max100，非thinking，seed123+prompt序号；三方法同unpruned静态[1,1]、k2/BC9。输入基线是本研究ESP冻结输入均值；输出beta=.9、beta_prime=.99、缩放映射保持原科学实现。实际输入/输出共享权重由两output decoder的storage门核实；四Run实际model_digest相同。
 
 [历史检索](history_inventory.json)找到的4B数字是输入空间方法：first26单槽680/704/777，[7,2]双槽621/704，全480冻结均值12809与选定EMA15009；旧Run原始制品未保留，未找到能核验的旧output0/output1结果与配置。因此不宣称精确复现旧输出收益，亦不直接拿不同树的旧接受数与本次配对比较。旧输入EMA选定参数也不当作输出一阶参数。
 
@@ -83,7 +83,7 @@ eval.warmup=false；Study局部适配在execute期间替换decoder模块时钟�
 
 [首次激活失败记录](first_run_failure.json)：v1基线在26条execute完成/全部AR相同后因Study collect入口导出模块而失败；原Run与锁未重签，v2仅修正原生phase callable导出，以新版本完成上述验收。旧失败额外26×spec/AR生成单列，不混作新的独立seed或成功Run。8项phase入口回归防止重现；关闭计时/调用语义与注册恢复另有回归。
 
-0.6B rare／单位置机理分析已暂停，结果归档原报告与1274bb2；其有限窗口结论不能代替本4B配对验收。此报告写回后继续预声明[4条新prompt确认](../../output_space_4b_holdout/docs/PLAN.md)，不选择有利prompt或改参数。
+0.6B rare／单位置机理分析已暂停，结果归档原报告与1274bb2；其有限窗口结论不能代替本4B配对验收。此报告写回后继续预声明[4条新prompt确认](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-4b-holdout-docs-plan>)，不选择有利prompt或改参数。
 
 未验证：未定位旧output-space4B正结果的完整配方，历史最优输入EMA的同链配对，多seed采样／多设备／更长预算／速度与全量任务泛化。不能从调用减少直接推断加速。
 
@@ -91,6 +91,6 @@ eval.warmup=false；Study局部适配在execute期间替换decoder模块时钟�
 
 原计划4条新prompt确认已执行并[完整验收](../../output_space_4b_holdout/docs/STUDY_REPORT.md)：冻结均值/零阶/一阶accepted51/39/47，主calls189/201/194，全部AR。因此first26两阶总收益成立而新4条不保持，不能合并后掩盖这一边界。
 
-随后按另冻[输入EMA协议](../../output_space_4b_input_control/docs/PLAN.md)，只新增两条历史EMA输入Run，输出/独立AR成功格不重跑。[结果](../../output_space_4b_input_control/docs/STUDY_REPORT.md)：first26 EMA240接受/1952调用，输出零/一仍+89/+81接受与-86/-76调用；新4条EMA39/202，零阶与其等接受、一阶+8，但两者均不胜冻结均值51。历史较强配方在本链上不能默认更强，正负均保留。
+随后按另冻[输入EMA协议](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-4b-input-control-docs-plan>)，只新增两条历史EMA输入Run，输出/独立AR成功格不重跑。[结果](../../output_space_4b_input_control/docs/STUDY_REPORT.md)：first26 EMA240接受/1952调用，输出零/一仍+89/+81接受与-86/-76调用；新4条EMA39/202，零阶与其等接受、一阶+8，但两者均不胜冻结均值51。历史较强配方在本链上不能默认更强，正负均保留。
 
 当前结论：4B的当前同链first26收益得到复验，未支持跨新prompt稳定收益或一阶普遍优于零阶。已继续两个实际后续步骤；0.6B rare/单位置分析保持归档暂停。

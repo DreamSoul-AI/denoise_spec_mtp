@@ -1,6 +1,6 @@
 # Qwen3-4B BF16五方法配对
 
-[计划](docs/PLAN.md)按首次make冻结执行，11/11 Run及native Study process全部通过，原串行队列已正常退出。10个Spec Run共4,800条prompt、809,118个提交token的argmax审计全过，输出owner/观测路径/实际BF16 mask范数验收通过；独立AR只运行一次480条。完整[报告](docs/STUDY_REPORT.md)、[逐prompt配对证据](docs/paired_evidence_v1.json)、[原生终验摘要](docs/native-process-evidence-v1.json)和[数字表](docs/NUMBERS.md)均已生成；正式JSON与真实图重复读出字节一致，图已目检。集成与CI见[PR #12](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12)。
+[计划](<../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-five-methods-docs-plan>)按首次make冻结执行，11/11 Run及native Study process全部通过，原串行队列已正常退出。10个Spec Run共4,800条prompt、809,118个提交token的argmax审计全过，输出owner/观测路径/实际BF16 mask范数验收通过；独立AR只运行一次480条。完整[报告](docs/STUDY_REPORT.md)、[逐prompt配对证据](docs/paired_evidence_v1.json)、[原生终验摘要](docs/native-process-evidence-v1.json)和[数字表](docs/NUMBERS.md)均已生成；正式JSON与真实图重复读出字节一致，图已目检。集成与CI见[PR #12](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/12)。
 
 两个预算均由输入一阶取得最高总accepted和最少主calls；两输出方法对frozen mean/输入零阶有小幅总量改善，但均落后输入一阶。输出一阶相对输出零阶，BC30 accepted+191/calls+139/new tokens+332，BC60为+75/+55/+132；逐prompt胜负混合，未显示稳定联合收益。独立AR一致率33.54%–38.33%及全部首分叉仅诊断，不宣称token exact或同输出加速。前置[8B Table1全480报告](../esp_table1_bf16_full_argmax/docs/STUDY_REPORT.md)与原生process已完成，PR #10经CI合dev；论文τ目标未复现，负结果保留。
 

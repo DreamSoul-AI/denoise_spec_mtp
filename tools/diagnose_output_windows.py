@@ -10,6 +10,7 @@ No alternative decoder/Run scheduler, source change, download or tuning.
 import argparse
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
@@ -134,8 +135,22 @@ def observe(model, prompt, spec, eval_cfg, eos, reference, targets, seed=124):
 
 
 def file_hash(path):
-    with Path(path).open('rb') as handle:
-        return hashlib.file_digest(handle, 'sha256').hexdigest()
+    path = Path(path)
+    if path.exists():
+        with path.open('rb') as handle:
+            return hashlib.file_digest(handle, 'sha256').hexdigest()
+    # Consolidated historical plan identities refer to fixed Git bytes, never today's plan.
+    root = Path(__file__).resolve().parents[1]
+    relative = path.resolve().relative_to(root).as_posix()
+    manifest = json.loads((root / 'docs/research/plan-consolidation-manifest.json').read_text(encoding='utf-8'))
+    item = next((x for x in manifest['plans'] if x['source_path'] == relative), None)
+    if item is None:
+        raise FileNotFoundError(path)
+    blob = subprocess.check_output(['git', 'show', item['source_commit'] + ':' + relative], cwd=root)
+    assert hashlib.sha256(blob).hexdigest() == item['git_blob_sha256']
+    candidates = (blob, blob.replace(b'\n', b'\r\n'))
+    assert item['source_sha256'] in {hashlib.sha256(data).hexdigest() for data in candidates}
+    return item['source_sha256']
 
 
 def main():
@@ -160,7 +175,7 @@ def main():
     data = read(study / 'docs/execution_v1.json')
     assert data['study_quality_passed'] and data['question_ids'] == [172, 173, 174]
     assert manifest()['digest'] == data['source_digest'] == '670c744e0535dcad'
-    plan = study / 'docs/WINDOW_PLAN.md'
+    plan = (Path(__file__).resolve().parents[1] / 'docs/研究计划 Denoising Speculative Decoding.md')
     tool = Path(__file__).resolve()
     inputs = {'plan_sha256': file_hash(plan), 'tool_sha256': file_hash(tool),
               'matrix_sha256': file_hash(study / 'docs/execution_v1.json'),

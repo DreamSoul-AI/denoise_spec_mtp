@@ -1,6 +1,6 @@
 # Input-mask baseline prerequisite
 
-从 [宏观方案到 Study](../../docs/research/rpipe-study-extraction.md) 提取的真实 Qwen3-0.6B / SpecBench q171 前置门。先看 [PLAN](docs/PLAN.md)，结果写 [STUDY_REPORT](docs/STUDY_REPORT.md)。四个 case 复用 src/spec_mtp 阶段，不含第二套算法或调度。
+从 [宏观方案到 Study](../../docs/research/rpipe-study-extraction.md) 提取的真实 Qwen3-0.6B / SpecBench q171 前置门。先看 [PLAN](<../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-input-mask-baseline-docs-plan>)，结果写 [STUDY_REPORT](docs/STUDY_REPORT.md)。四个 case 复用 src/spec_mtp 阶段，不含第二套算法或调度。
 
 先按ModelScope显式下载准备snapshot到shared/model，实际Run保持离线加载；随后，从仓库根运行 `python -m spec_mtp make studies/input_mask_baseline --num-gpus 1 --init-gpu 0 --round 1`，再 `launch studies/input_mask_baseline --num-gpus 1 --init-gpu 0 --console shared`，最后 process/status/logs/report。offline 设置要求缓存可用；不默默联网替换权重。新复跑须新 version，旧证据保留。
 

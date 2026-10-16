@@ -1,6 +1,6 @@
 # Study Report: smoke
 
-本报告保留 2026-10-13 各实现提交/version 的原验收事实。Study 结构重写不新增研究矩阵、不重新签收历史数字；可复用合同见 [PLAN](PLAN.md)。
+本报告保留 2026-10-13 各实现提交/version 的原验收事实。Study 结构重写不新增研究矩阵、不重新签收历史数字；可复用合同见 [PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-smoke-docs-plan>)。
 
 ## 一、摘要
 
@@ -54,7 +54,7 @@ accept_d1 是深度 1 的接受；accepted 是所有深度的接受（沿用原�
 
 ## 五、复跑与未执行项
 
-先读 [PLAN.md](PLAN.md)。普通 run/launch 不刷新现有专项锁；源码/输入变更先设置新的 algorithm.config.version，再 make/remake。make 已有对应 Run result 时不能用新源码重新签收。终验同时比较 Study/RPipe/专项来源、实际 config 和输入文件；make 尚未下载的远端资源只能在构造后记录实际权重/tokenizer，真实 Hub 环境另行验收。
+先读 [PLAN.md](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-smoke-docs-plan>)。普通 run/launch 不刷新现有专项锁；源码/输入变更先设置新的 algorithm.config.version，再 make/remake。make 已有对应 Run result 时不能用新源码重新签收。终验同时比较 Study/RPipe/专项来源、实际 config 和输入文件；make 尚未下载的远端资源只能在构造后记录实际权重/tokenizer，真实 Hub 环境另行验收。
 
 旧/新 probe 可由 Git archive b1f6191 src 后设 PYTHONPATH 指向归档 src，调用 validate_migration.py --out；切回当前 src，再加 --compare。完整 token/trace 参考已经入库；完整 555 格原始文件、实际 Run/assets/logs 和安装目录在 `.tmp/acceptance-20261013/`，不会随 clone 提供。Study 的正式报告与参考 JSON 可独立取得，完整 Run 需要按新 version 重跑。
 

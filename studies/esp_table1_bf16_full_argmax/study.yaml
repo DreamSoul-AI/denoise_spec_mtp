@@ -6,8 +6,16 @@ experiment:
 recipe: recipe.py
 freeze: true
 provenance:
+  project_plan:
+    path: docs/研究计划 Denoising Speculative Decoding.md
+    historical_sections:
+    - anchor: legacy-studies-esp-table1-bf16-full-argmax-docs-plan
+      source_commit: aed4eee23ea5e6b9772b388eec9aa50a38452089
+      source_path: studies/esp_table1_bf16_full_argmax/docs/PLAN.md
+      git_blob_sha256: 88f524f6f33eda74c43792826a8a80f91f550261d3ce3943b7fc595e2d005e4c
+    policy: Historical replay uses the pinned Git version; current central-plan edits
+      never re-sign old Runs.
   include:
-  - docs/PLAN.md
   - docs/modelscope_snapshot.json
   - docs/prompts_manifest.json
   - docs/specbench-source.json

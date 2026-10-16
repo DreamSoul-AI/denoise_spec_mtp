@@ -2,7 +2,7 @@
 
 最终状态：四格均完整480、原生Run成功、Study process complete/passed=true，GPU队列自然exit0。content Run `bf2985a87c29fb29` τ=1.364829262，80,777个提交token全argmax通过。六格[正式证据](../../qwen3_4b_bf16_directions/docs/direction_evidence_v1.json)及[最终报告](../../../docs/research/4b-full-direction-controls-2026-10-16.md)已形成；以下保留各时点的执行/资源历史，不作为当前pending状态。
 
-已先登记[PLAN](PLAN.md)，四因素random0/1/2/content各完整480；原template全480成功和旧zero复用，不重跑。只有原资源assert改成同进程准入等待，方向control原文保持，CPU15项针对回归和Ruff通过。
+已先登记[PLAN](<../../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-qwen3-4b-bf16-directions-recovery-docs-plan>)，四因素random0/1/2/content各完整480；原template全480成功和旧zero复用，不重跑。只有原资源assert改成同进程准入等待，方向control原文保持，CPU15项针对回归和Ruff通过。
 
 random0/1/2均已全480并原生succeeded：τ分别1.495188134/1.464349086/1.523884714，81,425/81,356/80,583个提交token全argmax通过；完整来源与配对见[direction_partial_v4.json](../../qwen3_4b_bf16_directions/docs/direction_partial_v4.json)和[主报告](../../qwen3_4b_bf16_directions/docs/STUDY_REPORT.md)。量化第二窗口单Run已终态并释放GPU，原SD队列已接content。原队列自然结束和资源失败全部保留；本Study native process及四格均通过后才称补齐完成，整个目标保持active。
 

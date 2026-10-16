@@ -1,6 +1,6 @@
 # ESP Table 1 full SpecBench BF16 matrix
 
-[PLAN](docs/PLAN.md): full480, BC10/1, BC30/1, BC60/1 primary and BC60/2 control. Both BC60 rows and target deltas are mandatory. Known preflight numerical failures are retained; full execution is evidence, not automatic reproduction success. No speed tests/FP32/new methods.
+[PLAN](<../../docs/研究计划 Denoising Speculative Decoding.md#legacy-studies-esp-table1-bf16-full-docs-plan>): full480, BC10/1, BC30/1, BC60/1 primary and BC60/2 control. Both BC60 rows and target deltas are mandatory. Known preflight numerical failures are retained; full execution is evidence, not automatic reproduction success. No speed tests/FP32/new methods.
 
 ## 新合同替代
 

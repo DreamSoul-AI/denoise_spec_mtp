@@ -51,4 +51,4 @@ v3四个真实Run成功，但Study expected_factors_match=false：上游index的
 
 ## Output-space next-stage contract (2026-10-14)
 
-New [Study PLAN](../studies/output_space_prerequisite/docs/PLAN.md) defines tied order0/order1, two-slot chain, fixed gains and normalized final-hidden mapping. Output provider owns state/owner masks; Model exposes final normalized hidden without all-layer storage; decoder owns observation timing and keeps existing verifier/tree/cache. Existing input providers and scientific presets remain unchanged. No untied/general-tree/Kalman claim.
+New [Study PLAN](<研究计划 Denoising Speculative Decoding.md#legacy-studies-output-space-prerequisite-docs-plan>) defines tied order0/order1, two-slot chain, fixed gains and normalized final-hidden mapping. Output provider owns state/owner masks; Model exposes final normalized hidden without all-layer storage; decoder owns observation timing and keeps existing verifier/tree/cache. Existing input providers and scientific presets remain unchanged. No untied/general-tree/Kalman claim.

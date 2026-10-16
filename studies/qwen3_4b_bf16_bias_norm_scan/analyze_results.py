@@ -81,46 +81,132 @@ def plot(cells, means, path):
     finally:
         plt.close(fig)
 
-def main():
-    from norm_control import check_refs
-    from rpipe.structure.artifact.provenance import check_frozen as pcheck
-    from rpipe.structure.make.expand import load_study_yaml
-    from spec_mtp.structure.artifact.sources import check_frozen, manifest
-    check_refs()
-    decl = load_study_yaml(STUDY)
-    check_frozen(STUDY, decl, manifest())
-    pcheck(STUDY, decl)
+def load_reused(data_root):
+    from spec_mtp.structure.artifact import validation
+    data_root = Path(data_root).resolve()
     formal = read(BASE / 'docs/paired_evidence_v1.json')
     original = read(ROOT / 'studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json')
     prompts, snapshot = (read(BASE / 'docs' / n) for n in ('prompts_manifest.json', 'modelscope_snapshot.json'))
     old_ar = formal['cells']['AR']
-    arpath = BASE / 'runs' / old_ar['run_id'] / 'assets/decode_observations.json'
+    arpath = data_root / 'studies/qwen3_4b_bf16_five_methods/runs' / old_ar['run_id'] / 'assets/decode_observations.json'
     assert sha(arpath) == old_ar['files_sha256']['assets/decode_observations.json']
+    raw_ar = read(arpath)['out']['evidence']
+    assert len(raw_ar) == len(prompts['rendered_prompts']) == 480
+    assert all(item['input_ids'] == prompt['input_ids'] for item, prompt in zip(raw_ar, prompts['rendered_prompts']))
     reference = [{'question_id': p['question_id'], 'output_ids': r['output_ids'][len(p['input_ids']):],
-                  'model_calls': r['stats']['ar_calls']} for p, r in zip(prompts['rendered_prompts'], read(arpath)['out']['evidence'])]
-    assert len(reference) == 480
+                  'model_calls': r['stats']['ar_calls']} for p, r in zip(prompts['rendered_prompts'], raw_ar)]
+    assert len(reference) == len(raw_ar) == 480
+    assert sum(len(r['output_ids']) for r in reference) == old_ar['totals']['new_tokens']
+    assert sum(r['model_calls'] for r in reference) == old_ar['totals']['model_calls']
     cells = {'zero/0': dict(original['cells']['zero'], reused=True)}
     for mode in ('template', 'random0', 'random1', 'random2'):
         cells[mode + '/1'] = dict(original['cells'][mode], reused=True)
     for cell in cells.values():
-        owner = ROOT / cell.get('study_path', 'studies/qwen3_4b_bf16_five_methods')
+        assert cell['contract']['dtype'] == 'torch.bfloat16'
+        assert cell['model_digest'] == formal['cells']['30/input_first']['model_digest']
+        setting = cell['actual_settings']
+        assert setting['spec']['num_masks'] == 2 and setting['spec']['block_complexity'] == 30
+        assert setting['eval']['temperature'] == 0 and setting['eval']['max_new_tokens'] == 256
+        owner = data_root / cell.get('study_path', 'studies/qwen3_4b_bf16_five_methods')
         path = owner / 'runs' / cell['run_id'] / 'assets/decode_observations.json'
-        assert sha(path) == cell['files_sha256']['assets/decode_observations.json']
-        cell['depth_rows'] = depth_rows(read(path)['out']['evidence'], prompts['rendered_prompts'])
-    for exp in read(STUDY / 'index.json')['experiments']:
+        for name, expected in cell['files_sha256'].items():
+            assert sha(owner / 'runs' / cell['run_id'] / name) == expected, name
+        raw = read(path)['out']['evidence']
+        assert len(raw) == len(cell['rows']) == len(prompts['rendered_prompts']) == 480
+        checked = 0
+        for item, row, prompt in zip(raw, cell['rows'], prompts['rendered_prompts']):
+            assert row['question_id'] == prompt['question_id'] and item['input_ids'] == prompt['input_ids']
+            assert all(item['stats'][k] == row[k] for k in ('accepted', 'committed', 'decode_calls', 'new_tokens'))
+            checked += validation._check_argmax(item)
+            assert row['model_calls'] == item['stats']['decode_calls'] + item['stats']['prefill_calls']
+        totals = _pair.summarize(cell['rows'], False)
+        assert all(cell['totals'][k] == value for k, value in totals.items())
+        assert checked == cell['totals']['argmax_checked_tokens']
+        cell.update(raw_argmax_checked_tokens=checked, raw_files_rechecked=len(cell['files_sha256']))
+        cell['depth_rows'] = depth_rows(raw, prompts['rendered_prompts'])
+    return formal, original, prompts, snapshot, reference, cells
+
+
+def check_matrix(decl, entries):
+    expected = decl['axes']['algorithm.config']
+    assert [(c['direction'], c['spec']['ema']['step_scale']) for c in expected] == [
+        (mode, scale) for mode in ('template', 'random0', 'random1', 'random2') for scale in (.5, 2.)]
+    assert [e['factors']['algorithm.config'] for e in entries] == expected, 'Expected all eight frozen norm cells in order'
+    assert all(len(e['runs']) == 1 for e in entries)
+
+
+def verify_reused(data_root, output_dir=None):
+    from norm_control import check_refs
+    from spec_mtp.structure.artifact import validation
+    check_refs()
+    formal, _, _, _, reference, cells = load_reused(data_root)
+    comparisons = []
+    for base in ('zero/0', 'template/1'):
+        for name, cell in cells.items():
+            if name == base:
+                continue
+            pair = directions.compare(cells[base]['rows'], cell['rows'])
+            pair.pop('rows')
+            comparisons.append(dict(first=base, second=name,
+                first_block_same_prefix=first_block_compare(cells[base]['depth_rows'], cell['depth_rows']), **pair))
+    decl = yaml.safe_load((STUDY / 'study.yaml').read_text(encoding='utf-8'))
+    expected = decl['axes']['algorithm.config']
+    check_matrix(decl, [{'factors': {'algorithm.config': setting}, 'runs': [{}]} for setting in expected])
+    body = {'complete': False, 'reused_only': True, 'new_cells_inspected': False, 'fixed_prompts': 480,
+        'data_root': str(Path(data_root).resolve()), 'no_timing': True, 'no_model_forward': True,
+        'scope': 'Hash and raw argmax recheck of five existing endpoints; no new native Run acceptance or curve',
+        'expected_new_cases': [{'direction': c['direction'], 'step_scale': c['spec']['ema']['step_scale']} for c in expected],
+        'shared_AR_reference': {'study_path': 'studies/qwen3_4b_bf16_five_methods',
+            'run_id': formal['cells']['AR']['run_id'],
+            'raw_sha256': formal['cells']['AR']['files_sha256']['assets/decode_observations.json']},
+        'shared_AR_reference_tokens': sum(len(row['output_ids']) for row in reference),
+        'raw_argmax_checked_tokens': sum(c['raw_argmax_checked_tokens'] for c in cells.values()),
+        'source_refs_sha256': sha(STUDY / 'docs/source_refs.json'), 'analyzer_sha256': sha(Path(__file__)),
+        'raw_math_checker_sha256': sha(Path(validation.__file__)),
+        'formal_sources': {str(p.relative_to(ROOT)): sha(p) for p in
+            (BASE / 'docs/paired_evidence_v1.json', ROOT / 'studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json')},
+        'cells': {name: dict({k: cell[k] for k in ('run_id', 'totals', 'raw_argmax_checked_tokens', 'raw_files_rechecked')},
+                            study_path=cell.get('study_path', 'studies/qwen3_4b_bf16_five_methods'),
+                            files_sha256=cell['files_sha256'])
+                  for name, cell in cells.items()}, 'paired_comparisons': comparisons}
+    if output_dir is not None:
+        output = Path(output_dir).resolve()
+        output.mkdir(parents=True, exist_ok=True)
+        (output / 'reused_readiness_v1.json').write_text(json.dumps(body, indent=2, allow_nan=False) + '\n', encoding='utf-8')
+    return body
+
+
+def main(data_root=None, study_dir=None, output_dir=None):
+    from norm_control import check_refs
+    from rpipe.structure.artifact.provenance import check_frozen as pcheck
+    from rpipe.structure.make.expand import load_study_yaml
+    from spec_mtp.structure.artifact.sources import check_frozen, manifest
+    data_root = ROOT if data_root is None else Path(data_root).resolve()
+    study = STUDY if study_dir is None else Path(study_dir).resolve()
+    output = study / 'docs' if output_dir is None else Path(output_dir).resolve()
+    assert Path.cwd().resolve() == study.parents[1], 'Run from the frozen execution checkout root for declared relative inputs'
+    check_refs()
+    decl = load_study_yaml(study)
+    check_frozen(study, decl, manifest())
+    pcheck(study, decl)
+    formal, original, prompts, snapshot, reference, cells = load_reused(data_root)
+    entries = read(study / 'index.json')['experiments']
+    check_matrix(decl, entries)
+    for exp in entries:
         setting = exp['factors']['algorithm.config']
         mode, scale = setting['direction'], setting['spec']['ema']['step_scale']
         name = f'{mode}/{scale:g}'
         assert name not in cells and len(exp['runs']) == 1
-        folder = STUDY / 'runs' / exp['runs'][0]['id']
+        folder = study / 'runs' / exp['runs'][0]['id']
         result = read(folder / 'result.json') if (folder / 'result.json').exists() else {}
         cells[name] = {'run_id': folder.name, 'native_status': result.get('status', 'pending')}
         if result.get('status') != 'succeeded':
             continue
         cfg = yaml.safe_load((folder / 'config.yaml').read_text(encoding='utf-8'))
+        assert cfg['algorithm']['config']['spec'] == setting['spec']
         assert cfg['seed'] == 123 and cfg['algorithm']['config']['direction'] == mode
         assert cfg['algorithm']['config']['spec']['ema']['step_scale'] == scale
-        cell, _ = _pair.load_cell(STUDY, folder, cfg, prompts['rendered_prompts'], prompts, snapshot, reference)
+        cell, _ = _pair.load_cell(study, folder, cfg, prompts['rendered_prompts'], prompts, snapshot, reference)
         assert cell['model_digest'] == formal['cells']['30/input_first']['model_digest']
         assert cell['runtime'] == formal['cells']['30/input_first']['runtime']
         progress = read(folder / 'assets/norm_progress.json')
@@ -153,25 +239,38 @@ def main():
         if all('rows' in c for c in rows):
             means[f'{scale:g}'] = sum(c['totals']['pooled_tau'] for c in rows) / 3
     if ready:
-        native = read(STUDY / 'spec_mtp_study_check.json')
-        process = read(STUDY / 'process.json')
+        native = read(study / 'spec_mtp_study_check.json')
+        process = read(study / 'process.json')
         assert native['passed'] and native['complete'] and process['complete'] and process['spec_mtp']['passed']
     body = {'complete': ready, 'author_official': False, 'no_timing': True, 'fixed_prompts': 480,
         'budget': 30, 'mask_count': 2, 'new_cells': 8, 'reused_cells': 5,
-        'source_refs_sha256': sha(STUDY / 'docs/source_refs.json'), 'analyzer_sha256': sha(Path(__file__)),
+        'source_refs_sha256': sha(study / 'docs/source_refs.json'), 'analyzer_sha256': sha(Path(__file__)),
         'paired_formal_sha256': sha(BASE / 'docs/paired_evidence_v1.json'),
         'direction_formal_sha256': sha(ROOT / 'studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json'),
         'cells': cells, 'paired_comparisons': pairs, 'random_three_seed_mean_pooled_tau': means}
-    target = STUDY / 'docs' / ('norm_evidence_v1.json' if ready else 'norm_pending.json')
+    output.mkdir(parents=True, exist_ok=True)
+    target = output / ('norm_evidence_v1.json' if ready else 'norm_pending.json')
     text = json.dumps(body, indent=2, allow_nan=False) + '\n'
     if ready and target.exists():
         assert target.read_text(encoding='utf-8') == text
     else:
         target.write_text(text, encoding='utf-8')
     if ready:
-        plot(cells, means, STUDY / 'docs/figures/bc30_norm_scan.png')
+        plot(cells, means, output / 'figures/bc30_norm_scan.png')
     print(json.dumps({'complete': ready, 'valid_cells': sum('rows' in c for c in cells.values())}))
 
 
 if __name__ == '__main__':
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--data-root', type=Path, default=ROOT, help='Checkout containing the original immutable 4B Runs')
+    parser.add_argument('--study-dir', type=Path, help='Frozen native norm Study, after the 8B queue exits')
+    parser.add_argument('--output-dir', type=Path, help='Separate CPU output directory')
+    parser.add_argument('--check-reused', action='store_true', help='Read-only old endpoints; never make/accept new cells or plot')
+    args = parser.parse_args()
+    if args.check_reused:
+        proof = verify_reused(args.data_root, args.output_dir)
+        print(json.dumps({'complete': proof['complete'], 'reused_cells': len(proof['cells']),
+                          'raw_argmax_checked_tokens': proof['raw_argmax_checked_tokens'], 'new_cells_inspected': False}))
+    else:
+        main(args.data_root, args.study_dir, args.output_dir)

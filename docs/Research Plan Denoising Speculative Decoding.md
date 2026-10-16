@@ -193,6 +193,14 @@ Primary readout: each direction/scale pooledτ, plus prompt means and equal-cate
 
 Hard gate: every committed token, including prefill and actual EOS/cap-trimmed output, equals its correct owner's same-verification-forward argmax, with native source/input/count/owner checks. AR exactness/first differences remain diagnostic; norm cells reuse old AR rather than generate more. No teacher,warmup or timing; decoder timing fields are zero sentinels and resource timestamps are not TPS/SR. Retain source/math/nonfinite/OOM failures, stop the affected cell without automatic retries. Wait for foreign GPU work only at group handoffs/prompt boundaries, without preemption. Exit/release between models; one serial queue only. Pending is not zero or a tie.
 
+### CPU preparation addendum,2026-10-16: norm endpoints and acceptance boundary
+
+Follow the17:52 instruction: retain the originalBC60 worker and measured-host-peak-plus2GiB gate; use the wait for CPU work. The eight new4B cells remain after8B. The read-only entry verified30 Spec source files for five old endpoints,405083 stored argmax/forward-owner records and81880 shared AR tokens. Raw paths, formal source hashes and values are in the [endpoint checkpoint](../studies/qwen3_4b_bf16_bias_norm_scan/docs/reused_readiness_v1.json) and [preparation report](../studies/qwen3_4b_bf16_bias_norm_scan/docs/STUDY_REPORT.md). No make, model forward or new-cell acceptance occurred;0.5/2x remain unobserved.
+
+For all480 original-input-plus-prefill prefixes with a first block, template/random0/random1/random2 versus zero have first-block accepted W/T/L of26/341/113,56/361/63,55/367/58,30/361/89. Original full-path tau remains1.507777653/1.495188134/1.464349086/1.523884714 versus zero1.422420206. These constrain a universal initial-block-gain explanation. Prompt W/T/L is not a mean accepted-count difference; subsequent divergent paths, call weights and output lengths require separate reporting. No new method or operator study follows. Bind magnitude scans to E3 fixed-v endpoints; retain E2 native updating input-first1.51195758 separately.
+
+The reader now explicitly requires all eight preregistered index settings in order, one Run per cell and exact full-spec agreement. Missing/duplicate/reordered cells, multiplier/beta drift and multiple Runs are rejected. --check-reused only inspects old endpoints, always reports complete=false/new_cells_inspected=false and draws no new curve; normal mode retains native source/input/argmax/process gates. Eighteen norm tests and50 related readout/pairing/documentation CPU tests in total passed. New cells remain unmade; immutable plan commit/blob, scientific code/defaults and data/prompts are unchanged.
+
 ## IX. Execution records and conclusions
 
 | Record | Actual evidence | Outcome/boundary |

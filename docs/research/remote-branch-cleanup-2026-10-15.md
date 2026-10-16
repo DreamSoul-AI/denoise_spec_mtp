@@ -95,3 +95,9 @@ PR #41已于2026-10-16T05:47:26Z合dev，merge5ef98ba0c2dcd8187b557cd46652d1dcd7
 ### 自动审批记录：范数Study make延后
 
 工作目录：本机活动执行树`tmp/4b-bf16-five-methods-20261015`。命令：`D:/anaconda3/python.exe -m spec_mtp make studies/qwen3_4b_bf16_bias_norm_scan --round 1 --num-gpus 1 --init-gpu 0`（输出拟写入`.tmp/sd-repeat-20261016/norm-make.log`）。自动审批拒绝整条工具执行，理由为：8B GPU队列仍在运行，此时make可能重叠GPU/模型准备，违反显式单任务先后顺序；须等待8B队列退出，不得间接绕过。该make未执行，未触碰运行中8B源码/配置/队列；范数脚本及9项CPU测试就绪，但未make/launch。后续等8B自然退出再执行；不重复申请或启动旁路队列。
+
+### PR42实际收尾补记
+
+PR42已双CI通过合dev（8bc2df1，cpu-checks5m41s、Branch flow2s），其自身chore/merged-branch-cleanup-20261016已退出并删除本地/远端。因此最终为**28个本地、2个远端**；上表27/1以外新增这条自身分支（tip ddb1101cf3d016ec9b3444514cddf8d87e4f4dac）。周期复查基线更新为PR42合入后。活动8B分支和数据仍保留。
+
+PR43的Linux CI为513 passed/1 failed，失败仅是新复制helper被Git转为LF、原字节CRLF断言不等。另用主仓集成分支保留原Git字节并补-text属性，保留严格字节断言；没有编辑活动GPU工作树、原Run或科学包。替代PR包含原8B执行代码，原PR按替代关系关闭但保留未合活动分支；不因CI问题重跑GPU。

@@ -1051,5 +1051,127 @@
     "gpu_execution": false,
     "openreview_requests": 0,
     "scope_limit": "Two previously identified author homepage repositories only; three current public branch trees checked by path, not all files/historical/deleted/private branches. No releases returned for these two repositories, not all author repositories. v1 archive complete member listing; repository URL scan limited to 20 TeX/JSON members. No source extraction/execution; older article files do not substitute native experiment code or change frozen v2 protocol."
+  },
+  "public_channels_followup": {
+    "scope": "Read-only public organizations, events and authored PRs for two previously identified author accounts",
+    "sources": [
+      {
+        "id": "RaghavvGoel-orgs",
+        "endpoint": "users/RaghavvGoel/orgs?per_page=100",
+        "query": null,
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:13:19.992589+00:00",
+        "snapshot": ".tmp\\esp-author-publication-channels-20261016T021319Z\\RaghavvGoel-orgs.response",
+        "bytes": 4,
+        "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+        "count": 0,
+        "organizations": []
+      },
+      {
+        "id": "RaghavvGoel-public-events",
+        "endpoint": "users/RaghavvGoel/events/public?per_page=100",
+        "query": null,
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:13:20.159905+00:00",
+        "snapshot": ".tmp\\esp-author-publication-channels-20261016T021319Z\\RaghavvGoel-public-events.response",
+        "bytes": 2495,
+        "sha256": "ecae3a253087ec8e07347cb89f57aa3026ba7e60a5c772d56af694e8f525aa87",
+        "count": 4,
+        "events": [
+          {
+            "type": "PushEvent",
+            "repository": "RaghavvGoel/raghavvgoel.github.io",
+            "created_at": "2026-10-13T22:51:37Z"
+          },
+          {
+            "type": "PushEvent",
+            "repository": "RaghavvGoel/raghavvgoel.github.io",
+            "created_at": "2026-10-09T04:06:57Z"
+          },
+          {
+            "type": "PushEvent",
+            "repository": "RaghavvGoel/raghavvgoel.github.io",
+            "created_at": "2026-09-20T18:40:04Z"
+          },
+          {
+            "type": "PushEvent",
+            "repository": "RaghavvGoel/raghavvgoel.github.io",
+            "created_at": "2026-09-20T18:23:54Z"
+          }
+        ]
+      },
+      {
+        "id": "RaghavvGoel-authored-prs",
+        "endpoint": "search/issues",
+        "query": "author:RaghavvGoel is:pr",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:13:21.095947+00:00",
+        "snapshot": ".tmp\\esp-author-publication-channels-20261016T021319Z\\RaghavvGoel-authored-prs.response",
+        "bytes": 17929,
+        "sha256": "7108f61a5b5cccee4aaf6922f2202d16449b9b4eb9a8afc60332d65da7c70432",
+        "count": 7,
+        "returned_count": 7,
+        "incomplete_results": false,
+        "latest_updated_at": "2019-10-30T19:13:11Z"
+      },
+      {
+        "id": "mgagrani-orgs",
+        "endpoint": "users/mgagrani/orgs?per_page=100",
+        "query": null,
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:13:20.672013+00:00",
+        "snapshot": ".tmp\\esp-author-publication-channels-20261016T021319Z\\mgagrani-orgs.response",
+        "bytes": 4,
+        "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+        "count": 0,
+        "organizations": []
+      },
+      {
+        "id": "mgagrani-public-events",
+        "endpoint": "users/mgagrani/events/public?per_page=100",
+        "query": null,
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:13:21.314539+00:00",
+        "snapshot": ".tmp\\esp-author-publication-channels-20261016T021319Z\\mgagrani-public-events.response",
+        "bytes": 4,
+        "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+        "count": 0,
+        "events": []
+      },
+      {
+        "id": "mgagrani-authored-prs",
+        "endpoint": "search/issues",
+        "query": "author:mgagrani is:pr",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T02:13:21.990090+00:00",
+        "snapshot": ".tmp\\esp-author-publication-channels-20261016T021319Z\\mgagrani-authored-prs.response",
+        "bytes": 2500,
+        "sha256": "f2217a8e40d849be3534007210b62a1da31f01c1c0982cf869bc81f970006e79",
+        "count": 1,
+        "returned_count": 1,
+        "incomplete_results": false,
+        "latest_updated_at": "2017-08-25T21:00:08Z"
+      },
+      {
+        "id": "openreview_note_refresh",
+        "url": "https://api2.openreview.net/notes?id=mKj4fO0BU4",
+        "status": 429,
+        "final_url": "https://api2.openreview.net/notes?id=mKj4fO0BU4",
+        "content_type": "text/html",
+        "retry_after": null,
+        "checked_at_utc": "2026-10-16T02:14:02.904037+00:00",
+        "snapshot": ".tmp\\esp-author-publication-channels-20261016T021319Z\\openreview_note_refresh.response",
+        "bytes": 162,
+        "sha256": "413d294fad14524bf94e764b33ff0f327682549408545171fcf9240189c154ae"
+      }
+    ],
+    "checked_at_utc": "2026-10-16T02:13:21.990315+00:00",
+    "official_repository": null,
+    "official_commit": null,
+    "native_entrypoint": null,
+    "gpu_execution": false,
+    "openreview_requests": 1,
+    "completed_at_utc": "2026-10-16T02:14:02.904081+00:00",
+    "scope_limit": "Two already identified public author accounts only. Public organization visibility is not full membership; event lists are bounded API returns, not all-time activity; authored-PR search excludes private/unindexed records. No author identity assigned to namesake profiles. One normal OpenReview request after more than one hour since previous 429; latest 429 means no resource fields acquired; no retry or alternate route used."
   }
 }

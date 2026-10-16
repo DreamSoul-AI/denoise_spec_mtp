@@ -158,6 +158,8 @@ Latest CPU source refresh: the [official-path recheck](research/esp-official-rec
 
 The [author repository/commit/attachment follow-up](research/esp-author-attachment-followup-2026-10-16.md) completed this bounded check: unchanged homepage commit, zero hits in three exact code queries, and six forum-ID hits yielding no verified author implementation. Three conventional OpenReview attachment candidates returned403 without code. The official entrypoint remains missing; GPU execution is not claimed. Once it is available, verify provenance and fresh admission using the launch checklist without asking for authorization again.
 
+The [Table1 protocol gap register](research/esp-table1-protocol-gaps-2026-10-16.md) separates local facts, missing author artifacts, CPU reconciliation and official launch triggers. This round read a public author post without obtaining a verified code entry; its paper short-link did not resolve, and OpenReview was not refreshed. PR36 completed the nonofficial full480 recheck; do not rerun GPU matrices while the author entry remains unavailable.
+
 ## X. GitHub use and plan changes
 
 This is the current project-level plan, with a chapter-matched English translation. Study `docs/PLAN.md` files are pre-make frozen contracts; results/figures live in their STUDY_REPORT/evidence. Raw tokens/traces, full Runs, weights and caches stay out of Git. Native records retain code/source/input/model identity, actual configuration/environment, seed, command, RunID, failures and artifacts. Do not recreate a historical Run ID or re-sign successful evidence.

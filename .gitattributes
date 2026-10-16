@@ -286,3 +286,8 @@
 # Public checkpoint hashes refer to their existing LF Git blobs.
 /studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json text eol=lf
 /studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json text eol=lf
+
+# Freeze the prepared paired follow-up and shared admission/accounting tools.
+/studies/qwen3_4b_bf16_paired_revalidation/** -text whitespace=cr-at-eol
+/tools/gpu_admission.py -text
+/tools/audit_4b_norm_queue.py -text

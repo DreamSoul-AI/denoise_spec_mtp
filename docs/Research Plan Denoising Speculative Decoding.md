@@ -224,6 +224,9 @@ CPU queue: reuse the untimed adapter, native token validator and load_cell/summa
 
 GPU queue: admit the originalBC60 first whenever its host-RAM gate becomes available; otherwise finish each current magnitude cell serially. Only after all eight cells succeed natively and pass per-cell accounting may the11-cell repeat take the GPU. Reuse measured4B BC30 maximum-input capacity plus2GiB host reserve and actual GPU nonpreemption. BC60 shapes have no separate peak guarantee: sample every Run, retain the per-prompt2GiB reserve, wait or preserve failures rather than lowering the gate or terminating work. The11 new cells are explicitly an independent repeat, not repairs to old results; prompts/methods remain fixed. Keep local thematic commits and open a milestone PR into dev. A read-only per-cell magnitude ledger checks native/input/source/token evidence and three tau aggregates; no complete curve before all eight.
 
+
+CPU preparation update: native declaration expansion and the unmade readout preflight passed (0/11,complete=false). All73 combined regressions and Ruff passed; old11-cell results do not fill new cells. Read-only watcher75696 uses tools/audit_4b_norm_queue.py; it records no tau before a new native cell completes, then retains three aggregates and file hashes using the strict readout. The19:53 display-whitelist/NVIDIA-type module is used only by the new Study; active8B/norm sources remain frozen. The local probe excludes ten display contexts and defers for the current known pure-C Python context. Branch review found no further deletable topics; active/unmerged topics remain.
+
 ## IX. Execution records and conclusions
 
 | Record | Actual evidence | Outcome/boundary |

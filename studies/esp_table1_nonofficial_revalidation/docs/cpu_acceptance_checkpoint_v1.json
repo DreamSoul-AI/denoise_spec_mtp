@@ -45,7 +45,7 @@
         "assets/spec_mtp_sources.json": "8bcb08586652fec4b8909c32fa9845406f676cc25c14f710ee14e5905cac0e7c"
       },
       "checkpoint": "studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json",
-      "checkpoint_sha256": "f004d2e9a2adc208c158538576182cb4f14184afac8369a2796e887fcde40891",
+      "checkpoint_sha256": "10067d968045a12f82aeb453fa3f710320830062847daf43f20199b8e0faf08e",
       "paired": {
         "n": 480,
         "accepted": {
@@ -106,7 +106,7 @@
         "assets/spec_mtp_sources.json": "2ca8cc81f50009d8b143a2643f0bcb9ac5263bef445c201d84fedfb9056f7aee"
       },
       "checkpoint": "studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json",
-      "checkpoint_sha256": "f451a80200a531c5755f1d21f97980e3eabdfaaec33292011320b546f11ca6d2",
+      "checkpoint_sha256": "ae0ee552f306e5d1b56dc23993118f9226b1686d109d548ff00ad7dabbe015a1",
       "paired": {
         "n": 480,
         "accepted": {
@@ -736,5 +736,6 @@
     "BC60 has no new completed result",
     "4B reaggregation does not rerun native/token verification",
     "AR exactness remains diagnostic; no speed or fixed-prefix causal claim"
-  ]
+  ],
+  "checkpoint_byte_contract": "Public BC10/30 snapshots retain their existing LF Git blobs, explicitly text eol=lf; native Run files unchanged"
 }

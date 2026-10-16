@@ -70,3 +70,5 @@ PR44/45/46已分别CI通过合dev；集成只发生在主仓及远端，活动4b
 4B新增verify_published.py只读入口复用已存在summarize/compare_rows，核11格、20对、各480个qid/category顺序、两种胜平负及输出长度/调用口径；源SHA8e85ac6ea9984047abf0ffd5d6653b28b6aadd74aa876139fa10465dc5bbf274不变。CPU检查点保存全10个Spec格τ、AR调用与完整20对汇总，既有逐prompt记录仍在原paired_evidence_v1.json；这是已发布计数重算，不重新验收历史Run，也不声称新增逐token审计。
 
 读出/配对与文档30项回归及ruff通过；新增回归验证输出与执行树分离、待完成矩阵不能声称成功，以及损坏totals/pair、缺pair和prompt乱序必须拒绝。BC60放行后的验收顺序、完整PowerShell命令和CUDA/PYTHONPATH恢复在[Study README](../README.md#bc60放行后的cpu验收)；4B入口见其README。下一步仍是原BC60完成后同一CPU命令生成正式三格证据，然后再按单队列运行4B范数八个新格。
+
+PR47首轮Linux CI为538 passed/1 failed，唯一失败是CPU检查点引用了Windows工作副本CRLF哈希，而两份公开检查点的既有Git blob为LF。已为这两份公开JSON指定text eol=lf，工作副本恢复为既有Git字节，引用哈希改核这些同名公开文件；原Git blob、JSON数值、原始Run和严格哈希断言不变。原工作副本另保留在本机.tmp/cpu-acceptance-20261016/checkpoint-eol。没有因此改数据、prompt、实际执行树或重新跑GPU。

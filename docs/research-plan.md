@@ -154,6 +154,8 @@ E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.46
 
 最新CPU来源刷新见[官方路径重查](research/esp-official-recheck-2026-10-16.md)：出版版Table1目标1.63/1.74未变；Figure8十类与采样表八类标签不构成Table1样本/权重合同。本地固定480/13类不改；作者入口未核验且OpenReview访问不完整，当前无可启动官方GPU项，不因空闲重跑自实现或失败第三方。
 
+作者repo/commit/附件[追加追踪](research/esp-author-attachment-followup-2026-10-16.md)已完成本轮有界核查：主页commit未变、三个精确代码查询各0项、六个论坛ID命中均未核验出作者实现；OpenReview三个附件候选403，未取得代码。当前官方入口仍缺，GPU步骤不虚报启动；入口到位后沿启动清单立即核来源和实时准入，无需重复授权。
+
 ## 十、GitHub使用与计划变更
 
 本文件是当前宏观计划入口，英文版逐章对应；Study级`docs/PLAN.md`是先于make冻结的执行合同，数字/图在其`STUDY_REPORT.md`和evidence中。原始tokens/trace、完整Run、模型和cache不进Git。每次正式运行沿用原生记录的commit、source/input/model摘要、配置、实际环境、seed、命令、RunID、失败和结果路径，不重建同名Run或重签历史成功记录。

@@ -154,6 +154,8 @@ No directionBC60 matrix is added this round: the five valid new cells already co
 
 Latest CPU source refresh: the [official-path recheck](research/esp-official-recheck-2026-10-16.md) confirms unchanged published Table1 targets1.63/1.74. Ten Figure8 labels and eight sampling-table labels do not establish the Table1 inclusion/weighting contract. Keep all480/13 local categories. No verified runnable author entry exists in the checked accessible sources; OpenReview access remains incomplete. No GPU job is started merely because the GPU is idle, and neither self-implementation nor the failed third-party path is rerun.
 
+The [author repository/commit/attachment follow-up](research/esp-author-attachment-followup-2026-10-16.md) completed this bounded check: unchanged homepage commit, zero hits in three exact code queries, and six forum-ID hits yielding no verified author implementation. Three conventional OpenReview attachment candidates returned403 without code. The official entrypoint remains missing; GPU execution is not claimed. Once it is available, verify provenance and fresh admission using the launch checklist without asking for authorization again.
+
 ## X. GitHub use and plan changes
 
 This is the current project-level plan, with a chapter-matched English translation. Study `docs/PLAN.md` files are pre-make frozen contracts; results/figures live in their STUDY_REPORT/evidence. Raw tokens/traces, full Runs, weights and caches stay out of Git. Native records retain code/source/input/model identity, actual configuration/environment, seed, command, RunID, failures and artifacts. Do not recreate a historical Run ID or re-sign successful evidence.

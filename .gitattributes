@@ -273,3 +273,12 @@
 # Match original CRLF Git blobs and the active frozen working-copy bytes.
 /studies/esp_table1_nonofficial_revalidation/untimed_bf16.py -text whitespace=cr-at-eol
 /studies/esp_table1_nonofficial_revalidation/argmax_audit.py -text whitespace=cr-at-eol
+
+# Freeze new norm-control source and declarations before native make.
+/studies/qwen3_4b_bf16_bias_norm_scan/** -text whitespace=cr-at-eol
+
+# The norm source guard pins the active Windows resource-helper bytes.
+/studies/esp_table1_nonofficial_revalidation/resource_admission.py -text whitespace=cr-at-eol
+
+# Preserve the frozen480 input file bytes across Windows and Linux.
+/datasets/spec_bench/question.jsonl -text whitespace=cr-at-eol

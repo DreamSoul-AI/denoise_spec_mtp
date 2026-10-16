@@ -160,6 +160,8 @@ The [author repository/commit/attachment follow-up](research/esp-author-attachme
 
 The [Table1 protocol gap register](research/esp-table1-protocol-gaps-2026-10-16.md) separates local facts, missing author artifacts, CPU reconciliation and official launch triggers. This round read a public author post without obtaining a verified code entry; its paper short-link did not resolve, and OpenReview was not refreshed. PR36 completed the nonofficial full480 recheck; do not rerun GPU matrices while the author entry remains unavailable.
 
+The [conference/HF channel follow-up](research/esp-table1-protocol-gaps-2026-10-16.md) adds the author-linked HF account scope: each public models/datasets/spaces API returned zero repositories, and the visible conference-page text supplied no code entry. Private/organization assets and recording content were not reviewed. The author entry remains unavailable; preserve the fixed480 and completed results without launching an idle-GPU rerun.
+
 ## X. GitHub use and plan changes
 
 This is the current project-level plan, with a chapter-matched English translation. Study `docs/PLAN.md` files are pre-make frozen contracts; results/figures live in their STUDY_REPORT/evidence. Raw tokens/traces, full Runs, weights and caches stay out of Git. Native records retain code/source/input/model identity, actual configuration/environment, seed, command, RunID, failures and artifacts. Do not recreate a historical Run ID or re-sign successful evidence.

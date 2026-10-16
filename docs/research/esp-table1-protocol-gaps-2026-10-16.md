@@ -61,3 +61,21 @@
 ## 五、交付范围
 
 本轮仅新增此缺口登记，并局部链接中英文研究计划、研究索引与启动清单；冻结Study、源码、原始Run和历史数字保持原样。提交/推工作分支/PR合dev及合后删除该已合远程分支沿用Enmao长期授权；不合main、不强推、不删本地分支或数据。实际检查、PR及远程分支清理结果以本轮PR记录为准，未执行动作不预写为通过。
+
+## 六、会议记录与作者HF发布渠道追加核验
+
+本轮继续执行只读来源追踪，不重跑PR36已完整的GPU矩阵。网页读取时间为2026-10-16约12:09–12:10（Asia/Shanghai），API实际时间见下表。
+
+- [SlidesLive条目39075543](https://slideslive.com/39075543/efficient-trainingfree-multitoken-prediction-via-embeddingspace-probing)可读，面包屑列ICML2026/Posters，题名及四名作者对应本论文，页面日期为2026-07-06。可见文本为会议条目与摘要，未给出ESP repo、实现commit或原生运行命令。只读取网页文本，没有观看录屏、提取幻灯片/二维码或检查视频帧；不能据此断言视频中没有代码链接。页面日期不替代作者帖子列的海报场次日期。
+- [HF论文页](https://huggingface.co/papers/2603.17942)的提交者链接指向[RaghavvGoel](https://huggingface.co/RaghavvGoel)，其账号公开链接指向已核验作者主页`raghavvgoel.github.io`。论文下可见作者评论说明免训练MTP方法，没有提供代码URL；自动推荐的其他论文不是ESP实现。本次身份关联来自这些公开链接，不声称平台完成了实名认证。
+- 本轮另做`site.qualcomm.com "Embedding-Space Probing"`及论文号/GitHub定向网页检索，没有取得可核验新入口；摘要命中只作线索，未审计Qualcomm整站。直接读取既有论文短链仍返回工具`Internal Error`，未核验最终目标；没有绕过访问限制。OpenReview本轮未请求。
+
+| 作者公开HF仓库API | 实际响应时间UTC | HTTP / 返回数 / 后续分页 |
+| --- | --- | --- |
+| [models](https://huggingface.co/api/models?author=RaghavvGoel&limit=100) | 2026-10-16T04:10:45.334443+00:00 | 200 / 0 / 无Link header |
+| [datasets](https://huggingface.co/api/datasets?author=RaghavvGoel&limit=100) | 2026-10-16T04:10:45.335578+00:00 | 200 / 0 / 无Link header |
+| [spaces](https://huggingface.co/api/spaces?author=RaghavvGoel&limit=100) | 2026-10-16T04:10:45.320613+00:00 | 200 / 0 / 无Link header |
+
+三份原始响应均为2字节`[]`，SHA256均为`4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945`，逐份重读哈希断言通过。[启动审计JSON](esp-official-launch-readiness-2026-10-16.json)的`author_hf_followup`记录三个URL/时间/哈希/计数；原始字节保留本机`.tmp/esp-author-hf-20261016T041044Z/`。网页阅读不冒称具有原始HTTP SHA。
+
+这补齐了先前HF论文关联资产计数之外的**作者账号公开仓库列表**范围；仍不覆盖私有/组织所属资产、历史删除仓库、所有帖子或视频内链接。当前未取得作者原生入口，不能由三个空列表推断ESP未发布。后续新线索优先核验作者主动给出的repo/附件/原生命令；会议录屏内资源是未审阅项，不将其升级成完整源码已可下载或立即可运行。官方GPU启动顺序仍按第四节，本轮模型加载/Run/GPU执行均为0。

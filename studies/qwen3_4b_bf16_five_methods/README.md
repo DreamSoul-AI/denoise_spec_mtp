@@ -11,3 +11,9 @@
 配对阅读器`analyze_results.py`保留五方法全部两两对照、逐prompt接受/calls赢平输及AR首分叉，另显式列出每个方法相对同一独立AR的调用数赢平输、Δcalls和两侧输出长度。AR无draft接受数，该项不适用。复用native证据/source/Study冻结门，仅全11格与process通过后生成正式证据；未完成格保持pending。运行和结论见[当前报告](docs/STUDY_REPORT.md)，CPU tiny/合成回归不代替真实4B。
 
 本次真实图`docs/figures/paired_outcomes.png`展示两个预算各自的接受数与调用数完整胜负矩阵，格内W/T/L、颜色W−L，固定范围±480，保留全部输局；正式JSON记录绘图器SHA。未完成、失败、缺失或重复配对不生成图。布局回归的合成计数仅用于测试，真实图来自本次完整正式证据并已目检，不表示测速或总体显著性。
+
+## CPU成对比较入口
+
+`D:/anaconda3/python.exe studies/qwen3_4b_bf16_five_methods/verify_published.py`从本Study正式paired_evidence_v1.json重算11格汇总和20组同预算逐prompt配对，检查480个qid/category顺序、接受数与调用数双向胜平负、输出长度及含prefill调用口径。入口复用既有summarize/compare_rows，不载模、不占GPU、不改原正式JSON；stdout可保存到主仓.tmp。它是已发布计数对账，**不是原生来源/逐token验收重跑**，不以新验证器重签历史证据。结果保留所有输局、AR诊断、原输入与各方法不同输出长度；不由调用数推断测速或同前缀因果。
+
+后续范数读出复用本Study的原生load_cell验收，并用已有方向读出比较接受/calls/τ；新增八格仍需各自原生argmax和输入/来源门全过，不能以本CPU对账代替实测。

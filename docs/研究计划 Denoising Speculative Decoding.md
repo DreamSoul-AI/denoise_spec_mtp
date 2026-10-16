@@ -3,10 +3,10 @@
 中文正本，更新于2026-10-16。[English translation](<Research Plan Denoising Speculative Decoding.md>)。采用[新版规范与模板](research/standards/README.md)，来源为RPipe已合入dev的`e461133218deabf8755b3e8657650e1e4a3cd9f4`。本次是对已有研究与证据的整理，不是对已看到结果的实验重新预注册，也不改运行中的Study合同。
 
 
-> 当前8B非官方复验：BC10/BC30单mask全480原生成功；BC60原队列等待RAM准入。4B范数扫描未make/launch。
+> 当前8B非官方复验：BC10/BC30单mask全480原生成功；BC60原队列受RAM准入阻塞（worker66500存活，需外部RAM恢复）。4B范数扫描未make/launch。
 > BC30 pooled tau=1.5633775043382236，较论文1.63低0.06662249566177625；79762个token自检全过，AR175/480仅诊断。
 > BC10 tau=1.3990470307950233；两格与各自旧Run逐prompt accepted/calls/tau均480平，输出/AR摘要各480一致。
-> 数值及路径见[BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json) / [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json)；BC60待完整终验，尚非全矩阵。
+> CPU验收入口已实际演练（两格有效、BC60 pending），读出与文档30项回归全过；[CPU检查点](../studies/esp_table1_nonofficial_revalidation/docs/cpu_acceptance_checkpoint_v1.json)。原数值见[BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json) / [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json)；BC60待完整终验，尚非全矩阵。
 
 ## 一、当前范围、状态与执行优先级
 

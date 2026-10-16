@@ -162,6 +162,8 @@ E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.46
 
 [会议/HF公开渠道追加核验](research/esp-table1-protocol-gaps-2026-10-16.md)补齐作者账号公开资产范围：三种仓库API各返回0项，会议页面可见文本未提供代码；私有/组织资产及录屏内容未覆盖。作者入口仍缺，继续保持原480及现有结果，不以空闲GPU触发重跑。
 
+本轮[P1输入/P2计数CPU对账](research/esp-table1-cpu-contract-reconciliation-2026-10-16.md)完成：四格原480首轮重渲染均token精确、无过滤（输入21–1500 token；80条源记录有多轮但仅取首轮）。BC30/60低于256的320/323条均为EOS停止；pooled相对prompt mean的差−0.029855/−0.022197主要是类间调用权重。完整旧trace前100 token的pooled τ为1.564682/1.647816，仍未达1.63/1.74；这是已观测前缀计数，不是100-token新生成。原主结果不变；作者qid/模板/thinking/revision、实际100/256停止合同、逐条原始计数/任务权重仍缺，不能唯一归因。下一步仅在取得作者证据后CPU按qid/token摘要/分子分母对齐；官方入口到位再按启动清单申请GPU。无外部刷新、无模型forward，不改prompt、不重跑完整矩阵，bias/random/Kalman后置。
+
 ## 十、GitHub使用与计划变更
 
 本文件是当前宏观计划入口，英文版逐章对应；Study级`docs/PLAN.md`是先于make冻结的执行合同，数字/图在其`STUDY_REPORT.md`和evidence中。原始tokens/trace、完整Run、模型和cache不进Git。每次正式运行沿用原生记录的commit、source/input/model摘要、配置、实际环境、seed、命令、RunID、失败和结果路径，不重建同名Run或重签历史成功记录。

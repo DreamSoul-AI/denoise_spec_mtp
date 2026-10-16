@@ -1,5 +1,7 @@
 # Research notes
 
+最新CPU对账：[Table1输入合同与计数聚合](esp-table1-cpu-contract-reconciliation-2026-10-16.md)、[完整CPU证据](esp-table1-cpu-contract-reconciliation-2026-10-16.json)。四格480输入重渲染精确，EOS/权重分解及已观测前100计数闭合；仍未解释作者缺口，不重跑GPU。
+
 当前缺口与启动触发：[Table1协议缺口登记](esp-table1-protocol-gaps-2026-10-16.md)。作者公开帖与ConFu评论已区分；记录所需作者合同、CPU对账及停止条件。PR36非官方结果完整，本轮不重跑GPU、不刷新OpenReview。
 
 最新非官方交付：[esp-table1-nonofficial-full480-recheck-2026-10-16](esp-table1-nonofficial-full480-recheck-2026-10-16.md)。已从四个完整480 Run复核318,830 token的argmax/owner及来源哈希，三主格无缺项；BC30/60未达论文τ目标。最新授权允许本地/HF栈，复用已完成格，不将作者入口缺失混同为非官方未运行；未新增GPU执行。

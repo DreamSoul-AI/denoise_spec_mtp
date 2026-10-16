@@ -158,6 +158,8 @@ E3有效pooled τ：template1.507777653、随机0为1.495188134、随机1为1.46
 
 作者repo/commit/附件[追加追踪](research/esp-author-attachment-followup-2026-10-16.md)已完成本轮有界核查：主页commit未变、三个精确代码查询各0项、六个论坛ID命中均未核验出作者实现；OpenReview三个附件候选403，未取得代码。当前官方入口仍缺，GPU步骤不虚报启动；入口到位后沿启动清单立即核来源和实时准入，无需重复授权。
 
+当前未解合同集中在[Table1协议缺口登记](research/esp-table1-protocol-gaps-2026-10-16.md)：逐项区分本地事实、作者所需证据、CPU对账与官方启动触发。本轮作者公开帖未提供可核验代码入口；短链未成功解析，OpenReview未刷新。PR36非官方全480复核已完成，官方入口仍缺时不重跑GPU矩阵。
+
 ## 十、GitHub使用与计划变更
 
 本文件是当前宏观计划入口，英文版逐章对应；Study级`docs/PLAN.md`是先于make冻结的执行合同，数字/图在其`STUDY_REPORT.md`和evidence中。原始tokens/trace、完整Run、模型和cache不进Git。每次正式运行沿用原生记录的commit、source/input/model摘要、配置、实际环境、seed、命令、RunID、失败和结果路径，不重建同名Run或重签历史成功记录。

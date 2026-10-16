@@ -7,16 +7,11 @@
 /studies/output_space_cross_task/analyze_canonical.py -text whitespace=cr-at-eol
 /studies/output_space_cross_task/analyze_results.py -text whitespace=cr-at-eol
 /studies/output_space_cross_task/plot_results.py -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/CANONICAL_PLAN.md -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/EXECUTION_PLAN.md -text whitespace=cr-at-eol
-/studies/output_space_extension/docs/PHI_RMS_PLAN.md -text whitespace=cr-at-eol
 
 # Preserve state/arithmetic factor measurement and analysis bytes.
 /tools/diagnose_q241_state_factors.py -text whitespace=cr-at-eol
 /tools/diagnose_q178_rounding_factors.py -text whitespace=cr-at-eol
 /studies/output_space_cross_task/analyze_state_factors.py -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/STATE_FACTOR_PLAN.md -text whitespace=cr-at-eol
-/studies/output_space_extension/docs/ROUNDING_FACTOR_PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/state_factor_analysis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/state_factor_diagnosis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_extension/docs/rounding_factor_diagnosis_v1.json -text whitespace=cr-at-eol
@@ -25,8 +20,6 @@
 /tools/diagnose_q241_local_factors.py -text whitespace=cr-at-eol
 /tools/diagnose_state_extension.py -text whitespace=cr-at-eol
 /studies/output_space_cross_task/analyze_local_extension.py -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/LOCAL_FACTOR_PLAN.md -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/STATE_EXTENSION_PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/local_extension_analysis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/local_factor_diagnosis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/state_extension_diagnosis_v1.json -text whitespace=cr-at-eol
@@ -35,8 +28,6 @@
 /tools/diagnose_sampling_paths.py -text whitespace=cr-at-eol
 /tools/diagnose_q241_owner1.py -text whitespace=cr-at-eol
 /studies/output_space_cross_task/analyze_sampling_owner.py -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/SAMPLING_PLAN.md -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/OWNER_PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/sampling_owner_analysis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/sampling_diagnosis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/owner1_diagnosis_v1.json -text whitespace=cr-at-eol
@@ -46,9 +37,6 @@
 /tools/diagnose_rare_events.py -text whitespace=cr-at-eol
 /studies/output_space_cross_task/analyze_sampling_expansion.py -text whitespace=cr-at-eol
 /studies/output_space_cross_task/analyze_first_delta.py -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/SAMPLING_EXPANSION_PLAN.md -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/RARE_EVENT_PLAN.md -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/FIRST_DELTA_PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/sampling_expansion_analysis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/sampling_expansion_diagnosis_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/rare_event_diagnosis_v1.json -text whitespace=cr-at-eol
@@ -57,11 +45,9 @@
 # Preserve new sampled continuation and rare stress protocol bytes.
 /tools/diagnose_sampling_continuation.py -text whitespace=cr-at-eol
 /tools/diagnose_rare_stress.py -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/SAMPLING_CONTINUATION_PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/sampling_continuation_inputs_v1.json -text whitespace=cr-at-eol
 /studies/output_space_cross_task/analyze_continuation.py -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/sampling_continuation_analysis_v1.json -text whitespace=cr-at-eol
-/studies/output_space_cross_task/docs/SAMPLED_DEPTH_PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_cross_task/analyze_sampled_depth.py -text whitespace=cr-at-eol
 /studies/output_space_cross_task/docs/sampled_depth_analysis_v1.json -text whitespace=cr-at-eol
 
@@ -70,7 +56,6 @@
 /studies/output_space_4b_recheck/recipe.py -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck/experiment_config.yaml -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck/study.yaml -text whitespace=cr-at-eol
-/studies/output_space_4b_recheck/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck/docs/history_inventory.json -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck/docs/prompts_manifest.json -text whitespace=cr-at-eol
@@ -80,7 +65,6 @@
 /studies/output_space_4b_holdout/recipe.py -text whitespace=cr-at-eol
 /studies/output_space_4b_holdout/experiment_config.yaml -text whitespace=cr-at-eol
 /studies/output_space_4b_holdout/study.yaml -text whitespace=cr-at-eol
-/studies/output_space_4b_holdout/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_4b_holdout/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
 /studies/output_space_4b_holdout/docs/history_inventory.json -text whitespace=cr-at-eol
 /studies/output_space_4b_holdout/docs/prompts_manifest.json -text whitespace=cr-at-eol
@@ -90,7 +74,6 @@
 /studies/output_space_4b_recheck_v2/recipe.py -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck_v2/experiment_config.yaml -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck_v2/study.yaml -text whitespace=cr-at-eol
-/studies/output_space_4b_recheck_v2/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck_v2/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck_v2/docs/history_inventory.json -text whitespace=cr-at-eol
 /studies/output_space_4b_recheck_v2/docs/prompts_manifest.json -text whitespace=cr-at-eol
@@ -103,7 +86,6 @@
 /studies/output_space_4b_input_control/untimed_4b.py -text whitespace=cr-at-eol
 /studies/output_space_4b_input_control/experiment_config.yaml -text whitespace=cr-at-eol
 /studies/output_space_4b_input_control/study.yaml -text whitespace=cr-at-eol
-/studies/output_space_4b_input_control/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/output_space_4b_input_control/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
 /studies/output_space_4b_input_control/docs/history_inventory.json -text whitespace=cr-at-eol
 /studies/output_space_4b_input_control/docs/prompts_manifest.json -text whitespace=cr-at-eol
@@ -115,7 +97,6 @@
 /studies/esp_table1_bf16_preflight/untimed_4b.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_preflight/study.yaml -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_preflight/experiment_config.yaml -text whitespace=cr-at-eol
-/studies/esp_table1_bf16_preflight/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_preflight/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_preflight/docs/prompts_manifest.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_preflight/docs/specbench-source.json -text whitespace=cr-at-eol
@@ -125,7 +106,6 @@
 /studies/esp_table1_bf16_numerics/numerics.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_numerics/study.yaml -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_numerics/experiment_config.yaml -text whitespace=cr-at-eol
-/studies/esp_table1_bf16_numerics/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_numerics/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_numerics/docs/prompts_manifest.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_numerics/docs/specbench-source.json -text whitespace=cr-at-eol
@@ -160,7 +140,6 @@
 /studies/esp_table1_bf16_reduction_check/numerics.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_reduction_check/study.yaml -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_reduction_check/experiment_config.yaml -text whitespace=cr-at-eol
-/studies/esp_table1_bf16_reduction_check/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_reduction_check/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_reduction_check/docs/prompts_manifest.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_reduction_check/docs/specbench-source.json -text whitespace=cr-at-eol
@@ -187,7 +166,6 @@
 /studies/esp_table1_bf16_shape_check/docs/prompts_manifest.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_shape_check/docs/shape_evidence_v1.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_shape_check/docs/specbench-source.json -text whitespace=cr-at-eol
-/studies/esp_table1_bf16_shape_check/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_reduction_check/docs/reduction_evidence_v1.json -text whitespace=cr-at-eol
 
 /studies/esp_table1_bf16_qwen_protocol/analyze_results.py -text whitespace=cr-at-eol
@@ -209,7 +187,6 @@
 /studies/esp_table1_bf16_qwen_protocol/docs/protocol_pending.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_qwen_protocol/docs/reused_preflight.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_qwen_protocol/docs/specbench-source.json -text whitespace=cr-at-eol
-/studies/esp_table1_bf16_qwen_protocol/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full/analyze_results.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full/recipe.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full/untimed_bf16.py -text whitespace=cr-at-eol
@@ -227,11 +204,9 @@
 /studies/esp_table1_bf16_full/docs/prompts_manifest.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full/docs/protocol_pending.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full/docs/specbench-source.json -text whitespace=cr-at-eol
-/studies/esp_table1_bf16_full/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/analyze_results.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/argmax_audit.py -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/docs/modelscope_snapshot.json -text whitespace=cr-at-eol
-/studies/esp_table1_bf16_full_argmax/docs/PLAN.md -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/docs/prompts_manifest.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/docs/specbench-source.json -text whitespace=cr-at-eol
 /studies/esp_table1_bf16_full_argmax/experiment_config.yaml -text whitespace=cr-at-eol
@@ -252,14 +227,11 @@
 # Preserve the bounded 4B geometry protocol, tools and scalar evidence bytes.
 /tools/analyze_4b_geometry.py -text whitespace=cr-at-eol
 /tools/capture_4b_geometry.py -text whitespace=cr-at-eol
-/studies/qwen3_4b_bf16_five_methods/docs/GEOMETRY_PLAN.md -text whitespace=cr-at-eol
 /docs/research/4b-mask-geometry-cpu-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-mask-geometry-observations-2026-10-15.json -text whitespace=cr-at-eol
 /tools/analyze_4b_velocity.py -text whitespace=cr-at-eol
 /tools/diagnose_4b_mask_windows.py -text whitespace=cr-at-eol
-/studies/qwen3_4b_bf16_five_methods/docs/MASK_WINDOW_PLAN.md -text whitespace=cr-at-eol
 /tools/analyze_4b_window_results.py -text whitespace=cr-at-eol
-/studies/qwen3_4b_bf16_five_methods/docs/MASK_ACTIVE_PLAN.md -text whitespace=cr-at-eol
 /docs/research/4b-mask-velocity-cpu-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-mask-window-observations-2026-10-15.json -text whitespace=cr-at-eol
 /docs/research/4b-mask-window-readout-2026-10-15.json -text whitespace=cr-at-eol
@@ -284,7 +256,6 @@
 /src/spec_mtp/structure/algorithm/reference/esp_reproduction_artifacts/** -text whitespace=cr-at-eol
 /src/spec_mtp/structure/algorithm/reference/esp_reproduction_artifacts/upstream/** whitespace=-blank-at-eol,cr-at-eol
 /tools/audit_esp_third_party.py -text whitespace=cr-at-eol
-/studies/esp_table1_bf16_full_argmax/docs/THIRD_PARTY_PLAN.md -text whitespace=cr-at-eol
 /docs/research/esp-third-party-audit-2026-10-15.json -text whitespace=cr-at-eol
 /studies/qwen3_4b_bf16_directions/** -text whitespace=cr-at-eol
 /tools/analyze_4b_full_directions.py -text whitespace=cr-at-eol
@@ -298,3 +269,7 @@
 
 /tools/analyze_esp_table1_gap.py -text whitespace=cr-at-eol
 /docs/research/esp-table1-gap-analysis-2026-10-16.json -text whitespace=cr-at-eol
+
+# Match original CRLF Git blobs and the active frozen working-copy bytes.
+/studies/esp_table1_nonofficial_revalidation/untimed_bf16.py -text whitespace=cr-at-eol
+/studies/esp_table1_nonofficial_revalidation/argmax_audit.py -text whitespace=cr-at-eol

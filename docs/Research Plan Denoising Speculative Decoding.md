@@ -212,6 +212,9 @@ The original BC60 worker66500 continues waiting on the unchanged host-RAM gate; 
 
 The latest authorization retains the original8B measured-peak-plus2GiB gate and permits the registered eight4B magnitude cells to use an idle GPU if safe working-set reclamation remains insufficient. The earlier requirement to wait for the8B queue to exit before make is superseded for this fallback. First calibrate4B capacity on the unchanged longest fixed input, then admit formal cells using the measured4B peak plus2GiB. Only reversibly suspend this session’s verified RAM-wait BC60 worker, resume in finally, and give8B priority between complete4B cells when its original admission becomes available. Scientific settings,480 inputs and original preregistration remain unchanged; capacity probes provide no formal tau result. [Protocol and observations](research/sd-memory-fallback-2026-10-16.md).
 
+
+The4B capacity probe completed: unchanged longest inputq295/1500 tokens, all256 capacity-token audits passed. Sampled process-tree peak8808693760 bytes gives a10956177408-byte formal4B gate. BC60 was resumed in finally; this is not a formal magnitude-scan tau result.
+
 ## IX. Execution records and conclusions
 
 | Record | Actual evidence | Outcome/boundary |

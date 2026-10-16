@@ -42,3 +42,9 @@ try {
 [实际准备报告](docs/STUDY_REPORT.md)和[CPU检查点](docs/reused_readiness_v1.json)覆盖5个旧端点、30份Spec源文件、405083个原始argmax/owner记录。输出明确complete=false、reused_only=true、new_cells_inspected=false；0.5×/2×八格仍未执行，不能由端点推算曲线。
 
 后续正常读出支持--data-root（旧Run根副本）、--study-dir（完成后的冻结范数Study）、--output-dir（独立CPU报告目录）；须从冻结Study所属执行根目录、使用该副本src调用，保留原生相对输入和来源检查。正常读出会严格比较索引与原八格声明和顺序、每格一个Run、实际cfg完整spec、逐token门、480条progress与原生Study process；正式JSON和曲线只在全13端点通过后生成。新输出先写独立目录，验收后按主题合dev，不重签或覆盖旧结果。
+
+## 19:15授权后的排班更新
+
+旧“先等8B自然退出”和借用8B预算的排班仅为历史状态；Enmao19:15明确授权RAM不足时空卡执行本八格。已完成固定q295/1500输入、256上界token的BF16容量标定（EOS关闭仅用于容量），全256 token数学门通过，非正式τ结果。实测进程树峰值8808693760 bytes，正式4B门加2GiB为10956177408 bytes；显存门为实测peak reserved加1024MiB。见docs/capacity_calibration_v1.json和norm_admission.py。探针结束已恢复BC60。
+
+主仓独立make version v2-capacity，不修改活动8B工作树；单一父队列逐格调用原生run-one，完整格结束即恢复BC60并检查8B优先权，满足原8B门时先让BC60。进程只可逆suspend/resume，保留创建时间核验，异常finally恢复；不终止其他会话。已有0/1倍和科学/数据合同不变。

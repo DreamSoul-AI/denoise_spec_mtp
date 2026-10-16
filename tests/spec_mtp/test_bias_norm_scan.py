@@ -196,3 +196,22 @@ def test_published_reuse_checkpoint_matches_existing_endpoints(monkeypatch):
         first = pair['first_block_same_prefix']
         assert first['total'] == first['same_prefix_with_block'] + first['different_prefix'] + first['missing_block'] == 480
         assert sum(first['accepted'].values()) == first['same_prefix_with_block'] == 480
+
+
+def test_measured_4b_admission_keeps_reserve_and_gpu_exclusion(monkeypatch):
+    module(monkeypatch)
+    path = ROOT / 'studies/qwen3_4b_bf16_bias_norm_scan/norm_admission.py'
+    spec = importlib.util.spec_from_file_location('sd_norm_admission_test', path)
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    cap = {'complete': True, 'peak_process_tree_rss_bytes': 8 << 30,
+           'decode': {'argmax_checked_tokens': 256, 'dtype': 'torch.bfloat16', 'cuda_peak_reserved_bytes': 10 << 30}}
+    base = dict(host_available_bytes=9 << 30, current_worker_rss_bytes=1 << 30,
+                foreign_gpu_processes=[], free_vram_mib=11264)
+    assert helper.apply_capacity(base, cap, True)['passed']
+    assert not helper.apply_capacity(dict(base, host_available_bytes=(9 << 30)-1), cap, True)['passed']
+    assert not helper.apply_capacity(dict(base, foreign_gpu_processes=[{'pid': 1}]), cap, True)['passed']
+    assert not helper.apply_capacity(dict(base, free_vram_mib=11263), cap, True)['passed']
+    assert not helper.apply_capacity(dict(base, host_available_bytes=(2 << 30)-1), cap, False)['passed']
+    with pytest.raises(AssertionError):
+        helper.apply_capacity(base, dict(cap, complete=False), True)

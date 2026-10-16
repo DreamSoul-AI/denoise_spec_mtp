@@ -1,5 +1,7 @@
 # Research notes
 
+20:55最终收尾范围：[中文主计划中的通俗阶段总结](<../研究计划 Denoising Speculative Decoding.md#sd-stage-closeout-20261016>) / [English](<../Research Plan Denoising Speculative Decoding.md>)。BC60全480及三格Study已成功验收，七格等待队列和只读入账器均已退出，临时启动器已保留并停用；后续11格仅make、不执行。首格恢复、现有全480结果和618+10两次CPU检查见[排班/收尾记录](sd-memory-fallback-2026-10-16.md)。不追加实验、不提下一阶段方案，正式8B结果见[全三格证据](../../studies/esp_table1_nonofficial_revalidation/docs/repeat_evidence_v1.json)，一次里程碑PR合dev；以下旧排班为历史。
+
 当前归因与下一步GPU假设：研究计划[中文第三章](<../研究计划 Denoising Speculative Decoding.md>) / [English SectionIII](<../Research Plan Denoising Speculative Decoding.md>)，[计数与显存准入证据](esp-table1-attribution-hypotheses-2026-10-16.json)。输入/停止/计数事实与作者未知合同分开；重复剪枝原路径直接机会约0.005，不能补主缺口。G-M原生配置已验证，当前峰值加2GiB容量门未过，未make/launch。
 
 最新CPU对账：[Table1输入合同与计数聚合](esp-table1-cpu-contract-reconciliation-2026-10-16.md)、[完整CPU证据](esp-table1-cpu-contract-reconciliation-2026-10-16.json)。四格480输入重渲染精确，EOS/权重分解及已观测前100计数闭合；仍未解释作者缺口，不重跑GPU。

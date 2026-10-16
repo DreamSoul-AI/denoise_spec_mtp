@@ -77,16 +77,22 @@ def test_native_tiny_bf16_argmax_audit_for_scaled_bias(monkeypatch, scale):
     assert stats['verification_argmax_audit']['passed'] and stats['verification_argmax_audit']['checked_committed_tokens'] == 12
 
 
-def test_unmade_readout_cannot_claim_completed_scan(monkeypatch):
+def test_unmade_readout_cannot_claim_completed_scan(monkeypatch, tmp_path):
     from spec_mtp.structure.artifact.sources import SpecMtpSourceChangedError
     m = module(monkeypatch)
     monkeypatch.syspath_prepend(str(m.STUDY))
     spec = importlib.util.spec_from_file_location('sd_norm_readout', m.STUDY / 'analyze_results.py')
     readout = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(readout)
+    fake_root = tmp_path / 'checkout'
+    unmade = fake_root / 'studies/unmade'
+    unmade.mkdir(parents=True)
+    (unmade / 'study.yaml').write_bytes((m.STUDY / 'study.yaml').read_bytes())
+    monkeypatch.chdir(fake_root)
+    output = tmp_path / 'output'
     with pytest.raises(SpecMtpSourceChangedError):
-        readout.main()
-    assert not (m.STUDY / 'docs/norm_evidence_v1.json').exists()
+        readout.main(study_dir=unmade, output_dir=output)
+    assert not output.exists()
 
 
 def test_first_block_pairing_excludes_changed_prefill_and_missing_blocks(monkeypatch):
@@ -118,13 +124,13 @@ def norm_reader(monkeypatch):
     return reader
 
 
-@pytest.mark.parametrize('damage', ['missing', 'duplicate', 'order', 'wrong_scale', 'wrong_spec', 'extra_run'])
+@pytest.mark.parametrize('damage', ['missing', 'duplicate', 'order', 'wrong_scale', 'wrong_spec', 'wrong_eval', 'partial_factor', 'extra_run'])
 def test_norm_matrix_must_match_all_eight_frozen_cases(monkeypatch, damage):
     import copy
     m = norm_reader(monkeypatch)
     decl = yaml.safe_load((m.STUDY / 'study.yaml').read_text(encoding='utf-8'))
     entries = [{'factors': {'algorithm.config': copy.deepcopy(c)}, 'runs': [{'id': str(i)}]}
-               for i, c in enumerate(decl['axes']['algorithm.config'])]
+               for i, c in enumerate(m.matrix_settings(decl))]
     m.check_matrix(decl, entries)
     if damage == 'missing':
         entries.pop()
@@ -136,6 +142,10 @@ def test_norm_matrix_must_match_all_eight_frozen_cases(monkeypatch, damage):
         entries[0]['factors']['algorithm.config']['spec']['ema']['step_scale'] = 1.
     elif damage == 'wrong_spec':
         entries[0]['factors']['algorithm.config']['spec']['ema']['beta'] = .9
+    elif damage == 'wrong_eval':
+        entries[0]['factors']['algorithm.config']['eval']['max_new_tokens'] = 128
+    elif damage == 'partial_factor':
+        entries[0]['factors']['algorithm.config'] = copy.deepcopy(decl['axes']['algorithm.config'][0])
     else:
         entries[0]['runs'].append({'id': 'extra'})
     with pytest.raises(AssertionError):
@@ -196,3 +206,22 @@ def test_published_reuse_checkpoint_matches_existing_endpoints(monkeypatch):
         first = pair['first_block_same_prefix']
         assert first['total'] == first['same_prefix_with_block'] + first['different_prefix'] + first['missing_block'] == 480
         assert sum(first['accepted'].values()) == first['same_prefix_with_block'] == 480
+
+
+def test_measured_4b_admission_keeps_reserve_and_gpu_exclusion(monkeypatch):
+    module(monkeypatch)
+    path = ROOT / 'studies/qwen3_4b_bf16_bias_norm_scan/norm_admission.py'
+    spec = importlib.util.spec_from_file_location('sd_norm_admission_test', path)
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    cap = {'complete': True, 'peak_process_tree_rss_bytes': 8 << 30,
+           'decode': {'argmax_checked_tokens': 256, 'dtype': 'torch.bfloat16', 'cuda_peak_reserved_bytes': 10 << 30}}
+    base = dict(host_available_bytes=9 << 30, current_worker_rss_bytes=1 << 30,
+                foreign_gpu_processes=[], free_vram_mib=11264)
+    assert helper.apply_capacity(base, cap, True)['passed']
+    assert not helper.apply_capacity(dict(base, host_available_bytes=(9 << 30)-1), cap, True)['passed']
+    assert not helper.apply_capacity(dict(base, foreign_gpu_processes=[{'pid': 1}]), cap, True)['passed']
+    assert not helper.apply_capacity(dict(base, free_vram_mib=11263), cap, True)['passed']
+    assert not helper.apply_capacity(dict(base, host_available_bytes=(2 << 30)-1), cap, False)['passed']
+    with pytest.raises(AssertionError):
+        helper.apply_capacity(base, dict(cap, complete=False), True)

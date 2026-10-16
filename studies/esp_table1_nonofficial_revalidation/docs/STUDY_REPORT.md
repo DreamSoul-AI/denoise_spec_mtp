@@ -1,74 +1,29 @@
-# 非官方8B独立复验：BC10/BC30全480检查点
+# 非官方8B Table1独立复验
 
-> 当前资源阻塞：BC60原队列worker66500存活，主机RAM不足，尚未载模；原队列保留自动等待。
-> BC10/30全480成功，BC30 τ=1.5633775043382236，79762个token自检全过；未达论文1.63。
-> CPU验收入口已实际演练，读出与文档30项回归全过；4B八个新范数格尚未make，仍排在BC60之后。
-> 最新资源数值、实际命令和来源见[RAM检查点](ram_wait_checkpoint_20261016.json)，不放宽门、不重开或终止其他任务。
+固定原480、Qwen3-8B BF16/T0、单mask、λ=.1 updating mean、动态树剪枝、256/EOS；无测速。
 
-BC10/BC30单mask均已原生成功，不是三格全矩阵结论。BC60已由原队列接续，等待实测峰值加2GiB的主机RAM准入。固定SpecBench480、Qwen3-8B BF16/eager/T0、lambda=.1 updating mean、动态树剪枝、256/EOS、seed123；无测速。
+| BC | native | argmax checked/pass | pooled τ | prompt mean τ | category mean τ | pooled τ−论文 | pooled τ−旧结果 | AR exact/480 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 10 | succeeded | 79757/True | 1.399047031 | 1.431765889 | 1.403033561 | n/a | 0.000000000 | 188/480 |
+| 30 | succeeded | 79762/True | 1.563377504 | 1.593232237 | 1.563387272 | -0.066622496 | 0.000000000 | 175/480 |
+| 60 | succeeded | 79618/True | 1.647301264 | 1.669498033 | 1.649693144 | -0.092698736 | 0.000000000 | 185/480 |
 
-| 指标 | 新BC10 | 与旧BC10差值 |
-| --- | --- | --- |
-| pooled tau | 1.3990470307950233 | 0 |
-| prompt mean tau | 1.43176588861066 | 0 |
-| category mean pooled tau | 1.4030335607141575 | 0 |
-| 接受draft数 | 22691 | 0 |
-| decode calls / 含prefill总调用 | 56665 / 57145 | 0 / 0 |
-| 实际新token / decode committed | 79757 / 79277 | 0 / 0 |
-| verifier argmax覆盖 | 79757/79757，全过 | 与旧覆盖相同 |
-| 独立AR完全一致 | 188/480，39.1667% | 0 |
+| BC | 聚合 | 原结果τ | 新τ−论文 | 新τ−原结果 |
+| --- | --- | --- | --- | --- |
+| 10 | pooled_tau | 1.399047031 | n/a | 0.000000000 |
+| 10 | prompt_mean_tau | 1.431765889 | n/a | 0.000000000 |
+| 10 | category_mean_pooled_tau | 1.403033561 | n/a | 0.000000000 |
+| 30 | pooled_tau | 1.563377504 | -0.066622496 | 0.000000000 |
+| 30 | prompt_mean_tau | 1.593232237 | -0.036767763 | 0.000000000 |
+| 30 | category_mean_pooled_tau | 1.563387272 | -0.066612728 | 0.000000000 |
+| 60 | pooled_tau | 1.647301264 | -0.092698736 | 0.000000000 |
+| 60 | prompt_mean_tau | 1.669498033 | -0.070501967 | 0.000000000 |
+| 60 | category_mean_pooled_tau | 1.649693144 | -0.090306856 | 0.000000000 |
 
-逐prompt accepted、calls、tau三项均为0胜/480平/0负；输出摘要和独立AR摘要分别480/480与旧结果一致。argmax审计JSONL的SHA也与旧格相同。这证明当前本机同设置下BC10旧结果可完整重复；论文没有BC10目标，不能由此声称BC30=1.63或BC60=1.74已复现，也不能外推后两格。
+主指标pooled τ=Σcommitted/Σdecode_calls，不含prefill；逐prompt等权及逐类别pooled后等权另列，均不是已确认的作者权重。AR一致率只诊断，不作失败门。
 
-所有数值来自[bc10_checkpoint_v1.json](bc10_checkpoint_v1.json)的totals、tau_deltas、vs_original；文件含逐qid计数、输出/AR摘要及首分叉。新Run80ff7a41958d8134的result、decode_observations、decode_inputs、argmax_audit路径和SHA见其run_path/files。旧Run为dfe1b9c8d5d12e92，原证据为studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json。本机新Run位于4b-bf16-five-methods-20261015执行树，旧Run位于主仓；完整tokens、权重和Run不入Git。
+逐prompt accepted/calls/τ赢平输、输出长度、旧/新输出与AR摘要是否相同、AR首分叉及所有新旧目标差值见JSON；不同长度/轨迹的配对计数不能解释为速度或同前缀因果。
 
-原生result为succeeded，政策verifier-argmax-v1；数学门与独立AR诊断分开。该检查点用已提交f677479读出逐token重核，不修改执行源码或旧结果。8B清单本身无EOS字段，改从SHA已匹配的旧Run真实decode_inputs核EOS及派生device；新旧实际设置一致。完整三格报告须待BC30/60和native process完成后再写，保留一切负结果。
+三格完整且原生process通过才生成正式repeat_evidence_v1.json；各已完成格可以单独列有效τ，但不称全矩阵完成。数学自检通过不等于论文目标数值已复现。
 
-JSON逐条spec_time/ar_time的0为禁用解码时钟后的原生占位，不是测量。已保存的执行commit4bb28c7与读出commit f677479分开记录；不重签旧Run。
-
-## BC30全480结果（2026-10-16）
-
-| 指标 | 新BC30 | 新减论文1.63 | 新减旧BC30 |
-| --- | --- | --- | --- |
-| pooled tau | 1.5633775043382236 | -0.06662249566177625 | 0 |
-| prompt mean tau | 1.5932322369198653 | -0.03676776308013463 | 0 |
-| category mean pooled tau | 1.5633872721805147 | -0.06661272781948524 | 0 |
-| 接受draft数 | 28684 | 不适用 | 0 |
-| decode calls / 含prefill总调用 | 50712 / 51192 | 不适用 | 0 / 0 |
-| 实际新token / decode committed | 79762 / 79282 | 不适用 | 0 / 0 |
-| verifier argmax覆盖 | 79762/79762，全过 | 不适用 | 与旧相同 |
-| 独立AR完全一致 | 175/480，36.4583% | 不适用 | 0 |
-
-出处：[bc30_checkpoint_v1.json](bc30_checkpoint_v1.json)，含原始result/config/输入/审计SHA、实际Run路径、480条计数与输出/AR摘要。新Run88d13ec4ecf0023c对旧b9b54923b1b9ea9f逐prompt accepted、calls、tau均0胜/480平/0负，输出/AR摘要各480一致。与旧结果完全重复仍未达到论文1.63，不把另两种聚合选作主结果。BC60论文1.74待本轮完整读数。
-
-CPU重核使用活动执行副本冻结验证器（source e963521adc8cb86f），逐token验argmax、旧真实输入合同、模型文件SHA、BF16默认数值设置；主仓已合的来源改动不能代替该冻结环境。第一次误用主仓验证器被来源检查拒绝，改用执行副本后全过，未修改或放宽验证器。
-
-BC60 Runa8e6bba1dd1d80e2由原队列自然接续，worker PID66500；16:44日志available=13197508608字节，低于19452530688字节门，尚未载模。保持等待、不重开、不终止其他任务。后续进度以其实际资产和队列日志为准。
-
-CPU队列另用现有4B读出函数重算正式paired_evidence_v1.json（SHA8e85ac6ea9984047abf0ffd5d6653b28b6aadd74aa876139fa10465dc5bbf274）：11格汇总、20对480条赢平输全部与已发布证据一致；源证据含809118个已审计Spec提交token。这只是汇总对账，不声称新增GPU或token审计。读取/门/配对18项及文档6项回归通过；BC30加入同一检查点回归后另验。
-
-## 恢复核验（2026-10-16 16:33，北京时间）
-
-目标状态为active。原队列PID50576、监控50640、BC30 worker72280及Run88d13ec4ecf0023c均已核实；未中断或重复启动。BC30进度文件已到367/480，该值仅表示进度，不是全480有效τ或终验。初始准入记录在15:18:33北京时间通过：host_available=22004486144字节，旧实测峰值17305047040加2GiB门为19452530688字节；没有放宽RAM门。BC60单mask Runa8e6bba1dd1d80e2仍由原队列后接。
-
-进度及准入来源：执行副本studies/esp_table1_nonofficial_revalidation/runs/88d13ec4ecf0023c/assets/revalidation_progress.json、resource_admission_initial.json；进程命令已匹配同一Study/Run。CPU结果读取、数学门与4B配对回归18项通过（test_repeat_readout.py、test_nonofficial_revalidation.py、structure/algorithm/test_4b_bf16_readout.py），GPU不可见环境执行。PR44/45/46的cpu-checks和Branch flow均已通过；同主题后续证据攒到完整里程碑再收尾，不以代码检查代替GPU结果。
-
-## 当前资源阻塞与集成边界
-
-同一BC60主机RAM不足条件已连续三个目标轮次复核；PID66500的cmdline和父队列50576均实时匹配，Run尚无progress/result，不以缺少文件单独判停。具体available、当前worker RSS、实测峰值加2GiB门及差额见ram_wait_checkpoint_20261016.json。这不是算法失败或AR门失败；原生等待会在资源恢复后自行重新准入，无须重开。
-
-可独立推进的CPU读出、Table1差值、4B11格/20对对账、范数八格准备和组合34项检查已完成。正常下一步必须先等BC60按冻结协议自然完成，再CPU终验三格和Study process，最后才make/串行launch八个4B范数格；不能用另一个GPU任务绕过排班或审批拒绝。当前没有可安全释放的本任务大内存进程，不终止其他应用或任务。目标未完成，需外部可用RAM改变后继续。
-
-PR44/45/46已分别CI通过合dev；集成只发生在主仓及远端，活动4bb28c7执行树保持原字节。已合普通分支3本地/3远端已清，活动分支按例外保留；清单在docs/research/remote-branch-cleanup-2026-10-15.md。当前阻塞记录与后续结果同主题合批，不另外新开小PR。
-
-## 等内存期间的CPU验收队列（2026-10-16 17:18）
-
-已按17:09指示继续CPU工作，BC60原进程不杀、不重开、不放宽门，量化PPL按实际GPU占用协调。新增读出支持--study-dir/--output-dir，从原执行CWD与冻结src读取，把报告写到主仓.tmp；原工作树与声明未改。原生绝对输入身份要求保留执行CWD，错误CWD会明确拒绝。
-
-实际演练完整8B读出后返回complete=false/cells_complete=2；BC10/30数学审计、输入/权重SHA、原生来源、三种τ与旧值配对均通过，BC60没有结果时只写pending，不生成全矩阵正式证据。数值在[cpu_acceptance_checkpoint_v1.json](cpu_acceptance_checkpoint_v1.json)中与已合的两份检查点再核一致。BC10三聚合1.3990470307950233/1.43176588861066/1.4030335607141575，论文无BC10目标；BC30三聚合1.5633775043382236/1.5932322369198653/1.5633872721805147，减论文1.63分别为-0.06662249566177625/-0.03676776308013463/-0.06661272781948524。旧Run对应差均0；主指标仍pooled，不换口径追目标。
-
-4B新增verify_published.py只读入口复用已存在summarize/compare_rows，核11格、20对、各480个qid/category顺序、两种胜平负及输出长度/调用口径；源SHA8e85ac6ea9984047abf0ffd5d6653b28b6aadd74aa876139fa10465dc5bbf274不变。CPU检查点保存全10个Spec格τ、AR调用与完整20对汇总，既有逐prompt记录仍在原paired_evidence_v1.json；这是已发布计数重算，不重新验收历史Run，也不声称新增逐token审计。
-
-读出/配对与文档30项回归及ruff通过；新增回归验证输出与执行树分离、待完成矩阵不能声称成功，以及损坏totals/pair、缺pair和prompt乱序必须拒绝。BC60放行后的验收顺序、完整PowerShell命令和CUDA/PYTHONPATH恢复在[Study README](../README.md#bc60放行后的cpu验收)；4B入口见其README。下一步仍是原BC60完成后同一CPU命令生成正式三格证据，然后再按单队列运行4B范数八个新格。
-
-PR47首轮Linux CI为538 passed/1 failed，唯一失败是CPU检查点引用了Windows工作副本CRLF哈希，而两份公开检查点的既有Git blob为LF。已为这两份公开JSON指定text eol=lf，工作副本恢复为既有Git字节，引用哈希改核这些同名公开文件；原Git blob、JSON数值、原始Run和严格哈希断言不变。原工作副本另保留在本机.tmp/cpu-acceptance-20261016/checkpoint-eol。没有因此改数据、prompt、实际执行树或重新跑GPU。
+来源：`repeat_evidence_v1.json`，每格files_sha256给出Run原始结果/输入/审计路径与哈希；旧结果`studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json`，新Run路径为每格run_path。原始tokens、logits、完整Run仅本机保留。

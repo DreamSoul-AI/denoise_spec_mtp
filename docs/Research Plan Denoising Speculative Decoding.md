@@ -1,14 +1,74 @@
 # SD research plan: fixed-data reproduction and mask-direction controls
 
-English translation of the [Chinese master](<研究计划 Denoising Speculative Decoding.md>), updated 2026-10-16. The Chinese version governs. This plan follows the [new standard and template](research/standards/README.md), pinned to RPipe commit `e461133218deabf8755b3e8657650e1e4a3cd9f4`, already merged into its dev branch. It organizes existing research and evidence; it does not retroactively preregister experiments whose results have been seen, or change frozen Study contracts.
+English translation of the [Chinese master](<研究计划 Denoising Speculative Decoding.md> Final20:55 scope: close the reproduction phase. Let only the running BC60 finish; no new experiments. The seven-cell queue is stopped and all results/data remain.
+> Nonofficial8B full480: BC10 tau1.399047031; BC30 tau1.563377504 versus paper1.63; BC60 tau1.647301264 versus1.74; all239,137 token checks pass.
+> 4B direction controls: e2−e1 1.507777653, norm-matched random mean1.494473978, zero1.422420206, content1.364829262; magnitude as the sole cause is unproven.
+> All618 CPU regression tests and ten additional explicitBF16/tied tiny-model gate checks pass; the prepared11-cell repeat is made but not executed and is paused.
+> The Chinese master contains the validated reader-oriented closure summary. One milestone PR to dev only; no next-phase proposal, no main changes or data deletion.
 
 
-> Nonofficial8B repeat: BC10/BC30 single-mask full480 succeeded natively; BC60 is blocked on RAM admission in the original live worker66500; external RAM availability must recover. The4B norm scan is not made/launched.
+> Nonofficial8B repeat: BC10/BC30 single-mask full480 succeeded natively; BC60 is blocked on RAM admission in the original live worker66500; external RAM availability must recover. The4B capacity probe completed; eight formal norm Runs are made, with one parent queue79868 executing the first template0.5× cell (worker73008); full480 acceptance is pending.
 > BC30 pooled tau=1.5633775043382236, below paper1.63 by0.06662249566177625; all79762 token checks passed; AR175/480 is diagnostic.
 > BC10 tau=1.3990470307950233; each completed cell ties its old Run on accepted/calls/tau for all480 prompts, with480 matching output/AR hashes.
 > CPU acceptance rehearsed: two valid cells, BC60 pending;30 readout/documentation tests passed. [CPU checkpoint](../studies/esp_table1_nonofficial_revalidation/docs/cpu_acceptance_checkpoint_v1.json). Original values: [BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json) / [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json). BC60 is pending; this is not full-matrix completion.
 
+<!-- SD_CLOSEOUT_20261016_START -->
+<a id="sd-stage-closeout-20261016"></a>
+## Reproduction phase summary
+
+### What the numbers mean
+
+The aim is to check ESP Table1 acceptance efficiency. Text is divided into tokens, which can be characters, words or word fragments. A draft forward explores several candidate tokens and a verification forward decides what can be committed. **BC10/30/60 are per-round draft/verification token-computation budgets.** Larger budgets permit more candidate exploration. Qwen3 uses a single mask in each main cell, allowing4/14/29 draft nodes, with a dynamic tree and pruning.
+
+**Tau is the average number of new tokens committed per verification round.** The main value divides total committed tokens across480 prompts by total verification calls, excluding the initial prefill token from both totals. Tau1.563 means about1.563 committed tokens per round. No speed measurement was performed; tau is not measured speedup. Prompt-equal and category-equal aggregates are retained separately.
+
+This is explicitly a **non-author-official reproduction**. No verified executable author experiment entrypoint was available, and HF third-party code was never labeled official. Settings remain SpecBench480, Qwen3-8B, BF16, T0, maximum256 new tokens/EOS stopping, lambda0.1 updating mean, dynamic tree and pruning.8B is restricted to Table1. No prompts are tuned, no timings measured and no operator-level numerical study continued.
+
+### 8B Table1 results
+
+| Cell | This repeat pooled tau | Paper target | Repeat minus paper | Status |
+| --- | ---: | ---: | ---: | --- |
+| BC10/one mask | 1.399047031 | No target fixed for this cell | — | full480 succeeded |
+| BC30/one mask | 1.563377504 | 1.63 | -0.066622496 | full480 succeeded; target not reproduced |
+| BC60/one mask | 1.647301264 | 1.74 | -0.092698736 | full480 succeeded; target not reproduced |
+
+Sources: [BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json), Run80ff7a41958d8134, and [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json), Run88d13ec4ecf0023c. The completed BC60 is a8e6bba1dd1d80e2. [Formal repeat evidence](../studies/esp_table1_nonofficial_revalidation/docs/repeat_evidence_v1.json) binds all three cells, per-prompt first AR divergences and hashes. BC30 prompt-equal/category-equal tau values are1.593232237/1.563387272, both below1.63. Changing aggregation does not establish reproduction. BC60 prompt/category tau values are1.669498033/1.649693144, both below1.74. Each of the three cells ties its old implementation on accepted/calls/tau for all480 prompts, with480 equal output and AR hashes.
+
+### 4B: the benefit is not unique to e2−e1
+
+The completed fixed480 Qwen3-4B BF16/T0 BC30 direction controls give:
+
+| Control | Pooled tau |
+| --- | ---: |
+| Fixed e2−e1 | 1.507777653 |
+| Mean of three norm-matched random directions | 1.494473978 |
+| Zero bias/input zero order | 1.422420206 |
+| Content initialization | 1.364829262 |
+
+Bias changes the draft placeholder representation while the input text stays fixed. Norm means vector magnitude; direction means where it points. The original direction is the difference between the first two input-token embeddings. Random controls replace direction at matched initial norm. Sources are [formal direction evidence](../studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json) and the [per-Run and paired report](research/4b-full-direction-controls-2026-10-16.md). All485,860 committed-token audits across six cells pass. Random seeds0/1/2 give1.495188134,1.464349086,1.523884714: all exceed zero bias, and one exceeds the original direction.
+
+The evidence supports that a norm-matched random bias can also help; e2−e1 is not uniquely responsible. It does not prove that direction is irrelevant or that magnitude is the sole cause. Random seeds still vary, and content changes initialization and subsequent velocity updating, with lower tau. The magnitude sweep is incomplete: only template0.5x finished480, tau1.471389646, with all80,940 token audits passing. Its collection export failure was recovered without execute rerun or raw-SHA changes; see [recovery evidence](../studies/qwen3_4b_bf16_bias_norm_continuation/docs/first_cell_recovery_v1.json). The seven remaining cells are stopped under the20:55 instruction, with all existing material retained.
+
+The original completed five-method plus AR comparison has BC30 input-first1.511957584, output-zero1.433178245 and output-first1.435539512. All methods, BC60 and per-prompt wins/ties/losses are in the [original paired evidence](../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json). Fixed-direction controls and the original updating-velocity recipe are different configurations and must not be pooled into one ranking. The later11-cell independent repeat was only made, never executed, and will not start.
+
+### Verification, gaps and unresolved questions
+
+The gate requires **every committed token to equal the argmax of its corresponding validation-forward logits**, including first-token coverage, ownership and hash/commit chains. BC10 passes79,757 checks, BC30 79,762 and BC60 79,618: all239,137 pass, as do all three native Runs and Study process. AR is the ordinary token-by-token generation baseline. Agreement with independent AR is diagnostic:188/480,175/480 and185/480 for BC10/30/60 respectively. BF16 tree and single-sequence AR forwards have different shapes and can diverge. This is disclosed and does not replace the mathematical gate. Output lengths can differ across methods, so paired counts are not equal-length speed comparisons.
+
+Fixed inputs, model snapshots, native source/plan freezing, Run configurations, raw audits and aggregation have been checked. All618 CPU regression tests pass, plus ten explicitBF16/actually-tied tiny-model checks for all five methods at both budgets, complete commit coverage and corrupted-token rejection. These are software checks, not substitutes for real4B/8B evidence; see [CPU readiness evidence](../studies/qwen3_4b_bf16_paired_revalidation/docs/cpu_readiness_v1.json).
+
+Passing correctness does not reproduce the paper's target tau. BC30 remains0.066622496 below target and BC60 0.092698736 below; none of the three reported aggregate conventions reaches its corresponding target. Possible, unproven explanations are author-side input/template/stopping contracts that have not been fully verified in the available sources, differences in nonofficial tree/pruning details, and unknown paper counting/weighting details. CPU counting reconciliation and three aggregates have not removed the gap; see [contract reconciliation](research/esp-table1-cpu-contract-reconciliation-2026-10-16.md) and [gap register](research/esp-table1-protocol-gaps-2026-10-16.md).
+
+Unresolved questions are the exact contract responsible for the paper gap; separate magnitude/direction contributions; why output-zero/first underperform input-first and the output velocity adds little; and effects of differing output lengths/trajectories on comparisons. **No next-phase proposal is made.**
+
+### Closure status
+
+Only the existing BC60 was allowed to continue and has now naturally completed. Queue64880 and ledger50944 have exited; two temporary launchers are preserved by SHA and disabled, with no source/results/weights/cache deletion. Final source/mathematical acceptance is complete. The merged experiment/sd-nonofficial-repeat-norm local/remote branch was deleted;17 unused legacy preparation files were SHA-archived and159 generated bytecode files cleaned. All experimental results and model caches remain; the old data checkout remains detached at its unchanged commit. Deliver one milestone PR to dev; the current unmerged branch stays until merge. Enmao review determines any later phase; older experiment queues in this plan are no longer execution instructions.
+<!-- SD_CLOSEOUT_20261016_END -->
+
 ## I. Current scope, status and execution priority
+
+Older scheduling below is historical. The20:55 closure summary governs; all later experiment queues are paused.
 
 Enmao's final instructions of2026-10-16 12:44/12:53 govern: stop searching for an official ESP entrypoint and label the existing stack **non-author-official reproduction**. Study the fixed480 SpecBench Table1τ gap and whether input-bias magnitude explains acceptance gains more strongly than the particular direction. No new Kalman/method work, prompt changes or timing; BF16/T0 only.
 
@@ -206,6 +266,26 @@ The reader now explicitly requires all eight preregistered index settings in ord
 The existing `tools/analyze_4b_geometry.py --audit-raw` rechecked all66 native files across the11 E2 five-method-plus-AR cells. All809118 saved Spec tokens passed the mathematical audit; the81880 AR tokens are reference data only. All ten prior depth/position/trimming summaries and six tau decompositions match exactly: this is replication of existing accounting, not a new mechanism finding. [Audit evidence](research/4b-paired-raw-audit-2026-10-16.json); [interpretation and command](research/4b-mask-geometry-2026-10-15.md#八2026-10-16-cpu完整原始审计与首块对账). Each of20 first-block comparisons covers480 shared prefixes. Output order0/order1 tie on all480 first blocks at both budgets. Relative to input-first, either output method wins/ties/loses114/339/27 atBC30 and131/306/43 atBC60 (output minus input). These local wins coexist with lower full-path tau; do not extrapolate them to whole-path gains or infer zero prompt velocity from the output-order ties. Shared prefill proposals and later velocity propagation have different timing.
 
 The original BC60 worker66500 continues waiting on the unchanged host-RAM gate; retain processes and data. This CPU audit does not accept new Runs, load a model, change prompts/defaults, measure speed or investigate operators. Switch the frozen execution tree for the eight4B magnitude cells only after the original8B queue exits naturally and its final acceptance completes. Missing cells remain pending; no new methods or fabricated curve.
+
+
+### 19:15 RAM and idle-GPU scheduling addendum
+
+The latest authorization retains the original8B measured-peak-plus2GiB gate and permits the registered eight4B magnitude cells to use an idle GPU if safe working-set reclamation remains insufficient. The earlier requirement to wait for the8B queue to exit before make is superseded for this fallback. First calibrate4B capacity on the unchanged longest fixed input, then admit formal cells using the measured4B peak plus2GiB. Only reversibly suspend this session’s verified RAM-wait BC60 worker, resume in finally, and give8B priority between complete4B cells when its original admission becomes available. Scientific settings,480 inputs and original preregistration remain unchanged; capacity probes provide no formal tau result. [Protocol and observations](research/sd-memory-fallback-2026-10-16.md).
+
+
+The4B capacity probe completed: unchanged longest inputq295/1500 tokens, all256 capacity-token audits passed. Sampled process-tree peak8808693760 bytes gives a10956177408-byte formal4B gate. BC60 was resumed in finally; this is not a formal magnitude-scan tau result.
+
+<a id="paired-followup-20261016"></a>
+### 19:46 preparation for an independent4B five-method-plus-AR repeat
+
+The original E2 matrix already completed11/11 cells. Do not invent missing cells or re-sign historical Runs. The latest19:46 instruction authorizes preparation of `qwen3_4b_bf16_paired_revalidation`, with new version/Run identities, after the current eight magnitude cells. Retain the original480 input/token-ID records, ModelScope Qwen3-4B snapshot, BF16/eager/T0/256/EOS and seed123+i. Preserve E2 exactly: ESP frozen mean (lambda0,update=false), input-zero updating mean (lambda.1), input-first mean+gamma (beta.9999), output-zero final-hidden norm mapping, and output-first native hidden EMA velocity (beta.9,beta-prime.99). BothBC30/60 use two masks and dynamic pruning; five methods per budget plus one shared independent AR give11 cells. This frozen-mean ESP differs from8B Table1's lambda.1 updating mean.
+
+CPU queue: reuse the untimed adapter, native token validator and load_cell/summarize/compare_rows. Preflight merged configurations, all11 ordered cases and immutable input/weight/method hashes. Prepare20 method pairs with accepted/calls/tau WTL, lengths and AR first divergence. Every committed Spec token must match its own verifier-forward argmax; independent T0 AR is diagnostic and differences do not fail Spec acceptance. Missing, failed or incomplete raw evidence stays pending, without formal tau. Run CPU tests and preparation/make only; do not start another GPU queue early.
+
+GPU queue: admit the originalBC60 first whenever its host-RAM gate becomes available; otherwise finish each current magnitude cell serially. Only after all eight cells succeed natively and pass per-cell accounting may the11-cell repeat take the GPU. Reuse measured4B BC30 maximum-input capacity plus2GiB host reserve and actual GPU nonpreemption. BC60 shapes have no separate peak guarantee: sample every Run, retain the per-prompt2GiB reserve, wait or preserve failures rather than lowering the gate or terminating work. The11 new cells are explicitly an independent repeat, not repairs to old results; prompts/methods remain fixed. Keep local thematic commits and open a milestone PR into dev. A read-only per-cell magnitude ledger checks native/input/source/token evidence and three tau aggregates; no complete curve before all eight.
+
+
+CPU preparation update: native declaration expansion and the unmade readout preflight passed (0/11,complete=false). All73 combined regressions and Ruff passed; old11-cell results do not fill new cells. Read-only watcher75696 uses tools/audit_4b_norm_queue.py; it records no tau before a new native cell completes, then retains three aggregates and file hashes using the strict readout. The19:53 display-whitelist/NVIDIA-type module is used only by the new Study; active8B/norm sources remain frozen. The local probe excludes ten display contexts and defers for the current known pure-C Python context. Branch review found no further deletable topics; active/unmerged topics remain.
 
 ## IX. Execution records and conclusions
 
@@ -2882,3 +2962,17 @@ Prepare uses recipe/builders for source/input/model; execute records observation
 Success requires every factor/seed Run success,exact1,complete/source/quality agreement. Report three Experiments,n=1 limits,real historical figures and separate static/CPU/GPU/install coverage. Public selectedJSON/figures/reports differ from local rawRuns/shared/tmp. Preserve the2026-10-13 migration record: compare the555-case c3263c0 pre-edit fingerprint on unchanged device/dependencies; export oldb1f6191 src and use validate_migration.py for three variants×T{0,.7,1}×four prompts. Passive Python line tracing observes full tokens/acceptance/fallback/cache without modifying old code; T0 accept_d1 reference27/31/8. New rpipe-v030-20261013 versions (later final03/delivery) run the real phase/AR/alignment/failure CLI. Install wheel/sdist outside source into separate.tmp using existing scientific dependencies,and check import/entrypoints/ORIGIN/LICENSE/tiny chain,including Windows double-import entry. No downloads,real-model/restore validation or speed ranking; failures/counterexamples stay unrelaxed and local logs are not supplied by clone.
 
 </details>
+
+<a id="norm-continuation-20261016"></a>
+### 2026-10-16 norm first-cell recovery and seven-cell continuation
+
+The full480 execute of template/0.5, Run `6ee3f749ee20c450`, completed. Collection failed because the Study package did not export run. The same native collector and existing revalidate_run tool recovered acceptance: all80,940 committed tokens passed verifier argmax, all raw SHAs stayed unchanged, and execute was not repeated. The failed result and recovery evidence remain under `.tmp/norm-collect-recovery-20261016/`; no AR gate was relaxed.
+
+Keep the frozen v2-capacity entrypoints unchanged. A separate continuation Study/new version contains only the remaining seven cells in their original order. Fixed SpecBench480/prompts/token IDs,4B BF16/T0, BC30/two masks, seed123, scales and science are identical, reusing NormEval. Only phase exports and the19:53 display-process admission classification change. CPU aggregation binds the recovered first cell and each new cell to their own native sources/gates; it never marks the old seven unexecuted Runs successful. Zero/unit-scale references are reused. Four phase-package callable regression checks precede execution.
+
+8B BC60 `a8e6bba1dd1d80e2` has naturally passed its original RAM gate and is running with priority; do not pause or duplicate it. Continue seven cells serially after it exits, retaining measured host peak+2GiB and actual free VRAM gates. Display/remote-desktop contexts do not block and no processes are killed. Report three tau aggregations, paired wins/ties/losses, source paths and the operational recovery at the complete milestone PR.
+
+
+Continuation readiness: native make created seven Runs, first d288934359a7ede1. One waiting queue60480 will not load before BC60 exits; read-only ledger78720 accepted the recovered first cell and retains the previous failed watcher history separately. Native dispatcher and positive/negative mapping checks, Ruff and mypy pass; the full suite found two tool-documentation failures; after fixing them,89 targeted checks pass. First-cell three tau aggregations and paired counts: [continuation report](../studies/qwen3_4b_bf16_bias_norm_continuation/docs/STUDY_REPORT.md). Branch review found only main/dev plus the merged branch still carrying active BC60 and the unmerged current branch; all retained, no additional deletions.
+
+V4 operational update: documentation-only helper SHA change; superseded unexecuted seven IDs retained with metadata backup. Current first Run `6719b3ae2c089133`, serial waiting queue `64880`, read-only ledger `50944`. Earlier60480/78720 CPU processes exited before replacement; BC60 was never interrupted. Native make/source bindings renewed only for the new version, not old completed evidence.

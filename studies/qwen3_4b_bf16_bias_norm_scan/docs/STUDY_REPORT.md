@@ -1,9 +1,9 @@
-# 4B BF16范数扫描：CPU准备与复用端点验收
+# 4B BF16范数扫描：首格恢复与复用端点验收
 
-> 当前仅完成CPU准备和5个旧端点复核；八个0.5×/2×新格尚未make/执行，未生成新曲线。
-> 30份Spec原始证据文件SHA匹配，405083个提交token的已存argmax/owner记录重核全过；共享AR为81880个token。
-> 全480相同首块前缀下，固定e2−e1相对零偏置接受数26胜/341平/113负；完整路径τ仍较高，两个口径分别报告。
-> BC60原进程仍按RAM门等待，先完成8B全矩阵再按单队列执行4B八格；不测速、不改prompt。
+> 最新：template/0.5×首格Run6ee3f749ee20c450全480完成，pooled τ1.4713896458，argmax80,940/80,940。
+> collect包导出故障已用同一原生collector与既有重验工具恢复，execute未重跑，原始SHA/冻结源未改，旧失败result保留。
+> 剩余七格在独立continuation Study续跑，旧七pending不记成功，完整范数矩阵未完成。
+> BC60已自然获得原准入并在运行；新单队列等待其退出。详情见[续跑报告](../../qwen3_4b_bf16_bias_norm_continuation/docs/STUDY_REPORT.md)。
 
 ## 已复核的0×/1×端点
 

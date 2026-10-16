@@ -24,7 +24,7 @@ algorithm:
   mode: eval
   source: spec_mtp
   config:
-    version: qwen3-4b-bf16-bias-norm-bc30-20261016-v1
+    version: qwen3-4b-bf16-bias-norm-bc30-20261016-v2-capacity
     task: esp_mtp
     eval:
       max_new_tokens: 256

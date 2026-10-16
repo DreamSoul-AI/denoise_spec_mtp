@@ -11,11 +11,12 @@ import torch
 ROOT = Path(__file__).resolve().parents[2]
 STUDY = Path(__file__).resolve().parent
 BASE = ROOT / 'studies/qwen3_4b_bf16_five_methods'
+sys.path.insert(0, str(STUDY))
 for folder in ('qwen3_4b_bf16_five_methods', 'qwen3_4b_bf16_directions', 'esp_table1_nonofficial_revalidation'):
     sys.path.insert(0, str(ROOT / 'studies' / folder))
 from untimed_pairing import PairedUntimedEval, build_cuda  # noqa: E402
 from direction_control import control  # noqa: E402
-from resource_admission import wait_for_admission  # noqa: E402
+from norm_admission import wait_for_admission  # noqa: E402
 from spec_mtp.structure.algorithm import decoding  # noqa: E402
 from rpipe.structure.algorithm.factory import AlgorithmRegistry  # noqa: E402
 from rpipe.structure.model.factory import ModelRegistry  # noqa: E402

@@ -129,3 +129,19 @@ PR47已双CI通过合dev，merge4856cee0d86c1c80c4215b7e330878901890fb13；分�
 PR48双CI通过合dev（25d07e9030ed94baed4d556481d8b88c192abc6f），完整CPU套件548 passed。已退出并删除analysis/sd-bc60-norm-results本地/远端，tip0531ad7c2ef2766fc1d4eb379f0a21e6ee94fcbe已核包含于origin/dev。累计**33个本地、7个远端**。从PR42基线后，44/45/46/47/48共5个合dev PR触发本次全面复查：其余已合普通topic无遗漏，open PR/issue均0，Git worktree只有主仓和仍活动的4b-bf16-five-methods-20261015；后者HEAD仍4bb28c7，BC60原队列保留。没有废弃新worktree或未合过时分支要删，没有删除数据。main仍b636f90e54c7641be6914fbccec13f64bd9cc04c。
 
 下一周期从PR48之后计数；后续既有4B计数/深度CPU对账在analysis/4b-paired-depth-readout合批，未合分支保留。
+
+### PR49完整CPU原始审计后的清理
+
+PR49两项CI通过，已合dev（16d04f87ba52f8f20a018aecfb14ed88b5785993），本地完整CPU套件550项通过。analysis/4b-paired-depth-readout的tip bef77db已核为origin/dev祖先、本地与远端tip一致；主仓退出至dev后，普通push --delete及git branch -d分别删除远端和本地。累计**34个本地、8个远端**。这是PR48周期基线后第1个合dev PR；活动experiment/sd-nonofficial-repeat-norm及工作树保留，BC60原worker66500/队列50576未干预，不删数据、不改main。
+
+当前后续结果分支analysis/sd-pending-results只登记实际清理，未合入前保留，等完整实验/CPU里程碑合批，不为本段单开PR。
+
+### 19:46 CPU接续期间复核
+
+重新fetch --prune并核对已合列表、两工作树及open PR（0）：除受保护main/dev，唯一已合topic仍是活动8B的experiment/sd-nonofficial-repeat-norm，保留原worker/工作树例外；analysis/sd-pending-results未合且承载当前范数八格，保留。无新增可删分支，累计仍34本地/8远端。本次未删除分支、数据或结果，不为此单开PR。
+
+### 20:55收尾指示后的已合活动分支清理
+
+BC60全480及三个Run/Study process全部成功，worker66500、原父队列50576、监视器50640均自然退出后，已解除活动例外。旧工作树保持相同HEAD `4bb28c79830b8f1db7cddf30cf80d6ddd5bd6e98`切换为detached，不删除工作树内数据/Run/shared缓存。17份早期未跟踪、未make的范数准备源码/测试均与既有备份逐SHA一致，原文件移至主仓`.tmp/sd-closeout-20261016/retired_legacy_sources`，映射在legacy_source_archive.json，数据未删除。主仓另清理159个未跟踪字节码缓存，记录在bytecode_cleanup.json。
+
+已再次fetch，确认`experiment/sd-nonofficial-repeat-norm`本地/远端tip均为4bb28c7、是origin/dev祖先，再普通push --delete及git branch -d成功。累计**35个本地、9个远端**。当前`analysis/sd-pending-results`未合，保留到本次里程碑PR合入；PR合后自身清理另在最终交付/PR记录列出，不提前记作已删。main/dev不删；未合分支不删；没有删除实验数据、结果或权重。open PR/issue核对均0。

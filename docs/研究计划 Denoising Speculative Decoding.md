@@ -1,12 +1,69 @@
 # SD研究计划：固定数据复现与mask方向对照
 
-中文正本，更新于2026-10-16。[English translation](<Research Plan Denoising Speculative Decoding.md>)。采用[新版规范与模板](research/standards/README.md)，来源为RPipe已合入dev的`e461133218deabf8755b3e8657650e1e4a3cd9f4`。本次是对已有研究与证据的整理，不是对已看到结果的实验重新预注册，也不改运行中的Study合同。
+中文正本，更新于2026-10-16。[English translation](<Research Plan Denoising Speculative Decoding.md> 20:55最终范围：复现阶段收尾，只让已在跑的BC60结束，不启动新实验；七格队列已停，现有数据/结果保留。
+> 8B非官方全480：BC10 τ1.399047031；BC30 τ1.563377504 vs论文1.63；BC60结果待完整终验后补入本节。
+> 4B方向对照：e2−e1 1.507777653、同范数随机均值1.494473978、零1.422420206、content1.364829262；范数唯一主因未证实。
+> 完整618项CPU检查及另十项BF16/tied微型模型数学门通过；后续11格仅make，已暂停执行。
+> 本文下方为中文通俗收尾总结草稿；最终仅一个里程碑PR合dev，不提下一阶段方案、不动main、不删数据。
 
 
 > 当前8B非官方复验：BC10/BC30单mask全480原生成功；BC60原队列受RAM准入阻塞（worker66500存活，需外部RAM恢复）。4B容量标定完成；范数八格已make，唯一父队列79868已接首格template0.5×（worker73008），完整480仍待验收。
 > BC30 pooled tau=1.5633775043382236，较论文1.63低0.06662249566177625；79762个token自检全过，AR175/480仅诊断。
 > BC10 tau=1.3990470307950233；两格与各自旧Run逐prompt accepted/calls/tau均480平，输出/AR摘要各480一致。
 > CPU验收入口已实际演练（两格有效、BC60 pending），读出与文档30项回归全过；[CPU检查点](../studies/esp_table1_nonofficial_revalidation/docs/cpu_acceptance_checkpoint_v1.json)。原数值见[BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json) / [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json)；BC60待完整终验，尚非全矩阵。
+
+<!-- SD_CLOSEOUT_20261016_START -->
+## 复现阶段总结（给 Enmao，BC60 完成前为收尾草稿）
+
+### 这次在验证什么
+
+目标是核对 ESP 论文 Table 1 的接受效率。模型先用一个前向过程同时探索若干候选词，再验证并提交能接受的词。**BC10、BC30、BC60 是每轮草稿与验证的 token 计算预算**；预算越大，容许探索的候选越多。本轮 Qwen3 三个主配置均为单 mask，分别最多4、14、29个草稿节点，采用动态树和剪枝。
+
+**τ 表示一次验证平均提交多少个新 token。**本报告主值为所有480条的提交token总数除以验证调用总数，首个prefill token单列，不混入分子分母。例如 τ=1.563，意思是平均一轮验证提交约1.563个token。这里没有做速度测试，不能把它当成实测加速倍数。另保留逐prompt等权、逐类别汇总后等权两种口径。
+
+本轮明确标为**非作者官方复现**：没有可核验的作者原生实验入口，使用本仓库已标注实现；HF第三方代码也没有当作作者官方。固定SpecBench全480、Qwen3-8B、BF16、T0、256最大新token/EOS停止、λ=0.1 updating mean、动态树加剪枝；8B仅用于Table1复现。数据和prompt不调整，不测速，不继续算子数值机理排查。
+
+### 8B Table 1：已经得到什么
+
+| 配置 | 本轮 pooled τ | 论文对照 | 本轮减论文 | 状态 |
+| --- | ---: | ---: | ---: | --- |
+| BC10 / 单mask | 1.399047031 | 本轮未指定该格目标 | — | 全480成功 |
+| BC30 / 单mask | 1.563377504 | 1.63 | -0.066622496 | 全480成功，低于目标 |
+| BC60 / 单mask | 待完整结果 | 1.74 | 待完整结果 | 仅让既有Run继续，不追加实验 |
+
+BC10/BC30原数值来自[BC10结果](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json)与[BC30结果](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json)，Run分别为`80ff7a41958d8134`、`88d13ec4ecf0023c`。正在运行BC60为`a8e6bba1dd1d80e2`；没有用旧BC60的数值冒充本轮结果。BC30另两种汇总为逐prompt 1.593232237、逐类别 1.563387272，均低于1.63；汇总口径差别不能据此宣称目标已复现。BC60完成后本节只按严格验收结果更新。
+
+### 4B：收益不依赖 e2−e1 这个特定方向
+
+在固定480条、4B BF16/T0、BC30下，既有完整方向对照如下；这里的e2−e1是输入头两个token embedding之差，随机组只替换其方向并保持初始范数。
+
+| 对照 | pooled τ |
+| --- | ---: |
+| 原固定 e2−e1 | 1.507777653 |
+| 同范数随机方向三种子平均 | 1.494473978 |
+| 零偏置 / 输入零阶 | 1.422420206 |
+| 内容初始化 | 1.364829262 |
+
+来源：[完整方向证据](../studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json)中`cells[*].totals`；[逐格来源、480条配对及解释](research/4b-full-direction-controls-2026-10-16.md)。六格共485,860个提交token的数学自检全过。三个随机方向分别为1.495188134、1.464349086、1.523884714；全部高于零偏置，其中一个高于原方向。
+
+**现有证据支持：同范数随机偏置也能起作用，提升不是 e2−e1 独有。**但不能把它说成“方向完全无关”或“范数已经被证明是唯一原因”：随机种子之间仍有差异，内容初始化的结果更低，而且content同时改变初始化和后续速度更新行为。未完成的范数倍率扫描没有完整曲线；仅template0.5×首格全480，τ=1.471389646，80,940个token数学门全过。该格的collect入口问题已恢复、原始SHA未变、没有重跑execute，见[恢复证据](../studies/qwen3_4b_bf16_bias_norm_continuation/docs/first_cell_recovery_v1.json)。其余七格按20:55指示停止排队，全部已有资料保留。
+
+原五方法加AR的完整4B配对已有结果：BC30输入一阶 1.511957584，输出零阶 1.433178245，输出一阶 1.435539512；其余方法、BC60及逐prompt胜平负见[原五方法结果](../studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json)。固定方向对照和原生更新速度的配方不同，不能直接混成同一个实验排名。后来准备的11格独立复验只make、未execute，现不启动。
+
+### 已核验什么，仍有哪些差距
+
+正确性门是**每个提交token等于本次验证前向对应logits的argmax**，覆盖首token、owner和哈希/完整提交链。BC10核验79,757个、BC30核验79,762个，均全过；BC60待完整终验。与独立AR逐token一致率只诊断：BC10为188/480，BC30为175/480。BF16树验证与单条AR前向形状不同，轨迹可能分叉；这里没有隐藏该差异，也不把AR失配当成数学门失败。不同方法输出长度可能不同，配对计数不能当等长速度比较。
+
+固定输入、模型快照、原生来源/计划冻结、Run配置、raw审计与汇总已经核对。CPU完整回归618项全过，另加十项显式BF16且权重实际tied的微型模型检查全过，覆盖五方法×两预算、全部提交token审计与token损坏拒绝；这些是软件门检查，不替代真实4B/8B测量。记录见[CPU验收证据](../studies/qwen3_4b_bf16_paired_revalidation/docs/cpu_readiness_v1.json)。
+
+**未复现的部分是论文目标数值，不能因为自检通过就说论文复现成功。**目前BC30仍低0.066622496；BC60差距等待完整结果。已知可能原因包括作者输入/模板与停止合同的细节未完全公开、非官方实现的树构建/剪枝细节可能不同，以及论文τ计数/权重合同仍有未知处。这些是解释候选，没有被本轮证明为因果。已完成的CPU计数对账和三种汇总没有消除差距，详见[输入与聚合对账](research/esp-table1-cpu-contract-reconciliation-2026-10-16.md)和[缺口登记](research/esp-table1-protocol-gaps-2026-10-16.md)。
+
+尚未解决：论文数值差距具体来自哪项合同；偏置范数和方向各贡献多少；为何输出零阶/一阶仍落后于输入一阶、输出速度项收益很小；不同输出长度和轨迹对跨方法比较的影响。这些问题保留为未解决事项，**本总结不提出下一阶段方案**。
+
+### 收尾执行状态
+
+按Enmao20:55指示，仅现有BC60继续；七格等待队列64880与入账器50944已退出，两个临时启动器保留原文/SHA并改为`.disabled`，不再自动接卡。源码、结果、权重和缓存未删除。BC60完成后核验、补齐本节、清理已合dev分支并合批为一个里程碑PR；下一阶段等待Enmao评阅，不执行旧章节中的后续实验安排。
+<!-- SD_CLOSEOUT_20261016_END -->
 
 ## 一、当前范围、状态与执行优先级
 

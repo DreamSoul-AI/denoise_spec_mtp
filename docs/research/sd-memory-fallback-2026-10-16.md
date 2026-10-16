@@ -1,10 +1,10 @@
 # SD RAM准入与4B空档执行
 
-> 首格template/0.5×全480完成；入口导出故障已通过原生collector与既有工具恢复，未重跑execute、未改原始SHA。
-> pooled τ=1.471389646；prompt平均1.517576442；类别平均1.479149404；argmax80,940/80,940，AR177/480仅诊断。
-> 来源：`.tmp/norm-collect-recovery-20261016/readout/norm_pending.json` 与 `recovery_evidence.json`，Run6ee3f749ee20c450。
-> BC60 worker66500自然通过原RAM门并运行；剩余七格独立版本续跑，保留原v2冻结入口与失败历史。
-> 显示进程分类已接入待运行Study，四phase导出与配置等82项定向CPU检查通过；不打断BC60。
+> 20:55最新：复现阶段收尾，只让既有BC60完成；七格等待队列64880及入账器50944已退出，不启动新实验。
+> 首格template/0.5全480保留，τ1.471389646、argmax80,940/80,940；原始SHA/失败恢复记录保留。
+> 完整618项CPU回归及另十项显式BF16/tied微型模型检查全过；618+10分别执行，未声称一次628全跑。
+> 后续11格只make、未execute；18个新Run的冻结/配置绑定已核验，当前均暂停。
+> 中文通俗总结在主研究计划“复现阶段总结”section；BC60完成后补齐，一次里程碑PR合dev，无下一阶段方案。
 
 2026-10-16 19:15 Enmao追加授权：核验8B实测峰值加2GB门，安全回收本会话等待进程工作集；仍不足则在GPU空闲单队列执行原4B范数八格。不改prompt、BF16 only、不测速，不终止任何活实验或其他会话进程。
 
@@ -51,3 +51,9 @@ CPU核对真实make索引时发现读出合同误把完整factors与局部axis�
 完整618用例套件中仅两项工具文档检查失败（缺layout索引/用法docstring）；补齐后包含三项文档门、四阶段入口、来源映射、显示分类和原norm/paired门的89项定向检查全部通过。未声称重新全跑完整套件。工具仅docstring字节变化，因此旧新Study的七个未执行Run及冻结元数据保留备份，continuation version更新v4-documented，重新make新七ID；只替换本会话等待中的CPU队列60480/入账器78720，不触及BC60或其他GPU/显示进程。
 
 V4 operational update: documentation-only helper SHA change; superseded unexecuted seven IDs retained with metadata backup. Current first Run `6719b3ae2c089133`, serial waiting queue `64880`, read-only ledger `50944`. Earlier60480/78720 CPU processes exited before replacement; BC60 was never interrupted. Native make/source bindings renewed only for the new version, not old completed evidence.
+
+## 20:55 最终收尾指示
+
+七格等待队列64880在未载模、无worker子进程时退出；入账器50944随后退出，BC60 worker66500未干预。`.tmp/norm-continuation-20261016/queue.py`和`.tmp/sd-memory-20261016/run_norm_queue.py`保留字节并改后缀为`.py.disabled`，SHA与映射见`.tmp/sd-closeout-20261016/paused_launchers.json`。未删除数据/结果。Git跟踪文件检查未发现__pycache__/pyc/.tmp/log/bak/orig残留，不为形式清理删除冻结来源或研究证据。
+
+自动审批拒绝记录：`mcp__codex_app__automation_update(mode=create, kind=heartbeat, name=SD BC60复现收尾, rrule=FREQ=MINUTELY;INTERVAL=10, status=ACTIVE)`被拒，原因为“未获用户明确授权的持久性每10分钟自动化任务，未来可能改文档、清理分支并创建/合并PR，副作用范围和持续时间超出当前一次性收尾请求”。未创建持久任务、未换工具绕过；本次一次性收尾继续，仍等待原BC60完成。记录不等于用户需要再次审批既有正常PR/dev授权。

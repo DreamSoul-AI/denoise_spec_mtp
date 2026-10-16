@@ -1,6 +1,6 @@
 # 固定480的4B五方法加AR独立复验准备
 
-原Study已11/11验收；本Study按19:46新指示准备独立复验，当前尚未make/execute，不修补或重签旧结果。唯一计划：[中文](<../../docs/研究计划 Denoising Speculative Decoding.md#paired-followup-20261016>) / [English](<../../docs/Research Plan Denoising Speculative Decoding.md#paired-followup-20261016>)；不可变计划commit与原始来源SHA在docs/source_refs.json。
+原Study已11/11验收；本Study按19:46新指示准备独立复验，当前已make 11格、尚未execute，不修补或重签旧结果。唯一计划：[中文](<../../docs/研究计划 Denoising Speculative Decoding.md#paired-followup-20261016>) / [English](<../../docs/Research Plan Denoising Speculative Decoding.md#paired-followup-20261016>)；不可变计划commit与原始来源SHA在docs/source_refs.json。
 
 配置逐字段复用原Study（仅experiment/version身份变化）：AR一次，BC30/60各ESP frozen mean、输入零阶、输入一阶、输出零阶、输出一阶，共11格。双mask、动态树剪枝、BF16/eager/T0/256/EOS、同480 token IDs和seed不变；无新方法，不改prompt，不测速。原方法β/范数/EMA定义完整沿用，不把空间比较误称同一EMA配方。
 
@@ -19,3 +19,5 @@ recipe只复用原PairedUntimedEval/build_cuda，添加只读来源检查和实�
 原生声明展开与源合同、缺失/重复/乱序/λ/eval篡改拒绝、资源门先于载模与两个解码入口、未make只生成pending，以及tiny BF16真实逐token数学门检查均通过。联合显示分类、范数入账与原范数合同回归共73项通过，Ruff通过；完整CPU套件另行记录，不将局部通过冒充全量。
 
 当前CPU只读预检输出在主仓.tmp/paired-followup-20261016/preflight/paired_pending.json：complete=false、valid_cells=0，未使用旧11格填本次新格。原基线逐格对照会写入versus_original；只有新的共同AR与全部新Spec原生成功后才签收本次配对。
+
+20:50更新：618项完整CPU回归全过，另10项五方法/双预算的显式BF16/tied微型模型argmax正负检查通过；实际18个待执行Run及恢复首格绑定见[CPU证据](docs/cpu_readiness_v1.json)。make仅准备，不启动第二GPU队列。

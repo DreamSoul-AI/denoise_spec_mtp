@@ -207,6 +207,11 @@ The existing `tools/analyze_4b_geometry.py --audit-raw` rechecked all66 native f
 
 The original BC60 worker66500 continues waiting on the unchanged host-RAM gate; retain processes and data. This CPU audit does not accept new Runs, load a model, change prompts/defaults, measure speed or investigate operators. Switch the frozen execution tree for the eight4B magnitude cells only after the original8B queue exits naturally and its final acceptance completes. Missing cells remain pending; no new methods or fabricated curve.
 
+
+### 19:15 RAM and idle-GPU scheduling addendum
+
+The latest authorization retains the original8B measured-peak-plus2GiB gate and permits the registered eight4B magnitude cells to use an idle GPU if safe working-set reclamation remains insufficient. The earlier requirement to wait for the8B queue to exit before make is superseded for this fallback. First calibrate4B capacity on the unchanged longest fixed input, then admit formal cells using the measured4B peak plus2GiB. Only reversibly suspend this session’s verified RAM-wait BC60 worker, resume in finally, and give8B priority between complete4B cells when its original admission becomes available. Scientific settings,480 inputs and original preregistration remain unchanged; capacity probes provide no formal tau result. [Protocol and observations](research/sd-memory-fallback-2026-10-16.md).
+
 ## IX. Execution records and conclusions
 
 | Record | Actual evidence | Outcome/boundary |

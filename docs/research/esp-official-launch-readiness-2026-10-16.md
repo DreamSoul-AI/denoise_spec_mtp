@@ -13,10 +13,10 @@
 | 顺序 | 必须具备的证据 | 当前状态 |
 | --- | --- | --- |
 | 1 | 作者身份与论文互相指向的repo/附件、实际commit/许可和原生入口 | 缺失；不建空壳src或编造manifest |
-| 2 | 原字节源码与manifest；入口能表达Qwen3-8B BF16、T0、原480、BC30/60、Qwen3单mask/λ0.1/动态剪枝及停止规则 | 尚不能核验，不用自实现代替 |
+| 2 | 原字节源码与manifest；入口能表达Qwen3-8B BF16、T0、原480、BC10/30/60、Qwen3单mask/λ0.1/动态剪枝及停止规则 | 尚不能核验，不用自实现代替 |
 | 3 | 实际nvidia-smi非抢占准入，容量满足该入口的模型工作集加余量、单串行队列 | 最新快照已空闲；取得官方入口后须再次核对实时占用及该入口容量，不能把单次快照当长期预约 |
 | 4 | 原固定输入预检，每个提交token等于验证forward正确owner的argmax；AR只诊断 | 未执行官方入口，不沿用旧自实现数学门充数 |
-| 5 | 通过后运行官方480，报告τ与1.63/1.74差值及所有失败/边界 | 未执行；不能把旧1.563378/1.647301更名为官方结果 |
+| 5 | 通过后运行官方480（BC10/30/60单mask），报告τ与1.63/1.74差值及所有失败/边界 | 未执行；不能把旧1.563378/1.647301更名为官方结果 |
 
 ## 研究计划与可继续工作
 
@@ -62,3 +62,20 @@
 只在内存读取tar目录和选定文本：37个条目（34个普通文件、3个目录），内容为TeX/参考文献/样式/论文图片；目录中没有Python/notebook/shell/ZIP实验文件或anc/code/src/scripts目录。16份TeX/JSON逐一记录原字节SHA，未找到GitHub/GitLab/HF代码仓库URL；扫描范围不含参考文献、样式、PDF和图片内部文本，不作更广的无链接断言。未解包到src、未执行任何源包内容。
 
 现有审计JSON在10份GitHub响应之外追加这一份arXiv源包响应及其完整成员清单/16份文本SHA。本次补到了可访问的作者原始资料，但其中未识别到原生实验入口；因此官方实现与GPU启动状态保持缺失/未运行。不能用论文TeX中的算法描述自行重写来代替原码要求。
+
+## 作者v1源包、公开分支与release附件核验
+
+本轮实际时间、9份响应SHA、源包清单、20份文本成员SHA及固定branch commit见[启动审计JSON](esp-official-launch-readiness-2026-10-16.json)的`author_versions_followup`。原始响应留本机`.tmp/esp-author-versions-20261016T013746Z/`；没有重复请求OpenReview或操作GPU。
+
+| 新来源 | 核验结果 | 边界 |
+| --- | --- | --- |
+| [作者arXiv v1源包](https://arxiv.org/src/2603.17942v1) | HTTP200/gzip，1,895,426字节；41条目、39普通文件，20份TeX/JSON；未识别实验脚本或anc/code/src/scripts目录 | 与v2压缩包字节不同，不能复用v2 SHA；只在内存读取，未解包/执行 |
+| 第一作者主页repo公开分支/release | 1分支master，commit `039d875e79ee55a032f2f7ba6c58651825cdc0f0`；release 0 | 固定分支树160条目；路径筛查只命中论文图片，不称全文代码审计 |
+| Mukul Gagrani主页repo公开分支/release | main `5eba01028084ccc00d1cbaad6212b2bf750e2579`、gh-pages `557f1837646967b032c9fb1e04de33f70b33a6cc`；release 0 | 固定分支树分别433/393条目；main命中普通网站notebook/引用更新脚本，未据此认定ESP实现 |
+| [共同作者固定版本出版元数据](https://github.com/mgagrani/mgagrani.github.io/blob/5eba01028084ccc00d1cbaad6212b2bf750e2579/_bibliography/papers.bib) | 唯一匹配ESP题名的`ssd`条目有pdf字段，只链接arXiv论文；没有code字段 | 仅该已确认作者网站条目，不认领同名其他账号 |
+
+v1源包SHA256为`6170a5b8a630017e3ff373b1285c312e5a6e21c15a54ebc2c33c8cba10667e83`。与此前v2做目录差集，v1独有15条、v2独有11条，涉及论文图表/参考文献及camera-ready布局；没有由此得到原生实验入口。20份TeX/JSON未命中GitHub/GitLab/HF仓库URL，扫描不包含参考文献/样式/图片内部文本。不能把历史表格或旧论文算法当作可执行官方代码。
+
+三个分支树均由API完整返回（truncated=false），但本次只做路径筛查和指定出版条目核对，未声称逐个审计全部网站文件。两个release列表为空仅说明该两个主页repo未返回公开release，不代表全部作者仓库没有资产或作者未开源。9份响应、20份文本成员及1份出版原文SHA复核通过；没有新Study、Run或τ。
+
+**当前仍缺可核验作者实现repo/commit/entrypoint，官方复现未执行。** 启动顺序补全为本次指定的SpecBench固定全480、Qwen3-8B BF16、T0、BC10/1、30/1、60/1；目标BC30 τ=1.63、BC60 τ=1.74。取得原生入口后固定原字节与manifest，实际nvidia-smi非抢占准入、单队列，数学门为每个提交token等于该次验证前向正确owner的argmax；独立AR仅报告。固定prompt，不用自实现/第三方冒充官方，不钻算子、不测速、不用逆映射，不因v1资料改变冻结主协议。

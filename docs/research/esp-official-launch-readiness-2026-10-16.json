@@ -457,5 +457,524 @@
       "source": "web tool result; no local response snapshot or new poster asset fields acquired"
     },
     "scope_limit": "GitHub search indexes may omit content; commit title query explicitly incomplete. Gists are two identified accounts only. No author implementation identified, not a proof of nonpublication. No source archive files executed/extracted. Repository URL scan covers TeX/JSON, not bibliography/style/PDF/image contents."
+  },
+  "author_versions_followup": {
+    "scope": "Read-only author homepage branch/release listings and official fixed arXiv v1 source archive; no OpenReview/GPU request",
+    "sources": [
+      {
+        "id": "RaghavvGoel--raghavvgoel.github.io--branches",
+        "endpoint": "repos/RaghavvGoel/raghavvgoel.github.io/branches?per_page=100",
+        "repository": "RaghavvGoel/raghavvgoel.github.io",
+        "kind": "branches",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:37:47.348661+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\RaghavvGoel--raghavvgoel.github.io--branches.response",
+        "bytes": 219,
+        "sha256": "dc21ef1fc2bfd46230080495fac9ae9f99d0f9d39305fb223c176b0924aec1f6",
+        "count": 1,
+        "items": [
+          {
+            "name": "master",
+            "commit": "039d875e79ee55a032f2f7ba6c58651825cdc0f0"
+          }
+        ]
+      },
+      {
+        "id": "RaghavvGoel--raghavvgoel.github.io--releases",
+        "endpoint": "repos/RaghavvGoel/raghavvgoel.github.io/releases?per_page=100",
+        "repository": "RaghavvGoel/raghavvgoel.github.io",
+        "kind": "releases",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:37:47.314744+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\RaghavvGoel--raghavvgoel.github.io--releases.response",
+        "bytes": 4,
+        "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+        "count": 0,
+        "items": []
+      },
+      {
+        "id": "mgagrani--mgagrani.github.io--branches",
+        "endpoint": "repos/mgagrani/mgagrani.github.io/branches?per_page=100",
+        "repository": "mgagrani/mgagrani.github.io",
+        "kind": "branches",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:37:47.906915+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\mgagrani--mgagrani.github.io--branches.response",
+        "bytes": 423,
+        "sha256": "1003d23a28a9580de3f0b8bfe88d53e92664f04e740e23f735a58d83ea42d377",
+        "count": 2,
+        "items": [
+          {
+            "name": "gh-pages",
+            "commit": "557f1837646967b032c9fb1e04de33f70b33a6cc"
+          },
+          {
+            "name": "main",
+            "commit": "5eba01028084ccc00d1cbaad6212b2bf750e2579"
+          }
+        ]
+      },
+      {
+        "id": "mgagrani--mgagrani.github.io--releases",
+        "endpoint": "repos/mgagrani/mgagrani.github.io/releases?per_page=100",
+        "repository": "mgagrani/mgagrani.github.io",
+        "kind": "releases",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:37:47.919177+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\mgagrani--mgagrani.github.io--releases.response",
+        "bytes": 4,
+        "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+        "count": 0,
+        "items": []
+      },
+      {
+        "id": "arxiv_v1_source",
+        "url": "https://arxiv.org/src/2603.17942v1",
+        "status": 200,
+        "content_type": "application/gzip",
+        "final_url": "https://arxiv.org/src/2603.17942v1",
+        "checked_at_utc": "2026-10-16T01:37:48.863297+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\arxiv_v1_source.response",
+        "bytes": 1895426,
+        "sha256": "6170a5b8a630017e3ff373b1285c312e5a6e21c15a54ebc2c33c8cba10667e83",
+        "members": [
+          {
+            "name": "00README.json",
+            "bytes": 1747,
+            "regular_file": true
+          },
+          {
+            "name": "algorithm.sty",
+            "bytes": 2223,
+            "regular_file": true
+          },
+          {
+            "name": "cos-sim-lemma.tex",
+            "bytes": 6308,
+            "regular_file": true
+          },
+          {
+            "name": "fancyhdr.sty",
+            "bytes": 20521,
+            "regular_file": true
+          },
+          {
+            "name": "iclr2026_conference.bib",
+            "bytes": 18233,
+            "regular_file": true
+          },
+          {
+            "name": "iclr2026_conference.bst",
+            "bytes": 26973,
+            "regular_file": true
+          },
+          {
+            "name": "icml2025.bst",
+            "bytes": 27147,
+            "regular_file": true
+          },
+          {
+            "name": "icml2026.bst",
+            "bytes": 27147,
+            "regular_file": true
+          },
+          {
+            "name": "icml2026.sty",
+            "bytes": 27346,
+            "regular_file": true
+          },
+          {
+            "name": "images",
+            "bytes": 0,
+            "regular_file": false
+          },
+          {
+            "name": "images/cos_sim_n_samples_100_llama3b.png",
+            "bytes": 513258,
+            "regular_file": true
+          },
+          {
+            "name": "images/dynamic_tree_with_probs.png",
+            "bytes": 378469,
+            "regular_file": true
+          },
+          {
+            "name": "images/efficient-attention.pdf",
+            "bytes": 91139,
+            "regular_file": true
+          },
+          {
+            "name": "images/forecasting-mask-tokens-v2.png",
+            "bytes": 388801,
+            "regular_file": true
+          },
+          {
+            "name": "images/llama3.1-8b-instruct_comprehensive_acceptance_comparison.pdf",
+            "bytes": 23131,
+            "regular_file": true
+          },
+          {
+            "name": "images/llama3.2-3b-instruct_max_complexity_acceptance_comparison.pdf",
+            "bytes": 18018,
+            "regular_file": true
+          },
+          {
+            "name": "images/online-ssd-prelim-diagram.png",
+            "bytes": 933601,
+            "regular_file": true
+          },
+          {
+            "name": "images/qwen3-32b_comprehensive_acceptance_comparison.pdf",
+            "bytes": 23809,
+            "regular_file": true
+          },
+          {
+            "name": "images/qwen3-8b_max_complexity_acceptance_comparison.pdf",
+            "bytes": 18013,
+            "regular_file": true
+          },
+          {
+            "name": "introduction_v3.tex",
+            "bytes": 8969,
+            "regular_file": true
+          },
+          {
+            "name": "main.bbl",
+            "bytes": 13479,
+            "regular_file": true
+          },
+          {
+            "name": "main.bib",
+            "bytes": 12373,
+            "regular_file": true
+          },
+          {
+            "name": "main.tex",
+            "bytes": 13542,
+            "regular_file": true
+          },
+          {
+            "name": "math_commands.tex",
+            "bytes": 12284,
+            "regular_file": true
+          },
+          {
+            "name": "methods-v2.tex",
+            "bytes": 17700,
+            "regular_file": true
+          },
+          {
+            "name": "natbib.sty",
+            "bytes": 45154,
+            "regular_file": true
+          },
+          {
+            "name": "prelims-v2.tex",
+            "bytes": 5674,
+            "regular_file": true
+          },
+          {
+            "name": "related_works-v2.tex",
+            "bytes": 5439,
+            "regular_file": true
+          },
+          {
+            "name": "results_v2.tex",
+            "bytes": 35307,
+            "regular_file": true
+          },
+          {
+            "name": "supplementary.tex",
+            "bytes": 44691,
+            "regular_file": true
+          },
+          {
+            "name": "tables",
+            "bytes": 0,
+            "regular_file": false
+          },
+          {
+            "name": "tables/bias_bita_llama3b.tex",
+            "bytes": 777,
+            "regular_file": true
+          },
+          {
+            "name": "tables/bias_bita_llama8b.tex",
+            "bytes": 1288,
+            "regular_file": true
+          },
+          {
+            "name": "tables/bias_standard_both_models.tex",
+            "bytes": 486,
+            "regular_file": true
+          },
+          {
+            "name": "tables/different_tree_depth_bita_llama3b.tex",
+            "bytes": 1130,
+            "regular_file": true
+          },
+          {
+            "name": "tables/main_result.tex",
+            "bytes": 5793,
+            "regular_file": true
+          },
+          {
+            "name": "tables/main_results_llama3b.tex",
+            "bytes": 1248,
+            "regular_file": true
+          },
+          {
+            "name": "tables/main_results_llama8b.tex",
+            "bytes": 1248,
+            "regular_file": true
+          },
+          {
+            "name": "tables/swift_results.tex",
+            "bytes": 308,
+            "regular_file": true
+          },
+          {
+            "name": "tables/tree_comparison_llama3b.tex",
+            "bytes": 1523,
+            "regular_file": true
+          },
+          {
+            "name": "tables/tree_comparison_llama8b.tex",
+            "bytes": 453,
+            "regular_file": true
+          }
+        ],
+        "code_or_ancillary_candidates": [],
+        "text_files": [
+          {
+            "name": "00README.json",
+            "bytes": 1747,
+            "sha256": "154935a2aad01e99451dbc4785f47b58a2467b33ce17042fd7a8b177da185f81"
+          },
+          {
+            "name": "cos-sim-lemma.tex",
+            "bytes": 6308,
+            "sha256": "5c8877f23b4f333a0b5e617319a10da100c04401f566e0d848b9899da5e30dc8"
+          },
+          {
+            "name": "introduction_v3.tex",
+            "bytes": 8969,
+            "sha256": "f2aedd5cf14d9bc75bcf98d40d8d1e254ac93003bd3a45f3410500b5b5379ac9"
+          },
+          {
+            "name": "main.tex",
+            "bytes": 13542,
+            "sha256": "0875ffeafa2338c7af3694eeb2cd90dbbb20b01e1aa80b91680b944f6d76ad1a"
+          },
+          {
+            "name": "math_commands.tex",
+            "bytes": 12284,
+            "sha256": "90473c4d0542070db244cea73ef962d6cddc5b2a746757e6a40ddf5fdfb90ba9"
+          },
+          {
+            "name": "methods-v2.tex",
+            "bytes": 17700,
+            "sha256": "be27cb01ec339a3939f1f10d8af882cca9655f70ea6f68d37047e1d5d3ad6399"
+          },
+          {
+            "name": "prelims-v2.tex",
+            "bytes": 5674,
+            "sha256": "39501d6fe0adf57ef84d3ac2ab0301142de97344c3530b72e7b4762a7866c592"
+          },
+          {
+            "name": "related_works-v2.tex",
+            "bytes": 5439,
+            "sha256": "e49e96fb05b41137a969ab8986fe64b6f660258059a1e3406be8d6b898b1f44e"
+          },
+          {
+            "name": "results_v2.tex",
+            "bytes": 35307,
+            "sha256": "05b71a2b021aaa36a2d487195627f5a6dda05c9d89cb08b4db9b7595758e8349"
+          },
+          {
+            "name": "supplementary.tex",
+            "bytes": 44691,
+            "sha256": "929b62a236dda69d8a6ab812e6554b5fc089951b0217ecd3e7f059fbf03ca6ce"
+          },
+          {
+            "name": "tables/bias_bita_llama3b.tex",
+            "bytes": 777,
+            "sha256": "4492bc63ec0e3fa21dec7a738b44bde897fbbaee3360e1a42829bb818132b4c2"
+          },
+          {
+            "name": "tables/bias_bita_llama8b.tex",
+            "bytes": 1288,
+            "sha256": "a7dbf15b6200bccf221fab04f22d8306a23470be3f5d3a3924f6226be3ad1a09"
+          },
+          {
+            "name": "tables/bias_standard_both_models.tex",
+            "bytes": 486,
+            "sha256": "495fc049c6f0383b7eb634bb50c033a73056fe5d53814f95952d00d03b457292"
+          },
+          {
+            "name": "tables/different_tree_depth_bita_llama3b.tex",
+            "bytes": 1130,
+            "sha256": "9402c1954430dbdddc527caba48557a953abbe4431265df2520e70b68fb8d101"
+          },
+          {
+            "name": "tables/main_result.tex",
+            "bytes": 5793,
+            "sha256": "2de099f0a58db5e46976b7e758b93c1568a878cb79ae07644371fa1bc3eb5ca8"
+          },
+          {
+            "name": "tables/main_results_llama3b.tex",
+            "bytes": 1248,
+            "sha256": "37163e44dea6a3b74f34ca692f104c1b814b7bd866213ee2f0a94f054f1c7523"
+          },
+          {
+            "name": "tables/main_results_llama8b.tex",
+            "bytes": 1248,
+            "sha256": "0ae37bd47a6d62b3fd5e4fb9f3211a662b906f074d86109298c228e9878862d1"
+          },
+          {
+            "name": "tables/swift_results.tex",
+            "bytes": 308,
+            "sha256": "c46aaa5e5d142c3af45601f8cdb0fc48242c6539faeaecd59b039d127c1e2f61"
+          },
+          {
+            "name": "tables/tree_comparison_llama3b.tex",
+            "bytes": 1523,
+            "sha256": "fe90df5890a418412774f8c6fc9a73a7b398c0403586e0441682affa1bc478dd"
+          },
+          {
+            "name": "tables/tree_comparison_llama8b.tex",
+            "bytes": 453,
+            "sha256": "85b5fae71359da0e0081e9838a90ab856e60c66a1bbd0353929e42e4c6233391"
+          }
+        ],
+        "repository_urls": []
+      },
+      {
+        "id": "RaghavvGoel/raghavvgoel.github.io--master--tree",
+        "endpoint": "repos/RaghavvGoel/raghavvgoel.github.io/git/trees/039d875e79ee55a032f2f7ba6c58651825cdc0f0?recursive=1",
+        "repository": "RaghavvGoel/raghavvgoel.github.io",
+        "branch": "master",
+        "commit": "039d875e79ee55a032f2f7ba6c58651825cdc0f0",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:38:19.794271+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\RaghavvGoel--raghavvgoel.github.io--master--tree.response",
+        "bytes": 40100,
+        "sha256": "94904af7f6b3fb9a2d96628e54dc09312f18fa836aace85fb4bbf0b29e53f13b",
+        "truncated": false,
+        "tree_entries": 160,
+        "candidate_paths": [
+          "images/raghavv/training-free-MTP.png"
+        ]
+      },
+      {
+        "id": "mgagrani/mgagrani.github.io--gh-pages--tree",
+        "endpoint": "repos/mgagrani/mgagrani.github.io/git/trees/557f1837646967b032c9fb1e04de33f70b33a6cc?recursive=1",
+        "repository": "mgagrani/mgagrani.github.io",
+        "branch": "gh-pages",
+        "commit": "557f1837646967b032c9fb1e04de33f70b33a6cc",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:38:19.610428+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\mgagrani--mgagrani.github.io--gh-pages--tree.response",
+        "bytes": 96539,
+        "sha256": "28feabab3a8450cf6f40ad03ff7189a84c4f37e8721fe07edbacd6d1b51d2d63",
+        "truncated": false,
+        "tree_entries": 393,
+        "candidate_paths": []
+      },
+      {
+        "id": "mgagrani/mgagrani.github.io--main--tree",
+        "endpoint": "repos/mgagrani/mgagrani.github.io/git/trees/5eba01028084ccc00d1cbaad6212b2bf750e2579?recursive=1",
+        "repository": "mgagrani/mgagrani.github.io",
+        "branch": "main",
+        "commit": "5eba01028084ccc00d1cbaad6212b2bf750e2579",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:38:19.687897+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\mgagrani--mgagrani.github.io--main--tree.response",
+        "bytes": 106322,
+        "sha256": "a235a31f72708aa2c774155d1997f3cd9b1d541d51004fea1e382e84727fc89b",
+        "truncated": false,
+        "tree_entries": 433,
+        "candidate_paths": [
+          "assets/jupyter/blog.ipynb",
+          "bin/update_scholar_citations.py"
+        ]
+      },
+      {
+        "id": "mukul_papers_bib",
+        "endpoint": "repos/mgagrani/mgagrani.github.io/contents/_bibliography/papers.bib?ref=5eba01028084ccc00d1cbaad6212b2bf750e2579",
+        "commit": "5eba01028084ccc00d1cbaad6212b2bf750e2579",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:38:56.100227+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\mukul_papers_bib.response",
+        "bytes": 37923,
+        "sha256": "9f2e43632fc0cf9467d09e2e70a17fef76437206483a45643c1570e2f401102d",
+        "blob_sha": "abeb60bea1d31c3d556b0d64866a4a4aa03ffc25",
+        "raw_sha256": "6aba844bef67ae0a54f434b81a580084f25959d2958841e9ca1285fad0054b5d",
+        "raw_snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\mukul_papers_bib.original",
+        "paper_entries": [
+          {
+            "key": "@article{ssd,",
+            "fields": [
+              "title",
+              "author",
+              "abbr",
+              "journal",
+              "year",
+              "area",
+              "selected",
+              "pdf",
+              "abstract"
+            ],
+            "urls": [
+              "https://arxiv.org/pdf/2603.17942"
+            ]
+          }
+        ]
+      }
+    ],
+    "checked_at_utc": "2026-10-16T01:37:48.877745+00:00",
+    "official_repository": null,
+    "official_commit": null,
+    "native_entrypoint": null,
+    "source_version_comparison": {
+      "v1_sha256": "6170a5b8a630017e3ff373b1285c312e5a6e21c15a54ebc2c33c8cba10667e83",
+      "v2_sha256": "734691dea1e1af91e8375a5306d1f0c0548677db44f86e6f6db0bab833811beb",
+      "v2_evidence": "docs/research/esp-official-launch-readiness-2026-10-16.json#release_lead_followup",
+      "v1_only_paths": [
+        "images/llama3.1-8b-instruct_comprehensive_acceptance_comparison.pdf",
+        "images/llama3.2-3b-instruct_max_complexity_acceptance_comparison.pdf",
+        "images/qwen3-32b_comprehensive_acceptance_comparison.pdf",
+        "images/qwen3-8b_max_complexity_acceptance_comparison.pdf",
+        "main.bbl",
+        "tables/bias_bita_llama3b.tex",
+        "tables/bias_bita_llama8b.tex",
+        "tables/bias_standard_both_models.tex",
+        "tables/different_tree_depth_bita_llama3b.tex",
+        "tables/main_result.tex",
+        "tables/main_results_llama3b.tex",
+        "tables/main_results_llama8b.tex",
+        "tables/swift_results.tex",
+        "tables/tree_comparison_llama3b.tex",
+        "tables/tree_comparison_llama8b.tex"
+      ],
+      "v2_only_paths": [
+        "images/camera-ready",
+        "images/camera-ready/llama3.1-8b-instruct_comprehensive_tau_sr_v2.pdf",
+        "images/camera-ready/llama3.2-3b-instruct_max_bc_tau_sr_v2.pdf",
+        "images/camera-ready/qwen3-32b_comprehensive_tau_sr_v2.pdf",
+        "images/camera-ready/qwen3-8b_max_bc_tau_sr_v2.pdf",
+        "tables/BC_ablation.tex",
+        "tables/comparison_with_eagle3.tex",
+        "tables/dynamic_tree_ablation_v2.tex",
+        "tables/main_results_table_v2.tex",
+        "tables/naive_vs_eff_speed_up_v2.tex",
+        "tables/number_mask_ablation.tex"
+      ],
+      "same_compressed_bytes": false
+    },
+    "completed_at_utc": "2026-10-16T01:38:56.101341+00:00",
+    "gpu_execution": false,
+    "openreview_requests": 0,
+    "scope_limit": "Two previously identified author homepage repositories only; three current public branch trees checked by path, not all files/historical/deleted/private branches. No releases returned for these two repositories, not all author repositories. v1 archive complete member listing; repository URL scan limited to 20 TeX/JSON members. No source extraction/execution; older article files do not substitute native experiment code or change frozen v2 protocol."
   }
 }

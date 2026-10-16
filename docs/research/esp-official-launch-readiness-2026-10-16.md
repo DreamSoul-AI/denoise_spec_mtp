@@ -65,7 +65,7 @@
 
 ## 作者v1源包、公开分支与release附件核验
 
-本轮实际时间、9份响应SHA、源包清单、20份文本成员SHA及固定branch commit见[启动审计JSON](esp-official-launch-readiness-2026-10-16.json)的`author_versions_followup`。原始响应留本机`.tmp/esp-author-versions-20261016T013746Z/`；没有重复请求OpenReview或操作GPU。
+本轮实际时间、10份响应SHA、源包清单、20份文本成员SHA及固定branch commit见[启动审计JSON](esp-official-launch-readiness-2026-10-16.json)的`author_versions_followup`。原始响应留本机`.tmp/esp-author-versions-20261016T013746Z/`；没有重复请求OpenReview或操作GPU。
 
 | 新来源 | 核验结果 | 边界 |
 | --- | --- | --- |
@@ -76,6 +76,8 @@
 
 v1源包SHA256为`6170a5b8a630017e3ff373b1285c312e5a6e21c15a54ebc2c33c8cba10667e83`。与此前v2做目录差集，v1独有15条、v2独有11条，涉及论文图表/参考文献及camera-ready布局；没有由此得到原生实验入口。20份TeX/JSON未命中GitHub/GitLab/HF仓库URL，扫描不包含参考文献/样式/图片内部文本。不能把历史表格或旧论文算法当作可执行官方代码。
 
-三个分支树均由API完整返回（truncated=false），但本次只做路径筛查和指定出版条目核对，未声称逐个审计全部网站文件。两个release列表为空仅说明该两个主页repo未返回公开release，不代表全部作者仓库没有资产或作者未开源。9份响应、20份文本成员及1份出版原文SHA复核通过；没有新Study、Run或τ。
+三个分支树均由API完整返回（truncated=false），但本次只做路径筛查和指定出版条目核对，未声称逐个审计全部网站文件。两个release列表为空仅说明该两个主页repo未返回公开release，不代表全部作者仓库没有资产或作者未开源。10份响应、20份文本成员及1份出版原文SHA复核通过；没有新Study、Run或τ。
 
 **当前仍缺可核验作者实现repo/commit/entrypoint，官方复现未执行。** 启动顺序补全为本次指定的SpecBench固定全480、Qwen3-8B BF16、T0、BC10/1、30/1、60/1；目标BC30 τ=1.63、BC60 τ=1.74。取得原生入口后固定原字节与manifest，实际nvidia-smi非抢占准入、单队列，数学门为每个提交token等于该次验证前向正确owner的argmax；独立AR仅报告。固定prompt，不用自实现/第三方冒充官方，不钻算子、不测速、不用逆映射，不因v1资料改变冻结主协议。
+
+补查共同作者[mgagrani公开repo列表](https://api.github.com/users/mgagrani/repos?per_page=100&type=owner)：分页实际共9个，8个非主页仓库最后推送于2017–2020年，另一为上述主页。名称/描述/推送时间保留在同一审计JSON，未出现新的ESP命名线索；仅为元数据核验，不能据旧日期排除旧库其他分支内存在相关内容。该一份响应追加后，本轮共10份响应、20份成员与1份出版原文SHA复核通过。

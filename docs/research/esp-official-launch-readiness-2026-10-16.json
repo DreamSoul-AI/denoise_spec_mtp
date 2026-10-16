@@ -459,7 +459,7 @@
     "scope_limit": "GitHub search indexes may omit content; commit title query explicitly incomplete. Gists are two identified accounts only. No author implementation identified, not a proof of nonpublication. No source archive files executed/extracted. Repository URL scan covers TeX/JSON, not bibliography/style/PDF/image contents."
   },
   "author_versions_followup": {
-    "scope": "Read-only author homepage branch/release listings and official fixed arXiv v1 source archive; no OpenReview/GPU request",
+    "scope": "Read-only author homepage branch/release listings and official fixed arXiv v1 source archive; no OpenReview/GPU request; complete identified coauthor public owned-repository metadata listing (9), without source audit of the other 8 repositories",
     "sources": [
       {
         "id": "RaghavvGoel--raghavvgoel.github.io--branches",
@@ -928,6 +928,81 @@
             "urls": [
               "https://arxiv.org/pdf/2603.17942"
             ]
+          }
+        ]
+      },
+      {
+        "id": "mukul_public_repos",
+        "endpoint": "users/mgagrani/repos?per_page=100&type=owner",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:43:38.560380+00:00",
+        "snapshot": ".tmp\\esp-author-versions-20261016T013746Z\\mukul_public_repos.response",
+        "bytes": 47638,
+        "sha256": "81283c3ecc29e0497de2d9e9ee24000d563fbadfca635d45670f5a3a31f0f6d0",
+        "count": 9,
+        "repositories": [
+          {
+            "full_name": "mgagrani/CS567-practice",
+            "description": null,
+            "fork": false,
+            "default_branch": "master",
+            "pushed_at": "2017-08-31T20:13:35Z"
+          },
+          {
+            "full_name": "mgagrani/Deep-learning-course-project",
+            "description": null,
+            "fork": false,
+            "default_branch": "master",
+            "pushed_at": "2020-01-27T04:50:03Z"
+          },
+          {
+            "full_name": "mgagrani/deeprlcourse",
+            "description": "Homework for deeprl course",
+            "fork": false,
+            "default_branch": "master",
+            "pushed_at": "2019-02-08T05:31:21Z"
+          },
+          {
+            "full_name": "mgagrani/hello-world",
+            "description": "first repository",
+            "fork": false,
+            "default_branch": "master",
+            "pushed_at": "2017-08-25T21:00:08Z"
+          },
+          {
+            "full_name": "mgagrani/homework",
+            "description": "Assignments for CS294-112.",
+            "fork": true,
+            "default_branch": "master",
+            "pushed_at": "2019-02-03T23:20:01Z"
+          },
+          {
+            "full_name": "mgagrani/MABC",
+            "description": null,
+            "fork": false,
+            "default_branch": "master",
+            "pushed_at": "2020-03-05T09:29:08Z"
+          },
+          {
+            "full_name": "mgagrani/mgagrani.github.io",
+            "description": "Personal Webpage",
+            "fork": false,
+            "default_branch": "main",
+            "pushed_at": "2026-07-29T01:50:45Z"
+          },
+          {
+            "full_name": "mgagrani/Reinforcement-Learning",
+            "description": "My implementation of the popular RL algorithms ",
+            "fork": false,
+            "default_branch": "master",
+            "pushed_at": "2020-01-04T06:24:51Z"
+          },
+          {
+            "full_name": "mgagrani/TSDE",
+            "description": null,
+            "fork": false,
+            "default_branch": "master",
+            "pushed_at": "2020-03-01T20:02:56Z"
           }
         ]
       }

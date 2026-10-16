@@ -83,6 +83,14 @@ def compare(old, new):
             'AR_hash_equal_count': sum(r['AR_hash_equal'] for r in rows), 'rows': rows}
 
 
+
+def verify_contract(inputs, previous, cfg):
+    expected = dict(cfg['algorithm']['config']['eval'], device=cfg['system']['config']['device'])
+    assert inputs['settings']['eval'] == previous['settings']['eval'] == expected
+    assert inputs['settings']['spec'] == previous['settings']['spec'] == cfg['algorithm']['config']['spec']
+    assert inputs['eos_ids'] == previous['eos_ids'] and inputs['eos_ids']
+    assert inputs['model_digest'] == previous['model_digest']
+
 def main():
     from revalidation_contract import check_refs
     from rpipe.structure.artifact.provenance import check_frozen as pcheck
@@ -124,8 +132,9 @@ def main():
         assert raw['inputs_digest'] == digest(inputs)
         assert inputs['dtype'] == 'torch.bfloat16' and inputs['backend'] == 'eager'
         assert inputs['model_digest'] == baseline[budget]['model_digest']
-        assert inputs['eos_ids'] == prompt_manifest['eos_token_ids']
-        assert inputs['settings']['eval'] == cfg['algorithm']['config']['eval']
+        old_inputs_path = BASE / 'runs' / baseline[budget]['run_id'] / 'assets/decode_inputs.json'
+        assert sha(old_inputs_path) == baseline[budget]['inputs_sha256']
+        verify_contract(inputs, read(old_inputs_path), cfg)
         settings = inputs['settings']['eval']
         assert settings['temperature'] == 0 and settings['max_new_tokens'] == 256
         assert settings['stop_on_eos'] and settings['run_ar_baseline'] and settings['warmup'] is False

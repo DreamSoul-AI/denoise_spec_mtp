@@ -74,3 +74,22 @@ def test_tau_pairing_uses_ratio_and_rejects_question_reordering(monkeypatch):
     new['rows'].reverse()
     with pytest.raises(AssertionError):
         m.compare(old, new)
+
+
+def test_input_contract_uses_real_old_run_eos_and_derived_device(monkeypatch):
+    import copy
+    m = reader(monkeypatch)
+    cfg = {'algorithm': {'config': {'eval': {'temperature': 0., 'max_new_tokens': 256}, 'spec': {'num_masks': 1}}},
+           'system': {'config': {'device': 'cuda'}}}
+    old = {'settings': {'eval': {'temperature': 0., 'max_new_tokens': 256, 'device': 'cuda'},
+                        'spec': {'num_masks': 1}}, 'eos_ids': [151645], 'model_digest': 'weights'}
+    m.verify_contract(copy.deepcopy(old), old, cfg)
+    for key, value in [('eos_ids', [151643]), ('model_digest', 'changed')]:
+        new = copy.deepcopy(old)
+        new[key] = value
+        with pytest.raises(AssertionError):
+            m.verify_contract(new, old, cfg)
+    new = copy.deepcopy(old)
+    new['settings']['eval']['device'] = 'cpu'
+    with pytest.raises(AssertionError):
+        m.verify_contract(new, old, cfg)

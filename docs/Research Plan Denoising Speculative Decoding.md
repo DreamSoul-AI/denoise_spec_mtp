@@ -3,13 +3,16 @@
 English translation of the [Chinese master](<研究计划 Denoising Speculative Decoding.md>), updated 2026-10-16. The Chinese version governs. This plan follows the [new standard and template](research/standards/README.md), pinned to RPipe commit `e461133218deabf8755b3e8657650e1e4a3cd9f4`, already merged into its dev branch. It organizes existing research and evidence; it does not retroactively preregister experiments whose results have been seen, or change frozen Study contracts.
 
 
-> Execution snapshot (2026-10-16): the isolated nonofficial8B repeat is running. First cell BC10 Run `80ff7a41958d8134` reached87/480; BC30/60 have not started and no new validated tau exists. Immutable preregistration: `085722e30c5bb30387f65f268648b58321aa9146`, ChapterVIII anchor `current-execution-20261016`; execution source `4bb28c7`. Progress comes from the new Run's `assets/revalidation_progress.json`, capacity from the execution worktree's `.tmp/sd-repeat-20261016/resources.latest.json`, not speed measurements. The norm scan follows only after this serial queue exits naturally.
+> Nonofficial8B repeat: BC10/single-mask full480 succeeded natively; BC30 is running, BC60 pending. The4B norm scan is not made/launched.
+> BC10 pooled tau=1.3990470307950233; all79757 token checks passed; AR188/480 is diagnostic.
+> Accepted/calls/tau are480 ties versus oldBC10; all480 output/AR hashes match; all three tau-aggregation differences are zero.
+> Values and raw paths: [checkpoint](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json). This does not establish the paper BC30/60 targets.
 
 ## I. Current scope, status and execution priority
 
 Enmao's final instructions of2026-10-16 12:44/12:53 govern: stop searching for an official ESP entrypoint and label the existing stack **non-author-official reproduction**. Study the fixed480 SpecBench Table1τ gap and whether input-bias magnitude explains acceptance gains more strongly than the particular direction. No new Kalman/method work, prompt changes or timing; BF16/T0 only.
 
-Status: the four8B nonofficial Table1 cells are complete with passing mathematical gates. BC30/60τ=1.563378/1.647301, below1.63/1.74. The4B five-method-plus-AR and six BC30 direction cells each cover480. The three norm-matched random directions averageτ=1.494473978, versus1.507777653 for e2−e1 and1.422420206 for zero bias. Enmao's working mechanism hypothesis is that magnitude is the primary factor and direction matters little. Existing results reject e2−e1 uniqueness, but random values1.464349086–1.523884714 vary; arbitrary-direction equivalence and the magnitude-response curve remain unestablished. Retain original evidence and limits rather than rewriting historical results.
+Status: the four original8B nonofficial Table1 cells are complete with passing mathematical gates. BC30/60τ=1.563378/1.647301, below1.63/1.74. The4B five-method-plus-AR and six BC30 direction cells each cover480. The three norm-matched random directions averageτ=1.494473978, versus1.507777653 for e2−e1 and1.422420206 for zero bias. Enmao's working mechanism hypothesis is that magnitude is the primary factor and direction matters little. Existing results reject e2−e1 uniqueness, but random values1.464349086–1.523884714 vary; arbitrary-direction equivalence and the magnitude-response curve remain unestablished. Retain original evidence and limits rather than rewriting historical results.
 
 Execution order: A, follow the newly authorized request to run an independent full480 nonofficial Table1 revalidation on8B, or the largest existing model admitted by host RAM, using single-mask BC10/30/60,λ0.1 updating mean,dynamic/pruning,256/EOS andseed123. Reuse old complete results as comparison, but use a new version/Run and never overwrite or re-sign. B,4B BF16 BC30 magnitude scan at0/0.5/1/2×, retaining e2−e1 and random seeds0/1/2. Reuse complete zero and1× results; run only the eight new combinations of four directions×0.5/2. C, assess curves, paired accepted/calls/τ win/tie/loss, actual bias norms and output lengths. No seed selection or prompt changes. Do not expand magnitude scans toBC60 yet.
 
@@ -252,6 +255,8 @@ Source: retrieved GitHub PR metadata. Author-search PRs are historical only; sea
 | [#40](https://github.com/DreamSoul-AI/denoising-speculative-decoding/pull/40) | 2026-10-16T04:57:05Z | `aed4eee23` | Repeated-root pruning opportunity and falsifiable hypotheses |
 
 Reading depth is in ChapterII; all60 legacy references, theorem conditions and unverified citations remain in the v6 ChapterXI archive. Consolidation is not a new full-text review. Remaining gaps include author input/stopping/tau weights, nonofficial-to-paper implementation differences, finite random seeds and content-magnitude confounding. Next: the independent repeat, then the preregistered eight norm cells; no renewed author search/operator chain.
+
+New evidence: the [BC10 full480 repeat](../studies/esp_table1_nonofficial_revalidation/docs/STUDY_REPORT.md) reproduces the old local result prompt by prompt; the other budgets are unfinished. PR44 byte preservation, PR45 norm preparation and PR46 readout/checkpoint support current execution, without author-official or new-method claims. No rerun for AR disagreement, prompt/operator changes or re-signing of the immutable085722e plan reference. Only these two bilingual project plans remain.
 
 ## X. GitHub use and plan changes
 

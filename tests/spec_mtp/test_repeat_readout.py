@@ -93,3 +93,19 @@ def test_input_contract_uses_real_old_run_eos_and_derived_device(monkeypatch):
     new['settings']['eval']['device'] = 'cpu'
     with pytest.raises(AssertionError):
         m.verify_contract(new, old, cfg)
+
+
+def test_completed_bc10_checkpoint_reconciles_all480_pairs(monkeypatch):
+    m = reader(monkeypatch)
+    snapshot = m.read(ROOT / 'studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json')
+    old = next(c for c in m.read(ROOT / 'studies/esp_table1_bf16_full_argmax/docs/protocol_evidence_v1.json')['cells']
+               if c['BC'] == 10 and c['num_masks'] == 1)
+    assert snapshot['native_status'] == 'succeeded' and snapshot['validation_policy'] == 'verifier-argmax-v1'
+    assert len(snapshot['rows']) == len(snapshot['token_audits']) == 480
+    for key, value in m.summarize(snapshot['rows']).items():
+        assert snapshot['totals'][key] == pytest.approx(value)
+    assert snapshot['vs_original'] == m.compare(old, snapshot)
+    assert snapshot['vs_original']['tau'] == {'win': 0, 'tie': 480, 'loss': 0}
+    assert snapshot['totals']['committed'] + 480 == snapshot['totals']['new_tokens'] == 79757
+    assert snapshot['totals']['main_calls'] == snapshot['totals']['decode_calls'] + 480
+    assert snapshot['files']['argmax_audit.jsonl'] == old['argmax_audit_sha256']

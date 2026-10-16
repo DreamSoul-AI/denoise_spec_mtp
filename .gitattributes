@@ -276,3 +276,6 @@
 
 # Freeze new norm-control source and declarations before native make.
 /studies/qwen3_4b_bf16_bias_norm_scan/** -text whitespace=cr-at-eol
+
+# The norm source guard pins the active Windows resource-helper bytes.
+/studies/esp_table1_nonofficial_revalidation/resource_admission.py -text whitespace=cr-at-eol

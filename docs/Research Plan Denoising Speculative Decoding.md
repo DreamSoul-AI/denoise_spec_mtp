@@ -201,6 +201,12 @@ For all480 original-input-plus-prefill prefixes with a first block, template/ran
 
 The reader now explicitly requires all eight preregistered index settings in order, one Run per cell and exact full-spec agreement. Missing/duplicate/reordered cells, multiplier/beta drift and multiple Runs are rejected. --check-reused only inspects old endpoints, always reports complete=false/new_cells_inspected=false and draws no new curve; normal mode retains native source/input/argmax/process gates. Fifty CPU tests passed in total, including18 norm tests and the related readout/pairing/documentation checks. New cells remain unmade; immutable plan commit/blob, scientific code/defaults and data/prompts are unchanged.
 
+### Saved-evidence CPU audit addendum (2026-10-16; no new experiment)
+
+The existing `tools/analyze_4b_geometry.py --audit-raw` rechecked all66 native files across the11 E2 five-method-plus-AR cells. All809118 saved Spec tokens passed the mathematical audit; the81880 AR tokens are reference data only. All ten prior depth/position/trimming summaries and six tau decompositions match exactly: this is replication of existing accounting, not a new mechanism finding. [Audit evidence](research/4b-paired-raw-audit-2026-10-16.json); [interpretation and command](research/4b-mask-geometry-2026-10-15.md#八2026-10-16-cpu完整原始审计与首块对账). Each of20 first-block comparisons covers480 shared prefixes. Output order0/order1 tie on all480 first blocks at both budgets. Relative to input-first, either output method wins/ties/loses114/339/27 atBC30 and131/306/43 atBC60 (output minus input). These local wins coexist with lower full-path tau; do not extrapolate them to whole-path gains or infer zero prompt velocity from the output-order ties. Shared prefill proposals and later velocity propagation have different timing.
+
+The original BC60 worker66500 continues waiting on the unchanged host-RAM gate; retain processes and data. This CPU audit does not accept new Runs, load a model, change prompts/defaults, measure speed or investigate operators. Switch the frozen execution tree for the eight4B magnitude cells only after the original8B queue exits naturally and its final acceptance completes. Missing cells remain pending; no new methods or fabricated curve.
+
 ## IX. Execution records and conclusions
 
 | Record | Actual evidence | Outcome/boundary |

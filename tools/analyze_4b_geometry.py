@@ -146,11 +146,76 @@ def summarize_cell(raw):
             'hidden_vectors_saved': False}
 
 
+def audit_saved(study, paired):
+    """Recheck saved tokens and first blocks; do not re-sign native Runs."""
+    import importlib.util
+    import sys
+    from spec_mtp.structure.artifact import validation
+    root = Path(__file__).resolve().parents[1]
+    norm = root / 'studies/qwen3_4b_bf16_bias_norm_scan'
+    sys.path.insert(0, str(norm))
+    spec = importlib.util.spec_from_file_location('geometry_norm_helpers', norm / 'analyze_results.py')
+    helpers = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helpers)
+    from norm_control import check_refs
+    check_refs()
+    assert sha(study / 'docs/paired_evidence_v1.json') == sha(root / 'studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json')
+    prompts = helpers.read(root / 'studies/qwen3_4b_bf16_five_methods/docs/prompts_manifest.json')['rendered_prompts']
+    assert len(prompts) == 480 and set(paired['cells']) == set(helpers._pair.CASES)
+    blocks, cells, reference = {}, {}, []
+    for name in helpers._pair.CASES:
+        cell = paired['cells'][name]
+        folder = study / 'runs' / cell['run_id']
+        assert cell['native_status'] == 'succeeded'
+        for path, expected in cell['files_sha256'].items():
+            assert sha(folder / path) == expected, name + ':' + path
+        raw = helpers.read(folder / 'assets/decode_observations.json')['out']['evidence']
+        rows = cell['rows']
+        assert len(raw) == len(rows) == len(prompts) == 480
+        assert helpers._pair.summarize(rows, name == 'AR') == cell['totals']
+        checked = 0
+        for item, prompt, row in zip(raw, prompts, rows):
+            assert item['input_ids'] == prompt['input_ids'] and row['question_id'] == prompt['question_id']
+            output = item['output_ids'][len(prompt['input_ids']):]
+            assert hashlib.sha256(json.dumps(output).encode()).hexdigest() == row['output_sha256']
+            assert len(output) == row['new_tokens']
+            if name == 'AR':
+                assert item['stats']['ar_calls'] == row['model_calls']
+                reference.append((output, row['model_calls']))
+            else:
+                checked += validation._check_argmax(item)
+                assert all(item['stats'][k] == row[k] for k in ('accepted', 'committed', 'decode_calls', 'new_tokens'))
+                assert row['model_calls'] == item['stats']['decode_calls'] + item['stats']['prefill_calls']
+        if name != 'AR':
+            assert cell['contract']['dtype'] == 'torch.bfloat16' and cell['contract']['tied_storage']
+            assert cell['model_digest'] == paired['cells']['AR']['model_digest']
+            settings = cell['actual_settings']
+            assert settings['spec']['num_masks'] == 2 and settings['spec']['block_complexity'] == int(name.split('/')[0])
+            assert settings['eval']['temperature'] == 0 and settings['eval']['max_new_tokens'] == 256
+            assert checked == cell['totals']['argmax_checked_tokens']
+            for item, row, (ar, calls) in zip(raw, rows, reference):
+                output = item['output_ids'][len(item['input_ids']):]
+                assert row['AR_exact'] == (output == ar) and row['AR_new_tokens'] == len(ar)
+                assert row['AR_model_calls'] == calls and row['calls_delta_vs_AR'] == row['model_calls'] - calls
+                assert row['first_new_difference_index'] == helpers._pair.first_difference(output, ar)
+            blocks[name] = helpers.depth_rows(raw, prompts)
+        cells[name] = dict(run_id=cell['run_id'], files_sha256=cell['files_sha256'], raw_argmax_checked_tokens=checked)
+    pairs = [dict(first=p['first'], second=p['second'],
+                  first_block=helpers.first_block_compare(blocks[p['first']], blocks[p['second']])) for p in paired['pairs']]
+    assert len(pairs) == 20
+    return dict(cells=cells, pairs=pairs, raw_files_checked=sum(len(c['files_sha256']) for c in cells.values()),
+                raw_argmax_checked_tokens=sum(c['raw_argmax_checked_tokens'] for c in cells.values()),
+                shared_AR_tokens=sum(len(ids) for ids, _ in reference),
+                helpers_sha256=sha(norm / 'analyze_results.py'), math_checker_sha256=sha(validation.__file__),
+                limitations='Saved token/owner/hash evidence only; no logits recomputation, new forward or source re-signing. First-block ties do not imply zero velocity.')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--study', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--capture', type=Path, help='Completed scalar geometry.json; summarize without model forwards')
+    parser.add_argument('--audit-raw', action='store_true', help='Recheck all saved argmax audits and shared-prefix first blocks, including AR files')
     args = parser.parse_args()
     assert not args.out.exists(), 'Use a new output path; previous observations are retained'
     study = args.study
@@ -178,6 +243,8 @@ def main():
             assert abs(sum(delta.values()) - (b['tau'] - a['tau'])) < 1e-12
             report['tau_differences'].append({'first': f'{bc}/{first}', 'second': f'{bc}/{second}',
                                               'tau_delta': b['tau'] - a['tau'], 'components': delta})
+    if args.audit_raw:
+        report['saved_audit'] = audit_saved(study, paired)
     if args.capture:
         report['geometry_capture_sha256'] = sha(args.capture)
         report['geometry'] = summarize_geometry(json.loads(args.capture.read_text(encoding='utf-8')))

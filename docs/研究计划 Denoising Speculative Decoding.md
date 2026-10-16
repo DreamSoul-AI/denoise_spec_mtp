@@ -201,6 +201,12 @@ B：新`qwen3_4b_bf16_bias_norm_scan`，ModelScope原Qwen3-4B内容，BF16/eager
 
 验收脚本现显式要求索引与八格预注册及顺序完整相等，每格一个Run、cfg完整spec一致；缺格/重复/乱序/倍率或beta漂移/多Run均拒绝。--check-reused只读旧端点且始终complete=false/new_cells_inspected=false，不绘新曲线；正常模式仍保留native source/input/argmax/process门。范数18项及相关读出/配对/文档共50项CPU回归通过，当前新格尚未make，冻结计划commit/blob及科学源码、默认配方、数据/prompt未改。
 
+### CPU原始审计补充（2026-10-16，非新实验）
+
+复用`tools/analyze_4b_geometry.py --audit-raw`对E2五方法加AR的11格、66份原始文件逐SHA重核，10个Spec格809118保存token数学门全部通过，AR81880 token仅作参考。旧10格深度/位置/裁剪计数和6组τ分解逐项不变，属于复核而非新机制发现。[审计证据](research/4b-paired-raw-audit-2026-10-16.json)、[解释与命令](research/4b-mask-geometry-2026-10-15.md#八2026-10-16-cpu完整原始审计与首块对账)。20组首块配对各480条共享前缀；输出零阶/一阶首块均480平，对输入一阶BC30为114胜339平27负、BC60为131胜306平43负（后者输出减输入）。这与完整路径τ落后并存，不把首块改善外推为全程收益，不把输出两order首块平局解释成prompt速度为零；共享prefill候选的时序与后续速度传播应分开描述。
+
+原BC60 worker66500等待RAM门的次序不变，保留全部进程与数据；CPU只读审计不签收新Run、不载模、不改prompt或默认配置、不测速、不追算子。原8B队列自然退出且终验完成后才可切换执行树准备4B范数八格；缺任一格继续标pending，不新增方法或填补曲线。
+
 ## 九、执行记录与结论
 
 | 记录 | 实际证据 | 结果与边界 |

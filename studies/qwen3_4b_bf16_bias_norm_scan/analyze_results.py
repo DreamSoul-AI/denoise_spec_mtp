@@ -127,11 +127,17 @@ def load_reused(data_root):
     return formal, original, prompts, snapshot, reference, cells
 
 
+def matrix_settings(decl):
+    from rpipe.structure.control.merge import deep_merge
+    common = yaml.safe_load((STUDY / 'experiment_config.yaml').read_text(encoding='utf-8'))['algorithm']['config']
+    return [deep_merge(common, setting) for setting in decl['axes']['algorithm.config']]
+
+
 def check_matrix(decl, entries):
     expected = decl['axes']['algorithm.config']
     assert [(c['direction'], c['spec']['ema']['step_scale']) for c in expected] == [
         (mode, scale) for mode in ('template', 'random0', 'random1', 'random2') for scale in (.5, 2.)]
-    assert [e['factors']['algorithm.config'] for e in entries] == expected, 'Expected all eight frozen norm cells in order'
+    assert [e['factors']['algorithm.config'] for e in entries] == matrix_settings(decl), 'Expected all eight frozen merged norm configurations in order'
     assert all(len(e['runs']) == 1 for e in entries)
 
 
@@ -151,7 +157,7 @@ def verify_reused(data_root, output_dir=None):
                 first_block_same_prefix=first_block_compare(cells[base]['depth_rows'], cell['depth_rows']), **pair))
     decl = yaml.safe_load((STUDY / 'study.yaml').read_text(encoding='utf-8'))
     expected = decl['axes']['algorithm.config']
-    check_matrix(decl, [{'factors': {'algorithm.config': setting}, 'runs': [{}]} for setting in expected])
+    check_matrix(decl, [{'factors': {'algorithm.config': setting}, 'runs': [{}]} for setting in matrix_settings(decl)])
     body = {'complete': False, 'reused_only': True, 'new_cells_inspected': False, 'fixed_prompts': 480,
         'data_root': str(Path(data_root).resolve()), 'no_timing': True, 'no_model_forward': True,
         'scope': 'Hash and raw argmax recheck of five existing endpoints; no new native Run acceptance or curve',

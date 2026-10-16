@@ -1,7 +1,7 @@
 # SD RAM准入与4B空档执行
 
 > 4B BF16容量探针完成，256/256数学门通过，实测峰值8,808,693,760 bytes；正式门为10,956,177,408 bytes。
-> 范数v2八格已make，单一父队列79868等待实际GPU空闲；首格6ee3f749ee20c450尚未execute，不填τ。
+> 范数v2八格已make，单一父队列79868已接首格6ee3f749ee20c450；worker73008独占GPU，完整480尚未完成，不填全量τ。
 > BC60原worker66500及RAM门保留，探针后已恢复；格间满足原8B准入时优先让回。
 > 本轮33项相关回归和Ruff通过；按主题本地提交，完整里程碑再PR。
 
@@ -28,3 +28,9 @@ GPU前后均检查nvidia-smi无其他实验Python；若有dayan/量化活任务�
 ## 八格原生队列已登记
 
 本地提交cbcd1e4后，v2-capacity原生make成功，生成8个新Run。唯一范数父队列79868已启动，首格template0.5×的Run为6ee3f749ee20c450；当前native execute尚未开始，等待量化已在运行的GPU进程55108自然结束，不抢占。后续依次template2×、random0/1/2各0.5×/2×，逐格run-one原生全阶段，完成格后finally恢复BC60；无失败自动重试。状态与各格资源在主仓.tmp/sd-memory-20261016/norm_queue.latest.json及<run_id>.capacity.json；启动器为run_norm_queue.py，标准输出/错误分文件保留。8B原队列50576/BC60 66500保留；它的RAM条件若在格间满足，范数等待8B先上卡。
+
+## 首格已执行与读出合同修复
+
+量化自然释放后，19:33父队列79868接首格6ee3f749ee20c450（template0.5×），worker73008实际载模执行；同一时刻nvidia-smi只有该Python计算进程。BC60在此完整格期间仅可逆暂停，格后finally恢复。一次只读进度快照为28/480、5245 token检查数与生成数一致；这不是全量验收或τ。
+
+CPU核对真实make索引时发现读出合同误把完整factors与局部axis直接相等比较，合法索引会被误拒绝。现使用RPipe已有deep_merge合并公共experiment_config与轴配置后严格比较，保留eval/version/spec全字段和八格次序约束；新增wrong_eval与partial_factor拒绝回归。未make测试改为隔离临时Study，避免依赖本机是否已make。35项相关回归、真实make索引预检与Ruff通过。修改仅在未被活动Run引用的分析脚本和测试，不改冻结科学/资源执行源，不重签或重跑首格。先前完整测试进程在修复前已收集旧用例，故保留7项失败记录；稳定源码的完整套件重新运行中，不记作已通过。

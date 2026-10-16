@@ -28,5 +28,434 @@
     "OpenReview supplementary access remains incomplete in last full audit."
   ],
   "actual_experiment_python_processes": [],
-  "gpu_observation_interpretation": "GPU released by latest snapshot:0% utilization,22001MiB free; Docker Desktop UI is not classified as an experiment Python."
+  "gpu_observation_interpretation": "GPU released by latest snapshot:0% utilization,22001MiB free; Docker Desktop UI is not classified as an experiment Python.",
+  "release_lead_followup": {
+    "scope": "Bounded GitHub commit/issue/repository release-lead searches; no OpenReview or GPU requests; fixed author-uploaded arXiv v2 source archive directory and 16 TeX/JSON files inspected in memory",
+    "sources": [
+      {
+        "id": "commit_paper",
+        "endpoint": "search/commits",
+        "query": "\"2603.17942\"",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:19:43.955411+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\commit_paper.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "incomplete_results": false,
+        "returned_count": 0
+      },
+      {
+        "id": "commit_title",
+        "endpoint": "search/commits",
+        "query": "\"Embedding-Space Probing\"",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:19:44.996145+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\commit_title.response",
+        "bytes": 166667,
+        "sha256": "8510830b18e0c1134504975d849eccbd9354926afa92f5c8c2d8b8ddcf5eaa04",
+        "total_count": 17,
+        "incomplete_results": true,
+        "returned_count": 17
+      },
+      {
+        "id": "commit_old_title",
+        "endpoint": "search/commits",
+        "query": "\"Training-Free Multi-Token Prediction via Probing\"",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:19:45.678540+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\commit_old_title.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "incomplete_results": false,
+        "returned_count": 0
+      },
+      {
+        "id": "issue_paper",
+        "endpoint": "search/issues",
+        "query": "\"2603.17942\"",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:19:45.868255+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\issue_paper.response",
+        "bytes": 118297,
+        "sha256": "cc1e306136db7b794621451f81ff0ff9df933ab3902d8a0c490493decdaba73e",
+        "total_count": 15,
+        "incomplete_results": false,
+        "returned_count": 15
+      },
+      {
+        "id": "issue_title",
+        "endpoint": "search/issues",
+        "query": "\"Embedding-Space Probing\"",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:19:47.422956+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\issue_title.response",
+        "bytes": 573525,
+        "sha256": "08ebd419f99c47ce82875e24dc52a491aac847669caaa8654b6b84184c1f1c6d",
+        "total_count": 30,
+        "incomplete_results": false,
+        "returned_count": 30
+      },
+      {
+        "id": "repo_old_title",
+        "endpoint": "search/repositories",
+        "query": "\"Training-Free Multi-Token Prediction via Probing\"",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:19:46.592459+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\repo_old_title.response",
+        "bytes": 55,
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "total_count": 0,
+        "incomplete_results": false,
+        "returned_count": 0
+      },
+      {
+        "id": "author_issue",
+        "endpoint": "repos/Xiaohao-Liu/Awesome-Multi-Token-Prediction/issues/2",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:20:17.419425+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\author_issue.response",
+        "bytes": 3843,
+        "sha256": "76b5e6bdef28e750afd1ff1317b4c9fed613a10fb2f6cd97bb39e92b0d2e17a3"
+      },
+      {
+        "id": "author_issue_comments",
+        "endpoint": "repos/Xiaohao-Liu/Awesome-Multi-Token-Prediction/issues/2/comments?per_page=100",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:20:18.353637+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\author_issue_comments.response",
+        "bytes": 1790,
+        "sha256": "5f1c6181bf3ba2d7cc940d4345ae3a9bbac50256acb7d1c9054effe45a82fa63"
+      },
+      {
+        "id": "author_gists",
+        "endpoint": "users/RaghavvGoel/gists?per_page=100",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:20:19.286546+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\author_gists.response",
+        "bytes": 2,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "returned_count": 0
+      },
+      {
+        "id": "coauthor_gists",
+        "endpoint": "users/mgagrani/gists?per_page=100",
+        "exit_code": 0,
+        "checked_at_utc": "2026-10-16T01:20:19.790257+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\coauthor_gists.response",
+        "bytes": 2,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "returned_count": 0
+      },
+      {
+        "id": "arxiv_v2_source",
+        "url": "https://arxiv.org/src/2603.17942v2",
+        "status": 200,
+        "final_url": "https://arxiv.org/src/2603.17942v2",
+        "content_type": "application/gzip",
+        "checked_at_utc": "2026-10-16T01:26:24.256879+00:00",
+        "snapshot": ".tmp\\esp-release-leads-20261016T011943Z\\arxiv_v2_source.response",
+        "bytes": 1895189,
+        "sha256": "734691dea1e1af91e8375a5306d1f0c0548677db44f86e6f6db0bab833811beb",
+        "archive_members": [
+          {
+            "name": "00README.json",
+            "size": 646,
+            "regular_file": true
+          },
+          {
+            "name": "algorithm.sty",
+            "size": 2223,
+            "regular_file": true
+          },
+          {
+            "name": "cos-sim-lemma.tex",
+            "size": 6308,
+            "regular_file": true
+          },
+          {
+            "name": "fancyhdr.sty",
+            "size": 20521,
+            "regular_file": true
+          },
+          {
+            "name": "iclr2026_conference.bib",
+            "size": 19742,
+            "regular_file": true
+          },
+          {
+            "name": "iclr2026_conference.bst",
+            "size": 26973,
+            "regular_file": true
+          },
+          {
+            "name": "icml2025.bst",
+            "size": 27147,
+            "regular_file": true
+          },
+          {
+            "name": "icml2026.bst",
+            "size": 27147,
+            "regular_file": true
+          },
+          {
+            "name": "icml2026.sty",
+            "size": 27346,
+            "regular_file": true
+          },
+          {
+            "name": "images",
+            "size": 0,
+            "regular_file": false
+          },
+          {
+            "name": "images/camera-ready",
+            "size": 0,
+            "regular_file": false
+          },
+          {
+            "name": "images/camera-ready/llama3.1-8b-instruct_comprehensive_tau_sr_v2.pdf",
+            "size": 26220,
+            "regular_file": true
+          },
+          {
+            "name": "images/camera-ready/llama3.2-3b-instruct_max_bc_tau_sr_v2.pdf",
+            "size": 16172,
+            "regular_file": true
+          },
+          {
+            "name": "images/camera-ready/qwen3-32b_comprehensive_tau_sr_v2.pdf",
+            "size": 26240,
+            "regular_file": true
+          },
+          {
+            "name": "images/camera-ready/qwen3-8b_max_bc_tau_sr_v2.pdf",
+            "size": 16185,
+            "regular_file": true
+          },
+          {
+            "name": "images/cos_sim_n_samples_100_llama3b.png",
+            "size": 513258,
+            "regular_file": true
+          },
+          {
+            "name": "images/dynamic_tree_with_probs.png",
+            "size": 378469,
+            "regular_file": true
+          },
+          {
+            "name": "images/efficient-attention.pdf",
+            "size": 91139,
+            "regular_file": true
+          },
+          {
+            "name": "images/forecasting-mask-tokens-v2.png",
+            "size": 388801,
+            "regular_file": true
+          },
+          {
+            "name": "images/online-ssd-prelim-diagram.png",
+            "size": 933601,
+            "regular_file": true
+          },
+          {
+            "name": "introduction_v3.tex",
+            "size": 8962,
+            "regular_file": true
+          },
+          {
+            "name": "main.bib",
+            "size": 12693,
+            "regular_file": true
+          },
+          {
+            "name": "main.tex",
+            "size": 13822,
+            "regular_file": true
+          },
+          {
+            "name": "math_commands.tex",
+            "size": 12284,
+            "regular_file": true
+          },
+          {
+            "name": "methods-v2.tex",
+            "size": 20867,
+            "regular_file": true
+          },
+          {
+            "name": "natbib.sty",
+            "size": 45154,
+            "regular_file": true
+          },
+          {
+            "name": "prelims-v2.tex",
+            "size": 5667,
+            "regular_file": true
+          },
+          {
+            "name": "related_works-v2.tex",
+            "size": 5439,
+            "regular_file": true
+          },
+          {
+            "name": "results_v2.tex",
+            "size": 29147,
+            "regular_file": true
+          },
+          {
+            "name": "supplementary.tex",
+            "size": 48567,
+            "regular_file": true
+          },
+          {
+            "name": "tables",
+            "size": 0,
+            "regular_file": false
+          },
+          {
+            "name": "tables/BC_ablation.tex",
+            "size": 622,
+            "regular_file": true
+          },
+          {
+            "name": "tables/comparison_with_eagle3.tex",
+            "size": 1036,
+            "regular_file": true
+          },
+          {
+            "name": "tables/dynamic_tree_ablation_v2.tex",
+            "size": 1066,
+            "regular_file": true
+          },
+          {
+            "name": "tables/main_results_table_v2.tex",
+            "size": 2153,
+            "regular_file": true
+          },
+          {
+            "name": "tables/naive_vs_eff_speed_up_v2.tex",
+            "size": 1088,
+            "regular_file": true
+          },
+          {
+            "name": "tables/number_mask_ablation.tex",
+            "size": 604,
+            "regular_file": true
+          }
+        ],
+        "potential_code_or_ancillary": [],
+        "text_files_checked": [
+          {
+            "name": "00README.json",
+            "bytes": 646,
+            "sha256": "d382dfa965c52461cba06a8e145e030b4206bc4afd6556ed35d2722dbe1f4b84"
+          },
+          {
+            "name": "cos-sim-lemma.tex",
+            "bytes": 6308,
+            "sha256": "5c8877f23b4f333a0b5e617319a10da100c04401f566e0d848b9899da5e30dc8"
+          },
+          {
+            "name": "introduction_v3.tex",
+            "bytes": 8962,
+            "sha256": "acc8f1958667ff8c5b040d61ef13d3f359fffb6b42f918d9641c86100693d661"
+          },
+          {
+            "name": "main.tex",
+            "bytes": 13822,
+            "sha256": "71458fb3449fc52e4171dbb40c00c09cf8c2fb94f2f7b06862d6e8db89f83215"
+          },
+          {
+            "name": "math_commands.tex",
+            "bytes": 12284,
+            "sha256": "90473c4d0542070db244cea73ef962d6cddc5b2a746757e6a40ddf5fdfb90ba9"
+          },
+          {
+            "name": "methods-v2.tex",
+            "bytes": 20867,
+            "sha256": "db1ca0c03ea391bf3b871c4eb4ef3c0d21214c05aecdcf234cbaee343394b937"
+          },
+          {
+            "name": "prelims-v2.tex",
+            "bytes": 5667,
+            "sha256": "4ff46cd2399b4ca153dd96aef68c89b9d33c5b073ce9015a7b2407d98a1e1a86"
+          },
+          {
+            "name": "related_works-v2.tex",
+            "bytes": 5439,
+            "sha256": "e49e96fb05b41137a969ab8986fe64b6f660258059a1e3406be8d6b898b1f44e"
+          },
+          {
+            "name": "results_v2.tex",
+            "bytes": 29147,
+            "sha256": "74c66b7582eec9858d5e28e57c978be0fe27d595a4a51fbd9be760add940e4c3"
+          },
+          {
+            "name": "supplementary.tex",
+            "bytes": 48567,
+            "sha256": "b23a9c488a0878513989a73fa38ea14f4f32a893a14ec874f75e4e0379956162"
+          },
+          {
+            "name": "tables/BC_ablation.tex",
+            "bytes": 622,
+            "sha256": "550c6105956c3898e7446cc3c27bae6d60dba97f5eef7ee09c0e5cca8f4999e9"
+          },
+          {
+            "name": "tables/comparison_with_eagle3.tex",
+            "bytes": 1036,
+            "sha256": "b17a2c189b7c230ee5493c2a3c39da0a112c8aa59a28df5be07c963206fdb88c"
+          },
+          {
+            "name": "tables/dynamic_tree_ablation_v2.tex",
+            "bytes": 1066,
+            "sha256": "6fd90e096cb8112719222bc1803de64197443f0f0002df912ada14f69e6ab8fd"
+          },
+          {
+            "name": "tables/main_results_table_v2.tex",
+            "bytes": 2153,
+            "sha256": "a850fa547abab584bcdeedefc8e3fe6384e9870b4c3a34e666abad84d36c38a0"
+          },
+          {
+            "name": "tables/naive_vs_eff_speed_up_v2.tex",
+            "bytes": 1088,
+            "sha256": "7936e5e43cb11c73be8ed4972a6494533500570e66aa4f8a8a22782187d214a4"
+          },
+          {
+            "name": "tables/number_mask_ablation.tex",
+            "bytes": 604,
+            "sha256": "33e83ea37c3e0006b6c966b3c43a5a595bcc44a8e2690ceab08758a8eefdfb5c"
+          }
+        ],
+        "external_repository_urls": []
+      }
+    ],
+    "checked_at_utc": "2026-10-16T01:19:47.425015+00:00",
+    "completed_at_utc": "2026-10-16T01:20:19.790319+00:00",
+    "official_repository": null,
+    "official_implementation_commit": null,
+    "native_entrypoint": null,
+    "gpu_execution": false,
+    "author_issue": {
+      "url": "https://github.com/Xiaohao-Liu/Awesome-Multi-Token-Prediction/issues/2",
+      "author_login": "RaghavvGoel",
+      "created_at": "2026-04-23T21:03:53Z",
+      "updated_at": "2026-04-28T01:51:41Z",
+      "paper_link": "https://arxiv.org/pdf/2603.17942",
+      "comments_count": 1,
+      "comment_author": "Xiaohao-Liu",
+      "comment_url": "https://github.com/Xiaohao-Liu/Awesome-Multi-Token-Prediction/issues/2#issuecomment-4331772613",
+      "interpretation": "Author submission links the paper only; maintainer reply confirms list inclusion; neither provides code or artifact link"
+    },
+    "openreview_requests_this_followup": 0,
+    "conference_observation": {
+      "downloads_url": "https://icml.cc/Downloads/2026",
+      "paper_title_present": true,
+      "poster_url": "https://icml.cc/virtual/2026/poster/61857",
+      "poster_access": "web search reports non-retryable robots.txt denial; did not fetch through alternate tools",
+      "source": "web tool result; no local response snapshot or new poster asset fields acquired"
+    },
+    "scope_limit": "GitHub search indexes may omit content; commit title query explicitly incomplete. Gists are two identified accounts only. No author implementation identified, not a proof of nonpublication. No source archive files executed/extracted. Repository URL scan covers TeX/JSON, not bibliography/style/PDF/image contents."
+  }
 }

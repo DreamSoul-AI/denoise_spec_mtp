@@ -35,3 +35,30 @@
 ## 官方组织README与最新访问状态
 
 [官方组织追加核查](esp-organization-readme-followup-2026-10-16.md)覆盖两个组织215个公开仓库元数据和10个固定commit的候选README，未核验到ESP作者实现入口。一般speculative decoding条目不等于该论文实现，未声称完成全代码审计。本次OpenReview note请求实际返回429，已停止进一步请求；附件字段仍未知，不把旧403或新429当作未开源证明。官方repo/commit/entrypoint仍为null，本轮无GPU操作；入口到位后按上表重新核对实际准入。
+
+## 作者公开议题、旧题名与代码发布线索
+
+本轮来源时间及10份实际GitHub响应SHA见[启动审计JSON](esp-official-launch-readiness-2026-10-16.json)的`release_lead_followup`；响应与第三方正文仅留本机`.tmp/esp-release-leads-20261016T011943Z/`，没有迁入科学源码。
+
+新增确认了[第一作者本人发布的论文议题](https://github.com/Xiaohao-Liu/Awesome-Multi-Token-Prediction/issues/2)：账号`RaghavvGoel`与已核验作者主页对应，2026-04-23发布、2026-04-28更新。正文只给论文题名与arXiv链接；唯一[维护者回复](https://github.com/Xiaohao-Liu/Awesome-Multi-Token-Prediction/issues/2#issuecomment-4331772613)确认已收录，没有代码或附件地址。此次只读核验未留言或联系作者。作者发帖身份是新增直接来源，但议题本身不是ESP实现repo/commit。
+
+| 追加公开检索 | API实际结果 | 限制/解释 |
+| --- | --- | --- |
+| GitHub提交：精确论文号 | 0 | 提交消息检索，不覆盖所有代码正文/分支 |
+| GitHub提交：Embedding-Space Probing | 返回17项，`incomplete_results=true` | 搜索并不完整，宽词命中不自动归属该论文；没有据此确认作者入口 |
+| GitHub提交：早期完整题名Training-Free Multi-Token Prediction via Probing | 0 | 题名/索引限制，不证明无代码 |
+| GitHub议题/PR：论文号、短题名 | 分别15、30项，API均未标记不完整 | 包含同一作者议题、论文清单、第三方agent候选及宽词噪声；并非45个独立官方资产，未逐个审计全部附件 |
+| GitHub仓库：早期完整题名 | 0 | 不覆盖未在仓库元数据中标题的实现 |
+| 已确认两位作者RaghavvGoel/mgagrani的公开gist列表 | 各0 | 仅公开列表，不涉及私有gist或其他作者同名身份 |
+
+[ICML Downloads公开目录](https://icml.cc/Downloads/2026)包含该论文题名；会议poster候选`https://icml.cc/virtual/2026/poster/61857`仍未取得页面资源字段：本轮web搜索报告该路径被robots.txt阻止，未用其他工具绕过。第三方索引只能给候选URL，不能据此认证代码或附件。[旧题名论文](https://openreview.net/pdf?id=Drfx9Gnqrv)在搜索索引可见，不等于本轮成功取得OpenReview附件。近期429后本轮对OpenReview实际请求为0，访问状态沿用原时间，不虚报新请求。
+
+**启动状态不变：官方repo/commit/entrypoint缺失，未启动GPU、没有新τ。** 目标仍为BC30/60的1.63/1.74；本次更新不改变480条prompt、BF16/T0、单mask、argmax门或冻结Study。后续只依据新增的作者/出版代码链接、可访问附件字段或身份可核验的发布事件继续；入口到位立即按上表原字节/协议/实际非抢占准入顺序执行，不再次等待授权。现有自实现与失败HF第三方仍不得改称官方。
+
+### 作者arXiv v2源包核验
+
+论文[固定v2页面](https://arxiv.org/abs/2603.17942v2)明确提供TeX Source链接；从该[官方源包](https://arxiv.org/src/2603.17942v2)实际取得HTTP200/application-gzip，1,895,189字节，SHA256=`734691dea1e1af91e8375a5306d1f0c0548677db44f86e6f6db0bab833811beb`。这是作者上传论文源包的版本/哈希，**不是ESP实现commit**。
+
+只在内存读取tar目录和选定文本：37个条目（34个普通文件、3个目录），内容为TeX/参考文献/样式/论文图片；目录中没有Python/notebook/shell/ZIP实验文件或anc/code/src/scripts目录。16份TeX/JSON逐一记录原字节SHA，未找到GitHub/GitLab/HF代码仓库URL；扫描范围不含参考文献、样式、PDF和图片内部文本，不作更广的无链接断言。未解包到src、未执行任何源包内容。
+
+现有审计JSON在10份GitHub响应之外追加这一份arXiv源包响应及其完整成员清单/16份文本SHA。本次补到了可访问的作者原始资料，但其中未识别到原生实验入口；因此官方实现与GPU启动状态保持缺失/未运行。不能用论文TeX中的算法描述自行重写来代替原码要求。

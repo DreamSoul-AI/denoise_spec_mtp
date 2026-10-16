@@ -91,13 +91,14 @@ def verify_contract(inputs, previous, cfg):
     assert inputs['eos_ids'] == previous['eos_ids'] and inputs['eos_ids']
     assert inputs['model_digest'] == previous['model_digest']
 
-def main():
+def main(baseline_runs=None):
     from revalidation_contract import check_refs
     from rpipe.structure.artifact.provenance import check_frozen as pcheck
     from rpipe.structure.make.expand import load_study_yaml
     from spec_mtp.structure.artifact.sources import check_frozen, manifest
     from spec_mtp.structure.artifact.validation import verify_evidence
     from spec_mtp.structure.artifact.evidence import digest
+    baseline_runs = BASE / 'runs' if baseline_runs is None else Path(baseline_runs)
     check_refs()
     decl = load_study_yaml(STUDY)
     check_frozen(STUDY, decl, manifest())
@@ -132,7 +133,7 @@ def main():
         assert raw['inputs_digest'] == digest(inputs)
         assert inputs['dtype'] == 'torch.bfloat16' and inputs['backend'] == 'eager'
         assert inputs['model_digest'] == baseline[budget]['model_digest']
-        old_inputs_path = BASE / 'runs' / baseline[budget]['run_id'] / 'assets/decode_inputs.json'
+        old_inputs_path = baseline_runs / baseline[budget]['run_id'] / 'assets/decode_inputs.json'
         assert sha(old_inputs_path) == baseline[budget]['inputs_sha256']
         verify_contract(inputs, read(old_inputs_path), cfg)
         settings = inputs['settings']['eval']
@@ -204,4 +205,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--baseline-runs', type=Path, default=BASE / 'runs',
+                        help='Old immutable Run directory, when stored in another checkout')
+    main(parser.parse_args().baseline_runs)

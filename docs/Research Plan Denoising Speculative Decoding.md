@@ -1,10 +1,10 @@
 # SD research plan: fixed-data reproduction and mask-direction controls
 
 English translation of the [Chinese master](<研究计划 Denoising Speculative Decoding.md> Final20:55 scope: close the reproduction phase. Let only the running BC60 finish; no new experiments. The seven-cell queue is stopped and all results/data remain.
-> Nonofficial8B full480: BC10 tau1.399047031; BC30 tau1.563377504 versus paper1.63; BC60 awaits complete acceptance.
+> Nonofficial8B full480: BC10 tau1.399047031; BC30 tau1.563377504 versus paper1.63; BC60 tau1.647301264 versus1.74; all239,137 token checks pass.
 > 4B direction controls: e2−e1 1.507777653, norm-matched random mean1.494473978, zero1.422420206, content1.364829262; magnitude as the sole cause is unproven.
 > All618 CPU regression tests and ten additional explicitBF16/tied tiny-model gate checks pass; the prepared11-cell repeat is made but not executed and is paused.
-> The Chinese master contains the reader-oriented closure draft. One milestone PR to dev only; no next-phase proposal, no main changes or data deletion.
+> The Chinese master contains the validated reader-oriented closure summary. One milestone PR to dev only; no next-phase proposal, no main changes or data deletion.
 
 
 > Nonofficial8B repeat: BC10/BC30 single-mask full480 succeeded natively; BC60 is blocked on RAM admission in the original live worker66500; external RAM availability must recover. The4B capacity probe completed; eight formal norm Runs are made, with one parent queue79868 executing the first template0.5× cell (worker73008); full480 acceptance is pending.
@@ -13,11 +13,12 @@ English translation of the [Chinese master](<研究计划 Denoising Speculative 
 > CPU acceptance rehearsed: two valid cells, BC60 pending;30 readout/documentation tests passed. [CPU checkpoint](../studies/esp_table1_nonofficial_revalidation/docs/cpu_acceptance_checkpoint_v1.json). Original values: [BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json) / [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json). BC60 is pending; this is not full-matrix completion.
 
 <!-- SD_CLOSEOUT_20261016_START -->
-## Reproduction phase summary (closure draft until BC60 finishes)
+<a id="sd-stage-closeout-20261016"></a>
+## Reproduction phase summary
 
 ### What the numbers mean
 
-The aim is to check ESP Table1 acceptance efficiency. A draft forward explores several candidate tokens and a verification forward decides what can be committed. **BC10/30/60 are per-round draft/verification token-computation budgets.** Larger budgets permit more candidate exploration. Qwen3 uses a single mask in each main cell, allowing4/14/29 draft nodes, with a dynamic tree and pruning.
+The aim is to check ESP Table1 acceptance efficiency. Text is divided into tokens, which can be characters, words or word fragments. A draft forward explores several candidate tokens and a verification forward decides what can be committed. **BC10/30/60 are per-round draft/verification token-computation budgets.** Larger budgets permit more candidate exploration. Qwen3 uses a single mask in each main cell, allowing4/14/29 draft nodes, with a dynamic tree and pruning.
 
 **Tau is the average number of new tokens committed per verification round.** The main value divides total committed tokens across480 prompts by total verification calls, excluding the initial prefill token from both totals. Tau1.563 means about1.563 committed tokens per round. No speed measurement was performed; tau is not measured speedup. Prompt-equal and category-equal aggregates are retained separately.
 
@@ -29,9 +30,9 @@ This is explicitly a **non-author-official reproduction**. No verified executabl
 | --- | ---: | ---: | ---: | --- |
 | BC10/one mask | 1.399047031 | No target fixed for this cell | — | full480 succeeded |
 | BC30/one mask | 1.563377504 | 1.63 | -0.066622496 | full480 succeeded; target not reproduced |
-| BC60/one mask | Pending complete result | 1.74 | Pending | Existing Run only; no additional experiment |
+| BC60/one mask | 1.647301264 | 1.74 | -0.092698736 | full480 succeeded; target not reproduced |
 
-Sources: [BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json), Run80ff7a41958d8134, and [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json), Run88d13ec4ecf0023c. BC60 isa8e6bba1dd1d80e2; an earlier BC60 value is not substituted for this repeat. BC30 prompt-equal/category-equal tau values are1.593232237/1.563387272, both below1.63. Changing aggregation does not establish reproduction. Only complete audited BC60 evidence will update this section.
+Sources: [BC10](../studies/esp_table1_nonofficial_revalidation/docs/bc10_checkpoint_v1.json), Run80ff7a41958d8134, and [BC30](../studies/esp_table1_nonofficial_revalidation/docs/bc30_checkpoint_v1.json), Run88d13ec4ecf0023c. The completed BC60 is a8e6bba1dd1d80e2. [Formal repeat evidence](../studies/esp_table1_nonofficial_revalidation/docs/repeat_evidence_v1.json) binds all three cells, per-prompt first AR divergences and hashes. BC30 prompt-equal/category-equal tau values are1.593232237/1.563387272, both below1.63. Changing aggregation does not establish reproduction. BC60 prompt/category tau values are1.669498033/1.649693144, both below1.74. Each of the three cells ties its old implementation on accepted/calls/tau for all480 prompts, with480 equal output and AR hashes.
 
 ### 4B: the benefit is not unique to e2−e1
 
@@ -44,7 +45,7 @@ The completed fixed480 Qwen3-4B BF16/T0 BC30 direction controls give:
 | Zero bias/input zero order | 1.422420206 |
 | Content initialization | 1.364829262 |
 
-The original direction is the difference between the first two input-token embeddings. Random controls replace direction at matched initial norm. Sources are [formal direction evidence](../studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json) and the [per-Run and paired report](research/4b-full-direction-controls-2026-10-16.md). All485,860 committed-token audits across six cells pass. Random seeds0/1/2 give1.495188134,1.464349086,1.523884714: all exceed zero bias, and one exceeds the original direction.
+Bias changes the draft placeholder representation while the input text stays fixed. Norm means vector magnitude; direction means where it points. The original direction is the difference between the first two input-token embeddings. Random controls replace direction at matched initial norm. Sources are [formal direction evidence](../studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json) and the [per-Run and paired report](research/4b-full-direction-controls-2026-10-16.md). All485,860 committed-token audits across six cells pass. Random seeds0/1/2 give1.495188134,1.464349086,1.523884714: all exceed zero bias, and one exceeds the original direction.
 
 The evidence supports that a norm-matched random bias can also help; e2−e1 is not uniquely responsible. It does not prove that direction is irrelevant or that magnitude is the sole cause. Random seeds still vary, and content changes initialization and subsequent velocity updating, with lower tau. The magnitude sweep is incomplete: only template0.5x finished480, tau1.471389646, with all80,940 token audits passing. Its collection export failure was recovered without execute rerun or raw-SHA changes; see [recovery evidence](../studies/qwen3_4b_bf16_bias_norm_continuation/docs/first_cell_recovery_v1.json). The seven remaining cells are stopped under the20:55 instruction, with all existing material retained.
 
@@ -52,20 +53,22 @@ The original completed five-method plus AR comparison has BC30 input-first1.5119
 
 ### Verification, gaps and unresolved questions
 
-The gate requires **every committed token to equal the argmax of its corresponding validation-forward logits**, including first-token coverage, ownership and hash/commit chains. BC10 passes all79,757 token checks and BC30 all79,762; complete BC60 acceptance is pending. Independent AR agreement is diagnostic:188/480 and175/480 respectively. BF16 tree and single-sequence AR forwards have different shapes and can diverge. This is disclosed and does not replace the mathematical gate. Output lengths can differ across methods, so paired counts are not equal-length speed comparisons.
+The gate requires **every committed token to equal the argmax of its corresponding validation-forward logits**, including first-token coverage, ownership and hash/commit chains. BC10 passes79,757 checks, BC30 79,762 and BC60 79,618: all239,137 pass, as do all three native Runs and Study process. AR is the ordinary token-by-token generation baseline. Agreement with independent AR is diagnostic:188/480,175/480 and185/480 for BC10/30/60 respectively. BF16 tree and single-sequence AR forwards have different shapes and can diverge. This is disclosed and does not replace the mathematical gate. Output lengths can differ across methods, so paired counts are not equal-length speed comparisons.
 
 Fixed inputs, model snapshots, native source/plan freezing, Run configurations, raw audits and aggregation have been checked. All618 CPU regression tests pass, plus ten explicitBF16/actually-tied tiny-model checks for all five methods at both budgets, complete commit coverage and corrupted-token rejection. These are software checks, not substitutes for real4B/8B evidence; see [CPU readiness evidence](../studies/qwen3_4b_bf16_paired_revalidation/docs/cpu_readiness_v1.json).
 
-Passing correctness does not reproduce the paper's target tau. BC30 remains0.066622496 below target; BC60 awaits completion. Possible, unproven explanations are incomplete author-side input/template/stopping contracts, differences in nonofficial tree/pruning details, and unknown paper counting/weighting details. CPU counting reconciliation and three aggregates have not removed the gap; see [contract reconciliation](research/esp-table1-cpu-contract-reconciliation-2026-10-16.md) and [gap register](research/esp-table1-protocol-gaps-2026-10-16.md).
+Passing correctness does not reproduce the paper's target tau. BC30 remains0.066622496 below target and BC60 0.092698736 below; none of the three reported aggregate conventions reaches its corresponding target. Possible, unproven explanations are author-side input/template/stopping contracts that have not been fully verified in the available sources, differences in nonofficial tree/pruning details, and unknown paper counting/weighting details. CPU counting reconciliation and three aggregates have not removed the gap; see [contract reconciliation](research/esp-table1-cpu-contract-reconciliation-2026-10-16.md) and [gap register](research/esp-table1-protocol-gaps-2026-10-16.md).
 
 Unresolved questions are the exact contract responsible for the paper gap; separate magnitude/direction contributions; why output-zero/first underperform input-first and the output velocity adds little; and effects of differing output lengths/trajectories on comparisons. **No next-phase proposal is made.**
 
 ### Closure status
 
-Only the existing BC60 continues. Queue64880 and ledger50944 have exited; two temporary launchers are preserved by SHA and disabled, with no source/results/weights/cache deletion. After BC60 acceptance, finish this section, clean merged dev branches and deliver one milestone PR. Enmao review determines any later phase; older experiment queues in this plan are no longer execution instructions.
+Only the existing BC60 was allowed to continue and has now naturally completed. Queue64880 and ledger50944 have exited; two temporary launchers are preserved by SHA and disabled, with no source/results/weights/cache deletion. Final source/mathematical acceptance is complete. The merged experiment/sd-nonofficial-repeat-norm local/remote branch was deleted;17 unused legacy preparation files were SHA-archived and159 generated bytecode files cleaned. All experimental results and model caches remain; the old data checkout remains detached at its unchanged commit. Deliver one milestone PR to dev; the current unmerged branch stays until merge. Enmao review determines any later phase; older experiment queues in this plan are no longer execution instructions.
 <!-- SD_CLOSEOUT_20261016_END -->
 
 ## I. Current scope, status and execution priority
+
+Older scheduling below is historical. The20:55 closure summary governs; all later experiment queues are paused.
 
 Enmao's final instructions of2026-10-16 12:44/12:53 govern: stop searching for an official ESP entrypoint and label the existing stack **non-author-official reproduction**. Study the fixed480 SpecBench Table1τ gap and whether input-bias magnitude explains acceptance gains more strongly than the particular direction. No new Kalman/method work, prompt changes or timing; BF16/T0 only.
 

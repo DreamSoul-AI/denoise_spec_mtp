@@ -1,10 +1,10 @@
 # SD RAM准入与4B空档执行
 
-> 20:55最新：复现阶段收尾，只让既有BC60完成；七格等待队列64880及入账器50944已退出，不启动新实验。
+> 最终状态：BC60全480和原生Study验收已完成；七格等待队列64880及入账器50944已退出，不启动新实验。
 > 首格template/0.5全480保留，τ1.471389646、argmax80,940/80,940；原始SHA/失败恢复记录保留。
 > 完整618项CPU回归及另十项显式BF16/tied微型模型检查全过；618+10分别执行，未声称一次628全跑。
 > 后续11格只make、未execute；18个新Run的冻结/配置绑定已核验，当前均暂停。
-> 中文通俗总结在主研究计划“复现阶段总结”section；BC60完成后补齐，一次里程碑PR合dev，无下一阶段方案。
+> 中文通俗总结已在主研究计划“复现阶段总结”section定稿；一次里程碑PR合dev，无下一阶段方案。
 
 2026-10-16 19:15 Enmao追加授权：核验8B实测峰值加2GB门，安全回收本会话等待进程工作集；仍不足则在GPU空闲单队列执行原4B范数八格。不改prompt、BF16 only、不测速，不终止任何活实验或其他会话进程。
 
@@ -57,3 +57,7 @@ V4 operational update: documentation-only helper SHA change; superseded unexecut
 七格等待队列64880在未载模、无worker子进程时退出；入账器50944随后退出，BC60 worker66500未干预。`.tmp/norm-continuation-20261016/queue.py`和`.tmp/sd-memory-20261016/run_norm_queue.py`保留字节并改后缀为`.py.disabled`，SHA与映射见`.tmp/sd-closeout-20261016/paused_launchers.json`。未删除数据/结果。Git跟踪文件检查未发现__pycache__/pyc/.tmp/log/bak/orig残留，不为形式清理删除冻结来源或研究证据。
 
 自动审批拒绝记录：`mcp__codex_app__automation_update(mode=create, kind=heartbeat, name=SD BC60复现收尾, rrule=FREQ=MINUTELY;INTERVAL=10, status=ACTIVE)`被拒，原因为“未获用户明确授权的持久性每10分钟自动化任务，未来可能改文档、清理分支并创建/合并PR，副作用范围和持续时间超出当前一次性收尾请求”。未创建持久任务、未换工具绕过；本次一次性收尾继续，仍等待原BC60完成。记录不等于用户需要再次审批既有正常PR/dev授权。
+
+代码清理已执行：仅主仓src/spec_mtp、tools、tests/spec_mtp内159个未跟踪Python字节码缓存（2,130,425 bytes），逐路径界限与Git未跟踪状态核验后删除；记录在.tmp/sd-closeout-20261016/bytecode_cleanup.json。未触及活动8B执行树、源码、Run、模型/数据缓存、测试XML或结果。未发现Git跟踪的临时产物；可复验的冻结研究源不按“当前暂停”误删为死代码。
+
+最终BC60原生验收与CPU对账通过：τ1.6473012635040902，prompt平均1.6694980332343348，类别平均1.6496931436589846；argmax79,618/79,618，AR185/480仅诊断。三格合计239,137全过，与旧结果各480条全部平/输出摘要一致。正式文件为studies/esp_table1_nonofficial_revalidation/docs/repeat_evidence_v1.json；中文通俗总结已填入主计划，未新增下一阶段方案。活动分支本地/远端清理完毕，旧工作树数据原地保留。

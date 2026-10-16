@@ -139,3 +139,9 @@ PR49两项CI通过，已合dev（16d04f87ba52f8f20a018aecfb14ed88b5785993），�
 ### 19:46 CPU接续期间复核
 
 重新fetch --prune并核对已合列表、两工作树及open PR（0）：除受保护main/dev，唯一已合topic仍是活动8B的experiment/sd-nonofficial-repeat-norm，保留原worker/工作树例外；analysis/sd-pending-results未合且承载当前范数八格，保留。无新增可删分支，累计仍34本地/8远端。本次未删除分支、数据或结果，不为此单开PR。
+
+### 20:55收尾指示后的已合活动分支清理
+
+BC60全480及三个Run/Study process全部成功，worker66500、原父队列50576、监视器50640均自然退出后，已解除活动例外。旧工作树保持相同HEAD `4bb28c79830b8f1db7cddf30cf80d6ddd5bd6e98`切换为detached，不删除工作树内数据/Run/shared缓存。17份早期未跟踪、未make的范数准备源码/测试均与既有备份逐SHA一致，原文件移至主仓`.tmp/sd-closeout-20261016/retired_legacy_sources`，映射在legacy_source_archive.json，数据未删除。主仓另清理159个未跟踪字节码缓存，记录在bytecode_cleanup.json。
+
+已再次fetch，确认`experiment/sd-nonofficial-repeat-norm`本地/远端tip均为4bb28c7、是origin/dev祖先，再普通push --delete及git branch -d成功。累计**35个本地、9个远端**。当前`analysis/sd-pending-results`未合，保留到本次里程碑PR合入；PR合后自身清理另在最终交付/PR记录列出，不提前记作已删。main/dev不删；未合分支不删；没有删除实验数据、结果或权重。open PR/issue核对均0。

@@ -1,5 +1,8 @@
 # 固定480的4B五方法加AR独立复验准备
 
+> 20:55 Enmao最终范围：复现收尾，仅既有8B BC60继续。本文准备的待执行格暂停，不启动；数据/结果与冻结来源保留，旧排班说明不再执行。
+
+
 原Study已11/11验收；本Study按19:46新指示准备独立复验，当前已make 11格、尚未execute，不修补或重签旧结果。唯一计划：[中文](<../../docs/研究计划 Denoising Speculative Decoding.md#paired-followup-20261016>) / [English](<../../docs/Research Plan Denoising Speculative Decoding.md#paired-followup-20261016>)；不可变计划commit与原始来源SHA在docs/source_refs.json。
 
 配置逐字段复用原Study（仅experiment/version身份变化）：AR一次，BC30/60各ESP frozen mean、输入零阶、输入一阶、输出零阶、输出一阶，共11格。双mask、动态树剪枝、BF16/eager/T0/256/EOS、同480 token IDs和seed不变；无新方法，不改prompt，不测速。原方法β/范数/EMA定义完整沿用，不把空间比较误称同一EMA配方。

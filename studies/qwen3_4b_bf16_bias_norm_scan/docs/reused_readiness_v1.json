@@ -49,11 +49,11 @@
   "shared_AR_reference_tokens": 81880,
   "raw_argmax_checked_tokens": 405083,
   "source_refs_sha256": "2e33990f06fa2d933b9eda260d9fb861459f32cfae3c0c8402bb1f30a4350a34",
-  "analyzer_sha256": "52e187d7e0620155d8824c4c75234f852c32f24aa10216d05952a1662d871aa8",
+  "analyzer_sha256": "3c49aca1af990037a98eb0053c00b4f6b0ada6aa7510b3851972699a696ea347",
   "raw_math_checker_sha256": "bade4aaea923d3495ca970d02fb1c9ed188bf50061a9ed5db932a7dc26e147a2",
   "formal_sources": {
-    "studies\\qwen3_4b_bf16_five_methods\\docs\\paired_evidence_v1.json": "8e85ac6ea9984047abf0ffd5d6653b28b6aadd74aa876139fa10465dc5bbf274",
-    "studies\\qwen3_4b_bf16_directions\\docs\\direction_evidence_v1.json": "e157ab5ed9fa0721681da3fd68b842ec6d9d1aa1dcb5923499f66540eca36bab"
+    "studies/qwen3_4b_bf16_five_methods/docs/paired_evidence_v1.json": "8e85ac6ea9984047abf0ffd5d6653b28b6aadd74aa876139fa10465dc5bbf274",
+    "studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json": "e157ab5ed9fa0721681da3fd68b842ec6d9d1aa1dcb5923499f66540eca36bab"
   },
   "cells": {
     "zero/0": {

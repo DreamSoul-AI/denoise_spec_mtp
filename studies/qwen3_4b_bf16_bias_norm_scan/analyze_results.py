@@ -163,7 +163,7 @@ def verify_reused(data_root, output_dir=None):
         'raw_argmax_checked_tokens': sum(c['raw_argmax_checked_tokens'] for c in cells.values()),
         'source_refs_sha256': sha(STUDY / 'docs/source_refs.json'), 'analyzer_sha256': sha(Path(__file__)),
         'raw_math_checker_sha256': sha(Path(validation.__file__)),
-        'formal_sources': {str(p.relative_to(ROOT)): sha(p) for p in
+        'formal_sources': {p.relative_to(ROOT).as_posix(): sha(p) for p in
             (BASE / 'docs/paired_evidence_v1.json', ROOT / 'studies/qwen3_4b_bf16_directions/docs/direction_evidence_v1.json')},
         'cells': {name: dict({k: cell[k] for k in ('run_id', 'totals', 'raw_argmax_checked_tokens', 'raw_files_rechecked')},
                             study_path=cell.get('study_path', 'studies/qwen3_4b_bf16_five_methods'),

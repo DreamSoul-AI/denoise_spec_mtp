@@ -183,6 +183,7 @@ def test_published_reuse_checkpoint_matches_existing_endpoints(monkeypatch):
     assert not proof['complete'] and proof['reused_only'] and not proof['new_cells_inspected']
     assert len(proof['cells']) == 5 and len(proof['expected_new_cases']) == 8
     for path, expected in proof['formal_sources'].items():
+        assert '\\' not in path and path.startswith('studies/')
         assert m.sha(ROOT / path) == expected
     for name, cell in proof['cells'].items():
         source = original['cells'][name.split('/')[0]]

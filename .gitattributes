@@ -279,3 +279,6 @@
 
 # The norm source guard pins the active Windows resource-helper bytes.
 /studies/esp_table1_nonofficial_revalidation/resource_admission.py -text whitespace=cr-at-eol
+
+# Preserve the frozen480 input file bytes across Windows and Linux.
+/datasets/spec_bench/question.jsonl -text whitespace=cr-at-eol

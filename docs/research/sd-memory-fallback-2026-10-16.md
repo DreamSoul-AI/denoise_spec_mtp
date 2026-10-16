@@ -3,7 +3,7 @@
 > 4B BF16容量探针完成，256/256数学门通过，实测峰值8,808,693,760 bytes；正式门为10,956,177,408 bytes。
 > 范数v2八格已make，单一父队列79868已接首格6ee3f749ee20c450；worker73008独占GPU，完整480尚未完成，不填全量τ。
 > BC60原worker66500及RAM门保留，探针后已恢复；格间满足原8B准入时优先让回。
-> 本轮33项相关回归和Ruff通过；按主题本地提交，完整里程碑再PR。
+> 最新35项相关回归、完整CPU套件553项及Ruff/mypy通过；按主题本地提交，完整里程碑再PR。
 
 2026-10-16 19:15 Enmao追加授权：核验8B实测峰值加2GB门，安全回收本会话等待进程工作集；仍不足则在GPU空闲单队列执行原4B范数八格。不改prompt、BF16 only、不测速，不终止任何活实验或其他会话进程。
 
@@ -34,3 +34,7 @@ GPU前后均检查nvidia-smi无其他实验Python；若有dayan/量化活任务�
 量化自然释放后，19:33父队列79868接首格6ee3f749ee20c450（template0.5×），worker73008实际载模执行；同一时刻nvidia-smi只有该Python计算进程。BC60在此完整格期间仅可逆暂停，格后finally恢复。一次只读进度快照为28/480、5245 token检查数与生成数一致；这不是全量验收或τ。
 
 CPU核对真实make索引时发现读出合同误把完整factors与局部axis直接相等比较，合法索引会被误拒绝。现使用RPipe已有deep_merge合并公共experiment_config与轴配置后严格比较，保留eval/version/spec全字段和八格次序约束；新增wrong_eval与partial_factor拒绝回归。未make测试改为隔离临时Study，避免依赖本机是否已make。35项相关回归、真实make索引预检与Ruff通过。修改仅在未被活动Run引用的分析脚本和测试，不改冻结科学/资源执行源，不重签或重跑首格。先前完整测试进程在修复前已收集旧用例，故保留7项失败记录；稳定源码的完整套件重新运行中，不记作已通过。
+
+## 稳定源码最终CPU验收
+
+修复后稳定源码重新完整执行`python -m pytest tests/spec_mtp -q`，553项全部通过；`ruff check src tests studies tools`通过，`mypy`56个源文件无问题。仅保留第三方原字节代码已知SyntaxWarning。此前7项旧收集用例失败不算通过，以上是独立重跑结果；35项定向检查和真实原生make索引检查也均通过。当前源分支analysis/sd-pending-results保持本地合批，不为本轮文档/准备另开PR。

@@ -215,6 +215,15 @@ The latest authorization retains the original8B measured-peak-plus2GiB gate and 
 
 The4B capacity probe completed: unchanged longest inputq295/1500 tokens, all256 capacity-token audits passed. Sampled process-tree peak8808693760 bytes gives a10956177408-byte formal4B gate. BC60 was resumed in finally; this is not a formal magnitude-scan tau result.
 
+<a id="paired-followup-20261016"></a>
+### 19:46 preparation for an independent4B five-method-plus-AR repeat
+
+The original E2 matrix already completed11/11 cells. Do not invent missing cells or re-sign historical Runs. The latest19:46 instruction authorizes preparation of `qwen3_4b_bf16_paired_revalidation`, with new version/Run identities, after the current eight magnitude cells. Retain the original480 input/token-ID records, ModelScope Qwen3-4B snapshot, BF16/eager/T0/256/EOS and seed123+i. Preserve E2 exactly: ESP frozen mean (lambda0,update=false), input-zero updating mean (lambda.1), input-first mean+gamma (beta.9999), output-zero final-hidden norm mapping, and output-first native hidden EMA velocity (beta.9,beta-prime.99). BothBC30/60 use two masks and dynamic pruning; five methods per budget plus one shared independent AR give11 cells. This frozen-mean ESP differs from8B Table1's lambda.1 updating mean.
+
+CPU queue: reuse the untimed adapter, native token validator and load_cell/summarize/compare_rows. Preflight merged configurations, all11 ordered cases and immutable input/weight/method hashes. Prepare20 method pairs with accepted/calls/tau WTL, lengths and AR first divergence. Every committed Spec token must match its own verifier-forward argmax; independent T0 AR is diagnostic and differences do not fail Spec acceptance. Missing, failed or incomplete raw evidence stays pending, without formal tau. Run CPU tests and preparation/make only; do not start another GPU queue early.
+
+GPU queue: admit the originalBC60 first whenever its host-RAM gate becomes available; otherwise finish each current magnitude cell serially. Only after all eight cells succeed natively and pass per-cell accounting may the11-cell repeat take the GPU. Reuse measured4B BC30 maximum-input capacity plus2GiB host reserve and actual GPU nonpreemption. BC60 shapes have no separate peak guarantee: sample every Run, retain the per-prompt2GiB reserve, wait or preserve failures rather than lowering the gate or terminating work. The11 new cells are explicitly an independent repeat, not repairs to old results; prompts/methods remain fixed. Keep local thematic commits and open a milestone PR into dev. A read-only per-cell magnitude ledger checks native/input/source/token evidence and three tau aggregates; no complete curve before all eight.
+
 ## IX. Execution records and conclusions
 
 | Record | Actual evidence | Outcome/boundary |

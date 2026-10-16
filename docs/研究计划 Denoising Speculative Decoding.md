@@ -215,6 +215,15 @@ B：新`qwen3_4b_bf16_bias_norm_scan`，ModelScope原Qwen3-4B内容，BF16/eager
 
 4B容量标定已实际完成：固定最长输入q295/1500 token、256容量token数学门全过；进程树峰值8808693760 bytes，正式4B门10956177408 bytes。原BC60已finally恢复；这不是正式范数τ结果。
 
+<a id="paired-followup-20261016"></a>
+### 19:46后续4B五方法加AR独立复验准备
+
+E2原11/11格已经完成，不追加“缺失格”或重签历史Run。本次按19:46最新指示准备独立复验Study`qwen3_4b_bf16_paired_revalidation`，与当前范数八格区分版本与Run。固定原480条输入/token IDs、ModelScope Qwen3-4B快照、BF16/eager/T0/256/EOS/seed123+i。五方法严格沿用E2：ESP frozen mean（λ0、update=false）、输入零阶（λ0.1 updating mean）、输入一阶（mean+gamma，原β=.9999）、输出零阶（末层hidden按原均值范数映射）、输出一阶（原hidden EMA速度β=.9/β′=.99）；BC30/60均双mask，动态树/剪枝，每预算五格加一次共同独立AR，共11格。这里ESP frozen mean与8B Table1的λ0.1 updating mean不同，不混称。
+
+CPU队列：复用旧untimed adapter、native逐token验证器、load_cell/summarize/compare_rows；预检原生合并配置、11格完整顺序、冻结输入/权重/方法SHA，输出20组方法配对accepted/calls/τ胜平负、输出长度及AR首分叉。数学门为每个Spec提交token等于本次验证forward logits argmax；AR为独立T0参考，其逐token差异只诊断。缺原始证据、失败或不全格只记pending，不填正式τ；不因AR失配拒绝有效Spec格。不载模的测试先通过，Study仅CPU准备/make，不提前开新GPU队列。
+
+GPU队列：原BC60有RAM准入时优先；否则现有范数八格按完整格串行。八格全部原生成功并逐格入账后，才能接这11格独立复验。沿用4B实测BC30最大输入容量+2GiB host门与实际GPU非抢占；BC60的新形状尚无独立峰值保证，逐Run采样且每prompt保留2GiB，容量不足则等待/保留失败、不降低门、不杀进程。旧结果不重跑来凑格；新11格是本次明确排队的独立验证，不改变主prompt或方法。收尾同主题本地提交、完整结果里程碑再PR合dev。范数每个成功格另有只读入账检查点，核验native status、输入/来源、token门及τ三聚合；全八格前不生成完整曲线。
+
 ## 九、执行记录与结论
 
 | 记录 | 实际证据 | 结果与边界 |

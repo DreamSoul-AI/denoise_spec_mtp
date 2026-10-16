@@ -1,5 +1,7 @@
 # Research notes
 
+最新来源追踪：[esp-organization-readme-followup-2026-10-16](esp-organization-readme-followup-2026-10-16.md)，215个官方组织仓库元数据/10个候选固定README未形成可核验ESP入口；OpenReview最新429，停止进一步请求。当前官方路径优先及实际启动前置条件见[启动清单](esp-official-launch-readiness-2026-10-16.md)。
+
 [最新作者官方路径与PMLR出版版重查](esp-official-recheck-2026-10-16.md)：仍无已核验可执行入口，目标未改；任务标签10/8与本地13的纳入/权重缺口明确列出。本轮仅CPU，不开GPU重复矩阵。
 
 当前优先：[Table1差距分析与无GPU计划](esp-table1-gap-analysis-2026-10-16.md)、[可复算CPU账本](esp-table1-gap-analysis-2026-10-16.json)。聚焦8B主复现缺口、统计/合同边界与已有效工作的来源；4B方向作为背景，bias/random/Kalman后置，不开新GPU组。

@@ -31,3 +31,7 @@
 ## 共同作者与历史版本追加核查
 
 [共同作者/历史跟进](esp-coauthor-history-followup-2026-10-16.md)扩展检查19份响应：第一作者index最近10个版本的ESP条目均只链接论文；Mukul Gagrani主页ESP条目只链接PDF，网站repo最新commit不当作实现commit；PMLR条目历史extras仍为空。标题README检索未形成作者互指入口。本轮未重复相同OpenReview403请求，官方实现仍未核验，未启动GPU；此前附件访问限制保留原时间。
+
+## 官方组织README与最新访问状态
+
+[官方组织追加核查](esp-organization-readme-followup-2026-10-16.md)覆盖两个组织215个公开仓库元数据和10个固定commit的候选README，未核验到ESP作者实现入口。一般speculative decoding条目不等于该论文实现，未声称完成全代码审计。本次OpenReview note请求实际返回429，已停止进一步请求；附件字段仍未知，不把旧403或新429当作未开源证明。官方repo/commit/entrypoint仍为null，本轮无GPU操作；入口到位后按上表重新核对实际准入。
